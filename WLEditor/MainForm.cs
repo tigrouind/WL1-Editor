@@ -18,9 +18,11 @@ namespace WLEditor
 		public Bitmap tiles16x16 = new Bitmap(16 * 8, 16 * 16);		
 		public int currentSector = -1;
 		public int currentTile = -1;		
+		public int currentObject = -1;
 		public int currentCourseId = -1;
 		public string romFilePath;		
 		public bool hasChanges;
+		public string[] ObjectIdToString = new [] { string.Empty, "1", "2", "3", "4", "5", "6", "G", "J", "D", "K", "H", "S", "C", "CC", "B" };
 				
 		public MainForm()
 		{
@@ -40,6 +42,7 @@ namespace WLEditor
 				Level.DumpLevel(rom, currentCourseId, currentSector, tiles8x8, tiles16x16, reloadAll, aToolStripMenuItem.Checked, bToolStripMenuItem.Checked);
 				
 				pictureBox1.Refresh();	
+				pictureBox2.Refresh();
 				pictureBox3.Refresh();
 			}			
 		}
@@ -191,7 +194,7 @@ namespace WLEditor
 									if(data != 0)
 									{
 										e.Graphics.FillRectangle(Brushes.Purple, destRect);
-										e.Graphics.DrawString(data.ToString("X"), font, Brushes.White, i * 16 + 8, j * 16 + 8, format);
+										e.Graphics.DrawString(ObjectIdToString[data], font, Brushes.White, i * 16 + 8, j * 16 + 8, format);
 									}
 								}
 							}
@@ -239,7 +242,7 @@ namespace WLEditor
 				if(viewSectors)
 				{
 					//wario position
-					Rectangle destRect = new Rectangle(Level.warioPosition % 8192 - 8, Level.warioPosition / 8192 - 8, 16, 16);
+					Rectangle destRect = new Rectangle(Level.warioPosition % 8192 - 8, Level.warioPosition / 8192 - 16, 16, 16);
 					if(destRect.IntersectsWith(e.ClipRectangle))
 					{	
 						e.Graphics.FillRectangle(Brushes.Green, destRect);
@@ -261,7 +264,7 @@ namespace WLEditor
 							e.Graphics.FillRectangle(blue, destRect);						
 						}						
 					}
-				}																					
+				}	
 			}		
 		}
 						
@@ -282,6 +285,30 @@ namespace WLEditor
 				}
 			}
 		}
+		
+		
+		void PictureBox2Paint(object sender, PaintEventArgs e)
+		{
+			if(Level.levelData != null && objectsToolStripMenuItem.Checked)
+			{
+				StringFormat format = new StringFormat();
+				format.LineAlignment = StringAlignment.Center;
+				format.Alignment = StringAlignment.Center;		
+				
+
+				using(Font font = new Font("Arial", 8))
+				{
+					int tileIndex = 0;				
+					for(int j = 0 ; j < 16 ; j++)
+					{
+						e.Graphics.FillRectangle(j == currentObject ? Brushes.Brown : Brushes.Purple, (j % 4) * 16, (j / 4) * 16, 16, 16);
+						e.Graphics.DrawString(ObjectIdToString[j], font, Brushes.White, (j % 4) * 16 + 8, (j / 4) * 16 + 8, format);
+						tileIndex++;
+					}							
+				}
+				
+			}
+		}	
 		
 		void NoneToolStripMenuItemClick(object sender, EventArgs e)
 		{			
@@ -323,9 +350,20 @@ namespace WLEditor
 			}
 		}
 		
-		void SaveChanges()
+		bool SaveChanges()
 		{
-			Level.SaveChanges(rom, currentCourseId, romFilePath);
+			if(rom.IsLoaded)
+			{
+				string message;
+				if(!Level.SaveChanges(rom, currentCourseId, romFilePath, out message))
+				{
+					MessageBox.Show(message, Text, MessageBoxButtons.OK, MessageBoxIcon.Error);					
+					return false;
+				}
+			}
+			
+			hasChanges = false;
+			return true;
 		}
 		
 		bool AskForSavingChanges()
@@ -336,9 +374,7 @@ namespace WLEditor
 				switch(result)
 				{
 					case DialogResult.Yes:
-						SaveChanges();
-						hasChanges = false;
-						return true;
+						return SaveChanges();
 						
 					case DialogResult.No:
 						hasChanges = false;
@@ -365,17 +401,44 @@ namespace WLEditor
 		void PictureBox3MouseDown(object sender, MouseEventArgs e)
 		{			
 			currentTile = e.Location.X / 16 + (e.Location.Y / 16) * 8;						
-			pictureBox3.Refresh();			
+			pictureBox3.Refresh();		
+
+			if(currentObject != -1)
+			{
+				currentObject = -1;						
+				pictureBox2.Refresh();
+			}			
+		}
+		
+		void PictureBox2MouseDown(object sender, MouseEventArgs e)
+		{
+			currentObject = e.Location.X / 16 + (e.Location.Y / 16) * 4;						
+			pictureBox2.Refresh();
+			
+			if(currentTile != -1)
+			{
+				currentTile = -1;
+				pictureBox3.Refresh();
+			}					
 		}
 		
 		void PictureBox1MouseDown(object sender, MouseEventArgs e)
 		{
-			if(e.Button == MouseButtons.Left && currentTile != -1)
+			if(e.Button == MouseButtons.Left)
 			{	
 				int tileIndex = e.Location.X / 16 + (e.Location.Y / 16) * 256;
 									
-				Level.levelData[tileIndex + 0x1000] = (byte)currentTile;
-				hasChanges = true;
+				if(currentTile != -1)
+				{
+					Level.levelData[tileIndex + 0x1000] = (byte)currentTile;
+					hasChanges = true;
+				}
+				
+				if(currentObject != -1)
+				{																			
+					Level.objectsData[tileIndex] = (byte)currentObject;						
+					hasChanges = true;
+				}
 
 				Region r = new Region(new Rectangle((tileIndex % 256) * 16, (tileIndex / 256) * 16, 16, 16));
 				pictureBox1.Invalidate(r);							
@@ -393,6 +456,6 @@ namespace WLEditor
 		void MainFormFormClosing(object sender, FormClosingEventArgs e)
 		{			
 			e.Cancel = !AskForSavingChanges();
-		}	
+		}			
 	}
 }

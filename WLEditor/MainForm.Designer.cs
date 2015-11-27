@@ -54,10 +54,12 @@ namespace WLEditor
 			this.noneToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.aToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.bToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.pictureBox2 = new System.Windows.Forms.PictureBox();
 			this.panel1.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).BeginInit();
 			this.menuStrip1.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// panel1
@@ -233,11 +235,22 @@ namespace WLEditor
 			this.bToolStripMenuItem.Text = "B";
 			this.bToolStripMenuItem.Click += new System.EventHandler(this.BToolStripMenuItemClick);
 			// 
+			// pictureBox2
+			// 
+			this.pictureBox2.Location = new System.Drawing.Point(10, 316);
+			this.pictureBox2.Name = "pictureBox2";
+			this.pictureBox2.Size = new System.Drawing.Size(64, 64);
+			this.pictureBox2.TabIndex = 6;
+			this.pictureBox2.TabStop = false;
+			this.pictureBox2.Paint += new System.Windows.Forms.PaintEventHandler(this.PictureBox2Paint);
+			this.pictureBox2.MouseDown += new System.Windows.Forms.MouseEventHandler(this.PictureBox2MouseDown);
+			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(908, 471);
+			this.Controls.Add(this.pictureBox2);
 			this.Controls.Add(this.comboBox1);
 			this.Controls.Add(this.pictureBox3);
 			this.Controls.Add(this.panel1);
@@ -251,9 +264,11 @@ namespace WLEditor
 			((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).EndInit();
 			this.menuStrip1.ResumeLayout(false);
 			this.menuStrip1.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 		}
+		private System.Windows.Forms.PictureBox pictureBox2;
 		private System.Windows.Forms.ToolStripMenuItem saveToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem bToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem aToolStripMenuItem;
@@ -276,5 +291,6 @@ namespace WLEditor
 
 			
 	
+		
 	}
 }

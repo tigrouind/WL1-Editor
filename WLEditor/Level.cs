@@ -177,6 +177,34 @@ namespace WLEditor
 			}
 		}
 		
+		public static IEnumerable<byte> RLECompressObjectshelper(byte[] levelData) 
+		{			
+			for(int i = 0 ; i < levelData.Length ; i+=2)
+			{
+				yield return (byte)((levelData[i] << 4) | levelData[i+1]);
+			}
+		}
+		
+		public static IEnumerable<byte> RLECompressObjects(byte[] levelData)
+		{
+			byte[] halfData = RLECompressObjectshelper(levelData).ToArray();
+			
+			int current = 0;
+			while(current < halfData.Length)
+			{
+				byte data = halfData[current++];
+				yield return data;
+				
+				byte count = 0;
+				while(current < halfData.Length && halfData[current] == 0 && count < 255)
+				{					
+					current++;
+					count++;
+				}
+				yield return count;
+			}
+		}
+		
 		public static void Dump16x16Tiles(Rom rom, int tileindexaddress, Bitmap gfx8, Graphics g, bool switchA, bool switchB)
 		{
 			for(int n = 0 ; n < 16 ; n++)
@@ -274,11 +302,24 @@ namespace WLEditor
 	    	return tileData;
 		}
 		
-		public static void SaveChanges(Rom rom, int course, string filePath)
+		public static bool SaveChanges(Rom rom, int course, string filePath, out string errorMessage)
 		{				
 			//rom expansion give new banks for level data
 			rom.ExpandTo1MB();
 
+			SaveBlocksToRom(rom, course);
+			if(!SaveObjectsToRom(rom, course, out errorMessage))
+			{
+				return false;
+			}
+			
+			rom.FixCRC();
+			rom.Save(filePath);
+			return true;
+		}
+				
+		public static void SaveBlocksToRom(Rom rom, int course)
+		{
 			//grab all levels data at once
 			byte[][] allTiles = new byte[0x2B][];
 			
@@ -325,12 +366,41 @@ namespace WLEditor
 				
 				subbank++;				
 				writePosition += tileData.Length;
-			}					
-			
-			rom.FixCRC();
-			rom.Save(filePath);
+			}	
 		}
 		
-		
+		public static bool SaveObjectsToRom(Rom rom, int course, out string errorMessage)
+		{
+			byte[][] enemyData = new byte[0x2B][];
+			
+			//save objects
+			rom.SetBank(0x7);
+			for(int i = 0 ; i < 0x2B ; i++)
+			{
+				int objectsPos = rom.ReadWord(0x4199 + i * 2);				
+				enemyData[i] = RLEDecompressObjects(rom, objectsPos).Take(0x2000).ToArray();
+			}			
+			enemyData[course]= objectsData;
+			
+			int objectSize = enemyData.Sum(x => RLECompressObjects(x).Count());			
+			if(objectSize > 4198)
+			{
+				errorMessage = string.Format("Object data is too big to fit in ROM.\r\nPlease remove at least {0} level object(s).", objectSize - 4198);
+				return false;
+			}
+			
+			int startPos = rom.ReadWord(0x4199);
+			for(int i = 0 ; i < 0x2B ; i++)
+			{
+				rom.WriteWord(0x4199 + i * 2, (ushort)startPos);
+				
+				byte[] data = RLECompressObjects(enemyData[i]).ToArray();
+				rom.WriteBytes(startPos, data);
+				startPos += data.Length;
+			}
+			
+			errorMessage = string.Empty;
+			return true;
+		}		
 	}
 }
