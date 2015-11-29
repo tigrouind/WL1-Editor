@@ -117,6 +117,14 @@ namespace WLEditor
 			}			
 		}
 		
+		public string Title
+		{
+			get
+			{
+				return System.Text.Encoding.ASCII.GetString(data, 0x134, 16).TrimEnd('\0');
+			}
+		}
+		
 		public void SetBank(int rombank)
 		{
 			bank = rombank;

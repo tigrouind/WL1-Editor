@@ -72,16 +72,26 @@ namespace WLEditor
 		void LoadToolStripMenuItemClick(object sender, EventArgs e)
 		{
 			OpenFileDialog openFileDialog1 = new OpenFileDialog();
+			openFileDialog1.Filter = "GB ROM Image (*.gb)|*.gb";
+			
 			if (openFileDialog1.ShowDialog() == DialogResult.OK)
 			{
 				rom.Load(openFileDialog1.FileName);				
-				LoadCombobox1();
-				romFilePath = openFileDialog1.FileName;
-											
-				if(comboBox1.SelectedIndex == 0)			
-					ComboBox1SelectedIndexChanged(sender, e);
-				else 
-					comboBox1.SelectedIndex = 0;										
+				if (rom.Title == "SUPERMARIOLAND3")
+				{
+					LoadCombobox1();
+					romFilePath = openFileDialog1.FileName;
+												
+					if(comboBox1.SelectedIndex == 0)			
+						ComboBox1SelectedIndexChanged(sender, e);
+					else 
+						comboBox1.SelectedIndex = 0;	
+				}
+				else
+				{
+					MessageBox.Show("Please select a valid WarioLand 1 rom", Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
+				}
+													
 			}
 		}
 		
