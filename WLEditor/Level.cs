@@ -14,9 +14,9 @@ namespace WLEditor
 		public static Color[] paletteColors;
 		public static Color[][] palettes = 
 		{
-			new [] { Color.FromArgb(255, 239, 255, 231), Color.FromArgb(255, 173, 244, 148), Color.FromArgb(255, 90, 148, 123), Color.FromArgb(255, 24, 57, 66) },
+			new [] { Color.FromArgb(255, 224, 248, 208), Color.FromArgb(255, 135, 201, 140), Color.FromArgb(255, 52, 104, 86), Color.FromArgb(255, 8, 24, 32) },
 			new [] { Color.White, Color.LightGray, Color.DarkGray, Color.Black },
-			new [] { Color.BlanchedAlmond, Color.DarkKhaki, Color.Olive, Color.Black },					
+			new [] { Color.White, Color.FromArgb(255, 230, 214, 156), Color.FromArgb(255, 180, 165, 106), Color.FromArgb(255, 57, 56, 41) },					
 		};
 		
 		public static byte[] levelData;

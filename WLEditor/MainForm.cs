@@ -76,9 +76,11 @@ namespace WLEditor
 			
 			if (openFileDialog1.ShowDialog() == DialogResult.OK)
 			{
-				rom.Load(openFileDialog1.FileName);				
-				if (rom.Title == "SUPERMARIOLAND3")
+				Rom newRom = new Rom();
+				newRom.Load(openFileDialog1.FileName);
+				if (newRom.Title == "SUPERMARIOLAND3")
 				{
+					rom = newRom;
 					LoadCombobox1();
 					romFilePath = openFileDialog1.FileName;
 												

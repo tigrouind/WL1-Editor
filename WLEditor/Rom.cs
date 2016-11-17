@@ -121,7 +121,14 @@ namespace WLEditor
 		{
 			get
 			{
-				return System.Text.Encoding.ASCII.GetString(data, 0x134, 16).TrimEnd('\0');
+				if(data.Length >= 16)
+				{
+					return System.Text.Encoding.ASCII.GetString(data, 0x134, 16).TrimEnd('\0');
+				}
+				else
+				{				
+					return string.Empty;
+				}
 			}
 		}
 		
