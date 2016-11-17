@@ -16,13 +16,13 @@ Right-click on one of the 16x16 sectors with a door to load tiles related to tha
 
 ##Object data 
 
-1-6 = usually enemies. different for each sector.
-G = Garlic pot
-J = Jet pot
-D = Dragon pot
-K = Key
-H = Heart
-S = Star
-C = Coin
-CC = 10 coins 
-B = Bull pot
+- 1-6 = usually enemies. different for each sector.
+- G = Garlic pot
+- J = Jet pot
+- D = Dragon pot
+- K = Key
+- H = Heart
+- S = Star
+- C = Coin
+- CC = 10 coins 
+- B = Bull pot
