@@ -79,6 +79,7 @@ namespace WLEditor
 			this.panel1.Name = "panel1";
 			this.panel1.Size = new System.Drawing.Size(752, 405);
 			this.panel1.TabIndex = 1;
+			this.panel1.Visible = false;
 			// 
 			// pictureBox1
 			// 
@@ -99,6 +100,7 @@ namespace WLEditor
 			this.pictureBox3.Size = new System.Drawing.Size(128, 256);
 			this.pictureBox3.TabIndex = 3;
 			this.pictureBox3.TabStop = false;
+			this.pictureBox3.Visible = false;
 			this.pictureBox3.Paint += new System.Windows.Forms.PaintEventHandler(this.PictureBox3Paint);
 			this.pictureBox3.MouseDown += new System.Windows.Forms.MouseEventHandler(this.PictureBox3MouseDown);
 			// 
@@ -109,6 +111,7 @@ namespace WLEditor
 			this.comboBox1.Name = "comboBox1";
 			this.comboBox1.Size = new System.Drawing.Size(126, 21);
 			this.comboBox1.TabIndex = 4;
+			this.comboBox1.Visible = false;
 			this.comboBox1.SelectedIndexChanged += new System.EventHandler(this.ComboBox1SelectedIndexChanged);
 			// 
 			// menuStrip1
@@ -143,6 +146,7 @@ namespace WLEditor
 			// 
 			// saveToolStripMenuItem
 			// 
+			this.saveToolStripMenuItem.Enabled = false;
 			this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
 			this.saveToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
 			this.saveToolStripMenuItem.Size = new System.Drawing.Size(186, 22);
@@ -151,6 +155,7 @@ namespace WLEditor
 			// 
 			// saveAsToolStripMenuItem
 			// 
+			this.saveAsToolStripMenuItem.Enabled = false;
 			this.saveAsToolStripMenuItem.Name = "saveAsToolStripMenuItem";
 			this.saveAsToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Alt) 
 			| System.Windows.Forms.Keys.S)));
@@ -292,6 +297,7 @@ namespace WLEditor
 			this.pictureBox2.Size = new System.Drawing.Size(64, 64);
 			this.pictureBox2.TabIndex = 6;
 			this.pictureBox2.TabStop = false;
+			this.pictureBox2.Visible = false;
 			this.pictureBox2.Paint += new System.Windows.Forms.PaintEventHandler(this.PictureBox2Paint);
 			this.pictureBox2.MouseDown += new System.Windows.Forms.MouseEventHandler(this.PictureBox2MouseDown);
 			// 

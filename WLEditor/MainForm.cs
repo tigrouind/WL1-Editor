@@ -88,6 +88,13 @@ namespace WLEditor
 						ComboBox1SelectedIndexChanged(sender, e);
 					else 
 						comboBox1.SelectedIndex = 0;	
+					
+					saveToolStripMenuItem.Enabled = true;
+					saveAsToolStripMenuItem.Enabled = true;
+					comboBox1.Visible = true;
+					panel1.Visible = true;
+					pictureBox3.Visible = true;
+					pictureBox2.Visible = true;
 				}
 				else
 				{
@@ -471,7 +478,7 @@ namespace WLEditor
 		}
 		
 		void SaveAsToolStripMenuItemClick(object sender, EventArgs e)
-		{
+		{			
 			SaveFileDialog saveFileDialog = new SaveFileDialog();
 			saveFileDialog.Filter = "GB ROM Image (*.gb)|*.gb";
 			
@@ -479,7 +486,7 @@ namespace WLEditor
 			{
 				romFilePath = saveFileDialog.FileName;
 				SaveChanges();
-			}
+			}			
 		}
 		
 		void ClassicToolStripMenuItemClick(object sender, EventArgs e)
