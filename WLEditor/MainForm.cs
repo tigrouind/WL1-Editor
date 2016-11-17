@@ -466,6 +466,18 @@ namespace WLEditor
 		void MainFormFormClosing(object sender, FormClosingEventArgs e)
 		{			
 			e.Cancel = !AskForSavingChanges();
+		}
+		
+		void SaveAsToolStripMenuItemClick(object sender, EventArgs e)
+		{
+			SaveFileDialog saveFileDialog = new SaveFileDialog();
+			saveFileDialog.Filter = "GB ROM Image (*.gb)|*.gb";
+			
+			if (saveFileDialog.ShowDialog() == DialogResult.OK)
+			{
+				romFilePath = saveFileDialog.FileName;
+				SaveChanges();
+			}
 		}			
 	}
 }

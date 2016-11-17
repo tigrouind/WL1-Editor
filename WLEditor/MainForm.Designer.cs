@@ -44,6 +44,7 @@ namespace WLEditor
 			this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.loadToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.saveAsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.viewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.regionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -65,8 +66,8 @@ namespace WLEditor
 			// panel1
 			// 
 			this.panel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-									| System.Windows.Forms.AnchorStyles.Left) 
-									| System.Windows.Forms.AnchorStyles.Right)));
+			| System.Windows.Forms.AnchorStyles.Left) 
+			| System.Windows.Forms.AnchorStyles.Right)));
 			this.panel1.AutoScroll = true;
 			this.panel1.Controls.Add(this.pictureBox1);
 			this.panel1.Location = new System.Drawing.Point(144, 54);
@@ -108,8 +109,8 @@ namespace WLEditor
 			// menuStrip1
 			// 
 			this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-									this.fileToolStripMenuItem,
-									this.viewToolStripMenuItem});
+			this.fileToolStripMenuItem,
+			this.viewToolStripMenuItem});
 			this.menuStrip1.Location = new System.Drawing.Point(0, 0);
 			this.menuStrip1.Name = "menuStrip1";
 			this.menuStrip1.Size = new System.Drawing.Size(908, 24);
@@ -119,9 +120,10 @@ namespace WLEditor
 			// fileToolStripMenuItem
 			// 
 			this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-									this.loadToolStripMenuItem,
-									this.saveToolStripMenuItem,
-									this.exitToolStripMenuItem});
+			this.loadToolStripMenuItem,
+			this.saveToolStripMenuItem,
+			this.saveAsToolStripMenuItem,
+			this.exitToolStripMenuItem});
 			this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
 			this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
 			this.fileToolStripMenuItem.Text = "&File";
@@ -130,7 +132,7 @@ namespace WLEditor
 			// 
 			this.loadToolStripMenuItem.Name = "loadToolStripMenuItem";
 			this.loadToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
-			this.loadToolStripMenuItem.Size = new System.Drawing.Size(177, 22);
+			this.loadToolStripMenuItem.Size = new System.Drawing.Size(186, 22);
 			this.loadToolStripMenuItem.Text = "Load rom...";
 			this.loadToolStripMenuItem.Click += new System.EventHandler(this.LoadToolStripMenuItemClick);
 			// 
@@ -138,25 +140,34 @@ namespace WLEditor
 			// 
 			this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
 			this.saveToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
-			this.saveToolStripMenuItem.Size = new System.Drawing.Size(177, 22);
+			this.saveToolStripMenuItem.Size = new System.Drawing.Size(186, 22);
 			this.saveToolStripMenuItem.Text = "Save";
 			this.saveToolStripMenuItem.Click += new System.EventHandler(this.SaveToolStripMenuItemClick);
+			// 
+			// saveAsToolStripMenuItem
+			// 
+			this.saveAsToolStripMenuItem.Name = "saveAsToolStripMenuItem";
+			this.saveAsToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Alt) 
+			| System.Windows.Forms.Keys.S)));
+			this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(186, 22);
+			this.saveAsToolStripMenuItem.Text = "Save As...";
+			this.saveAsToolStripMenuItem.Click += new System.EventHandler(this.SaveAsToolStripMenuItemClick);
 			// 
 			// exitToolStripMenuItem
 			// 
 			this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-			this.exitToolStripMenuItem.Size = new System.Drawing.Size(177, 22);
+			this.exitToolStripMenuItem.Size = new System.Drawing.Size(186, 22);
 			this.exitToolStripMenuItem.Text = "Exit";
 			this.exitToolStripMenuItem.Click += new System.EventHandler(this.ExitToolStripMenuItemClick);
 			// 
 			// viewToolStripMenuItem
 			// 
 			this.viewToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-									this.regionsToolStripMenuItem,
-									this.objectsToolStripMenuItem,
-									this.scrollRegionToolStripMenuItem,
-									this.collidersToolStripMenuItem,
-									this.switchToolStripMenuItem});
+			this.regionsToolStripMenuItem,
+			this.objectsToolStripMenuItem,
+			this.scrollRegionToolStripMenuItem,
+			this.collidersToolStripMenuItem,
+			this.switchToolStripMenuItem});
 			this.viewToolStripMenuItem.Name = "viewToolStripMenuItem";
 			this.viewToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
 			this.viewToolStripMenuItem.Text = "&View";
@@ -202,9 +213,9 @@ namespace WLEditor
 			// switchToolStripMenuItem
 			// 
 			this.switchToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-									this.noneToolStripMenuItem,
-									this.aToolStripMenuItem,
-									this.bToolStripMenuItem});
+			this.noneToolStripMenuItem,
+			this.aToolStripMenuItem,
+			this.bToolStripMenuItem});
 			this.switchToolStripMenuItem.Name = "switchToolStripMenuItem";
 			this.switchToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
 			this.switchToolStripMenuItem.Text = "Block switch";
@@ -215,7 +226,7 @@ namespace WLEditor
 			this.noneToolStripMenuItem.CheckOnClick = true;
 			this.noneToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.noneToolStripMenuItem.Name = "noneToolStripMenuItem";
-			this.noneToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
+			this.noneToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
 			this.noneToolStripMenuItem.Text = "None";
 			this.noneToolStripMenuItem.Click += new System.EventHandler(this.NoneToolStripMenuItemClick);
 			// 
@@ -223,7 +234,7 @@ namespace WLEditor
 			// 
 			this.aToolStripMenuItem.CheckOnClick = true;
 			this.aToolStripMenuItem.Name = "aToolStripMenuItem";
-			this.aToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
+			this.aToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
 			this.aToolStripMenuItem.Text = "A";
 			this.aToolStripMenuItem.Click += new System.EventHandler(this.AToolStripMenuItemClick);
 			// 
@@ -231,7 +242,7 @@ namespace WLEditor
 			// 
 			this.bToolStripMenuItem.CheckOnClick = true;
 			this.bToolStripMenuItem.Name = "bToolStripMenuItem";
-			this.bToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
+			this.bToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
 			this.bToolStripMenuItem.Text = "B";
 			this.bToolStripMenuItem.Click += new System.EventHandler(this.BToolStripMenuItemClick);
 			// 
@@ -267,6 +278,7 @@ namespace WLEditor
 			((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
 			this.ResumeLayout(false);
 			this.PerformLayout();
+
 		}
 		private System.Windows.Forms.PictureBox pictureBox2;
 		private System.Windows.Forms.ToolStripMenuItem saveToolStripMenuItem;
@@ -287,6 +299,7 @@ namespace WLEditor
 		private System.Windows.Forms.PictureBox pictureBox3;
 		private System.Windows.Forms.Panel panel1;
 		private System.Windows.Forms.PictureBox pictureBox1;
+		private System.Windows.Forms.ToolStripMenuItem saveAsToolStripMenuItem;
 		
 
 			
