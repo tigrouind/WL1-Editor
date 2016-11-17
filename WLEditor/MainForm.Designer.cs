@@ -36,6 +36,7 @@ namespace WLEditor
 		/// </summary>
 		private void InitializeComponent()
 		{
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
 			this.panel1 = new System.Windows.Forms.Panel();
 			this.pictureBox1 = new System.Windows.Forms.PictureBox();
 			this.pictureBox3 = new System.Windows.Forms.PictureBox();
@@ -230,21 +231,21 @@ namespace WLEditor
 			this.classicToolStripMenuItem.Checked = true;
 			this.classicToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.classicToolStripMenuItem.Name = "classicToolStripMenuItem";
-			this.classicToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+			this.classicToolStripMenuItem.Size = new System.Drawing.Size(147, 22);
 			this.classicToolStripMenuItem.Text = "Classic";
 			this.classicToolStripMenuItem.Click += new System.EventHandler(this.ClassicToolStripMenuItemClick);
 			// 
 			// blackWhiteToolStripMenuItem
 			// 
 			this.blackWhiteToolStripMenuItem.Name = "blackWhiteToolStripMenuItem";
-			this.blackWhiteToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+			this.blackWhiteToolStripMenuItem.Size = new System.Drawing.Size(147, 22);
 			this.blackWhiteToolStripMenuItem.Text = "Black && white";
 			this.blackWhiteToolStripMenuItem.Click += new System.EventHandler(this.BlackWhiteToolStripMenuItemClick);
 			// 
 			// autumnToolStripMenuItem
 			// 
 			this.autumnToolStripMenuItem.Name = "autumnToolStripMenuItem";
-			this.autumnToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+			this.autumnToolStripMenuItem.Size = new System.Drawing.Size(147, 22);
 			this.autumnToolStripMenuItem.Text = "Autumn";
 			this.autumnToolStripMenuItem.Click += new System.EventHandler(this.AutumnToolStripMenuItemClick);
 			// 
@@ -304,6 +305,7 @@ namespace WLEditor
 			this.Controls.Add(this.pictureBox3);
 			this.Controls.Add(this.panel1);
 			this.Controls.Add(this.menuStrip1);
+			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MainMenuStrip = this.menuStrip1;
 			this.Name = "MainForm";
 			this.Text = "WLEditor";
