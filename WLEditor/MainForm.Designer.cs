@@ -51,6 +51,10 @@ namespace WLEditor
 			this.objectsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.scrollRegionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.collidersToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.paletteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.classicToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.blackWhiteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.autumnToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.switchToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.noneToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.aToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -167,6 +171,7 @@ namespace WLEditor
 			this.objectsToolStripMenuItem,
 			this.scrollRegionToolStripMenuItem,
 			this.collidersToolStripMenuItem,
+			this.paletteToolStripMenuItem,
 			this.switchToolStripMenuItem});
 			this.viewToolStripMenuItem.Name = "viewToolStripMenuItem";
 			this.viewToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
@@ -210,6 +215,39 @@ namespace WLEditor
 			this.collidersToolStripMenuItem.Text = "Colliders";
 			this.collidersToolStripMenuItem.Click += new System.EventHandler(this.CollidersToolStripMenuItemClick);
 			// 
+			// paletteToolStripMenuItem
+			// 
+			this.paletteToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+			this.classicToolStripMenuItem,
+			this.blackWhiteToolStripMenuItem,
+			this.autumnToolStripMenuItem});
+			this.paletteToolStripMenuItem.Name = "paletteToolStripMenuItem";
+			this.paletteToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
+			this.paletteToolStripMenuItem.Text = "Palette";
+			// 
+			// classicToolStripMenuItem
+			// 
+			this.classicToolStripMenuItem.Checked = true;
+			this.classicToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
+			this.classicToolStripMenuItem.Name = "classicToolStripMenuItem";
+			this.classicToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+			this.classicToolStripMenuItem.Text = "Classic";
+			this.classicToolStripMenuItem.Click += new System.EventHandler(this.ClassicToolStripMenuItemClick);
+			// 
+			// blackWhiteToolStripMenuItem
+			// 
+			this.blackWhiteToolStripMenuItem.Name = "blackWhiteToolStripMenuItem";
+			this.blackWhiteToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+			this.blackWhiteToolStripMenuItem.Text = "Black && white";
+			this.blackWhiteToolStripMenuItem.Click += new System.EventHandler(this.BlackWhiteToolStripMenuItemClick);
+			// 
+			// autumnToolStripMenuItem
+			// 
+			this.autumnToolStripMenuItem.Name = "autumnToolStripMenuItem";
+			this.autumnToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+			this.autumnToolStripMenuItem.Text = "Autumn";
+			this.autumnToolStripMenuItem.Click += new System.EventHandler(this.AutumnToolStripMenuItemClick);
+			// 
 			// switchToolStripMenuItem
 			// 
 			this.switchToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -226,7 +264,7 @@ namespace WLEditor
 			this.noneToolStripMenuItem.CheckOnClick = true;
 			this.noneToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.noneToolStripMenuItem.Name = "noneToolStripMenuItem";
-			this.noneToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+			this.noneToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
 			this.noneToolStripMenuItem.Text = "None";
 			this.noneToolStripMenuItem.Click += new System.EventHandler(this.NoneToolStripMenuItemClick);
 			// 
@@ -234,7 +272,7 @@ namespace WLEditor
 			// 
 			this.aToolStripMenuItem.CheckOnClick = true;
 			this.aToolStripMenuItem.Name = "aToolStripMenuItem";
-			this.aToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+			this.aToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
 			this.aToolStripMenuItem.Text = "A";
 			this.aToolStripMenuItem.Click += new System.EventHandler(this.AToolStripMenuItemClick);
 			// 
@@ -242,7 +280,7 @@ namespace WLEditor
 			// 
 			this.bToolStripMenuItem.CheckOnClick = true;
 			this.bToolStripMenuItem.Name = "bToolStripMenuItem";
-			this.bToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+			this.bToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
 			this.bToolStripMenuItem.Text = "B";
 			this.bToolStripMenuItem.Click += new System.EventHandler(this.BToolStripMenuItemClick);
 			// 
@@ -300,6 +338,10 @@ namespace WLEditor
 		private System.Windows.Forms.Panel panel1;
 		private System.Windows.Forms.PictureBox pictureBox1;
 		private System.Windows.Forms.ToolStripMenuItem saveAsToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem paletteToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem classicToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem blackWhiteToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem autumnToolStripMenuItem;
 		
 
 			

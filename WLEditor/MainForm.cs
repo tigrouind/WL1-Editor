@@ -38,8 +38,8 @@ namespace WLEditor
 		void LoadLevel(bool reloadAll)
 		{			
 			if(rom.IsLoaded && comboBox1.SelectedItem != null)
-			{				
-				Level.DumpLevel(rom, currentCourseId, currentSector, tiles8x8, tiles16x16, reloadAll, aToolStripMenuItem.Checked, bToolStripMenuItem.Checked);
+			{								
+				Level.DumpLevel(rom, currentCourseId, currentSector, tiles8x8, tiles16x16, reloadAll, aToolStripMenuItem.Checked, bToolStripMenuItem.Checked, SelectedPaletteToolStripIndex());
 				
 				pictureBox1.Refresh();	
 				pictureBox2.Refresh();
@@ -478,6 +478,40 @@ namespace WLEditor
 				romFilePath = saveFileDialog.FileName;
 				SaveChanges();
 			}
-		}			
+		}
+		
+		void ClassicToolStripMenuItemClick(object sender, EventArgs e)
+		{
+			SetPalette(classicToolStripMenuItem);
+			LoadLevel(false);
+		}
+		
+		void BlackWhiteToolStripMenuItemClick(object sender, EventArgs e)
+		{
+			SetPalette(blackWhiteToolStripMenuItem);
+			LoadLevel(false);
+		}	
+
+		void AutumnToolStripMenuItemClick(object sender, EventArgs e)
+		{
+			SetPalette(autumnToolStripMenuItem);
+			LoadLevel(false);
+		}		
+		
+		int SelectedPaletteToolStripIndex()
+		{
+			if(classicToolStripMenuItem.Checked) return 0;
+			if(blackWhiteToolStripMenuItem.Checked) return 1;
+			return 2;
+		}
+
+		void SetPalette(ToolStripMenuItem toolStrip)
+		{
+			classicToolStripMenuItem.Checked = toolStrip == classicToolStripMenuItem;
+			blackWhiteToolStripMenuItem.Checked = toolStrip == blackWhiteToolStripMenuItem;
+			autumnToolStripMenuItem.Checked = toolStrip == autumnToolStripMenuItem;
+		}
+
+		
 	}
 }

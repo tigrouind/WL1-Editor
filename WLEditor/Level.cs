@@ -12,19 +12,20 @@ namespace WLEditor
 	public static class Level
 	{			
 		public static Color[] paletteColors;
+		public static Color[][] palettes = 
+		{
+			new [] { Color.LightGreen, Color.Teal, Color.DarkGreen, Color.Black },			
+			new [] { Color.White, Color.LightGray, Color.DarkGray, Color.Black },
+			new [] { Color.BlanchedAlmond, Color.DarkKhaki, Color.Olive, Color.Black },					
+		};
 		
 		public static byte[] levelData;
 		public static byte[] objectsData;
 		public static byte[] scrollData;
 		public static byte[] warps;			
 		public static int warioPosition;
-
-		static Level()
-		{
-			paletteColors = new Color[] { Color.LightGreen, Color.Teal, Color.DarkGreen, Color.Black };			
-		}
 			
-		public static void DumpLevel(Rom rom, int course, int sector, Bitmap tiles8x8, Bitmap tiles16x16, bool reloadAll, bool switchA, bool switchB)
+		public static void DumpLevel(Rom rom, int course, int sector, Bitmap tiles8x8, Bitmap tiles16x16, bool reloadAll, bool switchA, bool switchB, int paletteIndex)
 		{	
 			rom.SetBank(0xC);
 			int header = rom.ReadWord(0x4560 + course * 2);
@@ -63,6 +64,9 @@ namespace WLEditor
 					}	
 				}					
 			}					
+			
+			//set palette
+			paletteColors = palettes[paletteIndex];
 								
 			//dump 8x8 blocks
 	      	using(Graphics g = Graphics.FromImage(tiles8x8))
