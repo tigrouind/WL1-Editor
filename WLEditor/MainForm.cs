@@ -20,6 +20,7 @@ namespace WLEditor
 		public int currentTile = -1;		
 		public int currentObject = -1;
 		public int currentCourseId = -1;
+		public int currentWarp = -1;
 		public string romFilePath;		
 		public bool hasChanges;
 		public string[] ObjectIdToString = new [] { string.Empty, "1", "2", "3", "4", "5", "6", "G", "J", "D", "K", "H", "S", "C", "CC", "B" };
@@ -32,14 +33,14 @@ namespace WLEditor
 			InitializeComponent();			
 			//
 			// TODO: Add constructor code after the InitializeComponent() call.
-			//								
+			//					
 		}
-		
+							
 		void LoadLevel(bool reloadAll)
 		{			
 			if(rom.IsLoaded && comboBox1.SelectedItem != null)
-			{								
-				Level.DumpLevel(rom, currentCourseId, currentSector, tiles8x8, tiles16x16, reloadAll, aToolStripMenuItem.Checked, bToolStripMenuItem.Checked, SelectedPaletteToolStripIndex());
+			{				
+				Level.DumpLevel(rom, currentCourseId, currentWarp, tiles8x8, tiles16x16, reloadAll, aToolStripMenuItem.Checked, bToolStripMenuItem.Checked, SelectedPaletteToolStripIndex());
 				
 				pictureBox1.Refresh();	
 				pictureBox2.Refresh();
@@ -54,6 +55,7 @@ namespace WLEditor
 			{
 				if(AskForSavingChanges())
 				{
+					currentWarp = -1;
 					currentSector = -1;
 					ComboboxItem item = (ComboboxItem)comboBox1.SelectedItem;				
 					currentCourseId = (int)item.Value;
@@ -199,10 +201,32 @@ namespace WLEditor
 								if(viewSectors)
 								{								
 									//if tile is a door, display destination
-									if(tileIndex == 72 || tileIndex == 75 || tileIndex == 46 || tileIndex == 84)
+									if(Level.IsDoor(tileIndex))
 									{
-										e.Graphics.FillRectangle(Brushes.Brown, destRect);
-										e.Graphics.DrawString(Level.warps[i/16 + (j/16)*16].ToString("X"), font, Brushes.White, i *16 +8, j * 16 +8, format);
+										int sector = i/16 + (j/16)*16;
+										int sectorTarget = Level.warps[sector];
+										if(sectorTarget != 255)
+										{
+											string warpText;
+											switch(sectorTarget)
+											{
+												case 32:
+													warpText = "S";
+													break;
+												case 33: 												
+													warpText = "EA";
+													break;
+												case 34: 			
+													warpText = "EB";												
+													break;
+												default:
+													warpText = sectorTarget.ToString();
+													break;
+											}
+											
+											e.Graphics.FillRectangle(Brushes.Brown, destRect);
+											e.Graphics.DrawString(warpText, font, Brushes.White, i *16 +8, j * 16 + 8, format);																					
+										}
 									}
 								}
 								
@@ -242,7 +266,7 @@ namespace WLEditor
 										e.Graphics.FillRectangle(Brushes.Yellow, i * 256, j * 256, 6, 256);
 									
 									if ((scroll & 1) == 1)
-										e.Graphics.FillRectangle(Brushes.Yellow, (i+1) * 256 - 6, j*256, 6, 256);
+										e.Graphics.FillRectangle(Brushes.Yellow, (i+1) * 256 - 6, j*256, 6, 256);								
 								}
 								
 								//sectors
@@ -251,7 +275,7 @@ namespace WLEditor
 									e.Graphics.DrawRectangle(penBlue, i * 256 , j * 256, 256, 256);																								
 									
 									e.Graphics.FillRectangle(Brushes.DarkBlue, i * 256 , j * 256, 16.0f, 16.0f);
-									e.Graphics.DrawString(drawSector.ToString("X"), font, Brushes.White, i * 256 + 8, j * 256 + 8, format);									
+									e.Graphics.DrawString(drawSector.ToString(), font, Brushes.White, i * 256 + 8, j * 256 + 8, format);									
 								}
 							}
 						}
@@ -269,7 +293,7 @@ namespace WLEditor
 						{
 							e.Graphics.DrawString("W", font, Brushes.White, destRect, format);	
 						}
-					}
+					}									
 				}	
 
 				//current sector
@@ -362,9 +386,18 @@ namespace WLEditor
 				Point coordinates = me.Location;
 	    		int sector = me.Location.X / 256 + (me.Location.Y / 256) * 16;
 	    		if(sector != currentSector)
-	    		{
+	    		{	    			
 	    			currentSector = sector;
-	    			LoadLevel(false);
+	    			int warpTarget = Level.SearchWarp(rom, currentCourseId, currentSector);
+	    			if(warpTarget != currentWarp)
+	    			{
+	    				currentWarp = warpTarget;
+	    				LoadLevel(false);
+	    			}
+	    			else
+	    			{
+	    				pictureBox1.Refresh();
+	    			}
 	    		}
 			}
 		}
@@ -520,7 +553,5 @@ namespace WLEditor
 			blackWhiteToolStripMenuItem.Checked = toolStrip == blackWhiteToolStripMenuItem;
 			autumnToolStripMenuItem.Checked = toolStrip == autumnToolStripMenuItem;
 		}
-
-		
 	}
 }

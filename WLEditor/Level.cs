@@ -16,16 +16,16 @@ namespace WLEditor
 		{
 			new [] { Color.FromArgb(255, 224, 248, 208), Color.FromArgb(255, 135, 201, 140), Color.FromArgb(255, 52, 104, 86), Color.FromArgb(255, 8, 24, 32) },
 			new [] { Color.White, Color.LightGray, Color.DarkGray, Color.Black },
-			new [] { Color.White, Color.FromArgb(255, 230, 214, 156), Color.FromArgb(255, 180, 165, 106), Color.FromArgb(255, 57, 56, 41) },					
+			new [] { Color.White, Color.FromArgb(255, 230, 214, 156), Color.FromArgb(255, 180, 165, 106), Color.FromArgb(255, 57, 56, 41) }			
 		};
 		
 		public static byte[] levelData;
 		public static byte[] objectsData;
 		public static byte[] scrollData;
-		public static byte[] warps;			
+		public static byte[] warps;
 		public static int warioPosition;
 			
-		public static void DumpLevel(Rom rom, int course, int sector, Bitmap tiles8x8, Bitmap tiles16x16, bool reloadAll, bool switchA, bool switchB, int paletteIndex)
+		public static void DumpLevel(Rom rom, int course, int warp, Bitmap tiles8x8, Bitmap tiles16x16, bool reloadAll, bool switchA, bool switchB, int paletteIndex)
 		{	
 			rom.SetBank(0xC);
 			int header = rom.ReadWord(0x4560 + course * 2);
@@ -40,29 +40,15 @@ namespace WLEditor
 			int blockindex = rom.ReadWord(header + 11);	
 			byte palette = rom.ReadByte(header + 27);				
 						
-			if(sector != -1)
-			{
-				int warp = rom.ReadWord(0x4F30 + course * 64 + sector * 2);
-				
-				if(rom.ReadByte(warp) != 32)
-				{
-					//search sector that target that sector
-					for(int i = 0 ; i < 32 ; i++)
-					{						
-						warp = rom.ReadWord(0x4F30 + course * 64 + i * 2);
-																	
-						if(rom.ReadByte(warp) == sector)
-						{						
-							tilebank = rom.ReadByte(warp + 11);
-							tileaddressB = rom.ReadWord(warp + 12);
-							tileaddressA = rom.ReadWord(warp + 14);
-							tileanimated = rom.ReadWord(warp + 18);
-							blockindex = rom.ReadWord(warp + 20);
-							palette = rom.ReadByte(warp + 10);								
-							break;
-						}					
-					}	
-				}					
+			//load warp
+			if(warp != -1)
+			{										
+				tilebank = rom.ReadByte(warp + 11);
+				tileaddressB = rom.ReadWord(warp + 12);
+				tileaddressA = rom.ReadWord(warp + 14);
+				tileanimated = rom.ReadWord(warp + 18);
+				blockindex = rom.ReadWord(warp + 20);
+				palette = rom.ReadByte(warp + 10);											
 			}					
 			
 			//set palette
@@ -104,7 +90,7 @@ namespace WLEditor
 				rom.SetBank(0x7);
 				int objectsPosition = rom.ReadWord(0x4199 + course * 2);
 				objectsData = RLEDecompressObjects(rom, objectsPosition).Take(0x2000).ToArray();									      	  		     	
-	
+					
 				//dump warps
 				rom.SetBank(0xC);
 				warps = new Byte[32];
@@ -112,10 +98,31 @@ namespace WLEditor
 				{
 					int warpdata = rom.ReadWord(0x4F30 + course * 64 + i * 2);
 					warps[i] = rom.ReadByte(warpdata);
-				}	
+				}									
 
-				warioPosition = rom.ReadWordSwap(header + 15) + rom.ReadWordSwap(header + 13) * 8192;			
-	      	}
+				warioPosition = rom.ReadWordSwap(header + 15) + rom.ReadWordSwap(header + 13) * 8192;					
+	      	}	      		      	     
+		}
+		
+		public static int SearchWarp(Rom rom, int course, int sector)
+		{			
+			rom.SetBank(0xC);
+			int warp = rom.ReadWord(0x4F30 + course * 64 + sector * 2);				
+			if(rom.ReadByte(warp) != 32)
+			{
+				//search sector that target that sector
+				for(int i = 0 ; i < 32 ; i++)
+				{						
+					warp = rom.ReadWord(0x4F30 + course * 64 + i * 2);
+																
+					if(rom.ReadByte(warp) == sector)
+					{						
+						return warp;						
+					}					
+				}	
+			}		
+
+			return -1;			
 		}
 		
 		public static IEnumerable<byte> RLEDecompressTiles(Rom rom, int tilesdata)
@@ -244,7 +251,7 @@ namespace WLEditor
 					byte data1 = rom.ReadByte(gfxaddress++);
 					
 					for(int i = 0 ; i < 8 ; i++)
-					{																				
+					{															
 						int pixelA = (data0 >> (7 - i)) & 0x1;
 						int pixelB = (data1 >> (7 - i)) & 0x1;
 						int pixel = pixelA + pixelB * 2;
@@ -253,7 +260,7 @@ namespace WLEditor
 						int x = i + n%16 * 8;
 						int y = j + (n/16 + rowpos) * 8;
 						
-						gfx8.SetPixel(x, y, paletteColors[palindex]);											
+						gfx8.SetPixel(x, y, paletteColors[palindex]);									
 					}											
 				}
 			}
@@ -262,6 +269,11 @@ namespace WLEditor
 		public static bool IsCollidable(int tileIndex)
 		{
 			return (tileIndex & 64) != 64;
+		}
+		
+		public static bool IsDoor(int tileIndex)
+		{
+			return tileIndex == 72 || tileIndex == 75 || tileIndex == 46 || tileIndex == 84;
 		}
 				
 		//replace tiles when a (!) block is hit		
@@ -389,7 +401,7 @@ namespace WLEditor
 			int objectSize = enemyData.Sum(x => RLECompressObjects(x).Count());			
 			if(objectSize > 4198)
 			{
-				errorMessage = string.Format("Object data is too big to fit in ROM.\r\nPlease remove at least {0} level object(s).", objectSize - 4198);
+				errorMessage = string.Format("Object data is too big to fit in ROM.\r\nPlease remove at least {0} byte(s).", objectSize - 4198);
 				return false;
 			}
 			
