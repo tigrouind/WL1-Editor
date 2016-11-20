@@ -80,6 +80,17 @@ namespace WLEditor
 		
 		public void FixCRC()
 		{
+			//fix header CRC
+			ushort headerCRC = 0;
+			for (int i = 0x134; i <= 0x14c; i++)
+		    {
+				unchecked
+				{
+					headerCRC = (ushort)(headerCRC - data[i] - 1);
+				}
+		    }
+			data[0x14d] = (byte)(headerCRC & 0xFF);
+			
 			//fix global CRC
 			ushort globalCRC = 0;
 			for (int i = 0 ; i < data.Length ; i++)
@@ -93,18 +104,7 @@ namespace WLEditor
 				}
 			}
 			data[0x14e] = (byte)(globalCRC >> 8);
-			data[0x14f] = (byte)(globalCRC & 0xFF);
-			
-			//fix header CRC
-			ushort headerCRC = 0;
-			for (int i = 0x134; i <= 0x14c; i++)
-		    {
-				unchecked
-				{
-					headerCRC = (ushort)(headerCRC - data[i] - 1);
-				}
-		    }
-			data[0x14d] = (byte)(headerCRC & 0xFF);
+			data[0x14f] = (byte)(globalCRC & 0xFF);							
 		}
 		
 		public void ExpandTo1MB()
