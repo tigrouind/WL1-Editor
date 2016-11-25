@@ -38,35 +38,35 @@ namespace WLEditor
 							
 		void LoadLevel(bool reloadAll)
 		{			
-			if(rom.IsLoaded && comboBox1.SelectedItem != null)
+			if(rom.IsLoaded && levelComboBox.SelectedItem != null)
 			{				
 				Level.DumpLevel(rom, currentCourseId, currentWarp, tiles8x8, tiles16x16, reloadAll, aToolStripMenuItem.Checked, bToolStripMenuItem.Checked, SelectedPaletteToolStripIndex());
 				
-				pictureBox1.Refresh();	
-				pictureBox2.Refresh();
-				pictureBox3.Refresh();
+				levelPictureBox.Refresh();	
+				objectPictureBox.Refresh();
+				tilesPictureBox.Refresh();
 			}			
 		}
 		
 		
-		void ComboBox1SelectedIndexChanged(object sender, EventArgs e)				
+		void LevelComboBoxSelectedIndexChanged(object sender, EventArgs e)				
 		{								
-			if(comboBox1.SelectedItem != null)
+			if(levelComboBox.SelectedItem != null)
 			{
 				if(AskForSavingChanges())
 				{
 					currentWarp = -1;
 					currentSector = -1;
-					ComboboxItem item = (ComboboxItem)comboBox1.SelectedItem;				
+					ComboboxItem item = (ComboboxItem)levelComboBox.SelectedItem;				
 					currentCourseId = (int)item.Value;
 					LoadLevel(true);
 				}
 				else
 				{
 					//restore previous item
-					comboBox1.SelectedIndexChanged -= ComboBox1SelectedIndexChanged;
-					comboBox1.SelectedItem = comboBox1.Items.Cast<ComboboxItem>().First(x => (int)x.Value == currentCourseId);
-					comboBox1.SelectedIndexChanged += ComboBox1SelectedIndexChanged;
+					levelComboBox.SelectedIndexChanged -= LevelComboBoxSelectedIndexChanged;
+					levelComboBox.SelectedItem = levelComboBox.Items.Cast<ComboboxItem>().First(x => (int)x.Value == currentCourseId);
+					levelComboBox.SelectedIndexChanged += LevelComboBoxSelectedIndexChanged;
 				}
 			}
 		}			
@@ -83,20 +83,20 @@ namespace WLEditor
 				if (newRom.Title == "SUPERMARIOLAND3")
 				{
 					rom = newRom;
-					LoadCombobox1();
+					LoadLevelCombobox();
 					romFilePath = openFileDialog1.FileName;
 												
-					if(comboBox1.SelectedIndex == 0)			
-						ComboBox1SelectedIndexChanged(sender, e);
+					if(levelComboBox.SelectedIndex == 0)			
+						LevelComboBoxSelectedIndexChanged(sender, e);
 					else 
-						comboBox1.SelectedIndex = 0;	
+						levelComboBox.SelectedIndex = 0;	
 					
 					saveToolStripMenuItem.Enabled = true;
 					saveAsToolStripMenuItem.Enabled = true;
-					comboBox1.Visible = true;
-					panel1.Visible = true;
-					pictureBox3.Visible = true;
-					pictureBox2.Visible = true;
+					levelComboBox.Visible = true;
+					LevelPanel.Visible = true;
+					tilesPictureBox.Visible = true;
+					objectPictureBox.Visible = true;
 				}
 				else
 				{
@@ -106,11 +106,11 @@ namespace WLEditor
 			}
 		}
 		
-		void LoadCombobox1()
+		void LoadLevelCombobox()
 		{
 			//init combobox				
-			comboBox1.SelectedItem = null;
-			comboBox1.Items.Clear();
+			levelComboBox.SelectedItem = null;
+			levelComboBox.Items.Clear();
 			
 			//convert course id => course no using data in ROM
 			rom.SetBank(0);													
@@ -134,22 +134,22 @@ namespace WLEditor
 				oldItem = item.Text;
 			}
 			
-			comboBox1.Items.AddRange(items.ToArray());			
+			levelComboBox.Items.AddRange(items.ToArray());			
 		}
 		
 		void RegionsToolStripMenuItemClick(object sender, EventArgs e)
 		{
-			pictureBox1.Refresh();
+			levelPictureBox.Refresh();
 		}
 		
 		void ObjectsToolStripMenuItemClick(object sender, EventArgs e)
 		{
-			pictureBox1.Refresh();
+			levelPictureBox.Refresh();
 		}
 
 		void ScrollRegionToolStripMenuItemClick(object sender, EventArgs e)
 		{
-			pictureBox1.Refresh();
+			levelPictureBox.Refresh();
 		}
 	
 		void ExitToolStripMenuItemClick(object sender, EventArgs e)
@@ -157,7 +157,7 @@ namespace WLEditor
 			Application.Exit();
 		}						
 				
-		void PictureBox1Paint(object sender, PaintEventArgs e)
+		void LevelPictureBoxPaint(object sender, PaintEventArgs e)
 		{							
 			bool viewObjects = objectsToolStripMenuItem.Checked;
 			bool viewSectors = regionsToolStripMenuItem.Checked;
@@ -313,10 +313,10 @@ namespace WLEditor
 						
 		void CollidersToolStripMenuItemClick(object sender, EventArgs e)
 		{
-			pictureBox1.Refresh();	
+			levelPictureBox.Refresh();	
 		}
 
-		void PictureBox3Paint(object sender, PaintEventArgs e)
+		void ObjectsPictureBoxPaint(object sender, PaintEventArgs e)
 		{
 			e.Graphics.DrawImage(tiles16x16, 0, 0);
 			
@@ -330,7 +330,7 @@ namespace WLEditor
 		}
 		
 		
-		void PictureBox2Paint(object sender, PaintEventArgs e)
+		void TilesPictureBoxPaint(object sender, PaintEventArgs e)
 		{
 			if(Level.levelData != null && objectsToolStripMenuItem.Checked)
 			{
@@ -378,7 +378,7 @@ namespace WLEditor
 			bToolStripMenuItem.Checked = toolStrip == bToolStripMenuItem;			
 		}
 		
-		void PictureBox1Click(object sender, EventArgs e)
+		void LevelPictureBoxClick(object sender, EventArgs e)
 		{
 			MouseEventArgs me = (MouseEventArgs)e;
 			if(me.Button == MouseButtons.Right)
@@ -396,7 +396,7 @@ namespace WLEditor
 	    			}
 	    			else
 	    			{
-	    				pictureBox1.Refresh();
+	    				levelPictureBox.Refresh();
 	    			}
 	    		}
 			}
@@ -450,31 +450,31 @@ namespace WLEditor
 			SaveChanges();
 		}
 		
-		void PictureBox3MouseDown(object sender, MouseEventArgs e)
+		void ObjectsPictureBoxMouseDown(object sender, MouseEventArgs e)
 		{			
 			currentTile = e.Location.X / 16 + (e.Location.Y / 16) * 8;						
-			pictureBox3.Refresh();		
+			tilesPictureBox.Refresh();		
 
 			if(currentObject != -1)
 			{
 				currentObject = -1;						
-				pictureBox2.Refresh();
+				objectPictureBox.Refresh();
 			}			
 		}
 		
-		void PictureBox2MouseDown(object sender, MouseEventArgs e)
+		void TilesPictureBoxMouseDown(object sender, MouseEventArgs e)
 		{
 			currentObject = e.Location.X / 16 + (e.Location.Y / 16) * 4;						
-			pictureBox2.Refresh();
+			objectPictureBox.Refresh();
 			
 			if(currentTile != -1)
 			{
 				currentTile = -1;
-				pictureBox3.Refresh();
+				tilesPictureBox.Refresh();
 			}					
 		}
 		
-		void PictureBox1MouseDown(object sender, MouseEventArgs e)
+		void LevelPictureBoxMouseDown(object sender, MouseEventArgs e)
 		{
 			if(e.Button == MouseButtons.Left)
 			{	
@@ -493,15 +493,15 @@ namespace WLEditor
 				}
 
 				Region r = new Region(new Rectangle((tileIndex % 256) * 16, (tileIndex / 256) * 16, 16, 16));
-				pictureBox1.Invalidate(r);							
+				levelPictureBox.Invalidate(r);							
 			}
 		}
 		
-		void PictureBox1MouseMove(object sender, MouseEventArgs e)
+		void LevelPictureBoxMouseMove(object sender, MouseEventArgs e)
 		{
-			if (pictureBox1.ClientRectangle.Contains(e.Location))
+			if (levelPictureBox.ClientRectangle.Contains(e.Location))
 			{
-				PictureBox1MouseDown(sender, e);	
+				LevelPictureBoxMouseDown(sender, e);	
 			}
 		}
 		

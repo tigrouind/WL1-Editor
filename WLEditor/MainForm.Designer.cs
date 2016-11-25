@@ -37,10 +37,10 @@ namespace WLEditor
 		private void InitializeComponent()
 		{
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
-			this.panel1 = new System.Windows.Forms.Panel();
-			this.pictureBox1 = new System.Windows.Forms.PictureBox();
-			this.pictureBox3 = new System.Windows.Forms.PictureBox();
-			this.comboBox1 = new System.Windows.Forms.ComboBox();
+			this.LevelPanel = new System.Windows.Forms.Panel();
+			this.levelPictureBox = new System.Windows.Forms.PictureBox();
+			this.tilesPictureBox = new System.Windows.Forms.PictureBox();
+			this.levelComboBox = new System.Windows.Forms.ComboBox();
 			this.menuStrip1 = new System.Windows.Forms.MenuStrip();
 			this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.loadToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -60,65 +60,65 @@ namespace WLEditor
 			this.noneToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.aToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.bToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.pictureBox2 = new System.Windows.Forms.PictureBox();
-			this.panel1.SuspendLayout();
-			((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).BeginInit();
+			this.objectPictureBox = new System.Windows.Forms.PictureBox();
+			this.LevelPanel.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.levelPictureBox)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.tilesPictureBox)).BeginInit();
 			this.menuStrip1.SuspendLayout();
-			((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.objectPictureBox)).BeginInit();
 			this.SuspendLayout();
 			// 
-			// panel1
+			// LevelPanel
 			// 
-			this.panel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-			| System.Windows.Forms.AnchorStyles.Left) 
-			| System.Windows.Forms.AnchorStyles.Right)));
-			this.panel1.AutoScroll = true;
-			this.panel1.Controls.Add(this.pictureBox1);
-			this.panel1.Location = new System.Drawing.Point(144, 54);
-			this.panel1.Name = "panel1";
-			this.panel1.Size = new System.Drawing.Size(752, 405);
-			this.panel1.TabIndex = 1;
-			this.panel1.Visible = false;
+			this.LevelPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+									| System.Windows.Forms.AnchorStyles.Left) 
+									| System.Windows.Forms.AnchorStyles.Right)));
+			this.LevelPanel.AutoScroll = true;
+			this.LevelPanel.Controls.Add(this.levelPictureBox);
+			this.LevelPanel.Location = new System.Drawing.Point(144, 54);
+			this.LevelPanel.Name = "LevelPanel";
+			this.LevelPanel.Size = new System.Drawing.Size(752, 405);
+			this.LevelPanel.TabIndex = 1;
+			this.LevelPanel.Visible = false;
 			// 
-			// pictureBox1
+			// levelPictureBox
 			// 
-			this.pictureBox1.Location = new System.Drawing.Point(3, 3);
-			this.pictureBox1.Name = "pictureBox1";
-			this.pictureBox1.Size = new System.Drawing.Size(4096, 512);
-			this.pictureBox1.TabIndex = 2;
-			this.pictureBox1.TabStop = false;
-			this.pictureBox1.Click += new System.EventHandler(this.PictureBox1Click);
-			this.pictureBox1.Paint += new System.Windows.Forms.PaintEventHandler(this.PictureBox1Paint);
-			this.pictureBox1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.PictureBox1MouseDown);
-			this.pictureBox1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.PictureBox1MouseMove);
+			this.levelPictureBox.Location = new System.Drawing.Point(3, 3);
+			this.levelPictureBox.Name = "levelPictureBox";
+			this.levelPictureBox.Size = new System.Drawing.Size(4096, 512);
+			this.levelPictureBox.TabIndex = 2;
+			this.levelPictureBox.TabStop = false;
+			this.levelPictureBox.Click += new System.EventHandler(this.LevelPictureBoxClick);
+			this.levelPictureBox.Paint += new System.Windows.Forms.PaintEventHandler(this.LevelPictureBoxPaint);
+			this.levelPictureBox.MouseDown += new System.Windows.Forms.MouseEventHandler(this.LevelPictureBoxMouseDown);
+			this.levelPictureBox.MouseMove += new System.Windows.Forms.MouseEventHandler(this.LevelPictureBoxMouseMove);
 			// 
-			// pictureBox3
+			// tilesPictureBox
 			// 
-			this.pictureBox3.Location = new System.Drawing.Point(10, 54);
-			this.pictureBox3.Name = "pictureBox3";
-			this.pictureBox3.Size = new System.Drawing.Size(128, 256);
-			this.pictureBox3.TabIndex = 3;
-			this.pictureBox3.TabStop = false;
-			this.pictureBox3.Visible = false;
-			this.pictureBox3.Paint += new System.Windows.Forms.PaintEventHandler(this.PictureBox3Paint);
-			this.pictureBox3.MouseDown += new System.Windows.Forms.MouseEventHandler(this.PictureBox3MouseDown);
+			this.tilesPictureBox.Location = new System.Drawing.Point(10, 54);
+			this.tilesPictureBox.Name = "tilesPictureBox";
+			this.tilesPictureBox.Size = new System.Drawing.Size(128, 256);
+			this.tilesPictureBox.TabIndex = 3;
+			this.tilesPictureBox.TabStop = false;
+			this.tilesPictureBox.Visible = false;
+			this.tilesPictureBox.Paint += new System.Windows.Forms.PaintEventHandler(this.ObjectsPictureBoxPaint);
+			this.tilesPictureBox.MouseDown += new System.Windows.Forms.MouseEventHandler(this.ObjectsPictureBoxMouseDown);
 			// 
-			// comboBox1
+			// levelComboBox
 			// 
-			this.comboBox1.FormattingEnabled = true;
-			this.comboBox1.Location = new System.Drawing.Point(12, 27);
-			this.comboBox1.Name = "comboBox1";
-			this.comboBox1.Size = new System.Drawing.Size(126, 21);
-			this.comboBox1.TabIndex = 4;
-			this.comboBox1.Visible = false;
-			this.comboBox1.SelectedIndexChanged += new System.EventHandler(this.ComboBox1SelectedIndexChanged);
+			this.levelComboBox.FormattingEnabled = true;
+			this.levelComboBox.Location = new System.Drawing.Point(12, 27);
+			this.levelComboBox.Name = "levelComboBox";
+			this.levelComboBox.Size = new System.Drawing.Size(126, 21);
+			this.levelComboBox.TabIndex = 4;
+			this.levelComboBox.Visible = false;
+			this.levelComboBox.SelectedIndexChanged += new System.EventHandler(this.LevelComboBoxSelectedIndexChanged);
 			// 
 			// menuStrip1
 			// 
 			this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-			this.fileToolStripMenuItem,
-			this.viewToolStripMenuItem});
+									this.fileToolStripMenuItem,
+									this.viewToolStripMenuItem});
 			this.menuStrip1.Location = new System.Drawing.Point(0, 0);
 			this.menuStrip1.Name = "menuStrip1";
 			this.menuStrip1.Size = new System.Drawing.Size(908, 24);
@@ -128,10 +128,10 @@ namespace WLEditor
 			// fileToolStripMenuItem
 			// 
 			this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-			this.loadToolStripMenuItem,
-			this.saveToolStripMenuItem,
-			this.saveAsToolStripMenuItem,
-			this.exitToolStripMenuItem});
+									this.loadToolStripMenuItem,
+									this.saveToolStripMenuItem,
+									this.saveAsToolStripMenuItem,
+									this.exitToolStripMenuItem});
 			this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
 			this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
 			this.fileToolStripMenuItem.Text = "&File";
@@ -158,7 +158,7 @@ namespace WLEditor
 			this.saveAsToolStripMenuItem.Enabled = false;
 			this.saveAsToolStripMenuItem.Name = "saveAsToolStripMenuItem";
 			this.saveAsToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Alt) 
-			| System.Windows.Forms.Keys.S)));
+									| System.Windows.Forms.Keys.S)));
 			this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(186, 22);
 			this.saveAsToolStripMenuItem.Text = "Save As...";
 			this.saveAsToolStripMenuItem.Click += new System.EventHandler(this.SaveAsToolStripMenuItemClick);
@@ -173,12 +173,12 @@ namespace WLEditor
 			// viewToolStripMenuItem
 			// 
 			this.viewToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-			this.regionsToolStripMenuItem,
-			this.objectsToolStripMenuItem,
-			this.scrollRegionToolStripMenuItem,
-			this.collidersToolStripMenuItem,
-			this.paletteToolStripMenuItem,
-			this.switchToolStripMenuItem});
+									this.regionsToolStripMenuItem,
+									this.objectsToolStripMenuItem,
+									this.scrollRegionToolStripMenuItem,
+									this.collidersToolStripMenuItem,
+									this.paletteToolStripMenuItem,
+									this.switchToolStripMenuItem});
 			this.viewToolStripMenuItem.Name = "viewToolStripMenuItem";
 			this.viewToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
 			this.viewToolStripMenuItem.Text = "&View";
@@ -224,9 +224,9 @@ namespace WLEditor
 			// paletteToolStripMenuItem
 			// 
 			this.paletteToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-			this.classicToolStripMenuItem,
-			this.blackWhiteToolStripMenuItem,
-			this.autumnToolStripMenuItem});
+									this.classicToolStripMenuItem,
+									this.blackWhiteToolStripMenuItem,
+									this.autumnToolStripMenuItem});
 			this.paletteToolStripMenuItem.Name = "paletteToolStripMenuItem";
 			this.paletteToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
 			this.paletteToolStripMenuItem.Text = "Palette";
@@ -257,9 +257,9 @@ namespace WLEditor
 			// switchToolStripMenuItem
 			// 
 			this.switchToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-			this.noneToolStripMenuItem,
-			this.aToolStripMenuItem,
-			this.bToolStripMenuItem});
+									this.noneToolStripMenuItem,
+									this.aToolStripMenuItem,
+									this.bToolStripMenuItem});
 			this.switchToolStripMenuItem.Name = "switchToolStripMenuItem";
 			this.switchToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
 			this.switchToolStripMenuItem.Text = "Block switch";
@@ -290,43 +290,42 @@ namespace WLEditor
 			this.bToolStripMenuItem.Text = "B";
 			this.bToolStripMenuItem.Click += new System.EventHandler(this.BToolStripMenuItemClick);
 			// 
-			// pictureBox2
+			// objectPictureBox
 			// 
-			this.pictureBox2.Location = new System.Drawing.Point(10, 316);
-			this.pictureBox2.Name = "pictureBox2";
-			this.pictureBox2.Size = new System.Drawing.Size(64, 64);
-			this.pictureBox2.TabIndex = 6;
-			this.pictureBox2.TabStop = false;
-			this.pictureBox2.Visible = false;
-			this.pictureBox2.Paint += new System.Windows.Forms.PaintEventHandler(this.PictureBox2Paint);
-			this.pictureBox2.MouseDown += new System.Windows.Forms.MouseEventHandler(this.PictureBox2MouseDown);
+			this.objectPictureBox.Location = new System.Drawing.Point(10, 316);
+			this.objectPictureBox.Name = "objectPictureBox";
+			this.objectPictureBox.Size = new System.Drawing.Size(64, 64);
+			this.objectPictureBox.TabIndex = 6;
+			this.objectPictureBox.TabStop = false;
+			this.objectPictureBox.Visible = false;
+			this.objectPictureBox.Paint += new System.Windows.Forms.PaintEventHandler(this.TilesPictureBoxPaint);
+			this.objectPictureBox.MouseDown += new System.Windows.Forms.MouseEventHandler(this.TilesPictureBoxMouseDown);
 			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(908, 471);
-			this.Controls.Add(this.pictureBox2);
-			this.Controls.Add(this.comboBox1);
-			this.Controls.Add(this.pictureBox3);
-			this.Controls.Add(this.panel1);
+			this.Controls.Add(this.objectPictureBox);
+			this.Controls.Add(this.levelComboBox);
+			this.Controls.Add(this.tilesPictureBox);
+			this.Controls.Add(this.LevelPanel);
 			this.Controls.Add(this.menuStrip1);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MainMenuStrip = this.menuStrip1;
 			this.Name = "MainForm";
 			this.Text = "WLEditor";
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainFormFormClosing);
-			this.panel1.ResumeLayout(false);
-			((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).EndInit();
+			this.LevelPanel.ResumeLayout(false);
+			((System.ComponentModel.ISupportInitialize)(this.levelPictureBox)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.tilesPictureBox)).EndInit();
 			this.menuStrip1.ResumeLayout(false);
 			this.menuStrip1.PerformLayout();
-			((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.objectPictureBox)).EndInit();
 			this.ResumeLayout(false);
 			this.PerformLayout();
-
 		}
-		private System.Windows.Forms.PictureBox pictureBox2;
+		private System.Windows.Forms.PictureBox objectPictureBox;
 		private System.Windows.Forms.ToolStripMenuItem saveToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem bToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem aToolStripMenuItem;
@@ -341,10 +340,10 @@ namespace WLEditor
 		private System.Windows.Forms.ToolStripMenuItem viewToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
 		private System.Windows.Forms.MenuStrip menuStrip1;
-		private System.Windows.Forms.ComboBox comboBox1;
-		private System.Windows.Forms.PictureBox pictureBox3;
-		private System.Windows.Forms.Panel panel1;
-		private System.Windows.Forms.PictureBox pictureBox1;
+		private System.Windows.Forms.ComboBox levelComboBox;
+		private System.Windows.Forms.PictureBox tilesPictureBox;
+		private System.Windows.Forms.Panel LevelPanel;
+		private System.Windows.Forms.PictureBox levelPictureBox;
 		private System.Windows.Forms.ToolStripMenuItem saveAsToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem paletteToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem classicToolStripMenuItem;
