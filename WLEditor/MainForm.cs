@@ -206,26 +206,9 @@ namespace WLEditor
 										int sector = i/16 + (j/16)*16;
 										int sectorTarget = Level.warps[sector];
 										if(sectorTarget != 255)
-										{
-											string warpText;
-											switch(sectorTarget)
-											{
-												case 32:
-													warpText = "S";
-													break;
-												case 33: 												
-													warpText = "EA";
-													break;
-												case 34: 			
-													warpText = "EB";												
-													break;
-												default:
-													warpText = sectorTarget.ToString();
-													break;
-											}
-											
+										{																					
 											e.Graphics.FillRectangle(Brushes.Brown, destRect);
-											e.Graphics.DrawString(warpText, font, Brushes.White, i *16 +8, j * 16 + 8, format);																					
+											e.Graphics.DrawString(GetWarpName(sectorTarget), font, Brushes.White, i *16 +8, j * 16 + 8, format);
 										}
 									}
 								}
@@ -309,6 +292,28 @@ namespace WLEditor
 					}
 				}	
 			}		
+		}
+		
+		string GetWarpName(int sectorTarget)
+		{
+			string warpText;
+			switch(sectorTarget)
+			{
+				case 32:
+					warpText = "S";
+					break;
+				case 33: 												
+					warpText = "EA";
+					break;
+				case 34: 			
+					warpText = "EB";												
+					break;
+				default:
+					warpText = sectorTarget.ToString();
+					break;
+			}
+			
+			return warpText;
 		}
 						
 		void CollidersToolStripMenuItemClick(object sender, EventArgs e)
