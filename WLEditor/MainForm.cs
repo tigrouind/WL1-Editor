@@ -158,87 +158,29 @@ namespace WLEditor
 		}						
 				
 		void LevelPictureBoxPaint(object sender, PaintEventArgs e)
-		{							
-			bool viewObjects = objectsToolStripMenuItem.Checked;
+		{		
 			bool viewSectors = regionsToolStripMenuItem.Checked;
 			bool viewScroll = scrollRegionToolStripMenuItem.Checked;	
-			bool viewColliders = collidersToolStripMenuItem.Checked;	
-			bool switchA = aToolStripMenuItem.Checked;
-			bool switchB = bToolStripMenuItem.Checked;
-			
+						
 			if(Level.levelData != null)
 			{										
 				StringFormat format = new StringFormat();
 				format.LineAlignment = StringAlignment.Center;
 				format.Alignment = StringAlignment.Center;		
-				
+								
 				using (Brush brush = new SolidBrush(Color.FromArgb(128, 255, 0, 0)))
-				using (Font font = new Font("Arial", 8))
-				{								
-					for(int j = 0 ; j < 32 ; j++)
-					{
-						for(int i = 0 ; i < 256 ; i++)
-						{					
-							Rectangle destRect = new Rectangle(i * 16, j * 16, 16, 16);
-							
-							if(destRect.IntersectsWith(e.ClipRectangle))
-							{
-								//tile blocks														
-								byte tileIndex = Level.levelData[i + j * 256 + 0x1000];
-								e.Graphics.DrawImage(tiles16x16,
-						    		        destRect,
-						    		        new Rectangle((tileIndex % 8) * 16, (tileIndex / 8) * 16, 16, 16),
-						    		        GraphicsUnit.Pixel);
-								
-								if(viewColliders)
-								{
-									if(Level.IsCollidable(Level.Switch(tileIndex, switchA, switchB)))
-								   	{
-										e.Graphics.FillRectangle(brush, destRect);
-								   }
-								}
-								
-								if(viewSectors)
-								{								
-									//if tile is a door, display destination
-									if(Level.IsDoor(tileIndex))
-									{
-										int sector = i/16 + (j/16)*16;
-										int sectorTarget = Level.warps[sector];
-										if(sectorTarget != 255)
-										{																					
-											e.Graphics.FillRectangle(Brushes.Brown, destRect);
-											e.Graphics.DrawString(GetWarpName(sectorTarget), font, Brushes.White, i *16 +8, j * 16 + 8, format);
-										}
-									}
-								}
-								
-								//objects						
-								if(viewObjects)
-								{
-									byte data = Level.objectsData[i + j * 256];
-									if(data != 0)
-									{
-										e.Graphics.FillRectangle(Brushes.Purple, destRect);
-										e.Graphics.DrawString(ObjectIdToString[data], font, Brushes.White, i * 16 + 8, j * 16 + 8, format);
-									}
-								}
-							}
-					 	}
-					}					
-				}
-				
 				using(Font font = new Font("Arial", 8))
 				using(Pen penBlue = new Pen(Color.DarkBlue, 2.0f))								
 				{
 					for(int j = 0 ; j < 2 ; j++)
 					{
 						for(int i = 0 ; i < 16 ; i++)
-						{
-							Rectangle destRect = new Rectangle(i * 256, j * 256, 256, 256);
-							
+						{				
+							Rectangle destRect = new Rectangle(i * 256, j * 256, 256, 256);							
 							if(destRect.IntersectsWith(e.ClipRectangle))
-							{						
+							{														
+								DrawSector(i, j, brush, font, format, e);
+								
 								int drawSector = i + j * 16;							
 							
 								//scroll
@@ -291,9 +233,70 @@ namespace WLEditor
 						}						
 					}
 				}	
-			}		
+			}					
 		}
 		
+		void DrawSector(int x, int y, Brush brush, Font font, StringFormat format, PaintEventArgs e)
+		{
+			bool viewObjects = objectsToolStripMenuItem.Checked;
+			bool viewColliders = collidersToolStripMenuItem.Checked;	
+			bool viewSectors = regionsToolStripMenuItem.Checked;
+			bool switchA = aToolStripMenuItem.Checked;
+			bool switchB = bToolStripMenuItem.Checked;
+			
+			for(int j = y * 16 ; j < (y + 1) * 16 ; j++)
+			{
+				for(int i = x * 16 ; i < (x + 1) * 16 ; i++)
+				{					
+					Rectangle destRect = new Rectangle(i * 16, j * 16, 16, 16);
+					
+					if(destRect.IntersectsWith(e.ClipRectangle))
+					{
+						//tile blocks														
+						byte tileIndex = Level.levelData[i + j * 256 + 0x1000];
+						e.Graphics.DrawImage(tiles16x16,
+				    		        destRect,
+				    		        new Rectangle((tileIndex % 8) * 16, (tileIndex / 8) * 16, 16, 16),
+				    		        GraphicsUnit.Pixel);
+						
+						if(viewColliders)
+						{
+							if(Level.IsCollidable(Level.Switch(tileIndex, switchA, switchB)))
+						   	{
+								e.Graphics.FillRectangle(brush, destRect);
+						   }
+						}
+						
+						if(viewSectors)
+						{								
+							//if tile is a door, display destination
+							if(Level.IsDoor(tileIndex))
+							{
+								int sector = i/16 + (j/16)*16;
+								int sectorTarget = Level.warps[sector];
+								if(sectorTarget != 255)
+								{																					
+									e.Graphics.FillRectangle(Brushes.Brown, destRect);
+									e.Graphics.DrawString(GetWarpName(sectorTarget), font, Brushes.White, i *16 +8, j * 16 + 8, format);
+								}
+							}
+						}
+						
+						//objects						
+						if(viewObjects)
+						{
+							byte data = Level.objectsData[i + j * 256];
+							if(data != 0)
+							{
+								e.Graphics.FillRectangle(Brushes.Purple, destRect);
+								e.Graphics.DrawString(ObjectIdToString[data], font, Brushes.White, i * 16 + 8, j * 16 + 8, format);
+							}
+						}
+					}
+			 	}
+			}
+		}		
+				
 		string GetWarpName(int sectorTarget)
 		{
 			string warpText;
