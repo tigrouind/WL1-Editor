@@ -49,6 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ComboboxItem.cs" />
+    <Compile Include="DirectBitmap.cs" />
     <Compile Include="Level.cs" />
     <Compile Include="MainForm.cs" />
     <Compile Include="MainForm.Designer.cs">

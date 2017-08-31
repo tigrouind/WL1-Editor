@@ -14,8 +14,8 @@ namespace WLEditor
 	public partial class MainForm : Form
 	{		
 		public Rom rom = new Rom();
-		public Bitmap tiles8x8 = new Bitmap(16 * 8, 8 * 8);
-		public Bitmap tiles16x16 = new Bitmap(16 * 8, 16 * 16);		
+		public DirectBitmap tiles8x8 = new DirectBitmap(16 * 8, 8 * 8);
+		public DirectBitmap tiles16x16 = new DirectBitmap(16 * 8, 16 * 16);		
 		public int currentSector = -1;
 		public int currentTile = -1;		
 		public int currentObject = -1;
@@ -254,7 +254,7 @@ namespace WLEditor
 					{
 						//tile blocks														
 						byte tileIndex = Level.levelData[i + j * 256 + 0x1000];
-						e.Graphics.DrawImage(tiles16x16,
+						e.Graphics.DrawImage(tiles16x16.Bitmap,
 				    		        destRect,
 				    		        new Rectangle((tileIndex % 8) * 16, (tileIndex / 8) * 16, 16, 16),
 				    		        GraphicsUnit.Pixel);
@@ -326,7 +326,7 @@ namespace WLEditor
 
 		void ObjectsPictureBoxPaint(object sender, PaintEventArgs e)
 		{
-			e.Graphics.DrawImage(tiles16x16, 0, 0);
+			e.Graphics.DrawImage(tiles16x16.Bitmap, 0, 0);
 			
 			if(currentTile != -1)
 			{
