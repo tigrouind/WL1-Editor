@@ -14,8 +14,10 @@ namespace WLEditor
 	public partial class MainForm : Form
 	{		
 		public Rom rom = new Rom();
+		public DirectBitmap levelTiles = new DirectBitmap(4096, 512);
 		public DirectBitmap tiles8x8 = new DirectBitmap(16 * 8, 8 * 8);
 		public DirectBitmap tiles16x16 = new DirectBitmap(16 * 8, 16 * 16);		
+		public bool[] invalidTiles = new bool[256 * 32];
 		public int currentSector = -1;
 		public int currentTile = -1;		
 		public int currentObject = -1;
@@ -23,7 +25,7 @@ namespace WLEditor
 		public int currentWarp = -1;
 		public string romFilePath;		
 		public bool hasChanges;
-		public string[] ObjectIdToString = new [] { string.Empty, "1", "2", "3", "4", "5", "6", "G", "J", "D", "K", "H", "S", "C", "CC", "B" };
+		public string[] ObjectIdToString = { string.Empty, "1", "2", "3", "4", "5", "6", "G", "J", "D", "K", "H", "S", "C", "CC", "B" };
 				
 		public MainForm()
 		{
@@ -40,7 +42,8 @@ namespace WLEditor
 		{			
 			if(rom.IsLoaded && levelComboBox.SelectedItem != null)
 			{				
-				Level.DumpLevel(rom, currentCourseId, currentWarp, tiles8x8, tiles16x16, reloadAll, aToolStripMenuItem.Checked, bToolStripMenuItem.Checked, SelectedPaletteToolStripIndex());
+				Array.Clear(invalidTiles, 0, invalidTiles.Length);
+				Level.DumpLevel(rom, currentCourseId, currentWarp, tiles8x8, tiles16x16, levelTiles, reloadAll, aToolStripMenuItem.Checked, bToolStripMenuItem.Checked, SelectedPaletteToolStripIndex());
 				
 				levelPictureBox.Refresh();	
 				objectPictureBox.Refresh();
@@ -155,7 +158,7 @@ namespace WLEditor
 		void ExitToolStripMenuItemClick(object sender, EventArgs e)
 		{
 			Application.Exit();
-		}						
+		}	
 				
 		void LevelPictureBoxPaint(object sender, PaintEventArgs e)
 		{		
@@ -166,12 +169,26 @@ namespace WLEditor
 			{										
 				StringFormat format = new StringFormat();
 				format.LineAlignment = StringAlignment.Center;
-				format.Alignment = StringAlignment.Center;		
-								
+				format.Alignment = StringAlignment.Center;								
+				
 				using (Brush brush = new SolidBrush(Color.FromArgb(128, 255, 0, 0)))
 				using(Font font = new Font("Arial", 8))
 				using(Pen penBlue = new Pen(Color.DarkBlue, 2.0f))								
 				{
+					for(int y = 0 ; y < 2 ; y++)
+					{
+						for(int x = 0 ; x < 16 ; x++)
+						{				
+							Rectangle destRect = new Rectangle(x * 256, y * 256, 256, 256);							
+							if(destRect.IntersectsWith(e.ClipRectangle))
+							{	
+								DrawTiles(x, y, e);
+							}
+						}
+					}
+					
+					e.Graphics.DrawImage(levelTiles.Bitmap, 0, 0);				
+					
 					for(int j = 0 ; j < 2 ; j++)
 					{
 						for(int i = 0 ; i < 16 ; i++)
@@ -233,7 +250,27 @@ namespace WLEditor
 						}						
 					}
 				}	
-			}					
+			}	
+		}
+		
+		void DrawTiles(int x, int y, PaintEventArgs e)
+		{
+			for(int j = y * 16 ; j < (y + 1) * 16 ; j++)
+			{
+				for(int i = x * 16 ; i < (x + 1) * 16 ; i++)
+				{					
+					Rectangle destRect = new Rectangle(i * 16, j * 16, 16, 16);
+					
+					if(destRect.IntersectsWith(e.ClipRectangle))
+					{	
+						if(!invalidTiles[i + j * 256])
+						{
+							invalidTiles[i + j * 256] = true;
+							Level.DrawLevelTile(i, j, tiles16x16, levelTiles);
+						}
+					}
+				}
+			}
 		}
 		
 		void DrawSector(int x, int y, Brush brush, Font font, StringFormat format, PaintEventArgs e)
@@ -254,10 +291,6 @@ namespace WLEditor
 					{
 						//tile blocks														
 						byte tileIndex = Level.levelData[i + j * 256 + 0x1000];
-						e.Graphics.DrawImage(tiles16x16.Bitmap,
-				    		        destRect,
-				    		        new Rectangle((tileIndex % 8) * 16, (tileIndex / 8) * 16, 16, 16),
-				    		        GraphicsUnit.Pixel);
 						
 						if(viewColliders)
 						{
@@ -346,7 +379,6 @@ namespace WLEditor
 				format.LineAlignment = StringAlignment.Center;
 				format.Alignment = StringAlignment.Center;		
 				
-
 				using(Font font = new Font("Arial", 8))
 				{
 					int tileIndex = 0;				
@@ -499,8 +531,9 @@ namespace WLEditor
 					Level.objectsData[tileIndex] = (byte)currentObject;						
 					hasChanges = true;
 				}
-
-				Region r = new Region(new Rectangle((tileIndex % 256) * 16, (tileIndex / 256) * 16, 16, 16));
+				
+				invalidTiles[tileIndex] = false;
+				Region r = new Region(new Rectangle((tileIndex % 256) * 16, (tileIndex / 256) * 16, 16, 16));				
 				levelPictureBox.Invalidate(r);							
 			}
 		}

@@ -21,7 +21,7 @@ namespace WLEditor
 		public static byte[] warps;
 		public static int warioPosition;
 			
-		public static void DumpLevel(Rom rom, int course, int warp, DirectBitmap tiles8x8, DirectBitmap tiles16x16, bool reloadAll, bool switchA, bool switchB, int paletteIndex)
+		public static void DumpLevel(Rom rom, int course, int warp, DirectBitmap tiles8x8, DirectBitmap tiles16x16, DirectBitmap levelTiles, bool reloadAll, bool switchA, bool switchB, int paletteIndex)
 		{	
 			rom.SetBank(0xC);
 			int header = rom.ReadWord(0x4560 + course * 2);
@@ -211,6 +211,22 @@ namespace WLEditor
 				yield return count;
 			}
 		}		
+		
+		public static void DrawLevelTile(int i, int j, DirectBitmap gfx16, DirectBitmap levelTiles)
+		{							
+			byte tileIndex = Level.levelData[i + j * 256 + 0x1000];
+			Point dest = new Point(i * 16, j * 16);
+			Point src = new Point((tileIndex % 8) * 16, (tileIndex / 8) * 16);
+			
+			for(int y = 0 ; y < 16 ; y++)
+			{
+				for(int x = 0 ; x < 16 ; x++)
+				{
+					levelTiles.Bits[dest.X + x + (dest.Y + y) * levelTiles.Width] 
+						= gfx16.Bits[src.X + x + (src.Y + y) * gfx16.Width];
+				}
+			}
+		}
 		
 		public static void Dump16x16Tiles(Rom rom, int tileindexaddress, DirectBitmap gfx8, DirectBitmap gfx16, bool switchA, bool switchB)
 		{
