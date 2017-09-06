@@ -174,6 +174,7 @@ namespace WLEditor
 				using (Brush brush = new SolidBrush(Color.FromArgb(128, 255, 0, 0)))
 				using(Font font = new Font("Arial", 8))
 				using(Pen penBlue = new Pen(Color.DarkBlue, 2.0f))								
+				using(Graphics g = Graphics.FromImage(levelTiles.Bitmap))
 				{
 					for(int y = 0 ; y < 2 ; y++)
 					{
@@ -182,7 +183,7 @@ namespace WLEditor
 							Rectangle destRect = new Rectangle(x * 256, y * 256, 256, 256);							
 							if(destRect.IntersectsWith(e.ClipRectangle))
 							{	
-								DrawTiles(x, y, e);
+								DrawTiles(x, y, brush, g, e);
 							}
 						}
 					}
@@ -196,7 +197,7 @@ namespace WLEditor
 							Rectangle destRect = new Rectangle(i * 256, j * 256, 256, 256);							
 							if(destRect.IntersectsWith(e.ClipRectangle))
 							{														
-								DrawSector(i, j, brush, font, format, e);
+								DrawSector(i, j, font, format, e);
 								
 								int drawSector = i + j * 16;							
 							
@@ -253,8 +254,12 @@ namespace WLEditor
 			}	
 		}
 		
-		void DrawTiles(int x, int y, PaintEventArgs e)
+		void DrawTiles(int x, int y, Brush brush, Graphics g, PaintEventArgs e)
 		{
+			bool switchA = aToolStripMenuItem.Checked;
+			bool switchB = bToolStripMenuItem.Checked;			
+			bool viewColliders = collidersToolStripMenuItem.Checked;	
+			
 			for(int j = y * 16 ; j < (y + 1) * 16 ; j++)
 			{
 				for(int i = x * 16 ; i < (x + 1) * 16 ; i++)
@@ -262,24 +267,31 @@ namespace WLEditor
 					Rectangle destRect = new Rectangle(i * 16, j * 16, 16, 16);
 					
 					if(destRect.IntersectsWith(e.ClipRectangle))
-					{	
+					{												
 						if(!invalidTiles[i + j * 256])
-						{
+						{							
 							invalidTiles[i + j * 256] = true;
 							Level.DrawLevelTile(i, j, tiles16x16, levelTiles);
+													
+							if(viewColliders)
+							{
+								byte tileIndex = Level.levelData[i + j * 256 + 0x1000];
+								if(Level.IsCollidable(Level.Switch(tileIndex, switchA, switchB)))
+							   	{
+									g.FillRectangle(brush, destRect);
+							   }
+							}												
 						}
+						
 					}
 				}
 			}
 		}
 		
-		void DrawSector(int x, int y, Brush brush, Font font, StringFormat format, PaintEventArgs e)
+		void DrawSector(int x, int y, Font font, StringFormat format, PaintEventArgs e)
 		{
-			bool viewObjects = objectsToolStripMenuItem.Checked;
-			bool viewColliders = collidersToolStripMenuItem.Checked;	
+			bool viewObjects = objectsToolStripMenuItem.Checked;			
 			bool viewSectors = regionsToolStripMenuItem.Checked;
-			bool switchA = aToolStripMenuItem.Checked;
-			bool switchB = bToolStripMenuItem.Checked;
 			
 			for(int j = y * 16 ; j < (y + 1) * 16 ; j++)
 			{
@@ -291,14 +303,6 @@ namespace WLEditor
 					{
 						//tile blocks														
 						byte tileIndex = Level.levelData[i + j * 256 + 0x1000];
-						
-						if(viewColliders)
-						{
-							if(Level.IsCollidable(Level.Switch(tileIndex, switchA, switchB)))
-						   	{
-								e.Graphics.FillRectangle(brush, destRect);
-						   }
-						}
 						
 						if(viewSectors)
 						{								
@@ -354,6 +358,7 @@ namespace WLEditor
 						
 		void CollidersToolStripMenuItemClick(object sender, EventArgs e)
 		{
+			Array.Clear(invalidTiles, 0, invalidTiles.Length);
 			levelPictureBox.Refresh();	
 		}
 
