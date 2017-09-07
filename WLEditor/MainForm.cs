@@ -43,7 +43,7 @@ namespace WLEditor
 			if(rom.IsLoaded && levelComboBox.SelectedItem != null)
 			{				
 				Array.Clear(invalidTiles, 0, invalidTiles.Length);
-				Level.DumpLevel(rom, currentCourseId, currentWarp, tiles8x8, tiles16x16, levelTiles, reloadAll, aToolStripMenuItem.Checked, bToolStripMenuItem.Checked, SelectedPaletteToolStripIndex());
+				Level.DumpLevel(rom, currentCourseId, currentWarp, tiles8x8, tiles16x16, reloadAll, aToolStripMenuItem.Checked, bToolStripMenuItem.Checked, SelectedPaletteToolStripIndex());
 				
 				levelPictureBox.Refresh();	
 				objectPictureBox.Refresh();

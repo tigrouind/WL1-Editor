@@ -21,7 +21,7 @@ namespace WLEditor
 		public static byte[] warps;
 		public static int warioPosition;
 			
-		public static void DumpLevel(Rom rom, int course, int warp, DirectBitmap tiles8x8, DirectBitmap tiles16x16, DirectBitmap levelTiles, bool reloadAll, bool switchA, bool switchB, int paletteIndex)
+		public static void DumpLevel(Rom rom, int course, int warp, DirectBitmap tiles8x8, DirectBitmap tiles16x16, bool reloadAll, bool switchA, bool switchB, int paletteIndex)
 		{	
 			rom.SetBank(0xC);
 			int header = rom.ReadWord(0x4560 + course * 2);
@@ -50,27 +50,18 @@ namespace WLEditor
 			//set palette
 			paletteColors = palettes[paletteIndex];
 								
-			//dump 8x8 blocks
-	      	using(Graphics g = Graphics.FromImage(tiles8x8.Bitmap))
-	      	{
-	      		g.Clear(paletteColors[0]);
-	      		rom.SetBank(0x11);
-				Dump8x8Tiles(rom, tileaddressA, tiles8x8, 2*16, 0, palette);
-				rom.SetBank(tilebank);
-				Dump8x8Tiles(rom, tileaddressB, tiles8x8, 6*16, 2, palette);
-				rom.SetBank(0x11);
-				Dump8x8Tiles(rom, tileanimated, tiles8x8, 4, 2, palette);				
-				
-	      	}
+			//dump 8x8 blocks      
+	        rom.SetBank(0x11);
+			Dump8x8Tiles(rom, tileaddressA, tiles8x8, 2*16, 0, palette);
+			rom.SetBank(tilebank);
+			Dump8x8Tiles(rom, tileaddressB, tiles8x8, 6*16, 2, palette);
+			rom.SetBank(0x11);
+			Dump8x8Tiles(rom, tileanimated, tiles8x8, 4, 2, palette);			
 	      	
 	    	//dump 16x16 blocks	
-	      	using(Graphics g = Graphics.FromImage(tiles16x16.Bitmap))
-	      	{
-	      		g.Clear(paletteColors[0]);
-			    rom.SetBank(0xB);	
-			    Dump16x16Tiles(rom, blockindex, tiles8x8, tiles16x16, switchA, switchB);
-	      	}
-	      	
+	        rom.SetBank(0xB);	
+			Dump16x16Tiles(rom, blockindex, tiles8x8, tiles16x16, switchA, switchB);
+			
 	      	if(reloadAll)
 	      	{	      	
 		      	//dump level	      	
@@ -242,12 +233,11 @@ namespace WLEditor
 			    		for(int j = 0 ; j < 2 ; j++)
 			    		{
 			    			byte subTileIndex = rom.ReadByte(tileindexaddress + tileIndex * 4 + k * 2 + j);
+			    			Point dest = new Point(j * 8 + i * 16, k * 8 + n * 16);
 			    					    					    				    						    		
 			    			if(subTileIndex < 128)
-			    			{
-			    				Point dest = new Point(j * 8 + i * 16, k * 8 + n * 16);
-			    				Point source = new Point((subTileIndex % 16) * 8, (subTileIndex / 16) * 8);		
-			    			
+			    			{			    				
+			    				Point source = new Point((subTileIndex % 16) * 8, (subTileIndex / 16) * 8);					    			
 			    				for(int y = 0 ; y < 8 ; y++)
 						    	{
 						    		for(int x = 0 ; x < 8 ; x++)
@@ -256,7 +246,18 @@ namespace WLEditor
 						    				= gfx8.Bits[source.X + x + (source.Y + y) * gfx8.Width];
 						    		}
 						    	}	
-			    			}			    							    			
+			    			}
+							else			    			
+							{
+								for(int y = 0 ; y < 8 ; y++)
+						    	{
+						    		for(int x = 0 ; x < 8 ; x++)
+						    		{
+						    			gfx16.Bits[dest.X + x + (dest.Y + y) * gfx16.Width] 
+						    				= paletteColors[0].ToArgb();
+						    		}
+						    	}	
+							}
 			    		}
 			    	}			    	
 			    }
