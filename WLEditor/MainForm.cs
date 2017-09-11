@@ -271,7 +271,7 @@ namespace WLEditor
 						if(!invalidTiles[i + j * 256])
 						{							
 							invalidTiles[i + j * 256] = true;
-							Level.DrawLevelTile(i, j, tiles16x16, levelTiles);
+							DrawTileToBitmap(i, j);
 													
 							if(viewColliders)
 							{
@@ -284,6 +284,22 @@ namespace WLEditor
 						}
 						
 					}
+				}
+			}
+		}
+						
+		void DrawTileToBitmap(int i, int j)
+		{							
+			byte tileIndex = Level.levelData[i + j * 256 + 0x1000];
+			Point dest = new Point(i * 16, j * 16);
+			Point src = new Point((tileIndex % 8) * 16, (tileIndex / 8) * 16);
+			
+			for(int y = 0 ; y < 16 ; y++)
+			{
+				for(int x = 0 ; x < 16 ; x++)
+				{
+					levelTiles.Bits[dest.X + x + (dest.Y + y) * levelTiles.Width] 
+						= tiles16x16.Bits[src.X + x + (src.Y + y) * tiles16x16.Width];
 				}
 			}
 		}
