@@ -116,27 +116,19 @@ namespace WLEditor
 			levelComboBox.Items.Clear();
 			
 			//convert course id => course no using data in ROM
-			rom.SetBank(0);													
+			rom.SetBank(0);	
+			var courseIdToNo = new Dictionary<int, int>();
 			List<ComboboxItem> items = new List<ComboboxItem>();
 			for(int i = 0 ; i <= 0x2A ; i++)
 			{
 				int levelpointer = rom.ReadWord(0x0534 + i * 2);
 				int courseNo = (levelpointer - 0x0587) / 3;
-				ComboboxItem item = new ComboboxItem(string.Format("Course {0:D2}", courseNo), i);												
+				ComboboxItem item = new ComboboxItem(string.Format("{0:D2} {1}", courseNo, Level.levelNames[i]), i);
 				items.Add(item);
+				courseIdToNo.Add(i, courseNo);
 			}		
 			
-			items = items.OrderBy(x => x.Text).ToList();
-			string oldItem = null;
-			foreach(var item in items)
-			{
-				if(oldItem != null && item.Text == oldItem)
-				{
-					item.Text += " (revisited)";
-				}
-				oldItem = item.Text;
-			}
-			
+			items = items.OrderBy(x => courseIdToNo[(int)x.Value]).ToList();
 			levelComboBox.Items.AddRange(items.ToArray());			
 		}
 		

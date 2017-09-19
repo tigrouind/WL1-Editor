@@ -15,6 +15,53 @@ namespace WLEditor
 			new[] { Color.White, Color.FromArgb(255, 230, 214, 156), Color.FromArgb(255, 180, 165, 106), Color.FromArgb(255, 57, 56, 41) }			
 		};
 		
+		public static string[] levelNames =
+		{
+			"SS Teacup 1",
+			"Parsley Woods 3",
+			"Sherbet Land 2",
+			"Stove Canyon 1",
+			"Sherbet Land 3",
+			"Mt. Teapot 4",
+			"Mt. Teapot 1",
+			"Rice Beach 1",
+			"Sherbet Land 4",
+			"Mt. Teapot 6",
+			"Mt. Teapot 7",
+			"SS Teacup 4",
+			"Rice Beach 4",
+			"Mt. Teapot 3",
+			"Rice Beach 3",
+			"Rice Beach 2",
+			"Mt. Teapot 2",
+			"Mt. Teapot 5",
+			"Parsley Woods 5",
+			"Parsley Woods 4",
+			"SS Teacup 5",
+			"Stove Canyon 2",
+			"Stove Canyon 3",
+			"Rice Beach 1 - FLOODED",
+			"Sherbet Land 6",
+			"Rice Beach 5",
+			"Parsley Woods 6",
+			"Stove Canyon 5",
+			"Stove Canyon 6",
+			"Parsley Woods 2",
+			"SS Teacup 2",
+			"SS Teacup 3",
+			"Sherbet Land 5",
+			"Sherbet Land 1",
+			"Syrup Castle 2",
+			"Syrup Castle 3",
+			"Rice Beach 3 - FLOODED",
+			"Syrup Castle 1",
+			"Parsley Woods 1 - FLOODED",
+			"Stove Canyon 4",
+			"Syrup Castle 4",
+			"Rice Beach 6",
+			"Parsley Woods 1 - DRAINED"
+		};
+		
 		public static byte[] levelData;
 		public static byte[] objectsData;
 		public static byte[] scrollData;

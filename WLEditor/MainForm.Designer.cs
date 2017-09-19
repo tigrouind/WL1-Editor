@@ -109,7 +109,7 @@ namespace WLEditor
 			this.levelComboBox.FormattingEnabled = true;
 			this.levelComboBox.Location = new System.Drawing.Point(12, 27);
 			this.levelComboBox.Name = "levelComboBox";
-			this.levelComboBox.Size = new System.Drawing.Size(126, 21);
+			this.levelComboBox.Size = new System.Drawing.Size(184, 21);
 			this.levelComboBox.TabIndex = 4;
 			this.levelComboBox.Visible = false;
 			this.levelComboBox.SelectedIndexChanged += new System.EventHandler(this.LevelComboBoxSelectedIndexChanged);
