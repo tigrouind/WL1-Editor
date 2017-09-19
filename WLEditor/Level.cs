@@ -11,7 +11,7 @@ namespace WLEditor
 		public static Color[][] palettes = 
 		{
 			new[] { Color.FromArgb(255, 224, 248, 208), Color.FromArgb(255, 135, 201, 140), Color.FromArgb(255, 52, 104, 86), Color.FromArgb(255, 8, 24, 32) },
-			new[] { Color.White, Color.LightGray, Color.DarkGray, Color.Black },
+			new[] { Color.White, Color.FromArgb(255, 170, 170, 170), Color.FromArgb(255, 85, 85, 85), Color.Black },
 			new[] { Color.White, Color.FromArgb(255, 230, 214, 156), Color.FromArgb(255, 180, 165, 106), Color.FromArgb(255, 57, 56, 41) }			
 		};
 		
