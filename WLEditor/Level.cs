@@ -187,7 +187,7 @@ namespace WLEditor
 			{
 				byte repeat = 0;
 				byte data = levelData[current++];
-				while(current < levelData.Length && levelData[current] == data && repeat < 255)
+				while(current < levelData.Length && levelData[current] == data && repeat < 255 && current % 256 != 0)
 				{					
 					current++;
 					repeat++;
@@ -222,7 +222,7 @@ namespace WLEditor
 			}
 		}
 		
-		public static IEnumerable<byte> RLECompressObjectshelper(byte[] levelData) 
+		public static IEnumerable<byte> RLECompressObjectsHelper(byte[] levelData) 
 		{			
 			for(int i = 0 ; i < levelData.Length ; i+=2)
 			{
@@ -232,7 +232,7 @@ namespace WLEditor
 		
 		public static IEnumerable<byte> RLECompressObjects(byte[] levelData)
 		{
-			byte[] halfData = RLECompressObjectshelper(levelData).ToArray();
+			byte[] halfData = RLECompressObjectsHelper(levelData).ToArray();
 			
 			int current = 0;
 			while(current < halfData.Length)
