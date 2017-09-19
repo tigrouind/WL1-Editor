@@ -215,9 +215,9 @@ namespace WLEditor
 								//sectors
 								if(viewSectors)
 								{
-									e.Graphics.DrawRectangle(penBlue, i * 256 , j * 256, 256, 256);																								
+									e.Graphics.DrawRectangle(penBlue, i * 256, j * 256, 256, 256);																								
 									
-									e.Graphics.FillRectangle(Brushes.DarkBlue, i * 256 , j * 256, 16.0f, 16.0f);
+									e.Graphics.FillRectangle(Brushes.DarkBlue, i * 256, j * 256, 16, 16);
 									e.Graphics.DrawString(drawSector.ToString(), font, Brushes.White, i * 256 + 8, j * 256 + 8, format);									
 								}
 							}
