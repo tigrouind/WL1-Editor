@@ -106,6 +106,7 @@ namespace WLEditor
 			// 
 			// levelComboBox
 			// 
+			this.levelComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.levelComboBox.FormattingEnabled = true;
 			this.levelComboBox.Location = new System.Drawing.Point(12, 27);
 			this.levelComboBox.Name = "levelComboBox";
