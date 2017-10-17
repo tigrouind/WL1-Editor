@@ -93,8 +93,7 @@ namespace WLEditor
 						LevelComboBoxSelectedIndexChanged(sender, e);
 					else
 						levelComboBox.SelectedIndex = 0;
-
-					saveToolStripMenuItem.Enabled = true;
+					
 					saveAsToolStripMenuItem.Enabled = true;
 					levelComboBox.Visible = true;
 					LevelPanel.Visible = true;
@@ -467,7 +466,7 @@ namespace WLEditor
 				}
 			}
 
-			hasChanges = false;
+			SetChanges(false);
 			return true;
 		}
 
@@ -482,7 +481,7 @@ namespace WLEditor
 						return SaveChanges();
 
 					case DialogResult.No:
-						hasChanges = false;
+						SetChanges(false);
 						return true;
 
 					case DialogResult.Cancel:
@@ -496,6 +495,12 @@ namespace WLEditor
 			{
 				return true;
 			}
+		}
+		
+		void SetChanges(bool hasChanges)
+		{			
+			this.hasChanges = hasChanges;
+			saveToolStripMenuItem.Enabled = hasChanges;
 		}
 
 		void SaveToolStripMenuItemClick(object sender, EventArgs e)
@@ -536,13 +541,13 @@ namespace WLEditor
 				if(currentTile != -1)
 				{
 					Level.levelData[tileIndex + 0x1000] = (byte)currentTile;
-					hasChanges = true;
+					SetChanges(true);
 				}
 
 				if(currentObject != -1)
 				{
 					Level.objectsData[tileIndex] = (byte)currentObject;
-					hasChanges = true;
+					SetChanges(true);
 				}
 
 				invalidTiles[tileIndex] = false;
