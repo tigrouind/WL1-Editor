@@ -430,30 +430,6 @@ namespace WLEditor
 			bToolStripMenuItem.Checked = toolStrip == bToolStripMenuItem;
 		}
 
-		void LevelPictureBoxClick(object sender, EventArgs e)
-		{
-			MouseEventArgs me = (MouseEventArgs)e;
-			if(me.Button == MouseButtons.Right)
-			{
-				Point coordinates = me.Location;
-				int sector = me.Location.X / 256 + (me.Location.Y / 256) * 16;
-				if(sector != currentSector)
-				{
-					currentSector = sector;
-					int warpTarget = Level.SearchWarp(rom, currentCourseId, currentSector);
-					if(warpTarget != currentWarp)
-					{
-						currentWarp = warpTarget;
-						LoadLevel(false);
-					}
-					else
-					{
-						levelPictureBox.Refresh();
-					}
-				}
-			}
-		}
-
 		bool SaveChanges()
 		{
 			if(rom.IsLoaded)
@@ -529,7 +505,7 @@ namespace WLEditor
 			{
 				currentTile = -1;
 				tilesPictureBox.Refresh();
-			}
+			}					
 		}
 
 		void LevelPictureBoxMouseDown(object sender, MouseEventArgs e)
@@ -553,6 +529,25 @@ namespace WLEditor
 				invalidTiles[tileIndex] = false;
 				Region r = new Region(new Rectangle((tileIndex % 256) * 16, (tileIndex / 256) * 16, 16, 16));
 				levelPictureBox.Invalidate(r);
+			}
+			else if(e.Button == MouseButtons.Right)
+			{
+				Point coordinates = e.Location;
+				int sector = e.Location.X / 256 + (e.Location.Y / 256) * 16;
+				if(sector != currentSector)
+				{
+					currentSector = sector;
+					int warpTarget = Level.SearchWarp(rom, currentCourseId, currentSector);
+					if(warpTarget != currentWarp)
+					{
+						currentWarp = warpTarget;
+						LoadLevel(false);
+					}
+					else
+					{
+						levelPictureBox.Refresh();
+					}
+				}
 			}
 		}
 

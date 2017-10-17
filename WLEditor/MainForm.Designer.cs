@@ -87,8 +87,7 @@ namespace WLEditor
 			this.levelPictureBox.Name = "levelPictureBox";
 			this.levelPictureBox.Size = new System.Drawing.Size(4096, 512);
 			this.levelPictureBox.TabIndex = 2;
-			this.levelPictureBox.TabStop = false;
-			this.levelPictureBox.Click += new System.EventHandler(this.LevelPictureBoxClick);
+			this.levelPictureBox.TabStop = false;			
 			this.levelPictureBox.Paint += new System.Windows.Forms.PaintEventHandler(this.LevelPictureBoxPaint);
 			this.levelPictureBox.MouseDown += new System.Windows.Forms.MouseEventHandler(this.LevelPictureBoxMouseDown);
 			this.levelPictureBox.MouseMove += new System.Windows.Forms.MouseEventHandler(this.LevelPictureBoxMouseMove);
