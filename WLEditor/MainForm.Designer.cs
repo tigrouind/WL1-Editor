@@ -61,19 +61,17 @@ namespace WLEditor
 			this.aToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.bToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.objectPictureBox = new System.Windows.Forms.PictureBox();
-			this.panel1 = new System.Windows.Forms.Panel();
-			this.panel2 = new System.Windows.Forms.Panel();
-			this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-			this.panel3 = new System.Windows.Forms.Panel();
+			this.levelSelectPanel = new System.Windows.Forms.Panel();
+			this.mainTable = new System.Windows.Forms.TableLayoutPanel();
+			this.toolboxPanel = new System.Windows.Forms.Panel();
 			this.LevelPanel.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.levelPictureBox)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.tilesPictureBox)).BeginInit();
 			this.menuStrip1.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.objectPictureBox)).BeginInit();
-			this.panel1.SuspendLayout();
-			this.panel2.SuspendLayout();
-			this.tableLayoutPanel1.SuspendLayout();
-			this.panel3.SuspendLayout();
+			this.levelSelectPanel.SuspendLayout();
+			this.mainTable.SuspendLayout();
+			this.toolboxPanel.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// LevelPanel
@@ -310,58 +308,50 @@ namespace WLEditor
 			this.objectPictureBox.Paint += new System.Windows.Forms.PaintEventHandler(this.TilesPictureBoxPaint);
 			this.objectPictureBox.MouseDown += new System.Windows.Forms.MouseEventHandler(this.TilesPictureBoxMouseDown);
 			// 
-			// panel1
+			// levelSelectPanel
 			// 
-			this.panel1.AutoSize = true;
-			this.panel1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.panel1.Controls.Add(this.levelComboBox);
-			this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
-			this.panel1.Location = new System.Drawing.Point(0, 36);
-			this.panel1.Name = "panel1";
-			this.panel1.Size = new System.Drawing.Size(1209, 30);
-			this.panel1.TabIndex = 7;
+			this.levelSelectPanel.AutoSize = true;
+			this.levelSelectPanel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			this.levelSelectPanel.Controls.Add(this.levelComboBox);
+			this.levelSelectPanel.Dock = System.Windows.Forms.DockStyle.Top;
+			this.levelSelectPanel.Location = new System.Drawing.Point(0, 36);
+			this.levelSelectPanel.Name = "levelSelectPanel";
+			this.levelSelectPanel.Size = new System.Drawing.Size(1209, 30);
+			this.levelSelectPanel.TabIndex = 7;
 			// 
-			// panel2
+			// mainTable
 			// 
-			this.panel2.Controls.Add(this.tableLayoutPanel1);
-			this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.panel2.Location = new System.Drawing.Point(0, 66);
-			this.panel2.Name = "panel2";
-			this.panel2.Size = new System.Drawing.Size(1209, 577);
-			this.panel2.TabIndex = 3;
+			this.mainTable.ColumnCount = 2;
+			this.mainTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 140F));
+			this.mainTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+			this.mainTable.Controls.Add(this.toolboxPanel, 0, 0);
+			this.mainTable.Controls.Add(this.LevelPanel, 1, 0);
+			this.mainTable.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.mainTable.Location = new System.Drawing.Point(0, 66);
+			this.mainTable.Name = "mainTable";
+			this.mainTable.RowCount = 1;
+			this.mainTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+			this.mainTable.Size = new System.Drawing.Size(1209, 577);
+			this.mainTable.TabIndex = 3;
 			// 
-			// tableLayoutPanel1
+			// toolboxPanel
 			// 
-			this.tableLayoutPanel1.ColumnCount = 2;
-			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 140F));
-			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-			this.tableLayoutPanel1.Controls.Add(this.panel3, 0, 0);
-			this.tableLayoutPanel1.Controls.Add(this.LevelPanel, 1, 0);
-			this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
-			this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-			this.tableLayoutPanel1.RowCount = 1;
-			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-			this.tableLayoutPanel1.Size = new System.Drawing.Size(1209, 577);
-			this.tableLayoutPanel1.TabIndex = 3;
-			// 
-			// panel3
-			// 
-			this.panel3.AutoSize = true;
-			this.panel3.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.panel3.Controls.Add(this.tilesPictureBox);
-			this.panel3.Controls.Add(this.objectPictureBox);
-			this.panel3.Location = new System.Drawing.Point(3, 3);
-			this.panel3.Name = "panel3";
-			this.panel3.Size = new System.Drawing.Size(134, 332);
-			this.panel3.TabIndex = 7;
+			this.toolboxPanel.AutoSize = true;
+			this.toolboxPanel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			this.toolboxPanel.BackColor = System.Drawing.SystemColors.Control;
+			this.toolboxPanel.Controls.Add(this.tilesPictureBox);
+			this.toolboxPanel.Controls.Add(this.objectPictureBox);
+			this.toolboxPanel.Location = new System.Drawing.Point(3, 3);
+			this.toolboxPanel.Name = "toolboxPanel";
+			this.toolboxPanel.Size = new System.Drawing.Size(134, 332);
+			this.toolboxPanel.TabIndex = 7;
 			// 
 			// MainForm
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(1209, 643);
-			this.Controls.Add(this.panel2);
-			this.Controls.Add(this.panel1);
+			this.Controls.Add(this.mainTable);
+			this.Controls.Add(this.levelSelectPanel);
 			this.Controls.Add(this.menuStrip1);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MainMenuStrip = this.menuStrip1;
@@ -374,11 +364,10 @@ namespace WLEditor
 			this.menuStrip1.ResumeLayout(false);
 			this.menuStrip1.PerformLayout();
 			((System.ComponentModel.ISupportInitialize)(this.objectPictureBox)).EndInit();
-			this.panel1.ResumeLayout(false);
-			this.panel2.ResumeLayout(false);
-			this.tableLayoutPanel1.ResumeLayout(false);
-			this.tableLayoutPanel1.PerformLayout();
-			this.panel3.ResumeLayout(false);
+			this.levelSelectPanel.ResumeLayout(false);
+			this.mainTable.ResumeLayout(false);
+			this.mainTable.PerformLayout();
+			this.toolboxPanel.ResumeLayout(false);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -407,10 +396,9 @@ namespace WLEditor
 		private System.Windows.Forms.ToolStripMenuItem classicToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem blackWhiteToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem autumnToolStripMenuItem;
-		private System.Windows.Forms.Panel panel1;
-		private System.Windows.Forms.Panel panel2;
-		private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
-		private System.Windows.Forms.Panel panel3;
+		private System.Windows.Forms.Panel levelSelectPanel;
+		private System.Windows.Forms.TableLayoutPanel mainTable;
+		private System.Windows.Forms.Panel toolboxPanel;
 		
 
 			
