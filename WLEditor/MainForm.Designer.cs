@@ -61,26 +61,24 @@ namespace WLEditor
 			this.bToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.objectPictureBox = new System.Windows.Forms.PictureBox();
 			this.mainTable = new System.Windows.Forms.TableLayoutPanel();
-			this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
 			this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
 			this.tilesPictureBox = new System.Windows.Forms.PictureBox();
+			this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
 			this.LevelPanel.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.levelPictureBox)).BeginInit();
 			this.menuStrip1.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.objectPictureBox)).BeginInit();
 			this.mainTable.SuspendLayout();
-			this.tableLayoutPanel1.SuspendLayout();
 			this.flowLayoutPanel1.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.tilesPictureBox)).BeginInit();
+			this.tableLayoutPanel1.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// LevelPanel
 			// 
-			this.LevelPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-			| System.Windows.Forms.AnchorStyles.Left) 
-			| System.Windows.Forms.AnchorStyles.Right)));
 			this.LevelPanel.AutoScroll = true;
 			this.LevelPanel.Controls.Add(this.levelPictureBox);
+			this.LevelPanel.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.LevelPanel.Location = new System.Drawing.Point(137, 3);
 			this.LevelPanel.Name = "LevelPanel";
 			this.LevelPanel.Size = new System.Drawing.Size(1069, 586);
@@ -89,10 +87,9 @@ namespace WLEditor
 			// 
 			// levelPictureBox
 			// 
-			this.levelPictureBox.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.levelPictureBox.Location = new System.Drawing.Point(0, 0);
 			this.levelPictureBox.Name = "levelPictureBox";
-			this.levelPictureBox.Size = new System.Drawing.Size(1069, 586);
+			this.levelPictureBox.Size = new System.Drawing.Size(4096, 512);
 			this.levelPictureBox.TabIndex = 2;
 			this.levelPictureBox.TabStop = false;
 			this.levelPictureBox.Paint += new System.Windows.Forms.PaintEventHandler(this.LevelPictureBoxPaint);
@@ -314,21 +311,6 @@ namespace WLEditor
 			this.mainTable.Size = new System.Drawing.Size(1209, 592);
 			this.mainTable.TabIndex = 3;
 			// 
-			// tableLayoutPanel1
-			// 
-			this.tableLayoutPanel1.ColumnCount = 1;
-			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-			this.tableLayoutPanel1.Controls.Add(this.levelComboBox, 0, 0);
-			this.tableLayoutPanel1.Controls.Add(this.mainTable, 0, 1);
-			this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 24);
-			this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-			this.tableLayoutPanel1.RowCount = 2;
-			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-			this.tableLayoutPanel1.Size = new System.Drawing.Size(1209, 619);
-			this.tableLayoutPanel1.TabIndex = 8;
-			// 
 			// flowLayoutPanel1
 			// 
 			this.flowLayoutPanel1.AutoSize = true;
@@ -353,6 +335,21 @@ namespace WLEditor
 			this.tilesPictureBox.Paint += new System.Windows.Forms.PaintEventHandler(this.ObjectsPictureBoxPaint);
 			this.tilesPictureBox.MouseDown += new System.Windows.Forms.MouseEventHandler(this.ObjectsPictureBoxMouseDown);
 			// 
+			// tableLayoutPanel1
+			// 
+			this.tableLayoutPanel1.ColumnCount = 1;
+			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+			this.tableLayoutPanel1.Controls.Add(this.levelComboBox, 0, 0);
+			this.tableLayoutPanel1.Controls.Add(this.mainTable, 0, 1);
+			this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 24);
+			this.tableLayoutPanel1.Name = "tableLayoutPanel1";
+			this.tableLayoutPanel1.RowCount = 2;
+			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+			this.tableLayoutPanel1.Size = new System.Drawing.Size(1209, 619);
+			this.tableLayoutPanel1.TabIndex = 8;
+			// 
 			// MainForm
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -371,9 +368,9 @@ namespace WLEditor
 			((System.ComponentModel.ISupportInitialize)(this.objectPictureBox)).EndInit();
 			this.mainTable.ResumeLayout(false);
 			this.mainTable.PerformLayout();
-			this.tableLayoutPanel1.ResumeLayout(false);
 			this.flowLayoutPanel1.ResumeLayout(false);
 			((System.ComponentModel.ISupportInitialize)(this.tilesPictureBox)).EndInit();
+			this.tableLayoutPanel1.ResumeLayout(false);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
