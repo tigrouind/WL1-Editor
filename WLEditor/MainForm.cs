@@ -160,119 +160,70 @@ namespace WLEditor
 			{
 				StringFormat format = new StringFormat();
 				format.LineAlignment = StringAlignment.Center;
-				format.Alignment = StringAlignment.Center;				
+				format.Alignment = StringAlignment.Center;	
+			
+				var sectorsToDraw = GetVisibleSectors(e.ClipRectangle);
 
 				using (Brush redBrush = new SolidBrush(Color.FromArgb(128, 255, 0, 0)))
 				using (Font font = new Font("Arial", 8))				
 				using (Graphics g = Graphics.FromImage(levelTiles.Bitmap))
 				{
-					//draw tiles
-					for(int y = 0 ; y < 2 ; y++)
+					//draw tiles to cache
+					foreach (Point point in sectorsToDraw)
 					{
-						for(int x = 0 ; x < 16 ; x++)
-						{
-							Rectangle destRect = new Rectangle(x * 256, y * 256, 256, 256);
-							if(destRect.IntersectsWith(e.ClipRectangle))
-							{
-								DrawTiles(x, y, redBrush, g, e);
-							}
-						}
+						DrawTiles(point.X, point.Y, redBrush, g, e);
 					}
 
+					//draw tiles from cache
 					e.Graphics.DrawImage(levelTiles.Bitmap, 0, 0);
 					
-					for(int j = 0 ; j < 2 ; j++)
+					//sector objects (enemies, powerups)
+					foreach (Point point in sectorsToDraw)
 					{
-						for(int i = 0 ; i < 16 ; i++)
-						{
-							Rectangle destRect = new Rectangle(i * 256, j * 256, 256, 256);
-							if(destRect.IntersectsWith(e.ClipRectangle))
-							{
-								DrawSectorObjects(i, j, font, format, e);							
-							}
-						}
-					}
+						DrawSectorObjects(point.X, point.Y, font, format, e);			
+					}					
 					
 					if(viewSectors)
 					{
 						//wario position
 						Rectangle destRect = new Rectangle(Level.warioPosition % 8192 - 8, Level.warioPosition / 8192 - 16, 16, 16);
-						if(destRect.IntersectsWith(e.ClipRectangle))
+						if (destRect.IntersectsWith(e.ClipRectangle))
 						{
 							e.Graphics.FillRectangle(Brushes.Green, destRect);
 							e.Graphics.DrawString("W", font, Brushes.White, destRect, format);
 						}
-						
-						//sector info
-						for(int j = 0 ; j < 2 ; j++)
+					}
+					
+					//scroll
+					if(viewScroll)
+					{
+						foreach (Point point in sectorsToDraw)
 						{
-							for(int i = 0 ; i < 16 ; i++)
-							{
-								Rectangle sectorInfoRect = new Rectangle(i * 256, j * 256, 256, 256);
-								if(sectorInfoRect.IntersectsWith(e.ClipRectangle))
-								{
-									int drawSector = i + j * 16;
-	
-									//scroll
-									if(viewScroll)
-									{
-										byte scroll = Level.scrollData[drawSector];
-										if ((scroll & 2) == 2)
-											e.Graphics.FillRectangle(Brushes.Yellow, i * 256, j * 256, 6, 256);
-	
-										if ((scroll & 1) == 1)
-											e.Graphics.FillRectangle(Brushes.Yellow, (i+1) * 256 - 6, j*256, 6, 256);
-									}
-	
-									//sectors
-									if(viewSectors)
-									{									
-										e.Graphics.FillRectangle(Brushes.Blue, i * 256, j * 256, 16, 16);
-										e.Graphics.DrawString(drawSector.ToString("D2"), font, Brushes.White, i * 256 + 8, j * 256 + 8, format);
-																		
-										int sectorTarget = Level.warps[drawSector];
-										if(sectorTarget != 255)
-										{
-											string text = GetWarpName(sectorTarget);
-											var result = TextRenderer.MeasureText(text, font);
-											
-											e.Graphics.FillRectangle(Brushes.Blue,  i * 256 + 20, j * 256, result.Width, 16);
-											e.Graphics.DrawString(text, font, Brushes.White, i * 256 + result.Width / 2 + 20, j * 256 + 8, format);
-										}									
-									}							
-								}
-							}
+							DrawScrollInfo(point.X, point.Y, e.Graphics);
 						}
-						
-						//draw sector borders
-						using (Pen penBlue = new Pen(Color.Blue, 2.0f))
+					}
+
+					//sectors
+					if(viewSectors)
+					{			
+						foreach (Point point in sectorsToDraw)
 						{						
-							penBlue.DashPattern = new [] { 5.0f, 1.0f };
-							
-							for(int i = 1 ; i < 16 ; i++)
-							{
-								int x = i * 256;
-								Rectangle lineRect = new Rectangle(x - 2, 0, 4, 512);
-								if(lineRect.IntersectsWith(e.ClipRectangle))
-								{
-									e.Graphics.DrawLine(penBlue, x, 0, x, 512);
-								}
-							}
-													
-							e.Graphics.DrawLine(penBlue, 0, 256, 4096, 256);					
+							DrawSectorInfo(point.X, point.Y, e.Graphics, font, format);
 						}
 						
-						if(currentSector != -1)
+						DrawSectorBorders(e.Graphics, e.ClipRectangle);
+						
+						if (currentSector != -1)
 						{
 							Rectangle sectorRect = new Rectangle((currentSector % 16) * 256, (currentSector / 16) * 256, 256, 256);
-							if(sectorRect.IntersectsWith(e.ClipRectangle))
+							if (sectorRect.IntersectsWith(e.ClipRectangle))
 							{
-								using(Brush blue = new SolidBrush(Color.FromArgb(64, 0, 0, 255)))
+								using (Brush blue = new SolidBrush(Color.FromArgb(64, 0, 0, 255)))
 								{
 									e.Graphics.FillRectangle(blue, sectorRect);
 								}
 							}
-						}
+						}														
 					}
 				}			
 			}
@@ -312,10 +263,10 @@ namespace WLEditor
 			}
 		}
 
-		void DrawTileToBitmap(int i, int j)
+		void DrawTileToBitmap(int sectorX, int sectorY)
 		{
-			byte tileIndex = Level.levelData[i + j * 256 + 0x1000];
-			Point dest = new Point(i * 16, j * 16);
+			byte tileIndex = Level.levelData[sectorX + sectorY * 256 + 0x1000];
+			Point dest = new Point(sectorX * 16, sectorY * 16);
 			Point src = new Point((tileIndex % 8) * 16, (tileIndex / 8) * 16);
 
 			for(int y = 0 ; y < 16 ; y++)
@@ -366,6 +317,77 @@ namespace WLEditor
 					}
 				}
 			}
+		}
+		
+		void DrawScrollInfo(int x, int y, Graphics g)
+		{
+			int drawSector = x + y * 16;
+			
+			byte scroll = Level.scrollData[drawSector];
+			if ((scroll & 2) == 2)
+				g.FillRectangle(Brushes.Yellow, x * 256, y * 256, 6, 256);
+
+			if ((scroll & 1) == 1)
+				g.FillRectangle(Brushes.Yellow, (x+1) * 256 - 6, y*256, 6, 256);
+		}
+		
+		void DrawSectorInfo(int x, int y, Graphics g, Font font, StringFormat format)
+		{
+			int drawSector = x + y * 16;
+			
+			g.FillRectangle(Brushes.Blue, x * 256, y * 256, 16, 16);
+			g.DrawString(drawSector.ToString("D2"), font, Brushes.White, x * 256 + 8, y * 256 + 8, format);
+											
+			int sectorTarget = Level.warps[drawSector];
+			if(sectorTarget != 255)
+			{
+				string text = GetWarpName(sectorTarget);
+				var result = TextRenderer.MeasureText(text, font);
+				
+				g.FillRectangle(Brushes.Blue,  x * 256 + 20, y * 256, result.Width, 16);
+				g.DrawString(text, font, Brushes.White, x * 256 + result.Width / 2 + 20, y * 256 + 8, format);
+			}
+			
+		}
+		
+		void DrawSectorBorders(Graphics g, Rectangle clipRectangle)
+		{
+			//draw sector borders
+			using (Pen penBlue = new Pen(Color.Blue, 2.0f))
+			{						
+				penBlue.DashPattern = new [] { 5.0f, 1.0f };
+				
+				for(int i = 1 ; i < 16 ; i++)
+				{
+					int x = i * 256;
+					Rectangle lineRect = new Rectangle(x - 2, 0, 4, 512);
+					if(lineRect.IntersectsWith(clipRectangle))
+					{
+						g.DrawLine(penBlue, x, 0, x, 512);
+					}
+				}
+										
+				g.DrawLine(penBlue, 0, 256, 4096, 256);					
+			}			
+		}
+		
+		List<Point> GetVisibleSectors(Rectangle clipRectangle)
+		{
+			List<Point> sectors = new List<Point>();
+			
+			for(int y = 0 ; y < 2 ; y++)
+			{
+				for(int x = 0 ; x < 16 ; x++)
+				{
+					Rectangle destRect = new Rectangle(x * 256, y * 256, 256, 256);
+					if(destRect.IntersectsWith(clipRectangle))
+					{
+						sectors.Add(new Point(x, y));
+					}
+				}
+			}
+			
+			return sectors;
 		}
 
 		string GetWarpName(int sectorTarget)
