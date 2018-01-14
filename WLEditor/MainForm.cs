@@ -160,12 +160,12 @@ namespace WLEditor
 			{
 				StringFormat format = new StringFormat();
 				format.LineAlignment = StringAlignment.Center;
-				format.Alignment = StringAlignment.Center;
+				format.Alignment = StringAlignment.Center;				
 
-				using (Brush brush = new SolidBrush(Color.FromArgb(128, 255, 0, 0)))
-				using(Font font = new Font("Arial", 8))
-				using(Pen penBlue = new Pen(Color.DarkBlue, 2.0f))
-				using(Graphics g = Graphics.FromImage(levelTiles.Bitmap))
+				using (Brush redBrush = new SolidBrush(Color.FromArgb(128, 255, 0, 0)))
+				using (Font font = new Font("Arial", 8))
+				using (Pen penBlue = new Pen(Color.Blue, 2.0f))
+				using (Graphics g = Graphics.FromImage(levelTiles.Bitmap))
 				{
 					for(int y = 0 ; y < 2 ; y++)
 					{
@@ -174,7 +174,7 @@ namespace WLEditor
 							Rectangle destRect = new Rectangle(x * 256, y * 256, 256, 256);
 							if(destRect.IntersectsWith(e.ClipRectangle))
 							{
-								DrawTiles(x, y, brush, g, e);
+								DrawTiles(x, y, redBrush, g, e);
 							}
 						}
 					}
@@ -207,9 +207,18 @@ namespace WLEditor
 								if(viewSectors)
 								{
 									e.Graphics.DrawRectangle(penBlue, i * 256, j * 256, 256, 256);
-
-									e.Graphics.FillRectangle(Brushes.DarkBlue, i * 256, j * 256, 16, 16);
-									e.Graphics.DrawString(drawSector.ToString(), font, Brushes.White, i * 256 + 8, j * 256 + 8, format);
+									e.Graphics.FillRectangle(Brushes.Blue, i * 256, j * 256, 16, 16);
+									e.Graphics.DrawString(drawSector.ToString("D2"), font, Brushes.White, i * 256 + 8, j * 256 + 8, format);
+																	
+									int sectorTarget = Level.warps[drawSector];
+									if(sectorTarget != 255)
+									{
+										string text = GetWarpName(sectorTarget);
+										var result = TextRenderer.MeasureText(text, font);
+										
+										e.Graphics.FillRectangle(Brushes.Blue,  i * 256 + 20, j * 256, result.Width, 16);
+										e.Graphics.DrawString(text, font, Brushes.White, i * 256 + result.Width / 2 + 20, j * 256 + 8, format);
+									}									
 								}
 							}
 						}
@@ -310,19 +319,13 @@ namespace WLEditor
 					{
 						//tile blocks
 						byte tileIndex = Level.levelData[i + j * 256 + 0x1000];
-
+						
 						if(viewSectors)
 						{
-							//if tile is a door, display destination
 							if(Level.IsDoor(tileIndex))
 							{
-								int sector = i/16 + (j/16)*16;
-								int sectorTarget = Level.warps[sector];
-								if(sectorTarget != 255)
-								{
-									e.Graphics.FillRectangle(Brushes.Brown, destRect);
-									e.Graphics.DrawString(GetWarpName(sectorTarget), font, Brushes.White, i *16 +8, j * 16 + 8, format);
-								}
+								e.Graphics.FillRectangle(Brushes.Green, destRect);
+								e.Graphics.DrawString("D", font, Brushes.White, i * 16 + 8, j * 16 + 8, format);
 							}
 						}
 
@@ -347,16 +350,16 @@ namespace WLEditor
 			switch(sectorTarget)
 			{
 				case 32:
-					warpText = "S";
+					warpText = "START";
 					break;
 				case 33:
-					warpText = "EA";
+					warpText = "EXIT A";
 					break;
 				case 34:
-					warpText = "EB";
+					warpText = "EXIT B";
 					break;
 				default:
-					warpText = sectorTarget.ToString();
+					warpText = "W" + sectorTarget.ToString("D2");
 					break;
 			}
 
