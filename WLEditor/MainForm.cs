@@ -163,10 +163,10 @@ namespace WLEditor
 				format.Alignment = StringAlignment.Center;				
 
 				using (Brush redBrush = new SolidBrush(Color.FromArgb(128, 255, 0, 0)))
-				using (Font font = new Font("Arial", 8))
-				using (Pen penBlue = new Pen(Color.Blue, 2.0f))
+				using (Font font = new Font("Arial", 8))				
 				using (Graphics g = Graphics.FromImage(levelTiles.Bitmap))
 				{
+					//draw tiles
 					for(int y = 0 ; y < 2 ; y++)
 					{
 						for(int x = 0 ; x < 16 ; x++)
@@ -180,7 +180,7 @@ namespace WLEditor
 					}
 
 					e.Graphics.DrawImage(levelTiles.Bitmap, 0, 0);
-
+					
 					for(int j = 0 ; j < 2 ; j++)
 					{
 						for(int i = 0 ; i < 16 ; i++)
@@ -188,69 +188,93 @@ namespace WLEditor
 							Rectangle destRect = new Rectangle(i * 256, j * 256, 256, 256);
 							if(destRect.IntersectsWith(e.ClipRectangle))
 							{
-								DrawSector(i, j, font, format, e);
-
-								int drawSector = i + j * 16;
-
-								//scroll
-								if(viewScroll)
+								DrawSectorObjects(i, j, font, format, e);							
+							}
+						}
+					}
+					
+					if(viewSectors)
+					{
+						//wario position
+						Rectangle destRect = new Rectangle(Level.warioPosition % 8192 - 8, Level.warioPosition / 8192 - 16, 16, 16);
+						if(destRect.IntersectsWith(e.ClipRectangle))
+						{
+							e.Graphics.FillRectangle(Brushes.Green, destRect);
+							e.Graphics.DrawString("W", font, Brushes.White, destRect, format);
+						}
+						
+						//sector info
+						for(int j = 0 ; j < 2 ; j++)
+						{
+							for(int i = 0 ; i < 16 ; i++)
+							{
+								Rectangle sectorInfoRect = new Rectangle(i * 256, j * 256, 256, 256);
+								if(sectorInfoRect.IntersectsWith(e.ClipRectangle))
 								{
-									byte scroll = Level.scrollData[drawSector];
-									if ((scroll & 2) == 2)
-										e.Graphics.FillRectangle(Brushes.Yellow, i * 256, j * 256, 6, 256);
-
-									if ((scroll & 1) == 1)
-										e.Graphics.FillRectangle(Brushes.Yellow, (i+1) * 256 - 6, j*256, 6, 256);
-								}
-
-								//sectors
-								if(viewSectors)
-								{
-									e.Graphics.DrawRectangle(penBlue, i * 256, j * 256, 256, 256);
-									e.Graphics.FillRectangle(Brushes.Blue, i * 256, j * 256, 16, 16);
-									e.Graphics.DrawString(drawSector.ToString("D2"), font, Brushes.White, i * 256 + 8, j * 256 + 8, format);
-																	
-									int sectorTarget = Level.warps[drawSector];
-									if(sectorTarget != 255)
+									int drawSector = i + j * 16;
+	
+									//scroll
+									if(viewScroll)
 									{
-										string text = GetWarpName(sectorTarget);
-										var result = TextRenderer.MeasureText(text, font);
-										
-										e.Graphics.FillRectangle(Brushes.Blue,  i * 256 + 20, j * 256, result.Width, 16);
-										e.Graphics.DrawString(text, font, Brushes.White, i * 256 + result.Width / 2 + 20, j * 256 + 8, format);
-									}									
+										byte scroll = Level.scrollData[drawSector];
+										if ((scroll & 2) == 2)
+											e.Graphics.FillRectangle(Brushes.Yellow, i * 256, j * 256, 6, 256);
+	
+										if ((scroll & 1) == 1)
+											e.Graphics.FillRectangle(Brushes.Yellow, (i+1) * 256 - 6, j*256, 6, 256);
+									}
+	
+									//sectors
+									if(viewSectors)
+									{									
+										e.Graphics.FillRectangle(Brushes.Blue, i * 256, j * 256, 16, 16);
+										e.Graphics.DrawString(drawSector.ToString("D2"), font, Brushes.White, i * 256 + 8, j * 256 + 8, format);
+																		
+										int sectorTarget = Level.warps[drawSector];
+										if(sectorTarget != 255)
+										{
+											string text = GetWarpName(sectorTarget);
+											var result = TextRenderer.MeasureText(text, font);
+											
+											e.Graphics.FillRectangle(Brushes.Blue,  i * 256 + 20, j * 256, result.Width, 16);
+											e.Graphics.DrawString(text, font, Brushes.White, i * 256 + result.Width / 2 + 20, j * 256 + 8, format);
+										}									
+									}							
+								}
+							}
+						}
+						
+						//draw sector borders
+						using (Pen penBlue = new Pen(Color.Blue, 2.0f))
+						{						
+							penBlue.DashPattern = new [] { 5.0f, 1.0f };
+							
+							for(int i = 1 ; i < 16 ; i++)
+							{
+								int x = i * 256;
+								Rectangle lineRect = new Rectangle(x - 2, 0, 4, 512);
+								if(lineRect.IntersectsWith(e.ClipRectangle))
+								{
+									e.Graphics.DrawLine(penBlue, x, 0, x, 512);
+								}
+							}
+													
+							e.Graphics.DrawLine(penBlue, 0, 256, 4096, 256);					
+						}
+						
+						if(currentSector != -1)
+						{
+							Rectangle sectorRect = new Rectangle((currentSector % 16) * 256, (currentSector / 16) * 256, 256, 256);
+							if(sectorRect.IntersectsWith(e.ClipRectangle))
+							{
+								using(Brush blue = new SolidBrush(Color.FromArgb(64, 0, 0, 255)))
+								{
+									e.Graphics.FillRectangle(blue, sectorRect);
 								}
 							}
 						}
 					}
-				}
-
-				if(viewSectors)
-				{
-					//wario position
-					Rectangle destRect = new Rectangle(Level.warioPosition % 8192 - 8, Level.warioPosition / 8192 - 16, 16, 16);
-					if(destRect.IntersectsWith(e.ClipRectangle))
-					{
-						e.Graphics.FillRectangle(Brushes.Green, destRect);
-						using(Font font = new Font("Arial", 8))
-						{
-							e.Graphics.DrawString("W", font, Brushes.White, destRect, format);
-						}
-					}
-				}
-
-				//current sector
-				if(viewSectors && currentSector != -1)
-				{
-					Rectangle destRect = new Rectangle((currentSector % 16) * 256, (currentSector / 16) * 256, 256, 256);
-					if(destRect.IntersectsWith(e.ClipRectangle))
-					{
-						using(Brush blue = new SolidBrush(Color.FromArgb(64, 0, 0, 255)))
-						{
-							e.Graphics.FillRectangle(blue, destRect);
-						}
-					}
-				}
+				}			
 			}
 		}
 
@@ -304,7 +328,7 @@ namespace WLEditor
 			}
 		}
 
-		void DrawSector(int x, int y, Font font, StringFormat format, PaintEventArgs e)
+		void DrawSectorObjects(int x, int y, Font font, StringFormat format, PaintEventArgs e)
 		{
 			bool viewObjects = objectsToolStripMenuItem.Checked;
 			bool viewSectors = regionsToolStripMenuItem.Checked;
