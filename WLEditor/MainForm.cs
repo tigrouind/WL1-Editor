@@ -447,16 +447,16 @@ namespace WLEditor
 				format.LineAlignment = StringAlignment.Center;
 				format.Alignment = StringAlignment.Center;
 
-				using(Pen pen = new Pen(Color.White, 1.0f))
-				using(Font font = new Font("Arial", 8))
+				using (Brush brush = new SolidBrush(Color.FromArgb(128, 255, 0, 0)))
+				using (Pen pen = new Pen(Color.White, 1.0f))
+				using (Font font = new Font("Arial", 8))
 				{
-					int tileIndex = 0;
 					for(int j = 0 ; j < 16 ; j++)
 					{
 						int x = (j % 4) * 16;
 						int y = (j / 4) * 16;
 						
-						e.Graphics.FillRectangle(j == currentObject ? Brushes.Brown : Brushes.DarkViolet, (j % 4) * 16, (j / 4) * 16, 16, 16);
+						e.Graphics.FillRectangle(Brushes.DarkViolet, (j % 4) * 16, (j / 4) * 16, 16, 16);
 						
 						if(j == 0)
 						{							
@@ -471,7 +471,11 @@ namespace WLEditor
 						{
 							e.Graphics.DrawString(ObjectIdToString[j - 7], font, Brushes.White, x + 8, y + 8, format);							
 						}
-						tileIndex++;
+					}
+					
+					if(currentObject != -1)
+					{
+						e.Graphics.FillRectangle(brush, (currentObject % 4) * 16, (currentObject / 4) * 16, 16, 16);
 					}
 				}
 
