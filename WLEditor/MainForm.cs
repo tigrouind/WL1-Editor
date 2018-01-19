@@ -138,7 +138,9 @@ namespace WLEditor
 
 		void ObjectsToolStripMenuItemClick(object sender, EventArgs e)
 		{
+			objectPictureBox.Refresh();
 			levelPictureBox.Refresh();
+			currentObject = -1;
 		}
 
 		void ScrollRegionToolStripMenuItemClick(object sender, EventArgs e)
