@@ -310,8 +310,8 @@ namespace WLEditor
 							byte data = Level.objectsData[i + j * 256];
 							if(data != 0)
 							{
-								e.Graphics.FillRectangle(Brushes.Purple, destRect);
-								if(data < 7)
+								e.Graphics.FillRectangle(Brushes.DarkViolet, destRect);
+								if(data <= 6)
 								{
 									e.Graphics.DrawString(data.ToString(), font, Brushes.White, i * 16 + 8, j * 16 + 8, format);
 								}
@@ -447,6 +447,7 @@ namespace WLEditor
 				format.LineAlignment = StringAlignment.Center;
 				format.Alignment = StringAlignment.Center;
 
+				using(Pen pen = new Pen(Color.White, 1.0f))
 				using(Font font = new Font("Arial", 8))
 				{
 					int tileIndex = 0;
@@ -455,11 +456,16 @@ namespace WLEditor
 						int x = (j % 4) * 16;
 						int y = (j / 4) * 16;
 						
-						e.Graphics.FillRectangle(j == currentObject ? Brushes.Brown : Brushes.Purple, (j % 4) * 16, (j / 4) * 16, 16, 16);
+						e.Graphics.FillRectangle(j == currentObject ? Brushes.Brown : Brushes.DarkViolet, (j % 4) * 16, (j / 4) * 16, 16, 16);
 						
-						if(j < 7)
+						if(j == 0)
+						{							
+							e.Graphics.DrawLine(pen, x + 4, y + 4, x + 12, y + 12);
+							e.Graphics.DrawLine(pen, x + 12, y + 4, x + 4, y + 12);
+						}
+						else if(j <= 6)
 						{						
-							e.Graphics.DrawString(j == 0 ? string.Empty : j.ToString(), font, Brushes.White, x + 8, y + 8, format);
+							e.Graphics.DrawString(j.ToString(), font, Brushes.White, x + 8, y + 8, format);
 						}
 						else
 						{
