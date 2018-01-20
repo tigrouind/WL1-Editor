@@ -333,7 +333,6 @@ namespace WLEditor
 		//replace tiles when a (!) block is hit
 		public static int Switch(int tileData, bool switchA, bool switchB)
 		{
-
 			if(switchA)
 			{
 				switch(tileData)
@@ -366,6 +365,12 @@ namespace WLEditor
 
 					case 0x7B:
 						return 0x7A;
+						
+					case 0x59:
+						return 0x5D;
+
+					case 0x5D:
+						return 0x59;
 				}
 			}
 
