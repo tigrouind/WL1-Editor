@@ -299,7 +299,8 @@ namespace WLEditor
 						
 						if(viewSectors)
 						{
-							if(Level.IsDoor(tileIndex))
+							int sectorTarget = Level.warps[x + y * 16];
+							if(Level.IsDoor(tileIndex) && sectorTarget != 255)
 							{
 								e.Graphics.FillRectangle(Brushes.Green, destRect);
 								e.Graphics.DrawString("D", font, Brushes.White, i * 16 + 8, j * 16 + 8, format);
