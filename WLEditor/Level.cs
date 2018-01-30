@@ -251,7 +251,7 @@ namespace WLEditor
 		}
 
 		public static void Dump16x16Tiles(Rom rom, int tileindexaddress, DirectBitmap gfx8, DirectBitmap gfx16, bool switchA, bool switchB)
-		{
+		{	
 			for(int n = 0 ; n < 16 ; n++)
 			{
 				for(int i = 0 ; i < 8 ; i++)
@@ -269,23 +269,21 @@ namespace WLEditor
 							if(subTileIndex < 128)
 							{
 								Point source = new Point((subTileIndex % 16) * 8, (subTileIndex / 16) * 8);
+															
 								for(int y = 0 ; y < 8 ; y++)
 								{
-									for(int x = 0 ; x < 8 ; x++)
-									{
-										gfx16.Bits[dest.X + x + (dest.Y + y) * gfx16.Width]
-											= gfx8.Bits[source.X + x + (source.Y + y) * gfx8.Width];
-									}
+									Array.Copy(gfx8.Bits, source.X + (source.Y + y) * gfx8.Width, gfx16.Bits, dest.X + (dest.Y + y) * gfx16.Width, 8);
 								}
 							}
 							else
 							{
+								int defaultColor = paletteColors[0].ToArgb();								
 								for(int y = 0 ; y < 8 ; y++)
 								{
+									int destIndex = dest.X + (dest.Y + y) * gfx16.Width;									
 									for(int x = 0 ; x < 8 ; x++)
 									{
-										gfx16.Bits[dest.X + x + (dest.Y + y) * gfx16.Width]
-											= paletteColors[0].ToArgb();
+										gfx16.Bits[destIndex + x] = defaultColor;
 									}
 								}
 							}

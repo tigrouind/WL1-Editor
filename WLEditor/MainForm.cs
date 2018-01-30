@@ -277,11 +277,7 @@ namespace WLEditor
 
 			for(int y = 0 ; y < 16 ; y++)
 			{
-				for(int x = 0 ; x < 16 ; x++)
-				{
-					levelTiles.Bits[dest.X + x + (dest.Y + y) * levelTiles.Width]
-						= tiles16x16.Bits[src.X + x + (src.Y + y) * tiles16x16.Width];
-				}
+				Array.Copy(tiles16x16.Bits, src.X + (src.Y + y) * tiles16x16.Width, levelTiles.Bits, dest.X + (dest.Y + y) * levelTiles.Width, 16);
 			}
 		}
 
