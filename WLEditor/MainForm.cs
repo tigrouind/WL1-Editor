@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Linq;
 using System.Windows.Forms;
@@ -26,6 +27,7 @@ namespace WLEditor
 		public string romFilePath;
 		public bool hasChanges;
 		public string[] ObjectIdToString = { "G", "J", "D", "K", "H", "S", "C", "CC", "B" };
+		public int zoom = 1;
 
 		public MainForm()
 		{
@@ -167,7 +169,7 @@ namespace WLEditor
 				var sectorsToDraw = GetVisibleSectors(e.ClipRectangle);
 
 				using (Brush redBrush = new SolidBrush(Color.FromArgb(128, 255, 0, 0)))
-				using (Font font = new Font("Arial", 8))				
+				using (Font font = new Font("Arial", 8 * zoom))				
 				using (Graphics g = Graphics.FromImage(levelTiles.Bitmap))
 				{
 					//draw tiles to cache
@@ -177,7 +179,8 @@ namespace WLEditor
 					}
 
 					//draw tiles from cache
-					e.Graphics.DrawImage(levelTiles.Bitmap, 0, 0);
+					e.Graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
+					e.Graphics.DrawImage(levelTiles.Bitmap, 0, 0, 4096 * zoom, 512 * zoom);
 					
 					//sector objects (enemies, powerups)
 					foreach (Point point in sectorsToDraw)
@@ -188,7 +191,7 @@ namespace WLEditor
 					if(viewSectors)
 					{
 						//wario position
-						Rectangle destRect = new Rectangle(Level.warioPosition % 8192 - 8, Level.warioPosition / 8192 - 16, 16, 16);
+						Rectangle destRect = new Rectangle((Level.warioPosition % 8192 - 8) * zoom, (Level.warioPosition / 8192 - 16) * zoom, 16 * zoom, 16 * zoom);
 						if (destRect.IntersectsWith(e.ClipRectangle))
 						{
 							e.Graphics.FillRectangle(Brushes.Green, destRect);
@@ -217,7 +220,7 @@ namespace WLEditor
 						
 						if (currentSector != -1)
 						{
-							Rectangle sectorRect = new Rectangle((currentSector % 16) * 256, (currentSector / 16) * 256, 256, 256);
+							Rectangle sectorRect = new Rectangle((currentSector % 16) * 256 * zoom, (currentSector / 16) * 256 * zoom, 256 * zoom, 256 * zoom);
 							if (sectorRect.IntersectsWith(e.ClipRectangle))
 							{
 								using (Brush blue = new SolidBrush(Color.FromArgb(64, 0, 0, 255)))
@@ -241,7 +244,7 @@ namespace WLEditor
 			{
 				for(int i = x * 16 ; i < (x + 1) * 16 ; i++)
 				{
-					Rectangle destRect = new Rectangle(i * 16, j * 16, 16, 16);
+					Rectangle destRect = new Rectangle(i * 16 * zoom, j * 16 * zoom, 16 * zoom, 16 * zoom);
 
 					if(destRect.IntersectsWith(e.ClipRectangle))
 					{
@@ -255,7 +258,7 @@ namespace WLEditor
 								byte tileIndex = Level.levelData[i + j * 256 + 0x1000];
 								if(Level.IsCollidable(Level.Switch(tileIndex, switchA, switchB)))
 								{
-									g.FillRectangle(brush, destRect);
+									g.FillRectangle(brush, new Rectangle(destRect.X / zoom, destRect.Y / zoom, destRect.Width / zoom, destRect.Height / zoom));
 								}
 							}
 						}
@@ -290,7 +293,7 @@ namespace WLEditor
 			{
 				for(int i = x * 16 ; i < (x + 1) * 16 ; i++)
 				{
-					Rectangle destRect = new Rectangle(i * 16, j * 16, 16, 16);
+					Rectangle destRect = new Rectangle(i * 16 * zoom, j * 16 * zoom, 16 * zoom, 16 * zoom);
 
 					if(destRect.IntersectsWith(e.ClipRectangle))
 					{
@@ -303,7 +306,7 @@ namespace WLEditor
 							if(Level.IsDoor(tileIndex) && sectorTarget != 255)
 							{
 								e.Graphics.FillRectangle(Brushes.Green, destRect);
-								e.Graphics.DrawString("D", font, Brushes.White, i * 16 + 8, j * 16 + 8, format);
+								e.Graphics.DrawString("D", font, Brushes.White, (i * 16 + 8) * zoom, (j * 16 + 8) * zoom, format);
 							}
 						}
 
@@ -316,11 +319,11 @@ namespace WLEditor
 								e.Graphics.FillRectangle(Brushes.DarkViolet, destRect);
 								if(data <= 6)
 								{
-									e.Graphics.DrawString(data.ToString(), font, Brushes.White, i * 16 + 8, j * 16 + 8, format);
+									e.Graphics.DrawString(data.ToString(), font, Brushes.White, (i * 16 + 8) * zoom, (j * 16 + 8) * zoom, format);
 								}
 								else
 								{
-									e.Graphics.DrawString(ObjectIdToString[data - 7], font, Brushes.White, i * 16 + 8, j * 16 + 8, format);									
+									e.Graphics.DrawString(ObjectIdToString[data - 7], font, Brushes.White, (i * 16 + 8) * zoom, (j * 16 + 8) * zoom, format);
 								}
 							}
 						}
@@ -335,18 +338,18 @@ namespace WLEditor
 			
 			byte scroll = Level.scrollData[drawSector];
 			if ((scroll & 2) == 2)
-				g.FillRectangle(Brushes.Yellow, x * 256, y * 256, 6, 256);
+				g.FillRectangle(Brushes.Yellow, x * 256 * zoom, y * 256 * zoom, 6 * zoom, 256 * zoom);
 
 			if ((scroll & 1) == 1)
-				g.FillRectangle(Brushes.Yellow, (x+1) * 256 - 6, y*256, 6, 256);
+				g.FillRectangle(Brushes.Yellow, ((x+1) * 256 - 6) * zoom, y * 256 * zoom, 6 * zoom, 256 * zoom);
 		}
 		
 		void DrawSectorInfo(int x, int y, Graphics g, Font font, StringFormat format)
 		{
 			int drawSector = x + y * 16;
 			
-			g.FillRectangle(Brushes.Blue, x * 256, y * 256, 16, 16);
-			g.DrawString(drawSector.ToString("D2"), font, Brushes.White, x * 256 + 8, y * 256 + 8, format);
+			g.FillRectangle(Brushes.Blue, x * 256 * zoom, y * 256 * zoom, 16 * zoom, 16 * zoom);
+			g.DrawString(drawSector.ToString("D2"), font, Brushes.White, (x * 256 + 8) * zoom, (y * 256 + 8) * zoom, format);
 											
 			int sectorTarget = Level.warps[drawSector];
 			if(sectorTarget != 255)
@@ -354,8 +357,8 @@ namespace WLEditor
 				string text = GetWarpName(sectorTarget);
 				var result = TextRenderer.MeasureText(text, font);
 				
-				g.FillRectangle(Brushes.Blue,  x * 256 + 20, y * 256, result.Width, 16);
-				g.DrawString(text, font, Brushes.White, x * 256 + result.Width / 2 + 20, y * 256 + 8, format);
+				g.FillRectangle(Brushes.Blue,  (x * 256 + 20) * zoom, y * 256 * zoom, result.Width, 16 * zoom);
+				g.DrawString(text, font, Brushes.White, (x * 256) * zoom + result.Width / 2 + 20 * zoom, (y * 256 + 8) * zoom, format);
 			}
 			
 		}
@@ -363,21 +366,21 @@ namespace WLEditor
 		void DrawSectorBorders(Graphics g, Rectangle clipRectangle)
 		{
 			//draw sector borders
-			using (Pen penBlue = new Pen(Color.Blue, 2.0f))
+			using (Pen penBlue = new Pen(Color.Blue, 2.0f * zoom))
 			{						
 				penBlue.DashPattern = new [] { 5.0f, 1.0f };
 				
 				for(int i = 1 ; i < 16 ; i++)
 				{
-					int x = i * 256;
-					Rectangle lineRect = new Rectangle(x - 2, 0, 4, 512);
+					int x = i * 256 * zoom;
+					Rectangle lineRect = new Rectangle(x - 2, 0, 4, 512 * zoom);
 					if(lineRect.IntersectsWith(clipRectangle))
 					{
-						g.DrawLine(penBlue, x, 0, x, 512);
+						g.DrawLine(penBlue, x, 0, x, 512 * zoom);
 					}
 				}
 										
-				g.DrawLine(penBlue, 0, 256, 4096, 256);					
+				g.DrawLine(penBlue, 0, 256 * zoom, 4096 * zoom, 256 * zoom);					
 			}			
 		}
 		
@@ -389,7 +392,7 @@ namespace WLEditor
 			{
 				for(int x = 0 ; x < 16 ; x++)
 				{
-					Rectangle destRect = new Rectangle(x * 256, y * 256, 256, 256);
+					Rectangle destRect = new Rectangle(x * 256 * zoom, y * 256 * zoom, 256 * zoom, 256 * zoom);
 					if(destRect.IntersectsWith(clipRectangle))
 					{
 						sectors.Add(new Point(x, y));
@@ -592,7 +595,7 @@ namespace WLEditor
 		{
 			if(e.Button == MouseButtons.Left)
 			{
-				int tileIndex = e.Location.X / 16 + (e.Location.Y / 16) * 256;
+				int tileIndex = e.Location.X / 16 / zoom + (e.Location.Y / 16 / zoom) * 256;
 
 				if(currentTile != -1)
 				{
@@ -607,13 +610,13 @@ namespace WLEditor
 				}
 
 				invalidTiles[tileIndex] = false;
-				Region r = new Region(new Rectangle((tileIndex % 256) * 16, (tileIndex / 256) * 16, 16, 16));
+				Region r = new Region(new Rectangle((tileIndex % 256) * 16 * zoom, (tileIndex / 256) * 16 * zoom, 16 * zoom, 16 * zoom));
 				levelPictureBox.Invalidate(r);
 			}
 			else if(e.Button == MouseButtons.Right)
 			{
 				Point coordinates = e.Location;
-				int sector = e.Location.X / 256 + (e.Location.Y / 256) * 16;
+				int sector = e.Location.X / 256 / zoom + (e.Location.Y / 256 / zoom) * 16;
 				if(sector != currentSector)
 				{
 					currentSector = sector;
@@ -686,6 +689,27 @@ namespace WLEditor
 			classicToolStripMenuItem.Checked = toolStrip == classicToolStripMenuItem;
 			blackWhiteToolStripMenuItem.Checked = toolStrip == blackWhiteToolStripMenuItem;
 			autumnToolStripMenuItem.Checked = toolStrip == autumnToolStripMenuItem;
+		}
+		
+		void SetZoomLevel(int zoomLevel)
+		{
+			zoom = zoomLevel;
+			levelPictureBox.Height = 512 * zoom;
+			levelPictureBox.Width = 4096 * zoom;			
+			toolStripMenuItem2.Checked = zoomLevel == 1;
+			toolStripMenuItem3.Checked = zoomLevel == 2;
+		}
+				
+		
+		void ToolStripMenuItem2Click(object sender, EventArgs e)
+		{
+			SetZoomLevel(1);			
+			LoadLevel(false);
+		}
+		void ToolStripMenuItem3Click(object sender, EventArgs e)
+		{
+			SetZoomLevel(2);
+			LoadLevel(false);
 		}
 	}
 }

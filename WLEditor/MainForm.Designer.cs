@@ -59,6 +59,9 @@ namespace WLEditor
 			this.noneToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.aToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.bToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.zoomToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
+			this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripMenuItem();
 			this.objectPictureBox = new System.Windows.Forms.PictureBox();
 			this.mainTable = new System.Windows.Forms.TableLayoutPanel();
 			this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
@@ -171,6 +174,7 @@ namespace WLEditor
 			this.objectsToolStripMenuItem,
 			this.scrollRegionToolStripMenuItem,
 			this.collidersToolStripMenuItem,
+			this.zoomToolStripMenuItem,
 			this.paletteToolStripMenuItem,
 			this.switchToolStripMenuItem});
 			this.viewToolStripMenuItem.Name = "viewToolStripMenuItem";
@@ -283,6 +287,31 @@ namespace WLEditor
 			this.bToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
 			this.bToolStripMenuItem.Text = "B";
 			this.bToolStripMenuItem.Click += new System.EventHandler(this.BToolStripMenuItemClick);
+			// 
+			// zoomToolStripMenuItem
+			// 
+			this.zoomToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+			this.toolStripMenuItem2,
+			this.toolStripMenuItem3});
+			this.zoomToolStripMenuItem.Name = "zoomToolStripMenuItem";
+			this.zoomToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
+			this.zoomToolStripMenuItem.Text = "Zoom";
+			// 
+			// toolStripMenuItem2
+			// 
+			this.toolStripMenuItem2.Checked = true;
+			this.toolStripMenuItem2.CheckState = System.Windows.Forms.CheckState.Checked;
+			this.toolStripMenuItem2.Name = "toolStripMenuItem2";
+			this.toolStripMenuItem2.Size = new System.Drawing.Size(152, 22);
+			this.toolStripMenuItem2.Text = "100%";
+			this.toolStripMenuItem2.Click += new System.EventHandler(this.ToolStripMenuItem2Click);
+			// 
+			// toolStripMenuItem3
+			// 
+			this.toolStripMenuItem3.Name = "toolStripMenuItem3";
+			this.toolStripMenuItem3.Size = new System.Drawing.Size(152, 22);
+			this.toolStripMenuItem3.Text = "200%";
+			this.toolStripMenuItem3.Click += new System.EventHandler(this.ToolStripMenuItem3Click);
 			// 
 			// objectPictureBox
 			// 
@@ -402,6 +431,9 @@ namespace WLEditor
 		private System.Windows.Forms.TableLayoutPanel mainTable;
 		private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
 		private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
+		private System.Windows.Forms.ToolStripMenuItem zoomToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem2;
+		private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem3;
 		
 
 			
