@@ -180,7 +180,8 @@ namespace WLEditor
 
 					//draw tiles from cache
 					e.Graphics.InterpolationMode = InterpolationMode.NearestNeighbor;					
-					e.Graphics.DrawImage(levelTiles.Bitmap, 0, 0, 4096 * zoom, 512 * zoom);
+					e.Graphics.PixelOffsetMode = PixelOffsetMode.Half;
+					e.Graphics.DrawImage(levelTiles.Bitmap, 0, 0, 4096 * zoom, 512 * zoom);					
 					
 					//sector objects (enemies, powerups)
 					foreach (Point point in sectorsToDraw)
@@ -434,6 +435,7 @@ namespace WLEditor
 		void ObjectsPictureBoxPaint(object sender, PaintEventArgs e)
 		{
 			e.Graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
+			e.Graphics.PixelOffsetMode = PixelOffsetMode.Half;
 			e.Graphics.DrawImage(tiles16x16.Bitmap, 0, 0, 128 * zoom, 256 * zoom);
 
 			if(currentTile != -1)
@@ -458,6 +460,7 @@ namespace WLEditor
 				using (Font font = new Font("Arial", 8 * zoom))
 				{
 					e.Graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
+					e.Graphics.PixelOffsetMode = PixelOffsetMode.Half;
 					
 					for(int j = 0 ; j < 16 ; j++)
 					{
@@ -486,7 +489,6 @@ namespace WLEditor
 						e.Graphics.FillRectangle(brush, (currentObject % 4) * 16 * zoom, (currentObject / 4) * 16 * zoom, 16 * zoom, 16 * zoom);
 					}
 				}
-
 			}
 		}
 
