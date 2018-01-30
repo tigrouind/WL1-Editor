@@ -179,7 +179,7 @@ namespace WLEditor
 					}
 
 					//draw tiles from cache
-					e.Graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
+					e.Graphics.InterpolationMode = InterpolationMode.NearestNeighbor;					
 					e.Graphics.DrawImage(levelTiles.Bitmap, 0, 0, 4096 * zoom, 512 * zoom);
 					
 					//sector objects (enemies, powerups)
@@ -433,13 +433,14 @@ namespace WLEditor
 
 		void ObjectsPictureBoxPaint(object sender, PaintEventArgs e)
 		{
-			e.Graphics.DrawImage(tiles16x16.Bitmap, 0, 0);
+			e.Graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
+			e.Graphics.DrawImage(tiles16x16.Bitmap, 0, 0, 128 * zoom, 256 * zoom);
 
 			if(currentTile != -1)
 			{
 				using (Brush brush = new SolidBrush(Color.FromArgb(128, 255, 0, 0)))
 				{
-					e.Graphics.FillRectangle(brush, (currentTile % 8) * 16, (currentTile / 8) * 16, 16, 16);
+					e.Graphics.FillRectangle(brush, (currentTile % 8) * 16 * zoom, (currentTile / 8) * 16 * zoom, 16 * zoom, 16 * zoom);
 				}
 			}
 		}
@@ -454,34 +455,36 @@ namespace WLEditor
 				format.Alignment = StringAlignment.Center;
 
 				using (Brush brush = new SolidBrush(Color.FromArgb(128, 255, 0, 0)))
-				using (Pen pen = new Pen(Color.White, 1.0f))
-				using (Font font = new Font("Arial", 8))
+				using (Pen pen = new Pen(Color.White, 1.0f * zoom))
+				using (Font font = new Font("Arial", 8 * zoom))
 				{
+					e.Graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
+					
 					for(int j = 0 ; j < 16 ; j++)
 					{
 						int x = (j % 4) * 16;
 						int y = (j / 4) * 16;
 						
-						e.Graphics.FillRectangle(Brushes.DarkViolet, (j % 4) * 16, (j / 4) * 16, 16, 16);
+						e.Graphics.FillRectangle(Brushes.DarkViolet, (j % 4) * 16 * zoom, (j / 4) * 16 * zoom, 16 * zoom, 16 * zoom);
 						
 						if(j == 0)
 						{							
-							e.Graphics.DrawLine(pen, x + 4, y + 4, x + 12, y + 12);
-							e.Graphics.DrawLine(pen, x + 12, y + 4, x + 4, y + 12);
+							e.Graphics.DrawLine(pen, (x + 4) * zoom, (y + 4) * zoom, (x + 12) * zoom, (y + 12) * zoom);
+							e.Graphics.DrawLine(pen, (x + 12) * zoom, (y + 4) * zoom, (x + 4) * zoom, (y + 12) * zoom);
 						}
 						else if(j <= 6)
 						{						
-							e.Graphics.DrawString(j.ToString(), font, Brushes.White, x + 8, y + 8, format);
+							e.Graphics.DrawString(j.ToString(), font, Brushes.White, (x + 8) * zoom, (y + 8) * zoom, format);
 						}
 						else
 						{
-							e.Graphics.DrawString(ObjectIdToString[j - 7], font, Brushes.White, x + 8, y + 8, format);							
+							e.Graphics.DrawString(ObjectIdToString[j - 7], font, Brushes.White, (x + 8) * zoom, (y + 8) * zoom, format);
 						}
 					}
 					
 					if(currentObject != -1)
 					{
-						e.Graphics.FillRectangle(brush, (currentObject % 4) * 16, (currentObject / 4) * 16, 16, 16);
+						e.Graphics.FillRectangle(brush, (currentObject % 4) * 16 * zoom, (currentObject / 4) * 16 * zoom, 16 * zoom, 16 * zoom);
 					}
 				}
 
@@ -569,7 +572,7 @@ namespace WLEditor
 
 		void ObjectsPictureBoxMouseDown(object sender, MouseEventArgs e)
 		{
-			currentTile = e.Location.X / 16 + (e.Location.Y / 16) * 8;
+			currentTile = e.Location.X / 16 / zoom+ (e.Location.Y / 16 / zoom) * 8;
 			tilesPictureBox.Refresh();
 
 			if(currentObject != -1)
@@ -581,7 +584,7 @@ namespace WLEditor
 
 		void TilesPictureBoxMouseDown(object sender, MouseEventArgs e)
 		{
-			currentObject = e.Location.X / 16 + (e.Location.Y / 16) * 4;
+			currentObject = e.Location.X / 16 / zoom + (e.Location.Y / 16 / zoom) * 4;
 			objectPictureBox.Refresh();
 
 			if(currentTile != -1)
@@ -694,11 +697,21 @@ namespace WLEditor
 		void SetZoomLevel(int zoomLevel)
 		{
 			zoom = zoomLevel;
-			levelPictureBox.Height = 512 * zoom;
-			levelPictureBox.Width = 4096 * zoom;			
+			
 			toolStripMenuItem2.Checked = zoomLevel == 1;
-			toolStripMenuItem3.Checked = zoomLevel == 2;			
+			toolStripMenuItem3.Checked = zoomLevel == 2;	
+			
+			levelPictureBox.Height = 512 * zoom;
+			levelPictureBox.Width = 4096 * zoom;		
 			levelPictureBox.Refresh();
+			
+			tilesPictureBox.Height = 256 * zoom;
+			tilesPictureBox.Width = 128 * zoom;							
+			tilesPictureBox.Refresh();
+			
+			objectPictureBox.Height = 64 * zoom;
+			objectPictureBox.Width = 64 * zoom;
+			objectPictureBox.Refresh();
 		}
 				
 		
