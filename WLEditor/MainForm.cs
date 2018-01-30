@@ -445,7 +445,6 @@ namespace WLEditor
 			}
 		}
 
-
 		void TilesPictureBoxPaint(object sender, PaintEventArgs e)
 		{
 			if(Level.levelData != null && objectsToolStripMenuItem.Checked)
@@ -698,8 +697,8 @@ namespace WLEditor
 		{
 			zoom = zoomLevel;
 			
-			toolStripMenuItem2.Checked = zoomLevel == 1;
-			toolStripMenuItem3.Checked = zoomLevel == 2;	
+			zoom100ToolStripMenuItem.Checked = zoomLevel == 1;
+			zoom200ToolStripMenuItem.Checked = zoomLevel == 2;	
 			
 			levelPictureBox.Height = 512 * zoom;
 			levelPictureBox.Width = 4096 * zoom;		
@@ -715,11 +714,11 @@ namespace WLEditor
 		}
 				
 		
-		void ToolStripMenuItem2Click(object sender, EventArgs e)
+		void Zoom100ToolStripMenuItemClick(object sender, EventArgs e)
 		{
 			SetZoomLevel(1);			
 		}
-		void ToolStripMenuItem3Click(object sender, EventArgs e)
+		void Zoom200ToolStripMenuItemClick(object sender, EventArgs e)
 		{			
 			SetZoomLevel(2);
 		}
