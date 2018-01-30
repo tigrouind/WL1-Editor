@@ -697,19 +697,18 @@ namespace WLEditor
 			levelPictureBox.Height = 512 * zoom;
 			levelPictureBox.Width = 4096 * zoom;			
 			toolStripMenuItem2.Checked = zoomLevel == 1;
-			toolStripMenuItem3.Checked = zoomLevel == 2;
+			toolStripMenuItem3.Checked = zoomLevel == 2;			
+			levelPictureBox.Refresh();
 		}
 				
 		
 		void ToolStripMenuItem2Click(object sender, EventArgs e)
 		{
 			SetZoomLevel(1);			
-			LoadLevel(false);
 		}
 		void ToolStripMenuItem3Click(object sender, EventArgs e)
-		{
+		{			
 			SetZoomLevel(2);
-			LoadLevel(false);
 		}
 	}
 }
