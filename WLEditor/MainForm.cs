@@ -25,7 +25,7 @@ namespace WLEditor
 		public int currentWarp = -1;
 		public string romFilePath;
 		public bool hasChanges;
-		public string[] ObjectIdToString = { string.Empty, "1", "2", "3", "4", "5", "6", "G", "J", "D", "K", "H", "S", "C", "CC", "B" };
+		public string[] ObjectIdToString = { "G", "J", "D", "K", "H", "S", "C", "CC", "B" };
 
 		public MainForm()
 		{
@@ -311,7 +311,14 @@ namespace WLEditor
 							if(data != 0)
 							{
 								e.Graphics.FillRectangle(Brushes.Purple, destRect);
-								e.Graphics.DrawString(ObjectIdToString[data], font, Brushes.White, i * 16 + 8, j * 16 + 8, format);
+								if(data < 7)
+								{
+									e.Graphics.DrawString(data.ToString(), font, Brushes.White, i * 16 + 8, j * 16 + 8, format);
+								}
+								else
+								{
+									e.Graphics.DrawString(ObjectIdToString[data - 7], font, Brushes.White, i * 16 + 8, j * 16 + 8, format);									
+								}
 							}
 						}
 					}
@@ -445,8 +452,19 @@ namespace WLEditor
 					int tileIndex = 0;
 					for(int j = 0 ; j < 16 ; j++)
 					{
+						int x = (j % 4) * 16;
+						int y = (j / 4) * 16;
+						
 						e.Graphics.FillRectangle(j == currentObject ? Brushes.Brown : Brushes.Purple, (j % 4) * 16, (j / 4) * 16, 16, 16);
-						e.Graphics.DrawString(ObjectIdToString[j], font, Brushes.White, (j % 4) * 16 + 8, (j / 4) * 16 + 8, format);
+						
+						if(j < 7)
+						{						
+							e.Graphics.DrawString(j == 0 ? string.Empty : j.ToString(), font, Brushes.White, x + 8, y + 8, format);
+						}
+						else
+						{
+							e.Graphics.DrawString(ObjectIdToString[j - 7], font, Brushes.White, x + 8, y + 8, format);							
+						}
 						tileIndex++;
 					}
 				}
