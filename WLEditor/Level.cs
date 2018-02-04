@@ -61,14 +61,85 @@ namespace WLEditor
 			"Rice Beach 6",
 			"Parsley Woods 1 - DRAINED"
 		};
-			
+		
+		public static Dictionary<int, int> enemiesIdsToSpriteData = new Dictionary<int, int>
+		{
+			{ 0x5313, 0x4FAA },
+			{ 0x5323, 0x6C70 },
+			{ 0x542B, 0x6D56 },
+			{ 0x534B, 0x40F5 },
+			{ 0x53D3, 0x7570 },
+			{ 0x540F, 0x6D56 },
+			{ 0x5337, 0x66A0 },
+			{ 0x5333, 0x66A0 },
+			{ 0x5447, 0x7153 },
+			{ 0x533B, 0x686C },
+			{ 0x5407, 0x6F84 },
+			{ 0x535F, 0x5C86 },
+			{ 0x5327, 0x4DB0 },
+			{ 0x533F, 0x60D1 },
+			{ 0x5363, 0x5E0F },
+			{ 0x53C7, 0x6BEE },
+			{ 0x5443, 0x7F1F },
+			{ 0x53AB, 0x736F },
+			{ 0x5357, 0x4AA0 },
+			{ 0x5367, 0x64D4 },
+			{ 0x536B, 0x6D16 },
+			{ 0x536F, 0x6D16 },
+			{ 0x5317, 0x6FBC },
+			{ 0x535B, 0x53A3 },
+			{ 0x53FF, 0x6F1F },
+			{ 0x538B, 0x460F },
+			{ 0x537B, 0x7C56 },
+			{ 0x53D7, 0x7B10 },
+			{ 0x53CF, 0x72BF },
+			{ 0x53EB, 0x6B39 },
+			{ 0x5347, 0x4035 },
+			{ 0x5433, 0x7992 },
+			{ 0x53A7, 0x6E87 },
+			{ 0x537F, 0x435D },
+			{ 0x53CB, 0x6F27 },
+			{ 0x53B7, 0x64BA },
+			{ 0x5383, 0x4D26 },
+			{ 0x53B3, 0x6082 },
+			{ 0x5427, 0x776D },
+			{ 0x540B, 0x7338 },
+			{ 0x541B, 0x7567 },
+			{ 0x53FB, 0x7ABF },
+			{ 0x53EF, 0x7AB7 },
+			{ 0x53F7, 0x7AC3 },
+			{ 0x53F3, 0x7ABB },
+			{ 0x5387, 0x5ECA },
+			{ 0x5403, 0x6D59 },
+			{ 0x5343, 0x6373 },
+			{ 0x5353, 0x459E },
+			{ 0x543F, 0x7DE6 },
+			{ 0x5417, 0x730D },
+			{ 0x531B, 0x74E9 },
+			{ 0x5423, 0x778B },
+			{ 0x531F, 0x6B4E },
+			{ 0x534F, 0x4308 },
+			{ 0x538F, 0x54F8 },
+			{ 0x542F, 0x796C },
+			{ 0x53BF, 0x6933 },
+			{ 0x53C3, 0x6933 },
+			{ 0x5437, 0x7572 },
+			{ 0x543B, 0x7C24 },
+			{ 0x53DB, 0x4F33 },
+			{ 0x5413, 0x6D8E },
+			{ 0x541F, 0x7B16 },
+			{ 0x532F, 0x5BAF },
+			{ 0x53AF, 0x75BA },
+		};
+		
 		public static byte[] levelData;
 		public static byte[] objectsData;
 		public static byte[] scrollData;
 		public static byte[] warps;
 		public static int warioPosition;
+		public static List<int> loadedSprites;
 		
-		public static void DumpLevel(Rom rom, int course, int warp, DirectBitmap tiles8x8, DirectBitmap tiles16x16, bool reloadAll, bool switchA, bool switchB, int paletteIndex)
+		public static void DumpLevel(Rom rom, int course, int warp, DirectBitmap tiles8x8, DirectBitmap tiles16x16, DirectBitmap tilesEnemies, bool reloadAll, bool switchA, bool switchB, int paletteIndex)
 		{
 			rom.SetBank(0xC);
 			int header = rom.ReadWord(0x4560 + course * 2);
@@ -82,7 +153,8 @@ namespace WLEditor
 			int blockubbank = rom.ReadByte(header + 10);
 			int blockindex = rom.ReadWord(header + 11);
 			byte palette = rom.ReadByte(header + 27);
-
+			int enemiesIdsPointer, enemiesTiles;
+			
 			//load warp
 			if(warp != -1)
 			{
@@ -92,11 +164,17 @@ namespace WLEditor
 				tileanimated = rom.ReadWord(warp + 18);
 				blockindex = rom.ReadWord(warp + 20);
 				palette = rom.ReadByte(warp + 10);
+				FindEnemiesData(rom, rom.ReadWord(warp + 22), out enemiesIdsPointer, out enemiesTiles);
+			}
+			else
+			{
+				FindEnemiesData(rom, rom.ReadWord(header + 28), out enemiesIdsPointer, out enemiesTiles);
 			}
 			
 			Color[] paletteColors = palettes[paletteIndex];
 
 			//dump 8x8 blocks
+			Array.Clear(tiles8x8.Bits, 0, tiles8x8.Width * tiles8x8.Height);
 			rom.SetBank(0x11);
 			Dump8x8Tiles(rom, tileaddressA, tiles8x8, 2*16, 0*16, palette, paletteColors);
 			rom.SetBank(tilebank);
@@ -107,7 +185,9 @@ namespace WLEditor
 			//dump 16x16 blocks
 			rom.SetBank(0xB);
 			Dump16x16Tiles(rom, blockindex, tiles8x8, tiles16x16, switchA, switchB, paletteColors[0]);
-									
+			
+			DumpEnemiesSprites(rom, enemiesIdsPointer, enemiesTiles, tiles8x8, tilesEnemies);			
+			
 			if(reloadAll)
 			{
 				//dump level
@@ -336,7 +416,47 @@ namespace WLEditor
 				}
 			}
 		}
+		
+		public static void FindEnemiesData(Rom rom, int position, out int enemyId, out int tilesPointer)
+		{
+			byte[] pattern = { 
+				0x3E, 0x00,       //ld  a, ..
+				0xEA, 0x2F, 0xA3, //ld  (A32F),a
+				0x3E, 0x00,       //ld  a, ..
+				0xEA, 0x30, 0xA3, //ld  (A330),a
+				0x01, 0x00, 0x00, //ld  bc, ..
+				0xCD, 0xA7, 0x40  //call 40A7
+			};
+			
+			rom.SetBank(0x7);
+			while(rom.ReadByte(position) != 0xC9) //ret
+			{				
+				bool match = true;
+				for(int j = 0 ; j < pattern.Length ; j++)
+				{
+					byte valueFromRom = rom.ReadByte(position + j);
+					byte valueToCompare = pattern[j];
+					
+					if(valueToCompare != 0x00 && valueFromRom != valueToCompare)
+					{
+						match = false;
+						break;
+					}
+				}
+				
+				if(match)
+				{
+					enemyId = rom.ReadByte(position + 6) << 8 | rom.ReadByte(position + 1);
+					tilesPointer = rom.ReadByte(position + 12) << 8 | rom.ReadByte(position + 11);
+					return;
+				}
+				
+				position++;
+			}	
 
+			throw new Exception("cannot find enemies data");
+		}
+		
 		public static void DumpSprite(Rom rom, int posx, int posy, int spriteAddress, int startIndex, DirectBitmap tiles8x8, DirectBitmap tilesDest)
 		{						
 			int pos = spriteAddress;
@@ -388,6 +508,47 @@ namespace WLEditor
 				}	
 									
 			}
+		}
+		
+		public static void DumpEnemiesSprites(Rom rom, int enemiesIdsPointer, int enemiesTiles, DirectBitmap tiles8x8, DirectBitmap tilesEnemies)
+		{
+			loadedSprites = new List<int>();
+			bool quit = false;
+
+			int tilePos = 16*8;		
+			int enemyIndex = 0;
+			Array.Clear(tilesEnemies.Bits, 0, tilesEnemies.Width * tilesEnemies.Height);
+
+			do
+			{
+				rom.SetBank(0x7);
+				int bank = rom.ReadByte(enemiesTiles++);
+				int address = rom.ReadWord(enemiesTiles++); enemiesTiles++;
+				int num = rom.ReadByte(enemiesTiles++);			
+						
+				if(num != 0xFF)
+				{							
+					int spriteDataAddress;
+					rom.SetBank(0x7);
+					int enemiesId = rom.ReadWord(enemiesIdsPointer + (enemyIndex + 1) * 2);
+					
+					if(enemiesIdsToSpriteData.TryGetValue(enemiesId, out spriteDataAddress))
+					{
+						rom.SetBank(bank);						
+						Dump8x8Tiles(rom, address, tiles8x8, num, tilePos, 0x1E, palettes[3], true);
+						DumpSprite(rom, 32, 56 + enemyIndex * 64, spriteDataAddress, tilePos, tiles8x8, tilesEnemies);
+						loadedSprites.Add(enemyIndex + 1);
+					}	
+					
+					tilePos += num;
+					enemyIndex++;					
+				}
+				else
+				{
+					quit = true;
+				}
+			}
+			while(!quit);
 		}
 
 		public static bool IsCollidable(int tileIndex)

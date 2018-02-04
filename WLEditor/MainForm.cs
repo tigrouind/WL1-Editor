@@ -19,6 +19,7 @@ namespace WLEditor
 		public DirectBitmap tiles8x8 = new DirectBitmap(16 * 8, 16 * 8); 
 		public DirectBitmap tiles16x16 = new DirectBitmap(16 * 8, 16 * 16); 
 		public DirectBitmap tilesObjects = new DirectBitmap(16 * 9, 16);
+		public DirectBitmap tilesEnemies = new DirectBitmap(64, 64 * 6); 		
 		public bool[] invalidTiles = new bool[256 * 32];
 		public int currentSector = -1;
 		public int currentTile = -1;
@@ -45,7 +46,7 @@ namespace WLEditor
 			if(rom.IsLoaded && levelComboBox.SelectedItem != null)
 			{
 				Array.Clear(invalidTiles, 0, invalidTiles.Length);
-				Level.DumpLevel(rom, currentCourseId, currentWarp, tiles8x8, tiles16x16, reloadAll, aToolStripMenuItem.Checked, bToolStripMenuItem.Checked, SelectedPaletteToolStripIndex());
+				Level.DumpLevel(rom, currentCourseId, currentWarp, tiles8x8, tiles16x16, tilesEnemies, reloadAll, aToolStripMenuItem.Checked, bToolStripMenuItem.Checked, SelectedPaletteToolStripIndex());
 
 				levelPictureBox.Refresh();
 				objectPictureBox.Refresh();
@@ -315,9 +316,13 @@ namespace WLEditor
 							if(data != 0)
 							{
 								e.Graphics.FillRectangle(Brushes.DarkViolet, destRect);
+								
 								if(data <= 6)
 								{
-									e.Graphics.DrawString(data.ToString(), font, Brushes.White, (i * 16 + 8) * zoom, (j * 16 + 8) * zoom, format);
+									if(!Level.loadedSprites.Contains(data))
+									{
+										e.Graphics.DrawString(data.ToString(), font, Brushes.White, (i * 16 + 8) * zoom, (j * 16 + 8) * zoom, format);
+									}
 								}
 								else
 								{
@@ -325,6 +330,20 @@ namespace WLEditor
 								}
 							}
 						}
+					}
+					
+					//objects sprites							
+					if(viewObjects)
+					{											
+						byte data = Level.objectsData[i + j * 256];
+						if(data > 0 && data <= 6 && Level.loadedSprites.Contains(data))
+						{
+							destRect = new Rectangle((i * 16 + 8 - 32) * zoom, (j * 16 + 8 - 48) * zoom, 64 * zoom, 64 * zoom);
+							if(destRect.IntersectsWith(e.ClipRectangle))
+							{
+								e.Graphics.DrawImage(tilesEnemies.Bitmap, new Rectangle((i * 16 - 16 - 8)*zoom, (j * 16 - 40)*zoom, 64 * zoom, 64 * zoom), new Rectangle(0, (data - 1) * 64, 64, 64), GraphicsUnit.Pixel);	
+							}
+						}						
 					}
 				}
 			}
@@ -597,21 +616,26 @@ namespace WLEditor
 			if(e.Button == MouseButtons.Left)
 			{
 				int tileIndex = e.Location.X / 16 / zoom + (e.Location.Y / 16 / zoom) * 256;
+				Region r = new Region(new Rectangle((tileIndex % 256) * 16 * zoom, (tileIndex / 256) * 16 * zoom, 16 * zoom, 16 * zoom));			
 
 				if(currentTile != -1)
 				{
 					Level.levelData[tileIndex + 0x1000] = (byte)currentTile;
+					invalidTiles[tileIndex] = false;
 					SetChanges(true);
 				}
 
 				if(currentObject != -1)
 				{
 					Level.objectsData[tileIndex] = (byte)currentObject;
+					int objectIndex = Level.objectsData[tileIndex];
+					if(objectIndex == 0 || Level.loadedSprites.Contains(objectIndex))
+					{
+						r.Union(new Rectangle(((tileIndex % 256) * 16 + 8 - 32) * zoom, ((tileIndex / 256) * 16 + 8 - 48) * zoom, 64 * zoom, 64 * zoom));
+					}
 					SetChanges(true);
-				}
-
-				invalidTiles[tileIndex] = false;
-				Region r = new Region(new Rectangle((tileIndex % 256) * 16 * zoom, (tileIndex / 256) * 16 * zoom, 16 * zoom, 16 * zoom));
+				}				
+				
 				levelPictureBox.Invalidate(r);
 			}
 			else if(e.Button == MouseButtons.Right)
