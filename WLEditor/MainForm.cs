@@ -722,6 +722,8 @@ namespace WLEditor
 			
 			zoom100ToolStripMenuItem.Checked = zoomLevel == 1;
 			zoom200ToolStripMenuItem.Checked = zoomLevel == 2;	
+			zoom300ToolStripMenuItem.Checked = zoomLevel == 3;	
+			zoom400ToolStripMenuItem.Checked = zoomLevel == 4;	
 			
 			levelPictureBox.Height = 512 * zoom;
 			levelPictureBox.Width = 4096 * zoom;		
@@ -735,15 +737,25 @@ namespace WLEditor
 			objectPictureBox.Width = 64 * zoom;
 			objectPictureBox.Refresh();
 		}
-				
-		
+						
 		void Zoom100ToolStripMenuItemClick(object sender, EventArgs e)
 		{
 			SetZoomLevel(1);			
 		}
+		
 		void Zoom200ToolStripMenuItemClick(object sender, EventArgs e)
 		{			
 			SetZoomLevel(2);
+		}
+		
+		void Zoom300ToolStripMenuItemClick(object sender, EventArgs e)
+		{
+			SetZoomLevel(3);
+		}
+		
+		void Zoom400ToolStripMenuItemClick(object sender, EventArgs e)
+		{
+			SetZoomLevel(4);
 		}
 	}
 }
