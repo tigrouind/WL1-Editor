@@ -7,12 +7,12 @@ namespace WLEditor
 {
 	public static class Level
 	{
-		public static Color[] paletteColors;
 		public static Color[][] palettes =
 		{
 			new[] { Color.FromArgb(255, 224, 248, 208), Color.FromArgb(255, 135, 201, 140), Color.FromArgb(255, 52, 104, 86), Color.FromArgb(255, 8, 24, 32) },
 			new[] { Color.White, Color.FromArgb(255, 170, 170, 170), Color.FromArgb(255, 85, 85, 85), Color.Black },
-			new[] { Color.White, Color.FromArgb(255, 230, 214, 156), Color.FromArgb(255, 180, 165, 106), Color.FromArgb(255, 57, 56, 41) }
+			new[] { Color.White, Color.FromArgb(255, 230, 214, 156), Color.FromArgb(255, 180, 165, 106), Color.FromArgb(255, 57, 56, 41) },
+			new[] { Color.FromArgb(255, 223, 193, 255), Color.FromArgb(255, 203, 155, 255), Color.Pink, Color.FromArgb(255, 65, 0, 36) }
 		};
 
 		public static string[] levelNames =
@@ -61,13 +61,13 @@ namespace WLEditor
 			"Rice Beach 6",
 			"Parsley Woods 1 - DRAINED"
 		};
-
+			
 		public static byte[] levelData;
 		public static byte[] objectsData;
 		public static byte[] scrollData;
 		public static byte[] warps;
 		public static int warioPosition;
-
+		
 		public static void DumpLevel(Rom rom, int course, int warp, DirectBitmap tiles8x8, DirectBitmap tiles16x16, bool reloadAll, bool switchA, bool switchB, int paletteIndex)
 		{
 			rom.SetBank(0xC);
@@ -93,22 +93,21 @@ namespace WLEditor
 				blockindex = rom.ReadWord(warp + 20);
 				palette = rom.ReadByte(warp + 10);
 			}
-
-			//set palette
-			paletteColors = palettes[paletteIndex];
+			
+			Color[] paletteColors = palettes[paletteIndex];
 
 			//dump 8x8 blocks
 			rom.SetBank(0x11);
-			Dump8x8Tiles(rom, tileaddressA, tiles8x8, 2*16, 0, palette);
+			Dump8x8Tiles(rom, tileaddressA, tiles8x8, 2*16, 0*16, palette, paletteColors);
 			rom.SetBank(tilebank);
-			Dump8x8Tiles(rom, tileaddressB, tiles8x8, 6*16, 2, palette);
+			Dump8x8Tiles(rom, tileaddressB, tiles8x8, 6*16, 2*16, palette, paletteColors);
 			rom.SetBank(0x11);
-			Dump8x8Tiles(rom, tileanimated, tiles8x8, 4, 2, palette);
+			Dump8x8Tiles(rom, tileanimated, tiles8x8, 4, 2*16, palette, paletteColors);				
 
 			//dump 16x16 blocks
 			rom.SetBank(0xB);
-			Dump16x16Tiles(rom, blockindex, tiles8x8, tiles16x16, switchA, switchB);
-
+			Dump16x16Tiles(rom, blockindex, tiles8x8, tiles16x16, switchA, switchB, paletteColors[0]);
+									
 			if(reloadAll)
 			{
 				//dump level
@@ -134,7 +133,7 @@ namespace WLEditor
 					warps[i] = rom.ReadByte(warpdata);
 				}
 
-				warioPosition = rom.ReadWordSwap(header + 15) + rom.ReadWordSwap(header + 13) * 8192;
+				warioPosition = rom.ReadWordSwap(header + 15) + rom.ReadWordSwap(header + 13) * 8192;								
 			}
 		}
 
@@ -157,6 +156,23 @@ namespace WLEditor
 			}
 
 			return -1;
+		}
+		
+		public static void DumpBonusSprites(Rom rom, DirectBitmap tiles8x8, DirectBitmap tilesObject)
+		{
+			//bonus sprites
+			rom.SetBank(0x5);
+			Dump8x8Tiles(rom, 0x4C81, tiles8x8, 23, 0, 0x1E, palettes[3], true); 
+			
+			rom.SetBank(0x11);
+			Dump8x8Tiles(rom, 0x7300, tiles8x8, 4, 16+23, 0x1E, palettes[3], true); 
+			
+			rom.SetBank(0xF);
+			int[] sprites = { 0x4ACB, 0x4AEB, 0x4ADB, 0x4AFB, 0x4B0B, 0x4B1B, 0x4B2B, 0x4B4B, 0x4B5B };
+			for (int i = 0 ; i < sprites.Length ; i++)
+			{			
+				DumpSprite(rom, 8 + i * 16, 16, sprites[i], 0, tiles8x8, tilesObject);
+			}
 		}
 
 		public static IEnumerable<byte> RLEDecompressTiles(Rom rom, int tilesdata)
@@ -250,7 +266,7 @@ namespace WLEditor
 			}
 		}
 
-		public static void Dump16x16Tiles(Rom rom, int tileindexaddress, DirectBitmap gfx8, DirectBitmap gfx16, bool switchA, bool switchB)
+		public static void Dump16x16Tiles(Rom rom, int tileindexaddress, DirectBitmap gfx8, DirectBitmap gfx16, bool switchA, bool switchB, Color defaultColor)
 		{	
 			for(int n = 0 ; n < 16 ; n++)
 			{
@@ -277,13 +293,13 @@ namespace WLEditor
 							}
 							else
 							{
-								int defaultColor = paletteColors[0].ToArgb();								
+								int defaultColorInt = defaultColor.ToArgb();								
 								for(int y = 0 ; y < 8 ; y++)
 								{
 									int destIndex = dest.X + (dest.Y + y) * gfx16.Width;									
 									for(int x = 0 ; x < 8 ; x++)
 									{
-										gfx16.Bits[destIndex + x] = defaultColor;
+										gfx16.Bits[destIndex + x] = defaultColorInt;
 									}
 								}
 							}
@@ -293,7 +309,7 @@ namespace WLEditor
 			}
 		}
 
-		public static void Dump8x8Tiles(Rom rom, int gfxaddress, DirectBitmap gfx8, int tiles, int rowpos, byte palette)
+		public static void Dump8x8Tiles(Rom rom, int gfxaddress, DirectBitmap gfx8, int tiles, int pos, byte palette, Color[] customPalette, bool transparency = false)
 		{
 			for(int n = 0 ; n < tiles ; n++)
 			{
@@ -307,14 +323,70 @@ namespace WLEditor
 						int pixelA = (data0 >> (7 - i)) & 0x1;
 						int pixelB = (data1 >> (7 - i)) & 0x1;
 						int pixel = pixelA + pixelB * 2;
-						int palindex = (palette >> pixel * 2) & 0x3;
+						
+						if(!transparency || pixel != 0)
+						{
+							int palindex = (palette >> pixel * 2) & 0x3;
 
-						int x = i + n%16 * 8;
-						int y = j + (n/16 + rowpos) * 8;
-
-						gfx8.Bits[x + gfx8.Width * y] = paletteColors[palindex].ToArgb();
+							int x = i + ((n + pos) % 16) * 8;
+							int y = j + ((n + pos) / 16) * 8;
+							gfx8.Bits[x + gfx8.Width * y] = customPalette[palindex].ToArgb();
+						}
 					}
 				}
+			}
+		}
+
+		public static void DumpSprite(Rom rom, int posx, int posy, int spriteAddress, int startIndex, DirectBitmap tiles8x8, DirectBitmap tilesDest)
+		{						
+			int pos = spriteAddress;
+						
+			pos = rom.ReadWord(pos);
+			int palette = rom.ReadByte(pos++);
+			
+			while(rom.ReadByte(pos) != 0x80)
+			{		
+				int spx, spy;
+				unchecked
+				{
+					spy = (sbyte)rom.ReadByte(pos++) + posy;
+					spx = (sbyte)rom.ReadByte(pos++) + posx;
+				}
+				int spriteData = rom.ReadByte(pos++);
+				int spriteIndex = (spriteData & 0x3F) + startIndex;
+				Point source = new Point((spriteIndex % 16) * 8, (spriteIndex / 16) * 8);
+				
+				Func<int, int> getX, getY;
+				
+				if((spriteData & 0x40) != 0) //horizontal flip
+				{
+					getX = x => 7 - x;
+				}
+				else
+				{
+					getX = x => x;
+				}
+				
+				if((spriteData & 0x80) != 0) //vertical flip
+				{
+					getY = y => 7 - y;				
+				}
+				else
+				{
+					getY = y => y;
+				}				
+				
+				for(int y = 0 ; y < 8 ; y++)
+				{												
+					int src = source.X + (source.Y + getY(y)) * tiles8x8.Width;
+					int dst = spx + (spy + y) * tilesDest.Width;
+					
+					for(int x = 0 ; x < 8 ; x++)
+					{											
+						tilesDest.Bits[dst + x] = tiles8x8.Bits[src + getX(x)];
+					}
+				}	
+									
 			}
 		}
 

@@ -16,8 +16,9 @@ namespace WLEditor
 	{
 		public Rom rom = new Rom();
 		public DirectBitmap levelTiles = new DirectBitmap(4096, 512);
-		public DirectBitmap tiles8x8 = new DirectBitmap(16 * 8, 8 * 8);
-		public DirectBitmap tiles16x16 = new DirectBitmap(16 * 8, 16 * 16);
+		public DirectBitmap tiles8x8 = new DirectBitmap(16 * 8, 16 * 8); 
+		public DirectBitmap tiles16x16 = new DirectBitmap(16 * 8, 16 * 16); 
+		public DirectBitmap tilesObjects = new DirectBitmap(16 * 9, 16);
 		public bool[] invalidTiles = new bool[256 * 32];
 		public int currentSector = -1;
 		public int currentTile = -1;
@@ -26,7 +27,6 @@ namespace WLEditor
 		public int currentWarp = -1;
 		public string romFilePath;
 		public bool hasChanges;
-		public string[] ObjectIdToString = { "G", "J", "D", "K", "H", "S", "C", "CC", "B" };
 		public int zoom = 1;
 
 		public MainForm()
@@ -89,6 +89,7 @@ namespace WLEditor
 				{
 					rom = newRom;
 					LoadLevelCombobox();
+					Level.DumpBonusSprites(rom, tiles8x8, tilesObjects);
 					romFilePath = openFileDialog1.FileName;
 
 					if(levelComboBox.SelectedIndex == 0)
@@ -320,7 +321,7 @@ namespace WLEditor
 								}
 								else
 								{
-									e.Graphics.DrawString(ObjectIdToString[data - 7], font, Brushes.White, (i * 16 + 8) * zoom, (j * 16 + 8) * zoom, format);
+									e.Graphics.DrawImage(tilesObjects.Bitmap, new Rectangle(i * 16 * zoom, j * 16 * zoom, 16 * zoom, 16 * zoom), new Rectangle((data - 7) * 16, 0, 16, 16), GraphicsUnit.Pixel);
 								}
 							}
 						}
@@ -476,7 +477,7 @@ namespace WLEditor
 						}
 						else
 						{
-							e.Graphics.DrawString(ObjectIdToString[j - 7], font, Brushes.White, (x + 8) * zoom, (y + 8) * zoom, format);
+							e.Graphics.DrawImage(tilesObjects.Bitmap, new Rectangle(x * zoom, y * zoom, 16 * zoom, 16 * zoom), new Rectangle((j - 7) * 16, 0, 16, 16),  GraphicsUnit.Pixel);
 						}
 					}
 					
