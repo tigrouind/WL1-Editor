@@ -12,7 +12,7 @@ namespace WLEditor
 			new[] { Color.FromArgb(255, 224, 248, 208), Color.FromArgb(255, 135, 201, 140), Color.FromArgb(255, 52, 104, 86), Color.FromArgb(255, 8, 24, 32) },
 			new[] { Color.White, Color.FromArgb(255, 170, 170, 170), Color.FromArgb(255, 85, 85, 85), Color.Black },
 			new[] { Color.White, Color.FromArgb(255, 230, 214, 156), Color.FromArgb(255, 180, 165, 106), Color.FromArgb(255, 57, 56, 41) },
-			new[] { Color.FromArgb(255, 223, 193, 255), Color.FromArgb(255, 203, 155, 255), Color.Pink, Color.FromArgb(255, 65, 0, 36) }
+			new[] { Color.FromArgb(255, 255, 255, 255), Color.FromArgb(255, 203, 155, 255), Color.FromArgb(255, 169, 94, 255), Color.FromArgb(255, 65, 0, 36) }
 		};
 
 		public static string[] levelNames =
@@ -463,7 +463,7 @@ namespace WLEditor
 			int pos = spriteAddress;
 						
 			pos = rom.ReadWord(pos);
-			int palette = rom.ReadByte(pos++);
+			rom.ReadByte(pos++);
 			
 			while(rom.ReadByte(pos) != 0x80)
 			{		
@@ -535,8 +535,12 @@ namespace WLEditor
 					
 					if(enemiesIdsToSpriteData.TryGetValue(enemiesId, out spriteDataAddress))
 					{
-						rom.SetBank(bank);						
-						Dump8x8Tiles(rom, address, tiles8x8, num, tilePos, 0x1E, palettes[3], true);
+						rom.SetBank(bank);	
+						int pos = rom.ReadWord(spriteDataAddress);
+						int spriteFlags = rom.ReadByte(pos);
+						int palette = (spriteFlags & 0x10) != 0 ? 0xE1 : 0x1E;
+						
+						Dump8x8Tiles(rom, address, tiles8x8, num, tilePos, (byte)palette, palettes[3], true);
 						DumpSprite(rom, 32, 56 + enemyIndex * 64, spriteDataAddress, tilePos, tiles8x8, tilesEnemies);
 						loadedSprites.Add(enemyIndex + 1);
 					}	
