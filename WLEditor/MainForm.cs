@@ -390,7 +390,7 @@ namespace WLEditor
 				for(int i = 1 ; i < 16 ; i++)
 				{
 					int x = i * 256 * zoom;
-					Rectangle lineRect = new Rectangle(x - 2, 0, 4, 512 * zoom);
+					Rectangle lineRect = new Rectangle(x - zoom, 0, 2 * zoom, 512 * zoom);					
 					if(lineRect.IntersectsWith(clipRectangle))
 					{
 						g.DrawLine(penBlue, x, 0, x, 512 * zoom);
