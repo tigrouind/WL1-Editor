@@ -626,13 +626,13 @@ namespace WLEditor
 				}
 
 				if(currentObject != -1)
-				{
-					Level.objectsData[tileIndex] = (byte)currentObject;
+				{					
 					int objectIndex = Level.objectsData[tileIndex];
-					if(objectIndex == 0 || Level.loadedSprites.Contains(objectIndex))
+					if(Level.loadedSprites.Contains(objectIndex) || Level.loadedSprites.Contains(currentObject))
 					{
 						r.Union(new Rectangle(((tileIndex % 256) * 16 + 8 - 32) * zoom, ((tileIndex / 256) * 16 + 8 - 48) * zoom, 64 * zoom, 64 * zoom));
 					}
+					Level.objectsData[tileIndex] = (byte)currentObject;
 					SetChanges(true);
 				}				
 				
