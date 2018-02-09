@@ -426,7 +426,7 @@ namespace WLEditor
 			switch(sectorTarget)
 			{
 				case 32:
-					warpText = "START";
+					warpText = "EXIT MAP";
 					break;
 				case 33:
 					warpText = "EXIT A";
