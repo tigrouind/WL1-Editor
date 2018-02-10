@@ -561,11 +561,6 @@ namespace WLEditor
 			return (tileIndex & 64) != 64;
 		}
 
-		public static bool IsDoor(int tileIndex)
-		{
-			return tileIndex == 72 || tileIndex == 75 || tileIndex == 46 || tileIndex == 84;
-		}
-
 		//replace tiles when a (!) block is hit
 		public static int Switch(int tileData, bool switchA, bool switchB)
 		{

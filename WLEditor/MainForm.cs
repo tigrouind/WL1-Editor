@@ -296,19 +296,6 @@ namespace WLEditor
 
 					if(destRect.IntersectsWith(e.ClipRectangle))
 					{
-						//tile blocks
-						byte tileIndex = Level.levelData[i + j * 256 + 0x1000];
-						
-						if(viewSectors)
-						{
-							int sectorTarget = Level.warps[x + y * 16];
-							if(Level.IsDoor(tileIndex) && sectorTarget != 255)
-							{
-								e.Graphics.FillRectangle(Brushes.Green, destRect);
-								e.Graphics.DrawString("D", font, Brushes.White, (i * 16 + 8) * zoom, (j * 16 + 8) * zoom, format);
-							}
-						}
-
 						//objects
 						if(viewObjects)
 						{
