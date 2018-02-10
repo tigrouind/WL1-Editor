@@ -483,7 +483,7 @@ namespace WLEditor
 						int x = (j % 4) * 16;
 						int y = (j / 4) * 16;
 						
-						e.Graphics.FillRectangle(Brushes.DarkViolet, (j % 4) * 16 * zoom, (j / 4) * 16 * zoom, 16 * zoom, 16 * zoom);
+						e.Graphics.FillRectangle(Brushes.DarkViolet, x * zoom, y * zoom, 16 * zoom, 16 * zoom);
 						
 						if(j == 0)
 						{							
