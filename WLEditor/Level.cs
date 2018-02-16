@@ -245,6 +245,7 @@ namespace WLEditor
 		
 		public static void DumpBonusSprites(Rom rom, DirectBitmap tiles8x8, DirectBitmap tilesObject)
 		{
+			Array.Clear(tiles8x8.Bits, 0, tiles8x8.Width * tiles8x8.Height);
 			//bonus sprites
 			rom.SetBank(0x5);
 			Dump8x8Tiles(rom, 0x4C81, tiles8x8, 23, 0, 0x1E, enemyPalette, true); 
