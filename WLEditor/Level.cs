@@ -11,8 +11,12 @@ namespace WLEditor
 		{
 			new[] { Color.FromArgb(255, 224, 248, 208), Color.FromArgb(255, 135, 201, 140), Color.FromArgb(255, 52, 104, 86), Color.FromArgb(255, 8, 24, 32) },
 			new[] { Color.White, Color.FromArgb(255, 170, 170, 170), Color.FromArgb(255, 85, 85, 85), Color.Black },
-			new[] { Color.White, Color.FromArgb(255, 230, 214, 156), Color.FromArgb(255, 180, 165, 106), Color.FromArgb(255, 57, 56, 41) },
-			new[] { Color.FromArgb(255, 255, 255, 255), Color.FromArgb(255, 203, 155, 255), Color.FromArgb(255, 169, 94, 255), Color.FromArgb(255, 65, 0, 36) }
+			new[] { Color.White, Color.FromArgb(255, 230, 214, 156), Color.FromArgb(255, 180, 165, 106), Color.FromArgb(255, 57, 56, 41) }			
+		};
+		
+		public static Color[] enemyPalette =
+		{
+			Color.White, Color.FromArgb(255, 157, 201, 253), Color.FromArgb(255, 50, 50, 155), Color.FromArgb(255, 0, 0, 41)
 		};
 
 		public static string[] levelNames =
@@ -243,10 +247,10 @@ namespace WLEditor
 		{
 			//bonus sprites
 			rom.SetBank(0x5);
-			Dump8x8Tiles(rom, 0x4C81, tiles8x8, 23, 0, 0x1E, palettes[3], true); 
+			Dump8x8Tiles(rom, 0x4C81, tiles8x8, 23, 0, 0x1E, enemyPalette, true); 
 			
 			rom.SetBank(0x11);
-			Dump8x8Tiles(rom, 0x7300, tiles8x8, 4, 16+23, 0x1E, palettes[3], true); 
+			Dump8x8Tiles(rom, 0x7300, tiles8x8, 4, 16+23, 0x1E, enemyPalette, true); 
 			
 			rom.SetBank(0xF);
 			int[] sprites = { 0x4ACB, 0x4AEB, 0x4ADB, 0x4AFB, 0x4B0B, 0x4B1B, 0x4B2B, 0x4B4B, 0x4B5B };
@@ -538,9 +542,9 @@ namespace WLEditor
 						rom.SetBank(bank);	
 						int pos = rom.ReadWord(spriteDataAddress);
 						int spriteFlags = rom.ReadByte(pos);
-						int palette = (spriteFlags & 0x10) != 0 ? 0xE1 : 0x1E;
+						int palette = (spriteFlags & 0x10) != 0 ? 0xD1 : 0x1E;
 						
-						Dump8x8Tiles(rom, address, tiles8x8, num, tilePos, (byte)palette, palettes[3], true);
+						Dump8x8Tiles(rom, address, tiles8x8, num, tilePos, (byte)palette, enemyPalette, true);
 						DumpSprite(rom, 32, 56 + enemyIndex * 64, spriteDataAddress, tilePos, tiles8x8, tilesEnemies);
 						loadedSprites.Add(enemyIndex + 1);
 					}	

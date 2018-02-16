@@ -170,6 +170,7 @@ namespace WLEditor
 			
 				var sectorsToDraw = GetVisibleSectors(e.ClipRectangle);
 
+				using (Brush enemyBrush = new SolidBrush(Level.enemyPalette[2]))
 				using (Brush redBrush = new SolidBrush(Color.FromArgb(128, 255, 0, 0)))
 				using (Font font = new Font("Arial", 8 * zoom))				
 				using (Graphics g = Graphics.FromImage(levelTiles.Bitmap))
@@ -188,7 +189,7 @@ namespace WLEditor
 					//sector objects (enemies, powerups)
 					foreach (Point point in sectorsToDraw)
 					{
-						DrawSectorObjects(point.X, point.Y, font, format, e);			
+						DrawSectorObjects(point.X, point.Y, font, format, e, enemyBrush);			
 					}					
 					
 					if(viewSectors)
@@ -283,7 +284,7 @@ namespace WLEditor
 			}
 		}
 
-		void DrawSectorObjects(int x, int y, Font font, StringFormat format, PaintEventArgs e)
+		void DrawSectorObjects(int x, int y, Font font, StringFormat format, PaintEventArgs e, Brush brush)
 		{
 			bool viewObjects = objectsToolStripMenuItem.Checked;
 			bool viewSectors = regionsToolStripMenuItem.Checked;
@@ -302,7 +303,7 @@ namespace WLEditor
 							byte data = Level.objectsData[i + j * 256];
 							if(data != 0)
 							{
-								e.Graphics.FillRectangle(Brushes.DarkViolet, destRect);
+								e.Graphics.FillRectangle(brush, destRect);
 								
 								if(data <= 6)
 								{
@@ -458,6 +459,7 @@ namespace WLEditor
 				format.LineAlignment = StringAlignment.Center;
 				format.Alignment = StringAlignment.Center;
 
+				using (Brush enemyBrush = new SolidBrush(Level.enemyPalette[2]))
 				using (Brush brush = new SolidBrush(Color.FromArgb(128, 255, 0, 0)))
 				using (Pen pen = new Pen(Color.White, 1.0f * zoom))
 				using (Font font = new Font("Arial", 8 * zoom))
@@ -470,7 +472,7 @@ namespace WLEditor
 						int x = (j % 4) * 16;
 						int y = (j / 4) * 16;
 						
-						e.Graphics.FillRectangle(Brushes.DarkViolet, x * zoom, y * zoom, 16 * zoom, 16 * zoom);
+						e.Graphics.FillRectangle(enemyBrush, x * zoom, y * zoom, 16 * zoom, 16 * zoom);
 						
 						if(j == 0)
 						{							
