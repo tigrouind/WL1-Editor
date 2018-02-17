@@ -142,7 +142,7 @@ namespace WLEditor
 		public static byte[] scrollData;
 		public static byte[] warps;
 		public static int warioPosition;
-		public static List<int> loadedSprites;
+		public static Rectangle[] loadedSprites;
 		
 		public static void DumpLevel(Rom rom, int course, int warp, DirectBitmap tiles8x8, DirectBitmap tiles16x16, DirectBitmap tilesEnemies, bool reloadAll, bool switchA, bool switchB, int paletteIndex)
 		{
@@ -463,8 +463,9 @@ namespace WLEditor
 			throw new Exception("cannot find enemies data");
 		}
 		
-		public static void DumpSprite(Rom rom, int posx, int posy, int spriteAddress, int startIndex, DirectBitmap tiles8x8, DirectBitmap tilesDest)
+		public static Rectangle DumpSprite(Rom rom, int posx, int posy, int spriteAddress, int startIndex, DirectBitmap tiles8x8, DirectBitmap tilesDest)
 		{						
+			Rectangle rectangle = Rectangle.Empty;
 			int pos = spriteAddress;
 						
 			pos = rom.ReadWord(pos);
@@ -481,6 +482,9 @@ namespace WLEditor
 				int spriteData = rom.ReadByte(pos++);
 				int spriteIndex = (spriteData & 0x3F) + startIndex;
 				Point source = new Point((spriteIndex % 16) * 8, (spriteIndex / 16) * 8);
+				
+				Rectangle tileRect = new Rectangle(spx, spy, 8, 8);
+				rectangle = rectangle == Rectangle.Empty ? tileRect : Rectangle.Union(rectangle, tileRect);
 				
 				Func<int, int> getX, getY;
 				
@@ -511,14 +515,16 @@ namespace WLEditor
 					{											
 						tilesDest.Bits[dst + x] = tiles8x8.Bits[src + getX(x)];
 					}
-				}	
-									
+				}									
 			}
+			
+			return rectangle;
 		}
 		
 		public static void DumpEnemiesSprites(Rom rom, int enemiesIdsPointer, int enemiesTiles, DirectBitmap tiles8x8, DirectBitmap tilesEnemies)
 		{
-			loadedSprites = new List<int>();
+			loadedSprites = new Rectangle[6];
+			
 			bool quit = false;
 
 			int tilePos = 16*8;		
@@ -546,8 +552,8 @@ namespace WLEditor
 						int palette = (spriteFlags & 0x10) != 0 ? 0xD1 : 0x1E;
 						
 						Dump8x8Tiles(rom, address, tiles8x8, num, tilePos, (byte)palette, enemyPalette, true);
-						DumpSprite(rom, 32, 56 + enemyIndex * 64, spriteDataAddress, tilePos, tiles8x8, tilesEnemies);
-						loadedSprites.Add(enemyIndex + 1);
+						Rectangle rectangle = DumpSprite(rom, 32, 56 + enemyIndex * 64, spriteDataAddress, tilePos, tiles8x8, tilesEnemies);
+						loadedSprites[enemyIndex] = rectangle;
 					}	
 					
 					tilePos += num;

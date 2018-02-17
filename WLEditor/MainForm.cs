@@ -155,7 +155,7 @@ namespace WLEditor
 			bool viewSectors = regionsToolStripMenuItem.Checked;
 			bool viewScroll = scrollRegionToolStripMenuItem.Checked;
 			bool viewObjects = objectsToolStripMenuItem.Checked;
-
+			
 			if(Level.levelData != null)
 			{
 				StringFormat format = new StringFormat();
@@ -231,7 +231,7 @@ namespace WLEditor
 				}			
 			}
 		}
-
+		
 		void DrawTiles(int x, int y, Brush brush, Graphics g, PaintEventArgs e)
 		{
 			bool switchA = aToolStripMenuItem.Checked;
@@ -295,21 +295,22 @@ namespace WLEditor
 							
 							if(data > 6)
 							{
-								e.Graphics.DrawImage(tilesObjects.Bitmap, new Rectangle(i * 16 * zoom, j * 16 * zoom, 16 * zoom, 16 * zoom), new Rectangle((data - 7) * 16, 0, 16, 16), GraphicsUnit.Pixel);								
+								e.Graphics.DrawImage(tilesObjects.Bitmap, destRect, new Rectangle((data - 7) * 16, 0, 16, 16), GraphicsUnit.Pixel);								
 							}
-							else if(!Level.loadedSprites.Contains(data))
+							else if(Level.loadedSprites[data - 1] == Rectangle.Empty)
 							{
 								e.Graphics.DrawString(data.ToString(), font, Brushes.White, (i * 16 + 8) * zoom, (j * 16 + 8) * zoom, format);								
 							}
 						}
 						
-						//objects sprites							
-						destRect = new Rectangle((i * 16 + 8 - 32) * zoom, (j * 16 + 8 - 48) * zoom, 64 * zoom, 64 * zoom);
-						if(destRect.IntersectsWith(e.ClipRectangle))
+						//objects sprites																	
+						if(data <= 6 && Level.loadedSprites[data - 1] != Rectangle.Empty)
 						{
-							if(data <= 6 && Level.loadedSprites.Contains(data))
-							{
-								e.Graphics.DrawImage(tilesEnemies.Bitmap, new Rectangle((i * 16 - 16 - 8)*zoom, (j * 16 - 40)*zoom, 64 * zoom, 64 * zoom), new Rectangle(0, (data - 1) * 64, 64, 64), GraphicsUnit.Pixel);	
+							Rectangle enemyRect = Level.loadedSprites[data - 1];
+							destRect = new Rectangle((i * 16 + enemyRect.X - 32 + 8) * zoom, (j * 16 + enemyRect.Y - (data - 1) * 64 - 40) * zoom, enemyRect.Width * zoom, enemyRect.Height * zoom);							
+							if(destRect.IntersectsWith(e.ClipRectangle))
+							{																												
+								e.Graphics.DrawImage(tilesEnemies.Bitmap, destRect, enemyRect, GraphicsUnit.Pixel);
 							}
 						}			
 					}														
@@ -589,23 +590,41 @@ namespace WLEditor
 
 				if(currentTile != -1)
 				{
-					Level.levelData[tileIndex + 0x1000] = (byte)currentTile;
-					invalidTiles[tileIndex] = false;
-					SetChanges(true);
+					int previousTile = Level.levelData[tileIndex + 0x1000];
+					if(previousTile != currentTile)
+					{
+						Level.levelData[tileIndex + 0x1000] = (byte)currentTile;
+						invalidTiles[tileIndex] = false;
+						SetChanges(true);
+						levelPictureBox.Invalidate(r);
+					}
 				}
 
 				if(currentObject != -1)
-				{					
-					int objectIndex = Level.objectsData[tileIndex];
-					if(Level.loadedSprites.Contains(objectIndex) || Level.loadedSprites.Contains(currentObject))
+				{																		
+					int previousObject = Level.objectsData[tileIndex];
+					if(previousObject != currentObject)
 					{
-						r.Union(new Rectangle(((tileIndex % 256) * 16 + 8 - 32) * zoom, ((tileIndex / 256) * 16 + 8 - 48) * zoom, 64 * zoom, 64 * zoom));
+						Action<int> addEnemyRegion = enemyIndex =>
+						{
+							if(enemyIndex >= 1 && enemyIndex <= 6)
+							{
+								Rectangle enemyRect = Level.loadedSprites[enemyIndex - 1];
+								if(enemyRect != Rectangle.Empty)
+								{						
+									r.Union(new Rectangle(((tileIndex % 256) * 16 + enemyRect.X - 32 + 8) * zoom, ((tileIndex / 256) * 16 + enemyRect.Y - (enemyIndex - 1) * 64 - 40) * zoom, enemyRect.Width * zoom, enemyRect.Height * zoom));
+								}
+							}
+						};
+						
+						addEnemyRegion(previousObject);
+						addEnemyRegion(currentObject);
+						
+						Level.objectsData[tileIndex] = (byte)currentObject;
+						SetChanges(true);
+						levelPictureBox.Invalidate(r);
 					}
-					Level.objectsData[tileIndex] = (byte)currentObject;
-					SetChanges(true);
-				}				
-				
-				levelPictureBox.Invalidate(r);
+				}											
 			}
 			else if(e.Button == MouseButtons.Right)
 			{
