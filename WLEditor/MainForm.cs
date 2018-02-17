@@ -152,12 +152,15 @@ namespace WLEditor
 
 		void LevelPictureBoxPaint(object sender, PaintEventArgs e)
 		{
-			bool viewSectors = regionsToolStripMenuItem.Checked;
-			bool viewScroll = scrollRegionToolStripMenuItem.Checked;
-			bool viewObjects = objectsToolStripMenuItem.Checked;
-			
 			if(Level.levelData != null)
 			{
+				bool viewSectors = regionsToolStripMenuItem.Checked;
+				bool viewScroll = scrollRegionToolStripMenuItem.Checked;
+				bool viewObjects = objectsToolStripMenuItem.Checked;
+				bool switchA = aToolStripMenuItem.Checked;
+				bool switchB = bToolStripMenuItem.Checked;
+				bool viewColliders = collidersToolStripMenuItem.Checked;				
+				
 				StringFormat format = new StringFormat();
 				format.LineAlignment = StringAlignment.Center;
 				format.Alignment = StringAlignment.Center;	
@@ -172,7 +175,7 @@ namespace WLEditor
 					//draw tiles to cache
 					foreach (Point point in sectorsToDraw)
 					{
-						DrawTiles(point.X, point.Y, redBrush, g, e);
+						DrawTiles(point.X, point.Y, redBrush, g, e.ClipRectangle, viewColliders, switchA, switchB);
 					}
 
 					//draw tiles from cache
@@ -232,19 +235,15 @@ namespace WLEditor
 			}
 		}
 		
-		void DrawTiles(int x, int y, Brush brush, Graphics g, PaintEventArgs e)
+		void DrawTiles(int x, int y, Brush brush, Graphics g, Rectangle clipRectangle, bool viewColliders, bool switchA, bool switchB)
 		{
-			bool switchA = aToolStripMenuItem.Checked;
-			bool switchB = bToolStripMenuItem.Checked;
-			bool viewColliders = collidersToolStripMenuItem.Checked;
-
 			for(int j = y * 16 ; j < (y + 1) * 16 ; j++)
 			{
 				for(int i = x * 16 ; i < (x + 1) * 16 ; i++)
 				{
 					Rectangle destRect = new Rectangle(i * 16 * zoom, j * 16 * zoom, 16 * zoom, 16 * zoom);
 
-					if(destRect.IntersectsWith(e.ClipRectangle))
+					if(destRect.IntersectsWith(clipRectangle))
 					{
 						if(!invalidTiles[i + j * 256])
 						{
@@ -266,15 +265,15 @@ namespace WLEditor
 			}
 		}
 
-		void DrawTileToBitmap(int sectorX, int sectorY)
+		void DrawTileToBitmap(int x, int y)
 		{
-			byte tileIndex = Level.levelData[sectorX + sectorY * 256 + 0x1000];
-			Point dest = new Point(sectorX * 16, sectorY * 16);
+			byte tileIndex = Level.levelData[x + y * 256 + 0x1000];
+			Point dest = new Point(x * 16, y * 16);
 			Point src = new Point((tileIndex % 8) * 16, (tileIndex / 8) * 16);
 
-			for(int y = 0 ; y < 16 ; y++)
+			for(int i = 0 ; i < 16 ; i++)
 			{
-				Array.Copy(tiles16x16.Bits, src.X + (src.Y + y) * tiles16x16.Width, levelTiles.Bits, dest.X + (dest.Y + y) * levelTiles.Width, 16);
+				Array.Copy(tiles16x16.Bits, src.X + (src.Y + i) * tiles16x16.Width, levelTiles.Bits, dest.X + (dest.Y + i) * levelTiles.Width, 16);
 			}
 		}
 
@@ -419,15 +418,18 @@ namespace WLEditor
 
 		void ObjectsPictureBoxPaint(object sender, PaintEventArgs e)
 		{
-			e.Graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
-			e.Graphics.PixelOffsetMode = PixelOffsetMode.Half;
-			e.Graphics.DrawImage(tiles16x16.Bitmap, 0, 0, 128 * zoom, 256 * zoom);
-
-			if(currentTile != -1)
+			if(Level.levelData != null)
 			{
-				using (Brush brush = new SolidBrush(Color.FromArgb(128, 255, 0, 0)))
+				e.Graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
+				e.Graphics.PixelOffsetMode = PixelOffsetMode.Half;
+				e.Graphics.DrawImage(tiles16x16.Bitmap, 0, 0, 128 * zoom, 256 * zoom);
+	
+				if(currentTile != -1)
 				{
-					e.Graphics.FillRectangle(brush, (currentTile % 8) * 16 * zoom, (currentTile / 8) * 16 * zoom, 16 * zoom, 16 * zoom);
+					using (Brush brush = new SolidBrush(Color.FromArgb(128, 255, 0, 0)))
+					{
+						e.Graphics.FillRectangle(brush, (currentTile % 8) * 16 * zoom, (currentTile / 8) * 16 * zoom, 16 * zoom, 16 * zoom);
+					}
 				}
 			}
 		}
