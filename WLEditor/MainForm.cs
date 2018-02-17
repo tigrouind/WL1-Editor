@@ -161,6 +161,7 @@ namespace WLEditor
 		{
 			bool viewSectors = regionsToolStripMenuItem.Checked;
 			bool viewScroll = scrollRegionToolStripMenuItem.Checked;
+			bool viewObjects = objectsToolStripMenuItem.Checked;
 
 			if(Level.levelData != null)
 			{
@@ -187,9 +188,9 @@ namespace WLEditor
 					e.Graphics.DrawImage(levelTiles.Bitmap, 0, 0, 4096 * zoom, 512 * zoom);					
 					
 					//sector objects (enemies, powerups)
-					foreach (Point point in sectorsToDraw)
+					if(viewObjects)
 					{
-						DrawSectorObjects(point.X, point.Y, font, format, e, enemyBrush);			
+						DrawSectorObjects(font, format, e, enemyBrush);			
 					}					
 					
 					if(viewSectors)
@@ -284,50 +285,36 @@ namespace WLEditor
 			}
 		}
 
-		void DrawSectorObjects(int x, int y, Font font, StringFormat format, PaintEventArgs e, Brush brush)
+		void DrawSectorObjects(Font font, StringFormat format, PaintEventArgs e, Brush brush)
 		{
-			bool viewObjects = objectsToolStripMenuItem.Checked;
-			bool viewSectors = regionsToolStripMenuItem.Checked;
-
-			for(int j = y * 16 ; j < (y + 1) * 16 ; j++)
+			for(int j = 0 ; j < 32 ; j++)
 			{
-				for(int i = x * 16 ; i < (x + 1) * 16 ; i++)
+				for(int i = 0 ; i < 256 ; i++)
+				{
+					byte data = Level.objectsData[i + j * 256];
+					if(data > 0)
 				{
 					Rectangle destRect = new Rectangle(i * 16 * zoom, j * 16 * zoom, 16 * zoom, 16 * zoom);
-
 					if(destRect.IntersectsWith(e.ClipRectangle))
 					{
 						//objects
-						if(viewObjects)
-						{
-							byte data = Level.objectsData[i + j * 256];
-							if(data != 0)
-							{
 								e.Graphics.FillRectangle(brush, destRect);
 								
-								if(data <= 6)
-								{
-									if(!Level.loadedSprites.Contains(data))
-									{
-										e.Graphics.DrawString(data.ToString(), font, Brushes.White, (i * 16 + 8) * zoom, (j * 16 + 8) * zoom, format);
-									}
-								}
-								else
+							if(data > 6)
 								{
 									e.Graphics.DrawImage(tilesObjects.Bitmap, new Rectangle(i * 16 * zoom, j * 16 * zoom, 16 * zoom, 16 * zoom), new Rectangle((data - 7) * 16, 0, 16, 16), GraphicsUnit.Pixel);
 								}
-							}
+							else if(!Level.loadedSprites.Contains(data))
+							{
+								e.Graphics.DrawString(data.ToString(), font, Brushes.White, (i * 16 + 8) * zoom, (j * 16 + 8) * zoom, format);								
 						}
 					}
 					
 					//objects sprites							
-					if(viewObjects)
-					{											
-						byte data = Level.objectsData[i + j * 256];
-						if(data > 0 && data <= 6 && Level.loadedSprites.Contains(data))
-						{
 							destRect = new Rectangle((i * 16 + 8 - 32) * zoom, (j * 16 + 8 - 48) * zoom, 64 * zoom, 64 * zoom);
 							if(destRect.IntersectsWith(e.ClipRectangle))
+							{
+							if(data <= 6 && Level.loadedSprites.Contains(data))
 							{
 								e.Graphics.DrawImage(tilesEnemies.Bitmap, new Rectangle((i * 16 - 16 - 8)*zoom, (j * 16 - 40)*zoom, 64 * zoom, 64 * zoom), new Rectangle(0, (data - 1) * 64, 64, 64), GraphicsUnit.Pixel);	
 							}
