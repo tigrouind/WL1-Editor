@@ -110,28 +110,21 @@ namespace WLEditor
 				}
 
 			}
-		}
+		}			
 
 		void LoadLevelCombobox()
 		{
 			//init combobox
 			levelComboBox.SelectedItem = null;
 			levelComboBox.Items.Clear();
-
-			//convert course id => course no using data in ROM
-			rom.SetBank(0);
-			var courseIdToNo = new Dictionary<int, int>();
-			List<ComboboxItem> items = new List<ComboboxItem>();
-			for(int i = 0 ; i <= 0x2A ; i++)
+			
+			List<ComboboxItem> items = new List<ComboboxItem>();			
+			foreach(var levelInfo in Level.GetCourseIds(rom).OrderBy(x => x.Value))
 			{
-				int levelpointer = rom.ReadWord(0x0534 + i * 2);
-				int courseNo = (levelpointer - 0x0587) / 3;
-				ComboboxItem item = new ComboboxItem(string.Format("{0:D2} {1}", courseNo, Level.levelNames[i]), i);
-				items.Add(item);
-				courseIdToNo.Add(i, courseNo);
+				ComboboxItem item = new ComboboxItem(string.Format("{0:D2} {1}", levelInfo.Value, Level.levelNames[levelInfo.Key]), levelInfo.Key);
+				items.Add(item);				
 			}
 
-			items = items.OrderBy(x => courseIdToNo[(int)x.Value]).ToList();
 			levelComboBox.Items.AddRange(items.ToArray());
 		}
 
@@ -191,7 +184,7 @@ namespace WLEditor
 					if(viewObjects)
 					{
 						DrawSectorObjects(font, format, e, enemyBrush);			
-					}					
+					}
 					
 					if(viewSectors)
 					{
@@ -293,33 +286,33 @@ namespace WLEditor
 				{
 					byte data = Level.objectsData[i + j * 256];
 					if(data > 0)
-				{
-					Rectangle destRect = new Rectangle(i * 16 * zoom, j * 16 * zoom, 16 * zoom, 16 * zoom);
-					if(destRect.IntersectsWith(e.ClipRectangle))
 					{
-						//objects
-								e.Graphics.FillRectangle(brush, destRect);
-								
+						Rectangle destRect = new Rectangle(i * 16 * zoom, j * 16 * zoom, 16 * zoom, 16 * zoom);
+						if(destRect.IntersectsWith(e.ClipRectangle))
+						{
+							//objects						
+							e.Graphics.FillRectangle(brush, destRect);
+							
 							if(data > 6)
-								{
-									e.Graphics.DrawImage(tilesObjects.Bitmap, new Rectangle(i * 16 * zoom, j * 16 * zoom, 16 * zoom, 16 * zoom), new Rectangle((data - 7) * 16, 0, 16, 16), GraphicsUnit.Pixel);
-								}
+							{
+								e.Graphics.DrawImage(tilesObjects.Bitmap, new Rectangle(i * 16 * zoom, j * 16 * zoom, 16 * zoom, 16 * zoom), new Rectangle((data - 7) * 16, 0, 16, 16), GraphicsUnit.Pixel);								
+							}
 							else if(!Level.loadedSprites.Contains(data))
 							{
 								e.Graphics.DrawString(data.ToString(), font, Brushes.White, (i * 16 + 8) * zoom, (j * 16 + 8) * zoom, format);								
+							}
 						}
-					}
-					
-					//objects sprites							
-							destRect = new Rectangle((i * 16 + 8 - 32) * zoom, (j * 16 + 8 - 48) * zoom, 64 * zoom, 64 * zoom);
-							if(destRect.IntersectsWith(e.ClipRectangle))
-							{
+						
+						//objects sprites							
+						destRect = new Rectangle((i * 16 + 8 - 32) * zoom, (j * 16 + 8 - 48) * zoom, 64 * zoom, 64 * zoom);
+						if(destRect.IntersectsWith(e.ClipRectangle))
+						{
 							if(data <= 6 && Level.loadedSprites.Contains(data))
 							{
 								e.Graphics.DrawImage(tilesEnemies.Bitmap, new Rectangle((i * 16 - 16 - 8)*zoom, (j * 16 - 40)*zoom, 64 * zoom, 64 * zoom), new Rectangle(0, (data - 1) * 64, 64, 64), GraphicsUnit.Pixel);	
 							}
-						}						
-					}
+						}			
+					}														
 				}
 			}
 		}
