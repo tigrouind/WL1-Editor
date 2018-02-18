@@ -143,6 +143,7 @@ namespace WLEditor
 		public static byte[] warps;
 		public static int warioPosition;
 		public static Rectangle[] loadedSprites;
+		public static bool[] enemiesAvailable;
 		
 		public static void DumpLevel(Rom rom, int course, int warp, DirectBitmap tiles8x8, DirectBitmap tiles16x16, DirectBitmap tilesEnemies, bool reloadAll, bool switchA, bool switchB, int paletteIndex)
 		{
@@ -191,7 +192,8 @@ namespace WLEditor
 			rom.SetBank(0xB);
 			Dump16x16Tiles(rom, blockindex, tiles8x8, tiles16x16, switchA, switchB, paletteColors[0]);
 			
-			DumpEnemiesSprites(rom, enemiesIdsPointer, enemiesTiles, tiles8x8, tilesEnemies);			
+			DumpEnemiesSprites(rom, enemiesIdsPointer, enemiesTiles, tiles8x8, tilesEnemies);	
+			CheckEnemiesAvailable(rom, enemiesIdsPointer);
 			
 			if(reloadAll)
 			{
@@ -569,6 +571,16 @@ namespace WLEditor
 				}
 			}
 			while(!quit);
+		}
+		
+		public static void CheckEnemiesAvailable(Rom rom, int enemiesIdsPointer)
+		{
+			enemiesAvailable = new bool[6];			
+			rom.SetBank(0x7);		
+			for(int i = 0 ; i < 6 ; i++)
+			{
+				enemiesAvailable[i] = rom.ReadWord(enemiesIdsPointer + (i + 1) * 2) != 0x530F;
+			}
 		}
 		
 		public static List<KeyValuePair<int, int>> GetCourseIds(Rom rom)

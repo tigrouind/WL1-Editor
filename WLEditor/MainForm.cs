@@ -47,7 +47,8 @@ namespace WLEditor
 			{
 				Array.Clear(invalidTiles, 0, invalidTiles.Length);
 				Level.DumpLevel(rom, currentCourseId, currentWarp, tiles8x8, tiles16x16, tilesEnemies, reloadAll, aToolStripMenuItem.Checked, bToolStripMenuItem.Checked, SelectedPaletteToolStripIndex());
-
+				while(currentObject >= 1 && currentObject <= 6 && !Level.enemiesAvailable[currentObject - 1]) currentObject--;
+				
 				levelPictureBox.Refresh();
 				objectPictureBox.Refresh();
 				tilesPictureBox.Refresh();
@@ -463,8 +464,8 @@ namespace WLEditor
 							e.Graphics.DrawLine(pen, (x + 12) * zoom, (y + 4) * zoom, (x + 4) * zoom, (y + 12) * zoom);
 						}
 						else if(j <= 6)
-						{						
-							e.Graphics.DrawString(j.ToString(), font, Brushes.White, (x + 8) * zoom, (y + 8) * zoom, format);
+						{																	
+							e.Graphics.DrawString(j.ToString(), font, Level.enemiesAvailable[j - 1] ? Brushes.White : Brushes.DimGray, (x + 8) * zoom, (y + 8) * zoom, format);
 						}
 						else
 						{
@@ -573,13 +574,17 @@ namespace WLEditor
 
 		void TilesPictureBoxMouseDown(object sender, MouseEventArgs e)
 		{
-			currentObject = e.Location.X / 16 / zoom + (e.Location.Y / 16 / zoom) * 4;
-			objectPictureBox.Refresh();
-
-			if(currentTile != -1)
+			int index = e.Location.X / 16 / zoom + (e.Location.Y / 16 / zoom) * 4;
+			if(!(index >= 1 && index <= 6) || Level.enemiesAvailable[index - 1])
 			{
-				currentTile = -1;
-				tilesPictureBox.Refresh();
+				currentObject = index;
+				objectPictureBox.Refresh();
+	
+				if(currentTile != -1)
+				{
+					currentTile = -1;
+					tilesPictureBox.Refresh();
+				}			
 			}					
 		}
 
