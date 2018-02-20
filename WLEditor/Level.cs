@@ -200,7 +200,7 @@ namespace WLEditor
 				//dump level
 				rom.SetBank(blockbank);
 				int tilesdata = rom.ReadWord(0x4000 + blockubbank * 2);
-				levelData = RLEDecompressTiles(rom, tilesdata).Take(0x3000).ToArray();
+				levelData = RLEDecompressTiles(rom, tilesdata);
 
 				//dump scroll
 				rom.SetBank(0xC);
@@ -209,7 +209,7 @@ namespace WLEditor
 				//dump objects
 				rom.SetBank(0x7);
 				int objectsPosition = rom.ReadWord(0x4199 + course * 2);
-				objectsData = RLEDecompressObjects(rom, objectsPosition).Take(0x2000).ToArray();
+				objectsData = RLEDecompressObjects(rom, objectsPosition);
 
 				//dump warps
 				rom.SetBank(0xC);
@@ -263,9 +263,12 @@ namespace WLEditor
 			}
 		}
 
-		public static IEnumerable<byte> RLEDecompressTiles(Rom rom, int tilesdata)
+		public static byte[] RLEDecompressTiles(Rom rom, int tilesdata)
 		{
-			while(true)
+			byte[] decompressed = new byte[0x3000];
+			int position = 0;
+			
+			while(position < decompressed.Length)
 			{
 				byte data = rom.ReadByte(tilesdata++);
 				if((data & 0x80) == 0x80)
@@ -274,14 +277,16 @@ namespace WLEditor
 					byte rep = rom.ReadByte(tilesdata++);
 					for(int j = 0 ; j <= rep ; j++)
 					{
-						yield return data;
+						decompressed[position++] = data;
 					}
 				}
 				else
 				{
-					yield return data;
+					decompressed[position++] = data;
 				}
 			}
+			
+			return decompressed;
 		}
 
 		public static IEnumerable<byte> RLECompressTiles(byte[] levelData)
@@ -309,21 +314,26 @@ namespace WLEditor
 			}
 		}
 
-		public static IEnumerable<byte> RLEDecompressObjects(Rom rom, int enemiesData)
+		public static byte[] RLEDecompressObjects(Rom rom, int enemiesData)
 		{
-			while(true)
+			int position = 0;
+			byte[] decompressed = new byte[0x2000];
+			
+			while(position < decompressed.Length)
 			{
 				byte data = rom.ReadByte(enemiesData++);
-				yield return (byte)(data >> 4);
-				yield return (byte)(data & 0xF);
+				decompressed[position++] = (byte)(data >> 4);
+				decompressed[position++] = (byte)(data & 0xF);
 
 				byte repeat = rom.ReadByte(enemiesData++);
 				for(int i = 0 ; i < repeat ; i++)
 				{
-					yield return 0;
-					yield return 0;
+					decompressed[position++] = 0;
+					decompressed[position++] = 0;
 				}
 			}
+			
+			return decompressed;
 		}
 
 		public static IEnumerable<byte> RLECompressObjectsHelper(byte[] levelData)
@@ -471,7 +481,7 @@ namespace WLEditor
 			int pos = spriteAddress;
 						
 			pos = rom.ReadWord(pos);
-			rom.ReadByte(pos++);
+			pos++; //skip sprite flags
 			
 			while(rom.ReadByte(pos) != 0x80)
 			{		
@@ -680,7 +690,7 @@ namespace WLEditor
 
 				rom.SetBank(tilebank);
 				int tilePosition = rom.ReadWord(0x4000 + tilesubbank * 2);
-				byte[] tileData = RLEDecompressTiles(rom, tilePosition).Take(0x3000).ToArray();
+				byte[] tileData = RLEDecompressTiles(rom, tilePosition);
 				allTiles[i] = tileData;
 			}
 
@@ -726,7 +736,7 @@ namespace WLEditor
 			for(int i = 0 ; i < 0x2B ; i++)
 			{
 				int objectsPos = rom.ReadWord(0x4199 + i * 2);
-				enemyData[i] = RLEDecompressObjects(rom, objectsPos).Take(0x2000).ToArray();
+				enemyData[i] = RLEDecompressObjects(rom, objectsPos);
 			}
 			enemyData[course]= objectsData;
 
