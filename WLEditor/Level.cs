@@ -278,7 +278,7 @@ namespace WLEditor
 			}
 		}
 
-		public static byte[] RLEDecompressTiles(Rom rom, int tilesdata)
+		static byte[] RLEDecompressTiles(Rom rom, int tilesdata)
 		{
 			byte[] decompressed = new byte[0x3000];
 			int position = 0;
@@ -304,7 +304,7 @@ namespace WLEditor
 			return decompressed;
 		}
 
-		public static IEnumerable<byte> RLECompressTiles(byte[] levelData)
+		static IEnumerable<byte> RLECompressTiles(byte[] levelData)
 		{
 			int current = 0;
 			while(current < levelData.Length)
@@ -329,7 +329,7 @@ namespace WLEditor
 			}
 		}
 
-		public static byte[] RLEDecompressObjects(Rom rom, int enemiesData)
+		static byte[] RLEDecompressObjects(Rom rom, int enemiesData)
 		{
 			int position = 0;
 			byte[] decompressed = new byte[0x2000];
@@ -351,23 +351,23 @@ namespace WLEditor
 			return decompressed;
 		}
 
-		public static IEnumerable<byte> RLECompressObjectsHelper(byte[] levelData)
+		static IEnumerable<byte> RLECompressObjectsHelper(byte[] data)
 		{
-			for(int i = 0 ; i < levelData.Length ; i+=2)
+			for(int i = 0 ; i < data.Length ; i+=2)
 			{
-				yield return (byte)((levelData[i] << 4) | levelData[i+1]);
+				yield return (byte)((data[i] << 4) | data[i+1]);
 			}
 		}
 
-		public static IEnumerable<byte> RLECompressObjects(byte[] levelData)
+		static IEnumerable<byte> RLECompressObjects(byte[] data)
 		{
-			byte[] halfData = RLECompressObjectsHelper(levelData).ToArray();
+			byte[] halfData = RLECompressObjectsHelper(data).ToArray();
 
 			int current = 0;
 			while(current < halfData.Length)
 			{
-				byte data = halfData[current++];
-				yield return data;
+				byte value = halfData[current++];
+				yield return value;
 
 				byte count = 0;
 				while(current < halfData.Length && halfData[current] == 0 && count < 255)
@@ -379,14 +379,14 @@ namespace WLEditor
 			}
 		}
 
-		public static void Dump16x16Tiles(Rom rom, int tileindexaddress, DirectBitmap gfx8, DirectBitmap gfx16, bool switchA, bool switchB, Color defaultColor)
+		static void Dump16x16Tiles(Rom rom, int tileindexaddress, DirectBitmap gfx8, DirectBitmap gfx16, bool switchA, bool switchB, Color defaultColor)
 		{	
 			for(int n = 0 ; n < 16 ; n++)
 			{
 				for(int i = 0 ; i < 8 ; i++)
 				{
 					int tileIndex = i + n * 8;
-					tileIndex = Level.Switch(tileIndex, switchA, switchB);
+					tileIndex = Switch(tileIndex, switchA, switchB);
 
 					for(int k = 0 ; k < 2 ; k++)
 					{
@@ -422,7 +422,7 @@ namespace WLEditor
 			}
 		}
 
-		public static void Dump8x8Tiles(Rom rom, int gfxaddress, DirectBitmap gfx8, int tiles, int pos, byte palette, Color[] customPalette, bool transparency = false)
+		static void Dump8x8Tiles(Rom rom, int gfxaddress, DirectBitmap gfx8, int tiles, int pos, byte palette, Color[] customPalette, bool transparency = false)
 		{
 			for(int n = 0 ; n < tiles ; n++)
 			{
@@ -450,7 +450,7 @@ namespace WLEditor
 			}
 		}
 		
-		public static void FindEnemiesData(Rom rom, int position, out int enemyId, out int tilesPointer)
+		static void FindEnemiesData(Rom rom, int position, out int enemyId, out int tilesPointer)
 		{
 			byte[] pattern = { 
 				0x3E, 0x00,       //ld  a, ..
@@ -628,7 +628,7 @@ namespace WLEditor
 			while(!quit);
 		}
 		
-		public static void CheckEnemiesAvailable(Rom rom, int enemiesIdsPointer)
+		static void CheckEnemiesAvailable(Rom rom, int enemiesIdsPointer)
 		{
 			enemiesAvailable = new bool[6];			
 			rom.SetBank(0x7);		
