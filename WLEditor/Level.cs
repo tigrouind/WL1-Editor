@@ -144,6 +144,8 @@ namespace WLEditor
 		public static int warioPosition;
 		public static Rectangle[] loadedSprites;
 		public static bool[] enemiesAvailable;
+		public static bool warioRightFacing;
+		public static Rectangle[] playerRectangles;
 		
 		public static void DumpLevel(Rom rom, int course, int warp, DirectBitmap tiles8x8, DirectBitmap tiles16x16, DirectBitmap tilesEnemies, bool reloadAll, bool switchA, bool switchB, int paletteIndex)
 		{
@@ -221,6 +223,7 @@ namespace WLEditor
 				}
 
 				warioPosition = rom.ReadWordSwap(header + 15) + rom.ReadWordSwap(header + 13) * 8192;								
+				warioRightFacing = (rom.ReadByte(header + 18) & 0x20) == 0;
 			}
 		}
 
@@ -243,6 +246,18 @@ namespace WLEditor
 			}
 
 			return -1;
+		}
+		
+		public static void DumpPlayerSprite(Rom rom, DirectBitmap tiles8x8, DirectBitmap playerSprite)
+		{	
+			rom.SetBank(0x5);
+			Array.Clear(tiles8x8.Bits, 0, tiles8x8.Bits.Length);
+			Dump8x8Tiles(rom, 0x42F1, tiles8x8, 64, 0, 0x1E, enemyPalette, true);			
+			playerRectangles = new []
+			{
+				DumpSpritePlayer(rom, 32, 56, 0x603B, tiles8x8, playerSprite, false),
+				DumpSpritePlayer(rom, 32, 56 + 64, 0x603B, tiles8x8, playerSprite, true)
+			};
 		}
 		
 		public static void DumpBonusSprites(Rom rom, DirectBitmap tiles8x8, DirectBitmap tilesObject)
@@ -475,7 +490,32 @@ namespace WLEditor
 			throw new Exception("cannot find enemies data");
 		}
 		
-		public static Rectangle DumpSprite(Rom rom, int posx, int posy, int spriteAddress, int startIndex, DirectBitmap tiles8x8, DirectBitmap tilesDest)
+		static Rectangle DumpSpritePlayer(Rom rom, int posx, int posy, int spriteAddress, DirectBitmap tiles8x8, DirectBitmap tilesDest, bool horizontalFlip)
+		{						
+			Rectangle rectangle = Rectangle.Empty;
+			int pos = spriteAddress;
+			
+			Func<sbyte, sbyte> hflip = x => (sbyte)(horizontalFlip ? ((~(sbyte)x) - 7) : x);
+						
+			pos = rom.ReadWord(pos);			
+			while(rom.ReadByte(pos) != 0x80)
+			{		
+				int spx, spy;
+				unchecked
+				{
+					spy = (sbyte)rom.ReadByte(pos++) + posy;
+					spx = hflip((sbyte)rom.ReadByte(pos++)) + posx;
+				}
+				int spriteIndex = rom.ReadByte(pos++);
+				int spriteFlags = rom.ReadByte(pos++) ^ (horizontalFlip ? 0x40 : 0x00);
+				
+				DumpSpriteInternal(spx, spy, spriteIndex, spriteFlags, tiles8x8, tilesDest, ref rectangle);			
+			}
+			
+			return rectangle;
+		}
+		
+		static Rectangle DumpSprite(Rom rom, int posx, int posy, int spriteAddress, int startIndex, DirectBitmap tiles8x8, DirectBitmap tilesDest)
 		{						
 			Rectangle rectangle = Rectangle.Empty;
 			int pos = spriteAddress;
@@ -493,51 +533,56 @@ namespace WLEditor
 				}
 				int spriteData = rom.ReadByte(pos++);
 				int spriteIndex = (spriteData & 0x3F) + startIndex;
-				Point source = new Point((spriteIndex % 16) * 8, (spriteIndex / 16) * 8);
 				
-				Rectangle tileRect = new Rectangle(spx, spy, 8, 8);
-				rectangle = rectangle == Rectangle.Empty ? tileRect : Rectangle.Union(rectangle, tileRect);
-				
-				Func<int, int> getY;
-				Action<int, int> copyLine;
-				
-				if((spriteData & 0x40) != 0) //horizontal flip
-				{
-					copyLine = (src, dst) =>
-					{
-						for(int x = 0 ; x < 8 ; x++)
-						{											
-							tilesDest.Bits[dst + x] = tiles8x8.Bits[src + 7 - x];
-						}
-					};
-				}
-				else
-				{
-					copyLine = (src, dst) => Array.Copy(tiles8x8.Bits, src, tilesDest.Bits, dst, 8);
-				}
-				
-				if((spriteData & 0x80) != 0) //vertical flip
-				{
-					getY = y => 7 - y;				
-				}
-				else
-				{
-					getY = y => y;
-				}				
-				
-				for(int y = 0 ; y < 8 ; y++)
-				{												
-					int src = source.X + (source.Y + getY(y)) * tiles8x8.Width;
-					int dst = spx + (spy + y) * tilesDest.Width;
-					
-					copyLine(src, dst);
-				}									
+				DumpSpriteInternal(spx, spy, spriteIndex, spriteData, tiles8x8, tilesDest, ref rectangle);				
 			}
 			
 			return rectangle;
 		}
 		
-		public static void DumpEnemiesSprites(Rom rom, int enemiesIdsPointer, int enemiesTiles, DirectBitmap tiles8x8, DirectBitmap tilesEnemies)
+		static void DumpSpriteInternal(int spx, int spy, int spriteIndex, int spriteFlags, DirectBitmap tiles8x8, DirectBitmap tilesDest, ref Rectangle rectangle)
+		{
+			Point source = new Point((spriteIndex % 16) * 8, (spriteIndex / 16) * 8);
+				
+			Rectangle tileRect = new Rectangle(spx, spy, 8, 8);
+			rectangle = rectangle == Rectangle.Empty ? tileRect : Rectangle.Union(rectangle, tileRect);
+			
+			Func<int, int> getY;
+			Action<int, int> copyLine;
+			
+			if((spriteFlags & 0x40) != 0) //horizontal flip
+			{
+				copyLine = (src, dst) =>
+				{
+					for(int x = 0 ; x < 8 ; x++)
+					{											
+						tilesDest.Bits[dst + x] = tiles8x8.Bits[src + 7 - x];
+					}
+				};
+			}
+			else
+			{
+				copyLine = (src, dst) => Array.Copy(tiles8x8.Bits, src, tilesDest.Bits, dst, 8);
+			}
+			
+			if((spriteFlags & 0x80) != 0) //vertical flip
+			{
+				getY = y => 7 - y;				
+			}
+			else
+			{
+				getY = y => y;
+			}				
+			
+			for(int y = 0 ; y < 8 ; y++)
+			{												
+				int src = source.X + (source.Y + getY(y)) * tiles8x8.Width;
+				int dst = spx + (spy + y) * tilesDest.Width;				
+				copyLine(src, dst);
+			}	
+		}
+		
+		static void DumpEnemiesSprites(Rom rom, int enemiesIdsPointer, int enemiesTiles, DirectBitmap tiles8x8, DirectBitmap tilesEnemies)
 		{
 			loadedSprites = new Rectangle[6];
 			

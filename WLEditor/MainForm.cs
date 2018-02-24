@@ -20,6 +20,7 @@ namespace WLEditor
 		public DirectBitmap tiles16x16 = new DirectBitmap(16 * 8, 16 * 16); 
 		public DirectBitmap tilesObjects = new DirectBitmap(16 * 9, 16);
 		public DirectBitmap tilesEnemies = new DirectBitmap(64, 64 * 6); 		
+		public DirectBitmap playerSprite = new DirectBitmap(64, 64 * 2); 
 		public bool[] invalidTiles = new bool[256 * 32];
 		public int currentSector = -1;
 		public int currentTile = -1;
@@ -92,6 +93,7 @@ namespace WLEditor
 					rom = newRom;
 					LoadLevelCombobox();
 					Level.DumpBonusSprites(rom, tiles8x8, tilesObjects);
+					Level.DumpPlayerSprite(rom, tiles8x8, playerSprite);
 					romFilePath = openFileDialog1.FileName;
 
 					if(levelComboBox.SelectedIndex == 0)
@@ -188,16 +190,14 @@ namespace WLEditor
 					if(viewObjects)
 					{
 						DrawSectorObjects(font, format, e, enemyBrush);			
-					}
-					
-					if(viewSectors)
-					{
+						
 						//wario position
-						Rectangle destRect = new Rectangle((Level.warioPosition % 8192 - 8) * zoom, (Level.warioPosition / 8192 - 16) * zoom, 16 * zoom, 16 * zoom);
+						int index = Level.warioRightFacing ? 0 : 1;
+						Rectangle playerRectangle = Level.playerRectangles[index];
+						Rectangle destRect = new Rectangle((Level.warioPosition % 8192 + playerRectangle.X - 32) * zoom, (Level.warioPosition / 8192 + playerRectangle.Y - 56 - index * 64) * zoom, playerRectangle.Width * zoom, playerRectangle.Height * zoom);
 						if (destRect.IntersectsWith(e.ClipRectangle))
 						{
-							e.Graphics.FillRectangle(Brushes.Green, destRect);
-							e.Graphics.DrawString("W", font, Brushes.White, destRect, format);
+							e.Graphics.DrawImage(playerSprite.Bitmap, destRect, playerRectangle, GraphicsUnit.Pixel);
 						}
 					}
 					
