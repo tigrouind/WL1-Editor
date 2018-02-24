@@ -548,22 +548,16 @@ namespace WLEditor
 			rectangle = rectangle == Rectangle.Empty ? tileRect : Rectangle.Union(rectangle, tileRect);
 			
 			Func<int, int> getY;
-			Action<int, int> copyLine;
+			Func<int, int> getX;
 			
 			if((spriteFlags & 0x40) != 0) //horizontal flip
 			{
-				copyLine = (src, dst) =>
-				{
-					for(int x = 0 ; x < 8 ; x++)
-					{											
-						tilesDest.Bits[dst + x] = tiles8x8.Bits[src + 7 - x];
-					}
-				};
+				getX = x => 7 - x;				
 			}
 			else
 			{
-				copyLine = (src, dst) => Array.Copy(tiles8x8.Bits, src, tilesDest.Bits, dst, 8);
-			}
+				getX = x => x;
+			}	
 			
 			if((spriteFlags & 0x80) != 0) //vertical flip
 			{
@@ -575,10 +569,17 @@ namespace WLEditor
 			}				
 			
 			for(int y = 0 ; y < 8 ; y++)
-			{												
+			{		
 				int src = source.X + (source.Y + getY(y)) * tiles8x8.Width;
 				int dst = spx + (spy + y) * tilesDest.Width;				
-				copyLine(src, dst);
+					
+				for(int x = 0 ; x < 8 ; x++)
+				{			
+					if(tilesDest.Bits[dst + x] == 0)
+					{
+						tilesDest.Bits[dst + x] = tiles8x8.Bits[src + getX(x)];
+					}
+				}				
 			}	
 		}
 		
