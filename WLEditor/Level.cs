@@ -600,15 +600,19 @@ namespace WLEditor
 					int spriteDataAddress;
 					if(enemiesIdsToSpriteData.TryGetValue(enemyId, out spriteDataAddress))
 					{		
-						LoadEnemiesTiles(rom, i, spriteDataAddress, tilesDataAddress, tiles8x8, tilesEnemies);
+						if (LoadEnemiesTiles(rom, i, spriteDataAddress, tilesDataAddress, tiles8x8))
+						{
+							Rectangle rectangle = DumpSprite(rom, 32, 56 + i * 64, spriteDataAddress, tiles8x8, tilesEnemies);
+							loadedSprites[i] = rectangle;
+						}
 					}
 				}		
 			}
 		}		
 		
-		static void LoadEnemiesTiles(Rom rom, int enemyIndex, int spriteDataAddress, int tilesDataAddress, DirectBitmap tiles8x8, DirectBitmap tilesEnemies)
+		static bool LoadEnemiesTiles(Rom rom, int enemyIndex, int spriteDataAddress, int tilesDataAddress, DirectBitmap tiles8x8)
 		{
-			int enemyIndexCounter = 0;	
+			int index = 0;	
 
 			do
 			{
@@ -619,21 +623,21 @@ namespace WLEditor
 						
 				if(tilesCount == 0xFF)
 				{		
-					break;
+					return false;
 				}
 				
-				if(enemyIndexCounter == enemyIndex)
+				if(index == enemyIndex)
 				{					
-					LoadEnemiesTiles(rom, enemyIndex, spriteDataAddress, tilesBank, tilesCount, tilesAddress, tiles8x8, tilesEnemies);
-					break;							
+					LoadEnemiesTilesInternal(rom, spriteDataAddress, tilesBank, tilesCount, tilesAddress, tiles8x8);
+					return true;
 				}
 				
-				enemyIndexCounter++;
+				index++;
 			}
 			while(true);						
 		}
 		
-		static void LoadEnemiesTiles(Rom rom, int enemyIndex, int spriteDataAddress, int tilesBank, int tilesCount, int tilesAddress, DirectBitmap tiles8x8, DirectBitmap tilesEnemies)
+		static void LoadEnemiesTilesInternal(Rom rom, int spriteDataAddress, int tilesBank, int tilesCount, int tilesAddress, DirectBitmap tiles8x8)
 		{
 			rom.SetBank(tilesBank);	
 			int pos = rom.ReadWord(spriteDataAddress);
@@ -641,10 +645,7 @@ namespace WLEditor
 			int palette = (spriteFlags & 0x10) != 0 ? 0xD1 : 0x1E;
 			
 			Array.Clear(tiles8x8.Bits, 0, tiles8x8.Bits.Length);
-			Dump8x8Tiles(rom, tilesAddress, tiles8x8, tilesCount, 0, (byte)palette, enemyPalette, true);
-			
-			Rectangle rectangle = DumpSprite(rom, 32, 56 + enemyIndex * 64, spriteDataAddress, tiles8x8, tilesEnemies);
-			loadedSprites[enemyIndex] = rectangle;
+			Dump8x8Tiles(rom, tilesAddress, tiles8x8, tilesCount, 0, (byte)palette, enemyPalette, true);					
 		}
 				
 		public static List<KeyValuePair<int, int>> GetCourseIds(Rom rom)
