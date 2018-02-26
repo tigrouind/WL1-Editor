@@ -121,7 +121,7 @@ namespace WLEditor
 		{
 			get
 			{
-				if(data.Length >= 16)
+				if(data.Length >= 0x150)
 				{
 					return System.Text.Encoding.ASCII.GetString(data, 0x134, 16).TrimEnd('\0');
 				}
