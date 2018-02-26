@@ -50,6 +50,10 @@
   <ItemGroup>
     <Compile Include="ComboboxItem.cs" />
     <Compile Include="DirectBitmap.cs" />
+    <Compile Include="ToolboxForm.cs" />
+    <Compile Include="ToolboxForm.Designer.cs">
+      <DependentUpon>ToolboxForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Level.cs" />
     <Compile Include="MainForm.cs" />
     <Compile Include="MainForm.Designer.cs">
@@ -65,6 +69,9 @@
   <ItemGroup>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.Designer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ToolboxForm.resx">
+      <DependentUpon>ToolboxForm.Designer.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

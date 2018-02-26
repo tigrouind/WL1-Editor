@@ -37,8 +37,6 @@ namespace WLEditor
 		private void InitializeComponent()
 		{
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
-			this.LevelPanel = new System.Windows.Forms.Panel();
-			this.levelPictureBox = new System.Windows.Forms.PictureBox();
 			this.levelComboBox = new System.Windows.Forms.ComboBox();
 			this.menuStrip1 = new System.Windows.Forms.MenuStrip();
 			this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -47,6 +45,7 @@ namespace WLEditor
 			this.saveAsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.viewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.toolboxToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.regionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.objectsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.scrollRegionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -55,6 +54,7 @@ namespace WLEditor
 			this.zoom100ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.zoom200ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.zoom300ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.zoom400ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.paletteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.classicToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.blackWhiteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -63,43 +63,14 @@ namespace WLEditor
 			this.noneToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.aToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.bToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.objectPictureBox = new System.Windows.Forms.PictureBox();
-			this.mainTable = new System.Windows.Forms.TableLayoutPanel();
-			this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
-			this.tilesPictureBox = new System.Windows.Forms.PictureBox();
 			this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-			this.zoom400ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.LevelPanel = new System.Windows.Forms.Panel();
+			this.levelPictureBox = new System.Windows.Forms.PictureBox();
+			this.menuStrip1.SuspendLayout();
+			this.tableLayoutPanel1.SuspendLayout();
 			this.LevelPanel.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.levelPictureBox)).BeginInit();
-			this.menuStrip1.SuspendLayout();
-			((System.ComponentModel.ISupportInitialize)(this.objectPictureBox)).BeginInit();
-			this.mainTable.SuspendLayout();
-			this.flowLayoutPanel1.SuspendLayout();
-			((System.ComponentModel.ISupportInitialize)(this.tilesPictureBox)).BeginInit();
-			this.tableLayoutPanel1.SuspendLayout();
 			this.SuspendLayout();
-			// 
-			// LevelPanel
-			// 
-			this.LevelPanel.AutoScroll = true;
-			this.LevelPanel.Controls.Add(this.levelPictureBox);
-			this.LevelPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.LevelPanel.Location = new System.Drawing.Point(137, 3);
-			this.LevelPanel.Name = "LevelPanel";
-			this.LevelPanel.Size = new System.Drawing.Size(1069, 586);
-			this.LevelPanel.TabIndex = 1;
-			this.LevelPanel.Visible = false;
-			// 
-			// levelPictureBox
-			// 
-			this.levelPictureBox.Location = new System.Drawing.Point(0, 0);
-			this.levelPictureBox.Name = "levelPictureBox";
-			this.levelPictureBox.Size = new System.Drawing.Size(4096, 512);
-			this.levelPictureBox.TabIndex = 2;
-			this.levelPictureBox.TabStop = false;
-			this.levelPictureBox.Paint += new System.Windows.Forms.PaintEventHandler(this.LevelPictureBoxPaint);
-			this.levelPictureBox.MouseDown += new System.Windows.Forms.MouseEventHandler(this.LevelPictureBoxMouseDown);
-			this.levelPictureBox.MouseMove += new System.Windows.Forms.MouseEventHandler(this.LevelPictureBoxMouseMove);
 			// 
 			// levelComboBox
 			// 
@@ -172,6 +143,7 @@ namespace WLEditor
 			// viewToolStripMenuItem
 			// 
 			this.viewToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+			this.toolboxToolStripMenuItem,
 			this.regionsToolStripMenuItem,
 			this.objectsToolStripMenuItem,
 			this.scrollRegionToolStripMenuItem,
@@ -182,6 +154,15 @@ namespace WLEditor
 			this.viewToolStripMenuItem.Name = "viewToolStripMenuItem";
 			this.viewToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
 			this.viewToolStripMenuItem.Text = "&View";
+			// 
+			// toolboxToolStripMenuItem
+			// 
+			this.toolboxToolStripMenuItem.CheckOnClick = true;
+			this.toolboxToolStripMenuItem.Enabled = false;
+			this.toolboxToolStripMenuItem.Name = "toolboxToolStripMenuItem";
+			this.toolboxToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
+			this.toolboxToolStripMenuItem.Text = "Toolbox";
+			this.toolboxToolStripMenuItem.CheckedChanged += new System.EventHandler(this.ToolboxToolStripMenuItemCheckedChanged);
 			// 
 			// regionsToolStripMenuItem
 			// 
@@ -237,23 +218,30 @@ namespace WLEditor
 			this.zoom100ToolStripMenuItem.Checked = true;
 			this.zoom100ToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.zoom100ToolStripMenuItem.Name = "zoom100ToolStripMenuItem";
-			this.zoom100ToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+			this.zoom100ToolStripMenuItem.Size = new System.Drawing.Size(102, 22);
 			this.zoom100ToolStripMenuItem.Text = "100%";
 			this.zoom100ToolStripMenuItem.Click += new System.EventHandler(this.Zoom100ToolStripMenuItemClick);
 			// 
 			// zoom200ToolStripMenuItem
 			// 
 			this.zoom200ToolStripMenuItem.Name = "zoom200ToolStripMenuItem";
-			this.zoom200ToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+			this.zoom200ToolStripMenuItem.Size = new System.Drawing.Size(102, 22);
 			this.zoom200ToolStripMenuItem.Text = "200%";
 			this.zoom200ToolStripMenuItem.Click += new System.EventHandler(this.Zoom200ToolStripMenuItemClick);
 			// 
 			// zoom300ToolStripMenuItem
 			// 
 			this.zoom300ToolStripMenuItem.Name = "zoom300ToolStripMenuItem";
-			this.zoom300ToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+			this.zoom300ToolStripMenuItem.Size = new System.Drawing.Size(102, 22);
 			this.zoom300ToolStripMenuItem.Text = "300%";
 			this.zoom300ToolStripMenuItem.Click += new System.EventHandler(this.Zoom300ToolStripMenuItemClick);
+			// 
+			// zoom400ToolStripMenuItem
+			// 
+			this.zoom400ToolStripMenuItem.Name = "zoom400ToolStripMenuItem";
+			this.zoom400ToolStripMenuItem.Size = new System.Drawing.Size(102, 22);
+			this.zoom400ToolStripMenuItem.Text = "400%";
+			this.zoom400ToolStripMenuItem.Click += new System.EventHandler(this.Zoom400ToolStripMenuItemClick);
 			// 
 			// paletteToolStripMenuItem
 			// 
@@ -324,62 +312,12 @@ namespace WLEditor
 			this.bToolStripMenuItem.Text = "B";
 			this.bToolStripMenuItem.Click += new System.EventHandler(this.BToolStripMenuItemClick);
 			// 
-			// objectPictureBox
-			// 
-			this.objectPictureBox.Location = new System.Drawing.Point(3, 265);
-			this.objectPictureBox.Name = "objectPictureBox";
-			this.objectPictureBox.Size = new System.Drawing.Size(64, 64);
-			this.objectPictureBox.TabIndex = 6;
-			this.objectPictureBox.TabStop = false;
-			this.objectPictureBox.Visible = false;
-			this.objectPictureBox.Paint += new System.Windows.Forms.PaintEventHandler(this.TilesPictureBoxPaint);
-			this.objectPictureBox.MouseDown += new System.Windows.Forms.MouseEventHandler(this.TilesPictureBoxMouseDown);
-			// 
-			// mainTable
-			// 
-			this.mainTable.ColumnCount = 2;
-			this.mainTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-			this.mainTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-			this.mainTable.Controls.Add(this.LevelPanel, 1, 0);
-			this.mainTable.Controls.Add(this.flowLayoutPanel1, 0, 0);
-			this.mainTable.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.mainTable.Location = new System.Drawing.Point(0, 27);
-			this.mainTable.Margin = new System.Windows.Forms.Padding(0);
-			this.mainTable.Name = "mainTable";
-			this.mainTable.RowCount = 1;
-			this.mainTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-			this.mainTable.Size = new System.Drawing.Size(1209, 592);
-			this.mainTable.TabIndex = 3;
-			// 
-			// flowLayoutPanel1
-			// 
-			this.flowLayoutPanel1.AutoSize = true;
-			this.flowLayoutPanel1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.flowLayoutPanel1.Controls.Add(this.tilesPictureBox);
-			this.flowLayoutPanel1.Controls.Add(this.objectPictureBox);
-			this.flowLayoutPanel1.Location = new System.Drawing.Point(0, 0);
-			this.flowLayoutPanel1.Margin = new System.Windows.Forms.Padding(0);
-			this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-			this.flowLayoutPanel1.Size = new System.Drawing.Size(134, 332);
-			this.flowLayoutPanel1.TabIndex = 2;
-			// 
-			// tilesPictureBox
-			// 
-			this.tilesPictureBox.Location = new System.Drawing.Point(3, 3);
-			this.tilesPictureBox.Name = "tilesPictureBox";
-			this.tilesPictureBox.Size = new System.Drawing.Size(128, 256);
-			this.tilesPictureBox.TabIndex = 3;
-			this.tilesPictureBox.TabStop = false;
-			this.tilesPictureBox.Visible = false;
-			this.tilesPictureBox.Paint += new System.Windows.Forms.PaintEventHandler(this.ObjectsPictureBoxPaint);
-			this.tilesPictureBox.MouseDown += new System.Windows.Forms.MouseEventHandler(this.ObjectsPictureBoxMouseDown);
-			// 
 			// tableLayoutPanel1
 			// 
 			this.tableLayoutPanel1.ColumnCount = 1;
 			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+			this.tableLayoutPanel1.Controls.Add(this.LevelPanel, 0, 1);
 			this.tableLayoutPanel1.Controls.Add(this.levelComboBox, 0, 0);
-			this.tableLayoutPanel1.Controls.Add(this.mainTable, 0, 1);
 			this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 24);
 			this.tableLayoutPanel1.Name = "tableLayoutPanel1";
@@ -389,12 +327,27 @@ namespace WLEditor
 			this.tableLayoutPanel1.Size = new System.Drawing.Size(1209, 619);
 			this.tableLayoutPanel1.TabIndex = 8;
 			// 
-			// zoom400ToolStripMenuItem
+			// LevelPanel
 			// 
-			this.zoom400ToolStripMenuItem.Name = "zoom400ToolStripMenuItem";
-			this.zoom400ToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-			this.zoom400ToolStripMenuItem.Text = "400%";
-			this.zoom400ToolStripMenuItem.Click += new System.EventHandler(this.Zoom400ToolStripMenuItemClick);
+			this.LevelPanel.AutoScroll = true;
+			this.LevelPanel.Controls.Add(this.levelPictureBox);
+			this.LevelPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.LevelPanel.Location = new System.Drawing.Point(3, 30);
+			this.LevelPanel.Name = "LevelPanel";
+			this.LevelPanel.Size = new System.Drawing.Size(1203, 586);
+			this.LevelPanel.TabIndex = 5;
+			this.LevelPanel.Visible = false;
+			// 
+			// levelPictureBox
+			// 
+			this.levelPictureBox.Location = new System.Drawing.Point(0, 0);
+			this.levelPictureBox.Name = "levelPictureBox";
+			this.levelPictureBox.Size = new System.Drawing.Size(4096, 512);
+			this.levelPictureBox.TabIndex = 2;
+			this.levelPictureBox.TabStop = false;
+			this.levelPictureBox.Paint += new System.Windows.Forms.PaintEventHandler(this.LevelPictureBoxPaint);
+			this.levelPictureBox.MouseDown += new System.Windows.Forms.MouseEventHandler(this.LevelPictureBoxMouseDown);
+			this.levelPictureBox.MouseMove += new System.Windows.Forms.MouseEventHandler(this.LevelPictureBoxMouseMove);
 			// 
 			// MainForm
 			// 
@@ -407,21 +360,16 @@ namespace WLEditor
 			this.Name = "MainForm";
 			this.Text = "WLEditor";
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainFormFormClosing);
-			this.LevelPanel.ResumeLayout(false);
-			((System.ComponentModel.ISupportInitialize)(this.levelPictureBox)).EndInit();
+			this.Load += new System.EventHandler(this.MainFormLoad);
 			this.menuStrip1.ResumeLayout(false);
 			this.menuStrip1.PerformLayout();
-			((System.ComponentModel.ISupportInitialize)(this.objectPictureBox)).EndInit();
-			this.mainTable.ResumeLayout(false);
-			this.mainTable.PerformLayout();
-			this.flowLayoutPanel1.ResumeLayout(false);
-			((System.ComponentModel.ISupportInitialize)(this.tilesPictureBox)).EndInit();
 			this.tableLayoutPanel1.ResumeLayout(false);
+			this.LevelPanel.ResumeLayout(false);
+			((System.ComponentModel.ISupportInitialize)(this.levelPictureBox)).EndInit();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
 		}
-		private System.Windows.Forms.PictureBox objectPictureBox;
 		private System.Windows.Forms.ToolStripMenuItem saveToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem bToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem aToolStripMenuItem;
@@ -437,7 +385,6 @@ namespace WLEditor
 		private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
 		private System.Windows.Forms.MenuStrip menuStrip1;
 		private System.Windows.Forms.ComboBox levelComboBox;
-		private System.Windows.Forms.PictureBox tilesPictureBox;
 		private System.Windows.Forms.Panel LevelPanel;
 		private System.Windows.Forms.PictureBox levelPictureBox;
 		private System.Windows.Forms.ToolStripMenuItem saveAsToolStripMenuItem;
@@ -445,14 +392,13 @@ namespace WLEditor
 		private System.Windows.Forms.ToolStripMenuItem classicToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem blackWhiteToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem autumnToolStripMenuItem;
-		private System.Windows.Forms.TableLayoutPanel mainTable;
 		private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
-		private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
 		private System.Windows.Forms.ToolStripMenuItem zoomToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem zoom100ToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem zoom200ToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem zoom300ToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem zoom400ToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem toolboxToolStripMenuItem;
 
 			
 	

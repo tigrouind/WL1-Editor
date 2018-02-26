@@ -30,7 +30,8 @@ namespace WLEditor
 		public string romFilePath;
 		public bool hasChanges;
 		public int zoom = 1;
-
+		public ToolboxForm toolboxForm;
+		
 		public MainForm()
 		{
 			//
@@ -39,7 +40,7 @@ namespace WLEditor
 			InitializeComponent();
 			//
 			// TODO: Add constructor code after the InitializeComponent() call.
-			//
+			//					
 		}
 
 		void LoadLevel(bool reloadAll)
@@ -50,12 +51,11 @@ namespace WLEditor
 				Level.DumpLevel(rom, currentCourseId, currentWarp, tiles8x8, tiles16x16, tilesEnemies, reloadAll, aToolStripMenuItem.Checked, bToolStripMenuItem.Checked, SelectedPaletteToolStripIndex());
 				while(currentObject >= 1 && currentObject <= 6 && !Level.enemiesAvailable[currentObject - 1]) currentObject--;
 				
-				levelPictureBox.Refresh();
-				objectPictureBox.Refresh();
-				tilesPictureBox.Refresh();
+				levelPictureBox.Refresh();				
+				toolboxForm.RefreshPictureBoxes();
+				toolboxToolStripMenuItem.Enabled = true;
 			}
-		}
-
+		}			
 
 		void LevelComboBoxSelectedIndexChanged(object sender, EventArgs e)
 		{
@@ -103,9 +103,7 @@ namespace WLEditor
 					
 					saveAsToolStripMenuItem.Enabled = true;
 					levelComboBox.Visible = true;
-					LevelPanel.Visible = true;
-					tilesPictureBox.Visible = true;
-					objectPictureBox.Visible = true;
+					LevelPanel.Visible = true;					
 				}
 				else
 				{
@@ -138,9 +136,7 @@ namespace WLEditor
 
 		void ObjectsToolStripMenuItemClick(object sender, EventArgs e)
 		{
-			objectPictureBox.Refresh();
 			levelPictureBox.Refresh();
-			currentObject = -1;
 		}
 
 		void ScrollRegionToolStripMenuItemClick(object sender, EventArgs e)
@@ -417,70 +413,6 @@ namespace WLEditor
 			levelPictureBox.Refresh();
 		}
 
-		void ObjectsPictureBoxPaint(object sender, PaintEventArgs e)
-		{
-			if(Level.levelData != null)
-			{
-				e.Graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
-				e.Graphics.PixelOffsetMode = PixelOffsetMode.Half;
-				e.Graphics.DrawImage(tiles16x16.Bitmap, 0, 0, 128 * zoom, 256 * zoom);
-	
-				if(currentTile != -1)
-				{
-					using (Brush brush = new SolidBrush(Color.FromArgb(128, 255, 0, 0)))
-					{
-						e.Graphics.FillRectangle(brush, (currentTile % 8) * 16 * zoom, (currentTile / 8) * 16 * zoom, 16 * zoom, 16 * zoom);
-					}
-				}
-			}
-		}
-
-		void TilesPictureBoxPaint(object sender, PaintEventArgs e)
-		{
-			if(Level.levelData != null && objectsToolStripMenuItem.Checked)
-			{
-				StringFormat format = new StringFormat();
-				format.LineAlignment = StringAlignment.Center;
-				format.Alignment = StringAlignment.Center;
-
-				using (Brush enemyBrush = new SolidBrush(Level.enemyPalette[2]))
-				using (Brush brush = new SolidBrush(Color.FromArgb(128, 255, 0, 0)))
-				using (Pen pen = new Pen(Color.White, 1.0f * zoom))
-				using (Font font = new Font("Arial", 8 * zoom))
-				{
-					e.Graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
-					e.Graphics.PixelOffsetMode = PixelOffsetMode.Half;
-					
-					for(int j = 0 ; j < 16 ; j++)
-					{
-						int x = (j % 4) * 16;
-						int y = (j / 4) * 16;
-						
-						e.Graphics.FillRectangle(enemyBrush, x * zoom, y * zoom, 16 * zoom, 16 * zoom);
-						
-						if(j == 0)
-						{							
-							e.Graphics.DrawLine(pen, (x + 4) * zoom, (y + 4) * zoom, (x + 12) * zoom, (y + 12) * zoom);
-							e.Graphics.DrawLine(pen, (x + 12) * zoom, (y + 4) * zoom, (x + 4) * zoom, (y + 12) * zoom);
-						}
-						else if(j <= 6)
-						{																	
-							e.Graphics.DrawString(j.ToString(), font, Level.enemiesAvailable[j - 1] ? Brushes.White : Brushes.DimGray, (x + 8) * zoom, (y + 8) * zoom, format);
-						}
-						else
-						{
-							e.Graphics.DrawImage(tilesObjects.Bitmap, new Rectangle(x * zoom, y * zoom, 16 * zoom, 16 * zoom), new Rectangle((j - 7) * 16, 0, 16, 16),  GraphicsUnit.Pixel);
-						}
-					}
-					
-					if(currentObject != -1)
-					{
-						e.Graphics.FillRectangle(brush, (currentObject % 4) * 16 * zoom, (currentObject / 4) * 16 * zoom, 16 * zoom, 16 * zoom);
-					}
-				}
-			}
-		}
-
 		void NoneToolStripMenuItemClick(object sender, EventArgs e)
 		{
 			SetSwitchMode(noneToolStripMenuItem);
@@ -560,42 +492,15 @@ namespace WLEditor
 			SaveChanges();
 		}
 
-		void ObjectsPictureBoxMouseDown(object sender, MouseEventArgs e)
-		{
-			currentTile = e.Location.X / 16 / zoom+ (e.Location.Y / 16 / zoom) * 8;
-			tilesPictureBox.Refresh();
-
-			if(currentObject != -1)
-			{
-				currentObject = -1;
-				objectPictureBox.Refresh();
-			}
-		}
-
-		void TilesPictureBoxMouseDown(object sender, MouseEventArgs e)
-		{
-			int index = e.Location.X / 16 / zoom + (e.Location.Y / 16 / zoom) * 4;
-			if(!(index >= 1 && index <= 6) || Level.enemiesAvailable[index - 1])
-			{
-				currentObject = index;
-				objectPictureBox.Refresh();
-	
-				if(currentTile != -1)
-				{
-					currentTile = -1;
-					tilesPictureBox.Refresh();
-				}			
-			}					
-		}
-
 		void LevelPictureBoxMouseDown(object sender, MouseEventArgs e)
 		{
 			if(e.Button == MouseButtons.Left)
 			{
 				int tileIndex = e.Location.X / 16 / zoom + (e.Location.Y / 16 / zoom) * 256;
 				Region r = new Region(new Rectangle((tileIndex % 256) * 16 * zoom, (tileIndex / 256) * 16 * zoom, 16 * zoom, 16 * zoom));			
-
-				if(currentTile != -1)
+				int selectedPanelIndex = toolboxForm.GetSelectedPanelIndex();
+				
+				if(currentTile != -1 && toolboxForm.Visible && selectedPanelIndex == 0)
 				{
 					int previousTile = Level.levelData[tileIndex + 0x1000];
 					if(previousTile != currentTile)
@@ -607,7 +512,7 @@ namespace WLEditor
 					}
 				}
 
-				if(currentObject != -1)
+				if(currentObject != -1 && objectsToolStripMenuItem.Checked && toolboxForm.Visible && selectedPanelIndex == 2)
 				{																		
 					int previousObject = Level.objectsData[tileIndex];
 					if(previousObject != currentObject)
@@ -724,13 +629,7 @@ namespace WLEditor
 			levelPictureBox.Width = 4096 * zoom;		
 			levelPictureBox.Refresh();
 			
-			tilesPictureBox.Height = 256 * zoom;
-			tilesPictureBox.Width = 128 * zoom;							
-			tilesPictureBox.Refresh();
-			
-			objectPictureBox.Height = 64 * zoom;
-			objectPictureBox.Width = 64 * zoom;
-			objectPictureBox.Refresh();
+			toolboxForm.SetZoom(zoomLevel);			
 		}
 						
 		void Zoom100ToolStripMenuItemClick(object sender, EventArgs e)
@@ -752,5 +651,30 @@ namespace WLEditor
 		{
 			SetZoomLevel(4);
 		}
+		
+		void MainFormLoad(object sender, EventArgs e)
+		{
+			toolboxForm = new ToolboxForm();
+			toolboxForm.MainForm = this;	
+			toolboxForm.FormClosing += (send, ev) => toolboxToolStripMenuItem.Checked = false;
+		}				
+		
+		void ToolboxToolStripMenuItemCheckedChanged(object sender, EventArgs e)
+		{
+			if(toolboxToolStripMenuItem.Checked)
+			{
+				if(!toolboxForm.Visible)
+				{
+					toolboxForm.Show(this);	
+				}	
+			}
+			else
+			{
+				if(toolboxForm.Visible)
+				{
+					toolboxForm.Hide();	
+				}
+			}		
+		}		
 	}
 }
