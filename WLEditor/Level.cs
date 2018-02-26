@@ -160,12 +160,14 @@ namespace WLEditor
 			int blockbank = rom.ReadByte(header + 9);
 			int blockubbank = rom.ReadByte(header + 10);
 			int blockindex = rom.ReadWord(header + 11);
+			int animatedTilesMask = rom.ReadByte(header + 26);
 			byte palette = rom.ReadByte(header + 27);
 			int enemiesIdsPointer, enemiesTiles;
 			
 			//load warp
 			if(warp != -1)
 			{
+				animatedTilesMask = rom.ReadByte(warp + 9);
 				tilebank = rom.ReadByte(warp + 11);
 				tileaddressB = rom.ReadWord(warp + 12);
 				tileaddressA = rom.ReadWord(warp + 14);
@@ -189,8 +191,12 @@ namespace WLEditor
 			Dump8x8Tiles(rom, tileaddressA, tiles8x8, 2*16, 0*16, palette, paletteColors);
 			rom.SetBank(tilebank);
 			Dump8x8Tiles(rom, tileaddressB, tiles8x8, 6*16, 2*16, palette, paletteColors);
-			rom.SetBank(0x11);
-			Dump8x8Tiles(rom, tileanimated, tiles8x8, 4, 2*16, palette, paletteColors);				
+						
+			if(animatedTilesMask != 0)
+			{
+				rom.SetBank(0x11);
+				Dump8x8Tiles(rom, tileanimated, tiles8x8, 4, 2*16, palette, paletteColors);			
+			}				
 
 			//dump 16x16 blocks
 			rom.SetBank(0xB);
