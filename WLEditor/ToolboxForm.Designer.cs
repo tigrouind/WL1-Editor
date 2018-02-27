@@ -125,8 +125,7 @@ namespace WLEditor
 			// 
 			// ToolboxForm
 			// 
-			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.AutoSize = true;
 			this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.ClientSize = new System.Drawing.Size(156, 648);
@@ -137,7 +136,6 @@ namespace WLEditor
 			this.Name = "ToolboxForm";
 			this.ShowIcon = false;
 			this.ShowInTaskbar = false;
-			this.Text = "Toolbox";
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Tiles16x16FormFormClosing);
 			this.Load += new System.EventHandler(this.Tiles16x16FormLoad);
 			((System.ComponentModel.ISupportInitialize)(this.tiles16x16PictureBox)).EndInit();
