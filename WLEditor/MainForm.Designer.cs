@@ -66,6 +66,7 @@ namespace WLEditor
 			this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
 			this.LevelPanel = new System.Windows.Forms.Panel();
 			this.levelPictureBox = new System.Windows.Forms.PictureBox();
+			this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.menuStrip1.SuspendLayout();
 			this.tableLayoutPanel1.SuspendLayout();
 			this.LevelPanel.SuspendLayout();
@@ -88,7 +89,8 @@ namespace WLEditor
 			this.menuStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
 			this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
 			this.fileToolStripMenuItem,
-			this.viewToolStripMenuItem});
+			this.viewToolStripMenuItem,
+			this.aboutToolStripMenuItem});
 			this.menuStrip1.Location = new System.Drawing.Point(0, 0);
 			this.menuStrip1.Name = "menuStrip1";
 			this.menuStrip1.Size = new System.Drawing.Size(1209, 24);
@@ -349,6 +351,13 @@ namespace WLEditor
 			this.levelPictureBox.MouseDown += new System.Windows.Forms.MouseEventHandler(this.LevelPictureBoxMouseDown);
 			this.levelPictureBox.MouseMove += new System.Windows.Forms.MouseEventHandler(this.LevelPictureBoxMouseMove);
 			// 
+			// aboutToolStripMenuItem
+			// 
+			this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
+			this.aboutToolStripMenuItem.Size = new System.Drawing.Size(52, 20);
+			this.aboutToolStripMenuItem.Text = "About";
+			this.aboutToolStripMenuItem.Click += new System.EventHandler(this.AboutToolStripMenuItemClick);
+			// 
 			// MainForm
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -399,6 +408,7 @@ namespace WLEditor
 		private System.Windows.Forms.ToolStripMenuItem zoom300ToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem zoom400ToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem toolboxToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
 
 			
 	

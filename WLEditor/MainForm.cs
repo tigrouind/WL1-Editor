@@ -675,6 +675,10 @@ namespace WLEditor
 					toolboxForm.Hide();	
 				}
 			}		
+		}
+		void AboutToolStripMenuItemClick(object sender, EventArgs e)
+		{
+			MessageBox.Show(this.Text+" v0.66\r\nDate : 27.02.2018.\r\nContact me : tigrou.ind@gmail.com");
 		}		
 	}
 }
