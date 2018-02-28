@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-# SharpDevelop 4.4
+# SharpDevelop 5.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WLEditor", "WLEditor\WLEditor.csproj", "{9AF489D5-BCAC-487E-83AE-4A3E0CBDD1CB}"
 EndProject
 Global
@@ -10,9 +10,9 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{9AF489D5-BCAC-487E-83AE-4A3E0CBDD1CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9AF489D5-BCAC-487E-83AE-4A3E0CBDD1CB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9AF489D5-BCAC-487E-83AE-4A3E0CBDD1CB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9AF489D5-BCAC-487E-83AE-4A3E0CBDD1CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9AF489D5-BCAC-487E-83AE-4A3E0CBDD1CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9AF489D5-BCAC-487E-83AE-4A3E0CBDD1CB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

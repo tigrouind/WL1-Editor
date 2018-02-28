@@ -655,7 +655,7 @@ namespace WLEditor
 		void MainFormLoad(object sender, EventArgs e)
 		{
 			toolboxForm = new ToolboxForm();
-			toolboxForm.MainForm = this;	
+			toolboxForm.InitializeControls(this);
 			toolboxForm.FormClosing += (send, ev) => toolboxToolStripMenuItem.Checked = false;
 		}				
 		
