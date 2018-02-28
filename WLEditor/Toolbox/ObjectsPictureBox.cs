@@ -8,14 +8,13 @@ namespace WLEditor
 {
 	public class ObjectsPictureBox : PictureBox
 	{
-		public MainForm MainForm;			
+		public int CurrentObject = -1;	
+		int zoom;
 		
 		protected override void OnPaint(PaintEventArgs e)
 		{			
 			if(Level.levelData != null)
 			{
-				int zoom = MainForm.zoom;
-				
 				StringFormat format = new StringFormat();
 				format.LineAlignment = StringAlignment.Center;
 				format.Alignment = StringAlignment.Center;
@@ -66,9 +65,9 @@ namespace WLEditor
 					    }						
 					}
 					
-					if(MainForm.currentObject != -1)
+					if(CurrentObject != -1)
 					{
-						int index = ObjectIndexToGUI(MainForm.currentObject);
+						int index = ObjectIndexToGUI(CurrentObject);
 						e.Graphics.FillRectangle(brush, (index % 4) * 32 * zoom, (index / 4) * 32 * zoom, 32 * zoom, 32 * zoom);
 					}
 				}
@@ -77,23 +76,22 @@ namespace WLEditor
 		
 		protected override void OnMouseDown(MouseEventArgs e)
 		{
-			int zoom = MainForm.zoom;
-			
-			int index = e.Location.X / 32 / MainForm.zoom + (e.Location.Y / 32 / zoom) * 4;
+			int index = e.Location.X / 32 / zoom + (e.Location.Y / 32 / zoom) * 4;
 			index = GUIToObjectIndex(index);
 			
 			if(!(index >= 1 && index <= 6) || Level.enemiesAvailable[index - 1])
 			{
-				MainForm.currentObject = index;
-				Refresh();
+				CurrentObject = index;
+				Invalidate();
 			}					
 		}
 		
-		public void SetZoom(int zoom)
+		public void SetZoom(int zoomlevel)
 		{
-			Height = 128 * zoom;
-			Width = 128 * zoom;
-			Refresh();			
+			Height = 128 * zoomlevel;
+			Width = 128 * zoomlevel;
+			zoom = zoomlevel;
+			Invalidate();			
 		}
 		
 		int ObjectIndexToGUI(int index)

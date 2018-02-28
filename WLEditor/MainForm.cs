@@ -7,27 +7,23 @@ namespace WLEditor
 {
 	public partial class MainForm : Form
 	{
-		public Rom rom = new Rom();		 		
-		public ToolboxForm toolboxForm = new ToolboxForm();
-		
-		public int currentSector = -1;
-		public int currentTile = -1;
-		public int currentObject = -1;		
-		public int currentCourseId = -1;
-		public int currentWarp = -1;
-		public string romFilePath;
-		public bool hasChanges;
-		public int zoom = 1;
+		Rom rom = new Rom();		 		
+		ToolboxForm toolboxForm = new ToolboxForm();
+			
+		int currentCourseId = -1;
+		int currentWarp = -1;
+		string romFilePath;
+		bool hasChanges;
+		int zoom = 1;
 				
 		public MainForm()
 		{
 			InitializeComponent();						
 			
-			toolboxForm.FormClosing += (send, ev) => toolboxToolStripMenuItem.Checked = false;
-			toolboxForm.MainForm = this;
-			toolboxForm.InitializeControls();
+			toolboxForm.FormClosing += ToolBoxFormClosing;
 			
-			levelPictureBox.MainForm = this;			
+			levelPictureBox.OnTileClick += LevelPictureBoxTileClick;
+			levelPictureBox.OnSectorChange += LevelPictureBoxSectorChanged;
 		}
 
 		public void LoadLevel(bool reloadAll)
@@ -35,11 +31,14 @@ namespace WLEditor
 			if(rom.IsLoaded && levelComboBox.SelectedItem != null)
 			{
 				levelPictureBox.ClearTileCache(); 
-				Level.DumpLevel(rom, currentCourseId, currentWarp, reloadAll, aToolStripMenuItem.Checked, bToolStripMenuItem.Checked, SelectedPaletteToolStripIndex());
-				while(currentObject >= 1 && currentObject <= 6 && !Level.enemiesAvailable[currentObject - 1]) currentObject--;
+				Level.DumpLevel(rom, currentCourseId, currentWarp, reloadAll, levelPictureBox.SwitchMode, SelectedPaletteToolStripIndex());
 				
-				levelPictureBox.Refresh();				
-				toolboxForm.RefreshPictureBoxes();
+				int currentObject = toolboxForm.CurrentObject;
+				while(currentObject >= 1 && currentObject <= 6 && !Level.enemiesAvailable[currentObject - 1]) currentObject--;
+				toolboxForm.CurrentObject = currentObject;
+				
+				levelPictureBox.Invalidate();				
+				toolboxForm.Invalidate(true);
 				toolboxToolStripMenuItem.Enabled = true;
 			}
 		}			
@@ -51,7 +50,7 @@ namespace WLEditor
 				if(AskForSavingChanges())
 				{
 					currentWarp = -1;
-					currentSector = -1;
+					levelPictureBox.CurrentSector = -1;
 					ComboboxItem item = (ComboboxItem)levelComboBox.SelectedItem;
 					currentCourseId = (int)item.Value;
 					LoadLevel(true);
@@ -117,17 +116,20 @@ namespace WLEditor
 
 		void RegionsToolStripMenuItemClick(object sender, EventArgs e)
 		{
-			levelPictureBox.Refresh();
+			levelPictureBox.ShowSectors = regionsToolStripMenuItem.Checked;
+			levelPictureBox.Invalidate();
 		}
 
 		void ObjectsToolStripMenuItemClick(object sender, EventArgs e)
 		{
-			levelPictureBox.Refresh();
+			levelPictureBox.ShowObjects = objectsToolStripMenuItem.Checked;
+			levelPictureBox.Invalidate();
 		}
 
 		void ScrollRegionToolStripMenuItemClick(object sender, EventArgs e)
 		{
-			levelPictureBox.Refresh();
+			levelPictureBox.ShowScrollInfo = scrollRegionToolStripMenuItem.Checked;
+			levelPictureBox.Invalidate();
 		}
 
 		void ExitToolStripMenuItemClick(object sender, EventArgs e)
@@ -137,24 +139,28 @@ namespace WLEditor
 
 		void CollidersToolStripMenuItemClick(object sender, EventArgs e)
 		{
+			levelPictureBox.ShowColliders = collidersToolStripMenuItem.Checked;
 			levelPictureBox.ClearTileCache();
-			levelPictureBox.Refresh();
+			levelPictureBox.Invalidate();
 		}
 
 		void NoneToolStripMenuItemClick(object sender, EventArgs e)
 		{
+			levelPictureBox.SwitchMode = 0;
 			SetSwitchMode(noneToolStripMenuItem);
 			LoadLevel(false);
 		}
 
 		void AToolStripMenuItemClick(object sender, EventArgs e)
 		{
+			levelPictureBox.SwitchMode = 1;
 			SetSwitchMode(aToolStripMenuItem);
 			LoadLevel(false);
 		}
 
 		void BToolStripMenuItemClick(object sender, EventArgs e)
 		{
+			levelPictureBox.SwitchMode = 2;
 			SetSwitchMode(bToolStripMenuItem);
 			LoadLevel(false);
 		}
@@ -320,58 +326,57 @@ namespace WLEditor
 			}		
 		}		
 		
+		void ToolBoxFormClosing(object sender, EventArgs e)
+		{
+			toolboxToolStripMenuItem.Checked = false;
+		}
+		
+		void LevelPictureBoxTileClick(object sender, int tileIndex)
+		{
+			int selectedPanelIndex = toolboxForm.SelectedPanelIndex;
+			int currentTile = toolboxForm.CurrentTile;
+			int currentObject = toolboxForm.CurrentObject;
+			
+			if(currentTile != -1 && toolboxForm.Visible && selectedPanelIndex == 0)
+			{
+				int previousTile = Level.levelData[tileIndex + 0x1000];
+		        if(previousTile != currentTile)
+		        {
+		        	Level.levelData[tileIndex + 0x1000] = (byte)currentTile;
+		        	levelPictureBox.InvalidateTile(tileIndex);
+		            SetChanges(true);
+		        }						
+			}
+			
+			if(currentObject != -1 && levelPictureBox.ShowObjects && toolboxForm.Visible && selectedPanelIndex == 2)
+			{	
+				int previousObject = Level.objectsData[tileIndex];
+				if(previousObject != currentObject)
+				{
+					Level.objectsData[tileIndex] = (byte)currentObject;
+					levelPictureBox.InvalidateObject(tileIndex, currentObject, previousObject);
+					SetChanges(true);
+				}				
+			}
+		}
+		
+		void LevelPictureBoxSectorChanged(object sender, int currentSector)
+		{
+			int warpTarget = Level.SearchWarp(rom, currentCourseId, currentSector);
+			if(warpTarget != currentWarp)
+			{
+				currentWarp = warpTarget;
+				LoadLevel(false);
+			}
+			else
+			{
+				levelPictureBox.Invalidate();
+			}
+		}
+		
 		void AboutToolStripMenuItemClick(object sender, EventArgs e)
 		{
 			MessageBox.Show(Text+" v0.66\r\nDate : 27.02.2018.\r\nContact me : tigrou.ind@gmail.com");
 		}
-
-		public bool ViewRegions
-		{
-			get
-			{
-				return regionsToolStripMenuItem.Checked;
-			}			
-		}
-		
-		public bool ViewScroll
-		{
-			get			
-			{
-				return scrollRegionToolStripMenuItem.Checked;	
-			}			
-		}
-		
-		public bool ViewObjects
-		{
-			get
-			{
-				return objectsToolStripMenuItem.Checked; 
-			}
-			
-		}
-		
-		public bool ViewSwitchA
-		{
-			get
-			{			
-				return aToolStripMenuItem.Checked;
-			}
-		}
-		
-		public bool ViewSwitchB
-		{
-			get
-			{
-				return bToolStripMenuItem.Checked;
-			}
-		}
-		
-		public bool ViewColliders
-		{
-			get
-			{
-				return collidersToolStripMenuItem.Checked;			
-			}
-		}	
 	}
 }

@@ -153,7 +153,7 @@ namespace WLEditor
 		public static DirectBitmap tilesEnemies = new DirectBitmap(64, 64 * 6); 		
 		public static DirectBitmap playerSprite = new DirectBitmap(64, 64 * 2);
 		
-		public static void DumpLevel(Rom rom, int course, int warp, bool reloadAll, bool switchA, bool switchB, int paletteIndex)
+		public static void DumpLevel(Rom rom, int course, int warp, bool reloadAll, int switchMode, int paletteIndex)
 		{
 			rom.SetBank(0xC);
 			int header = rom.ReadWord(0x4560 + course * 2);
@@ -206,7 +206,7 @@ namespace WLEditor
 
 			//dump 16x16 blocks
 			rom.SetBank(0xB);
-			Dump16x16Tiles(rom, blockindex, switchA, switchB, paletteColors[0]);
+			Dump16x16Tiles(rom, blockindex, switchMode, paletteColors[0]);
 
 			if(reloadAll)
 			{
@@ -391,14 +391,14 @@ namespace WLEditor
 			}
 		}
 
-		static void Dump16x16Tiles(Rom rom, int tileindexaddress, bool switchA, bool switchB, Color defaultColor)
+		static void Dump16x16Tiles(Rom rom, int tileindexaddress, int switchMode, Color defaultColor)
 		{	
 			for(int n = 0 ; n < 16 ; n++)
 			{
 				for(int i = 0 ; i < 8 ; i++)
 				{
 					int tileIndex = i + n * 8;
-					tileIndex = Switch(tileIndex, switchA, switchB);
+					tileIndex = SwitchTile(tileIndex, switchMode);
 
 					for(int k = 0 ; k < 2 ; k++)
 					{
@@ -681,9 +681,9 @@ namespace WLEditor
 		}
 
 		//replace tiles when a (!) block is hit
-		public static int Switch(int tileData, bool switchA, bool switchB)
+		public static int SwitchTile(int tileData, int switchMode)
 		{
-			if(switchA)
+			if(switchMode == 1)
 			{
 				switch(tileData)
 				{
@@ -700,7 +700,7 @@ namespace WLEditor
 						return 0x45;
 				}
 			}
-			else if(switchB)
+			else if(switchMode == 2)
 			{
 				switch(tileData)
 				{

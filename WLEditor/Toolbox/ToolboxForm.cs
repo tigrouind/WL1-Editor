@@ -1,31 +1,18 @@
 ﻿using System;
+using System.Drawing;
 using System.Windows.Forms;
 
 namespace WLEditor
 {
 	public partial class ToolboxForm : Form
 	{		
-		public MainForm MainForm;				
-		public Tiles8x8PictureBox tiles8x8PictureBox  = new Tiles8x8PictureBox();	
-		public Tiles16x16PictureBox tiles16x16PictureBox = new Tiles16x16PictureBox();
-		public ObjectsPictureBox objectsPictureBox = new ObjectsPictureBox();
-				
 		public ToolboxForm()
 		{				
 			InitializeComponent();
-		}	
-		
-		public void InitializeControls()
-		{
-			tiles8x8PictureBox.MainForm = MainForm;
-			tiles8x8PictureBox.SetZoom(1);
-						
-			tiles16x16PictureBox.MainForm = MainForm;
-			tiles16x16PictureBox.SetZoom(1);
-									
-			objectsPictureBox.MainForm = MainForm;			
+			tiles8x8PictureBox.SetZoom(1);						
+			tiles16x16PictureBox.SetZoom(1);											
 			objectsPictureBox.SetZoom(1);				
-		}
+		}	
 		
 		public void SetZoom(int zoom)
 		{
@@ -34,36 +21,22 @@ namespace WLEditor
 			objectsPictureBox.SetZoom(zoom);			
 		}
 		
-		public void RefreshPictureBoxes()
-		{
-			tiles16x16PictureBox.Refresh();	
-			tiles8x8PictureBox.Refresh();
-			objectsPictureBox.Refresh();			
-		}				
-		
 		void ComboBox1SelectedIndexChanged(object sender, EventArgs e)
 		{
 			SuspendLayout();
-			Control controlToRemove = tableLayoutPanel1.GetControlFromPosition(0, 1);
-			tableLayoutPanel1.Controls.Remove(controlToRemove);
 			
-			Control controlToAdd;
-			switch(comboBox1.SelectedIndex)
+			Control controlToShow = new Control[] { tiles16x16PictureBox, tiles8x8PictureBox, objectsPictureBox }[comboBox1.SelectedIndex];
+			controlToShow.Visible = true;
+			controlToShow.Location = new Point(controlToShow.Margin.Left, controlToShow.Margin.Top);
+			
+			foreach(Control control in panel1.Controls)
 			{
-				case 0:
-					controlToAdd = tiles16x16PictureBox;
-					break;
-				case 1:
-					controlToAdd = tiles8x8PictureBox;
-					break;
-				case 2:
-					controlToAdd = objectsPictureBox;
-					break;
-				default:
-					throw new NotImplementedException();
+				if(control != controlToShow)
+				{
+					control.Visible = false;
+				}
 			}
-			
-			tableLayoutPanel1.Controls.Add(controlToAdd, 0, 1);			
+						
 			ResumeLayout();
 		}		
 		
@@ -81,9 +54,33 @@ namespace WLEditor
 		    }
 		}
 		
-		public int GetSelectedPanelIndex()
+		public int CurrentObject
 		{
-			return comboBox1.SelectedIndex;
+			get
+			{
+				return objectsPictureBox.CurrentObject;
+			}
+			
+			set
+			{
+				objectsPictureBox.CurrentObject = value;
+			}
+		}
+		
+		public int CurrentTile
+		{
+			get
+			{
+				return tiles16x16PictureBox.CurrentTile;
+			}			
+		}
+		
+		public int SelectedPanelIndex
+		{
+			get
+			{
+				return comboBox1.SelectedIndex;	
+			}			
 		}
 	}
 }

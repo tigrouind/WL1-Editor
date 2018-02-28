@@ -7,24 +7,24 @@ using System.Windows.Forms;
 namespace WLEditor
 {
 	public class LevelPictureBox : PictureBox
-	{		
-		public MainForm MainForm;	
-		public bool[] invalidTiles = new bool[256 * 32];	
-		public DirectBitmap levelTiles = new DirectBitmap(4096, 512);
-		
+	{			
+		readonly bool[] invalidTiles = new bool[256 * 32];	
+		DirectBitmap levelTiles = new DirectBitmap(4096, 512);		
+		int zoom = 1;
+				
+		public bool ShowSectors = true;
+		public bool ShowScrollInfo = true;
+		public bool ShowObjects = true;		
+		public bool ShowColliders;
+		public int SwitchMode;
+		public int CurrentSector = -1;		
+		public EventHandler<int> OnTileClick;
+		public EventHandler<int> OnSectorChange;
+				
 		protected override void OnPaint(PaintEventArgs e)
-		{
-			int zoom = MainForm.zoom;
-			
+		{			
 			if(Level.levelData != null)
 			{
-				bool viewSectors = MainForm.ViewRegions;
-				bool viewScroll = MainForm.ViewScroll;
-				bool viewObjects = MainForm.ViewObjects;
-				bool switchA = MainForm.ViewSwitchA;
-				bool switchB = MainForm.ViewSwitchB;
-				bool viewColliders = MainForm.ViewColliders;				
-				
 				StringFormat format = new StringFormat();
 				format.LineAlignment = StringAlignment.Center;
 				format.Alignment = StringAlignment.Center;	
@@ -39,7 +39,7 @@ namespace WLEditor
 					//draw tiles to cache
 					foreach (Point point in sectorsToDraw)
 					{
-						DrawTiles(point.X, point.Y, redBrush, g, e.ClipRectangle, viewColliders, switchA, switchB);
+						DrawTiles(point.X, point.Y, redBrush, g, e.ClipRectangle, ShowColliders);
 					}
 
 					//draw tiles from cache
@@ -48,7 +48,7 @@ namespace WLEditor
 					e.Graphics.DrawImage(levelTiles.Bitmap, 0, 0, 4096 * zoom, 512 * zoom);					
 					
 					//sector objects (enemies, powerups)
-					if(viewObjects)
+					if(ShowObjects)
 					{
 						DrawSectorObjects(font, format, e, enemyBrush);			
 						
@@ -63,7 +63,7 @@ namespace WLEditor
 					}
 					
 					//scroll
-					if(viewScroll)
+					if(ShowScrollInfo)
 					{
 						foreach (Point point in sectorsToDraw)
 						{
@@ -72,7 +72,7 @@ namespace WLEditor
 					}
 
 					//sectors
-					if(viewSectors)
+					if(ShowSectors)
 					{			
 						foreach (Point point in sectorsToDraw)
 						{						
@@ -81,9 +81,9 @@ namespace WLEditor
 						
 						DrawSectorBorders(e.Graphics, e.ClipRectangle);
 						
-						if (MainForm.currentSector != -1)
+						if (CurrentSector != -1)
 						{
-							Rectangle sectorRect = new Rectangle((MainForm.currentSector % 16) * 256 * zoom, (MainForm.currentSector / 16) * 256 * zoom, 256 * zoom, 256 * zoom);
+							Rectangle sectorRect = new Rectangle((CurrentSector % 16) * 256 * zoom, (CurrentSector / 16) * 256 * zoom, 256 * zoom, 256 * zoom);
 							if (sectorRect.IntersectsWith(e.ClipRectangle))
 							{
 								using (Brush blue = new SolidBrush(Color.FromArgb(64, 0, 0, 255)))
@@ -97,10 +97,8 @@ namespace WLEditor
 			}
 		}
 		
-		void DrawTiles(int x, int y, Brush brush, Graphics g, Rectangle clipRectangle, bool viewColliders, bool switchA, bool switchB)
-		{
-			int zoom = MainForm.zoom;
-			
+		void DrawTiles(int x, int y, Brush brush, Graphics g, Rectangle clipRectangle, bool viewColliders)
+		{			
 			for(int j = y * 16 ; j < (y + 1) * 16 ; j++)
 			{
 				for(int i = x * 16 ; i < (x + 1) * 16 ; i++)
@@ -117,7 +115,7 @@ namespace WLEditor
 							if(viewColliders)
 							{
 								byte tileIndex = Level.levelData[i + j * 256 + 0x1000];
-								if(Level.IsCollidable(Level.Switch(tileIndex, switchA, switchB)))
+								if(Level.IsCollidable(Level.SwitchTile(tileIndex, SwitchMode)))
 								{
 									g.FillRectangle(brush, new Rectangle(destRect.X / zoom, destRect.Y / zoom, destRect.Width / zoom, destRect.Height / zoom));
 								}
@@ -142,9 +140,7 @@ namespace WLEditor
 		}
 
 		void DrawSectorObjects(Font font, StringFormat format, PaintEventArgs e, Brush brush)
-		{
-			int zoom = MainForm.zoom;
-			
+		{			
 			for(int j = 0 ; j < 32 ; j++)
 			{
 				for(int i = 0 ; i < 256 ; i++)
@@ -185,8 +181,6 @@ namespace WLEditor
 		
 		void DrawScrollInfo(int x, int y, Graphics g)
 		{
-			int zoom = MainForm.zoom;
-			
 			int drawSector = x + y * 16;
 			
 			byte scroll = Level.scrollData[drawSector];
@@ -199,7 +193,6 @@ namespace WLEditor
 		
 		void DrawSectorInfo(int x, int y, Graphics g, Font font, StringFormat format)
 		{
-			int zoom = MainForm.zoom;
 			int drawSector = x + y * 16;
 			
 			g.FillRectangle(Brushes.Blue, x * 256 * zoom, y * 256 * zoom, 16 * zoom, 16 * zoom);
@@ -218,9 +211,7 @@ namespace WLEditor
 		}
 		
 		void DrawSectorBorders(Graphics g, Rectangle clipRectangle)
-		{			
-			int zoom = MainForm.zoom;
-			
+		{	
 			//draw sector borders
 			using (Pen penBlue = new Pen(Color.Blue, 2.0f * zoom))
 			{						
@@ -242,8 +233,6 @@ namespace WLEditor
 		
 		List<Point> GetVisibleSectors(Rectangle clipRectangle)
 		{
-			int zoom = MainForm.zoom;
-			
 			List<Point> sectors = new List<Point>();
 			
 			for(int y = 0 ; y < 2 ; y++)
@@ -283,73 +272,49 @@ namespace WLEditor
 			return warpText;
 		}
 		
+		public void InvalidateTile(int tileIndex)
+		{
+			Region r = new Region(new Rectangle((tileIndex % 256) * 16 * zoom, (tileIndex / 256) * 16 * zoom, 16 * zoom, 16 * zoom));						
+			invalidTiles[tileIndex] = false;                
+            Invalidate(r);						
+		}
+		
+		public void InvalidateObject(int tileIndex, int currentObject, int previousObject)
+		{
+			Region r = new Region(new Rectangle((tileIndex % 256) * 16 * zoom, (tileIndex / 256) * 16 * zoom, 16 * zoom, 16 * zoom));									
+			Action<int> addEnemyRegion = enemyIndex =>
+			{
+				if(enemyIndex >= 1 && enemyIndex <= 6)
+				{
+					Rectangle enemyRect = Level.loadedSprites[enemyIndex - 1];
+					if(enemyRect != Rectangle.Empty)
+					{						
+						r.Union(new Rectangle(((tileIndex % 256) * 16 + enemyRect.X - 32 + 8) * zoom, ((tileIndex / 256) * 16 + enemyRect.Y - (enemyIndex - 1) * 64 - 40) * zoom, enemyRect.Width * zoom, enemyRect.Height * zoom));
+					}
+				}
+			};
+			
+			addEnemyRegion(previousObject);
+			addEnemyRegion(currentObject);
+			
+			Invalidate(r);
+		}
+				
 		protected override void OnMouseDown(MouseEventArgs e)
 		{
-			int zoom = MainForm.zoom;
-			bool viewObjects = MainForm.ViewObjects;
-			ToolboxForm toolboxForm = MainForm.toolboxForm;
-			
 			if(e.Button == MouseButtons.Left)
 			{
 				int tileIndex = e.Location.X / 16 / zoom + (e.Location.Y / 16 / zoom) * 256;
-				Region r = new Region(new Rectangle((tileIndex % 256) * 16 * zoom, (tileIndex / 256) * 16 * zoom, 16 * zoom, 16 * zoom));			
-				int selectedPanelIndex = toolboxForm.GetSelectedPanelIndex();
-				
-				if(MainForm.currentTile != -1 && toolboxForm.Visible && selectedPanelIndex == 0)
-				{
-					int previousTile = Level.levelData[tileIndex + 0x1000];
-					if(previousTile != MainForm.currentTile)
-					{
-						Level.levelData[tileIndex + 0x1000] = (byte)MainForm.currentTile;
-						invalidTiles[tileIndex] = false;
-						MainForm.SetChanges(true);
-						Invalidate(r);
-					}
-				}
-
-				if(MainForm.currentObject != -1 && viewObjects && toolboxForm.Visible && selectedPanelIndex == 2)
-				{																		
-					int previousObject = Level.objectsData[tileIndex];
-					if(previousObject != MainForm.currentObject)
-					{
-						Action<int> addEnemyRegion = enemyIndex =>
-						{
-							if(enemyIndex >= 1 && enemyIndex <= 6)
-							{
-								Rectangle enemyRect = Level.loadedSprites[enemyIndex - 1];
-								if(enemyRect != Rectangle.Empty)
-								{						
-									r.Union(new Rectangle(((tileIndex % 256) * 16 + enemyRect.X - 32 + 8) * zoom, ((tileIndex / 256) * 16 + enemyRect.Y - (enemyIndex - 1) * 64 - 40) * zoom, enemyRect.Width * zoom, enemyRect.Height * zoom));
-								}
-							}
-						};
-						
-						addEnemyRegion(previousObject);
-						addEnemyRegion(MainForm.currentObject);
-						
-						Level.objectsData[tileIndex] = (byte)MainForm.currentObject;
-						MainForm.SetChanges(true);
-						Invalidate(r);
-					}
-				}											
+				OnTileClick(this, tileIndex);
 			}
 			else if(e.Button == MouseButtons.Right)
 			{
 				Point coordinates = e.Location;
 				int sector = e.Location.X / 256 / zoom + (e.Location.Y / 256 / zoom) * 16;
-				if(sector != MainForm.currentSector)
+				if(sector != CurrentSector)
 				{
-					MainForm.currentSector = sector;
-					int warpTarget = Level.SearchWarp(MainForm.rom, MainForm.currentCourseId, MainForm.currentSector);
-					if(warpTarget != MainForm.currentWarp)
-					{
-						MainForm.currentWarp = warpTarget;
-						MainForm.LoadLevel(false);
-					}
-					else
-					{
-						Refresh();
-					}
+					CurrentSector = sector;
+					OnSectorChange(this, sector);
 				}
 			}
 		}
@@ -362,11 +327,12 @@ namespace WLEditor
 			}
 		}
 	
-		public void SetZoom(int zoom)
+		public void SetZoom(int zoomLevel)
 		{
-			Height = 512 * zoom;
-			Width = 4096 * zoom;		
-			Refresh();
+			Height = 512 * zoomLevel;
+			Width = 4096 * zoomLevel;	
+			zoom = zoomLevel;
+			Invalidate();
 		}
 		
 		public void ClearTileCache()
