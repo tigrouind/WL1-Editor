@@ -8,7 +8,7 @@ namespace WLEditor
 {
 	public class ObjectsPictureBox : PictureBox
 	{
-		public MainForm MainForm;				
+		public MainForm MainForm;			
 		
 		protected override void OnPaint(PaintEventArgs e)
 		{			

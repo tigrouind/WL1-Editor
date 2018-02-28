@@ -51,6 +51,7 @@
     <Compile Include="ComboboxItem.cs" />
     <Compile Include="DirectBitmap.cs" />
     <Compile Include="Level.cs" />
+    <Compile Include="LevelPictureBox.cs" />
     <Compile Include="MainForm.cs" />
     <Compile Include="MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>

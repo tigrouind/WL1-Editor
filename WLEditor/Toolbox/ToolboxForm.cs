@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 
 namespace WLEditor
@@ -8,30 +6,25 @@ namespace WLEditor
 	public partial class ToolboxForm : Form
 	{		
 		public MainForm MainForm;				
-		public Tiles8x8PictureBox tiles8x8PictureBox;
-		public Tiles16x16PictureBox tiles16x16PictureBox;
-		public ObjectsPictureBox objectsPictureBox;
+		public Tiles8x8PictureBox tiles8x8PictureBox  = new Tiles8x8PictureBox();	
+		public Tiles16x16PictureBox tiles16x16PictureBox = new Tiles16x16PictureBox();
+		public ObjectsPictureBox objectsPictureBox = new ObjectsPictureBox();
 				
 		public ToolboxForm()
 		{				
 			InitializeComponent();
 		}	
 		
-		public void InitializeControls(MainForm mainForm)
+		public void InitializeControls()
 		{
-			tiles8x8PictureBox = new Tiles8x8PictureBox();	
-			tiles8x8PictureBox.MainForm = mainForm;
+			tiles8x8PictureBox.MainForm = MainForm;
 			tiles8x8PictureBox.SetZoom(1);
 						
-			tiles16x16PictureBox = new Tiles16x16PictureBox();
-			tiles16x16PictureBox.MainForm = mainForm;
+			tiles16x16PictureBox.MainForm = MainForm;
 			tiles16x16PictureBox.SetZoom(1);
-						
-			objectsPictureBox = new ObjectsPictureBox();			
-			objectsPictureBox.MainForm = mainForm;			
-			objectsPictureBox.SetZoom(1);
-			
-			MainForm = mainForm;
+									
+			objectsPictureBox.MainForm = MainForm;			
+			objectsPictureBox.SetZoom(1);				
 		}
 		
 		public void SetZoom(int zoom)

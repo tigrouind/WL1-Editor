@@ -65,7 +65,7 @@ namespace WLEditor
 			this.bToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
 			this.LevelPanel = new System.Windows.Forms.Panel();
-			this.levelPictureBox = new System.Windows.Forms.PictureBox();
+			this.levelPictureBox = new LevelPictureBox();
 			this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.menuStrip1.SuspendLayout();
 			this.tableLayoutPanel1.SuspendLayout();
@@ -347,9 +347,6 @@ namespace WLEditor
 			this.levelPictureBox.Size = new System.Drawing.Size(4096, 512);
 			this.levelPictureBox.TabIndex = 2;
 			this.levelPictureBox.TabStop = false;
-			this.levelPictureBox.Paint += new System.Windows.Forms.PaintEventHandler(this.LevelPictureBoxPaint);
-			this.levelPictureBox.MouseDown += new System.Windows.Forms.MouseEventHandler(this.LevelPictureBoxMouseDown);
-			this.levelPictureBox.MouseMove += new System.Windows.Forms.MouseEventHandler(this.LevelPictureBoxMouseMove);
 			// 
 			// aboutToolStripMenuItem
 			// 
@@ -369,7 +366,6 @@ namespace WLEditor
 			this.Name = "MainForm";
 			this.Text = "WLEditor";
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainFormFormClosing);
-			this.Load += new System.EventHandler(this.MainFormLoad);
 			this.menuStrip1.ResumeLayout(false);
 			this.menuStrip1.PerformLayout();
 			this.tableLayoutPanel1.ResumeLayout(false);
@@ -395,7 +391,7 @@ namespace WLEditor
 		private System.Windows.Forms.MenuStrip menuStrip1;
 		private System.Windows.Forms.ComboBox levelComboBox;
 		private System.Windows.Forms.Panel LevelPanel;
-		private System.Windows.Forms.PictureBox levelPictureBox;
+		LevelPictureBox levelPictureBox;
 		private System.Windows.Forms.ToolStripMenuItem saveAsToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem paletteToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem classicToolStripMenuItem;

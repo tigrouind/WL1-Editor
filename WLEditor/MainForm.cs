@@ -1,53 +1,45 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
 using System.Linq;
 using System.Windows.Forms;
 
 namespace WLEditor
 {
-	/// <summary>
-	/// Description of MainForm.
-	/// </summary>
 	public partial class MainForm : Form
 	{
-		public Rom rom = new Rom();
-		public DirectBitmap levelTiles = new DirectBitmap(4096, 512);
+		public Rom rom = new Rom();		
 		public DirectBitmap tiles8x8 = new DirectBitmap(16 * 8, 16 * 8); 
 		public DirectBitmap tiles16x16 = new DirectBitmap(16 * 8, 16 * 16); 
 		public DirectBitmap tilesObjects = new DirectBitmap(16 * 9, 16);
 		public DirectBitmap tilesEnemies = new DirectBitmap(64, 64 * 6); 		
-		public DirectBitmap playerSprite = new DirectBitmap(64, 64 * 2); 
-		public bool[] invalidTiles = new bool[256 * 32];
+		public DirectBitmap playerSprite = new DirectBitmap(64, 64 * 2); 		
+		public ToolboxForm toolboxForm = new ToolboxForm();
+		
 		public int currentSector = -1;
 		public int currentTile = -1;
-		public int currentObject = -1;
+		public int currentObject = -1;		
 		public int currentCourseId = -1;
 		public int currentWarp = -1;
 		public string romFilePath;
 		public bool hasChanges;
 		public int zoom = 1;
-		public ToolboxForm toolboxForm;
-		
+				
 		public MainForm()
 		{
-			//
-			// The InitializeComponent() call is required for Windows Forms designer support.
-			//
-			InitializeComponent();
-			//
-			// TODO: Add constructor code after the InitializeComponent() call.
-			//					
+			InitializeComponent();						
+			
+			toolboxForm.FormClosing += (send, ev) => toolboxToolStripMenuItem.Checked = false;
+			toolboxForm.MainForm = this;
+			toolboxForm.InitializeControls();
+			
+			levelPictureBox.MainForm = this;			
 		}
 
-		void LoadLevel(bool reloadAll)
+		public void LoadLevel(bool reloadAll)
 		{
 			if(rom.IsLoaded && levelComboBox.SelectedItem != null)
 			{
-				Array.Clear(invalidTiles, 0, invalidTiles.Length);
+				levelPictureBox.ClearTileCache(); 
 				Level.DumpLevel(rom, currentCourseId, currentWarp, tiles8x8, tiles16x16, tilesEnemies, reloadAll, aToolStripMenuItem.Checked, bToolStripMenuItem.Checked, SelectedPaletteToolStripIndex());
 				while(currentObject >= 1 && currentObject <= 6 && !Level.enemiesAvailable[currentObject - 1]) currentObject--;
 				
@@ -109,7 +101,6 @@ namespace WLEditor
 				{
 					MessageBox.Show("Please select a valid WarioLand 1 rom", Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
 				}
-
 			}
 		}			
 
@@ -149,267 +140,9 @@ namespace WLEditor
 			Application.Exit();
 		}
 
-		void LevelPictureBoxPaint(object sender, PaintEventArgs e)
-		{
-			if(Level.levelData != null)
-			{
-				bool viewSectors = regionsToolStripMenuItem.Checked;
-				bool viewScroll = scrollRegionToolStripMenuItem.Checked;
-				bool viewObjects = objectsToolStripMenuItem.Checked;
-				bool switchA = aToolStripMenuItem.Checked;
-				bool switchB = bToolStripMenuItem.Checked;
-				bool viewColliders = collidersToolStripMenuItem.Checked;				
-				
-				StringFormat format = new StringFormat();
-				format.LineAlignment = StringAlignment.Center;
-				format.Alignment = StringAlignment.Center;	
-			
-				var sectorsToDraw = GetVisibleSectors(e.ClipRectangle);
-
-				using (Brush enemyBrush = new SolidBrush(Level.enemyPalette[2]))
-				using (Brush redBrush = new SolidBrush(Color.FromArgb(128, 255, 0, 0)))
-				using (Font font = new Font("Arial", 8 * zoom))				
-				using (Graphics g = Graphics.FromImage(levelTiles.Bitmap))
-				{
-					//draw tiles to cache
-					foreach (Point point in sectorsToDraw)
-					{
-						DrawTiles(point.X, point.Y, redBrush, g, e.ClipRectangle, viewColliders, switchA, switchB);
-					}
-
-					//draw tiles from cache
-					e.Graphics.InterpolationMode = InterpolationMode.NearestNeighbor;					
-					e.Graphics.PixelOffsetMode = PixelOffsetMode.Half;
-					e.Graphics.DrawImage(levelTiles.Bitmap, 0, 0, 4096 * zoom, 512 * zoom);					
-					
-					//sector objects (enemies, powerups)
-					if(viewObjects)
-					{
-						DrawSectorObjects(font, format, e, enemyBrush);			
-						
-						//wario position
-						int index = Level.warioRightFacing ? 0 : 1;
-						Rectangle playerRectangle = Level.playerRectangles[index];
-						Rectangle destRect = new Rectangle((Level.warioPosition % 8192 + playerRectangle.X - 32) * zoom, (Level.warioPosition / 8192 + playerRectangle.Y - 56 - index * 64) * zoom, playerRectangle.Width * zoom, playerRectangle.Height * zoom);
-						if (destRect.IntersectsWith(e.ClipRectangle))
-						{
-							e.Graphics.DrawImage(playerSprite.Bitmap, destRect, playerRectangle, GraphicsUnit.Pixel);
-						}
-					}
-					
-					//scroll
-					if(viewScroll)
-					{
-						foreach (Point point in sectorsToDraw)
-						{
-							DrawScrollInfo(point.X, point.Y, e.Graphics);
-						}
-					}
-
-					//sectors
-					if(viewSectors)
-					{			
-						foreach (Point point in sectorsToDraw)
-						{						
-							DrawSectorInfo(point.X, point.Y, e.Graphics, font, format);
-						}
-						
-						DrawSectorBorders(e.Graphics, e.ClipRectangle);
-						
-						if (currentSector != -1)
-						{
-							Rectangle sectorRect = new Rectangle((currentSector % 16) * 256 * zoom, (currentSector / 16) * 256 * zoom, 256 * zoom, 256 * zoom);
-							if (sectorRect.IntersectsWith(e.ClipRectangle))
-							{
-								using (Brush blue = new SolidBrush(Color.FromArgb(64, 0, 0, 255)))
-								{
-									e.Graphics.FillRectangle(blue, sectorRect);
-								}
-							}
-						}														
-					}
-				}			
-			}
-		}
-		
-		void DrawTiles(int x, int y, Brush brush, Graphics g, Rectangle clipRectangle, bool viewColliders, bool switchA, bool switchB)
-		{
-			for(int j = y * 16 ; j < (y + 1) * 16 ; j++)
-			{
-				for(int i = x * 16 ; i < (x + 1) * 16 ; i++)
-				{
-					Rectangle destRect = new Rectangle(i * 16 * zoom, j * 16 * zoom, 16 * zoom, 16 * zoom);
-
-					if(destRect.IntersectsWith(clipRectangle))
-					{
-						if(!invalidTiles[i + j * 256])
-						{
-							invalidTiles[i + j * 256] = true;
-							DrawTileToBitmap(i, j);
-
-							if(viewColliders)
-							{
-								byte tileIndex = Level.levelData[i + j * 256 + 0x1000];
-								if(Level.IsCollidable(Level.Switch(tileIndex, switchA, switchB)))
-								{
-									g.FillRectangle(brush, new Rectangle(destRect.X / zoom, destRect.Y / zoom, destRect.Width / zoom, destRect.Height / zoom));
-								}
-							}
-						}
-
-					}
-				}
-			}
-		}
-
-		void DrawTileToBitmap(int x, int y)
-		{
-			byte tileIndex = Level.levelData[x + y * 256 + 0x1000];
-			Point dest = new Point(x * 16, y * 16);
-			Point src = new Point((tileIndex % 8) * 16, (tileIndex / 8) * 16);
-
-			for(int i = 0 ; i < 16 ; i++)
-			{
-				Array.Copy(tiles16x16.Bits, src.X + (src.Y + i) * tiles16x16.Width, levelTiles.Bits, dest.X + (dest.Y + i) * levelTiles.Width, 16);
-			}
-		}
-
-		void DrawSectorObjects(Font font, StringFormat format, PaintEventArgs e, Brush brush)
-		{
-			for(int j = 0 ; j < 32 ; j++)
-			{
-				for(int i = 0 ; i < 256 ; i++)
-				{
-					byte data = Level.objectsData[i + j * 256];
-					if(data > 0)
-					{
-						Rectangle destRect = new Rectangle(i * 16 * zoom, j * 16 * zoom, 16 * zoom, 16 * zoom);
-						if(destRect.IntersectsWith(e.ClipRectangle))
-						{
-							//objects						
-							e.Graphics.FillRectangle(brush, destRect);
-							
-							if(data > 6)
-							{
-								e.Graphics.DrawImage(tilesObjects.Bitmap, destRect, new Rectangle((data - 7) * 16, 0, 16, 16), GraphicsUnit.Pixel);								
-							}
-							else if(Level.loadedSprites[data - 1] == Rectangle.Empty)
-							{
-								e.Graphics.DrawString(data.ToString(), font, Brushes.White, (i * 16 + 8) * zoom, (j * 16 + 8) * zoom, format);								
-							}
-						}
-						
-						//objects sprites																	
-						if(data <= 6 && Level.loadedSprites[data - 1] != Rectangle.Empty)
-						{
-							Rectangle enemyRect = Level.loadedSprites[data - 1];
-							destRect = new Rectangle((i * 16 + enemyRect.X - 32 + 8) * zoom, (j * 16 + enemyRect.Y - (data - 1) * 64 - 40) * zoom, enemyRect.Width * zoom, enemyRect.Height * zoom);							
-							if(destRect.IntersectsWith(e.ClipRectangle))
-							{																												
-								e.Graphics.DrawImage(tilesEnemies.Bitmap, destRect, enemyRect, GraphicsUnit.Pixel);
-							}
-						}			
-					}														
-				}
-			}
-		}
-		
-		void DrawScrollInfo(int x, int y, Graphics g)
-		{
-			int drawSector = x + y * 16;
-			
-			byte scroll = Level.scrollData[drawSector];
-			if ((scroll & 2) == 2)
-				g.FillRectangle(Brushes.Yellow, x * 256 * zoom, y * 256 * zoom, 6 * zoom, 256 * zoom);
-
-			if ((scroll & 1) == 1)
-				g.FillRectangle(Brushes.Yellow, ((x+1) * 256 - 6) * zoom, y * 256 * zoom, 6 * zoom, 256 * zoom);
-		}
-		
-		void DrawSectorInfo(int x, int y, Graphics g, Font font, StringFormat format)
-		{
-			int drawSector = x + y * 16;
-			
-			g.FillRectangle(Brushes.Blue, x * 256 * zoom, y * 256 * zoom, 16 * zoom, 16 * zoom);
-			g.DrawString(drawSector.ToString("D2"), font, Brushes.White, (x * 256 + 8) * zoom, (y * 256 + 8) * zoom, format);
-											
-			int sectorTarget = Level.warps[drawSector];
-			if(sectorTarget != 255)
-			{
-				string text = GetWarpName(sectorTarget);
-				var result = TextRenderer.MeasureText(text, font);
-				
-				g.FillRectangle(Brushes.Blue,  (x * 256 + 20) * zoom, y * 256 * zoom, result.Width, 16 * zoom);
-				g.DrawString(text, font, Brushes.White, (x * 256) * zoom + result.Width / 2 + 20 * zoom, (y * 256 + 8) * zoom, format);
-			}
-			
-		}
-		
-		void DrawSectorBorders(Graphics g, Rectangle clipRectangle)
-		{
-			//draw sector borders
-			using (Pen penBlue = new Pen(Color.Blue, 2.0f * zoom))
-			{						
-				penBlue.DashPattern = new [] { 5.0f, 1.0f };
-				
-				for(int i = 1 ; i < 16 ; i++)
-				{
-					int x = i * 256 * zoom;
-					Rectangle lineRect = new Rectangle(x - zoom, 0, 2 * zoom, 512 * zoom);					
-					if(lineRect.IntersectsWith(clipRectangle))
-					{
-						g.DrawLine(penBlue, x, 0, x, 512 * zoom);
-					}
-				}
-										
-				g.DrawLine(penBlue, 0, 256 * zoom, 4096 * zoom, 256 * zoom);					
-			}			
-		}
-		
-		List<Point> GetVisibleSectors(Rectangle clipRectangle)
-		{
-			List<Point> sectors = new List<Point>();
-			
-			for(int y = 0 ; y < 2 ; y++)
-			{
-				for(int x = 0 ; x < 16 ; x++)
-				{
-					Rectangle destRect = new Rectangle(x * 256 * zoom, y * 256 * zoom, 256 * zoom, 256 * zoom);
-					if(destRect.IntersectsWith(clipRectangle))
-					{
-						sectors.Add(new Point(x, y));
-					}
-				}
-			}
-			
-			return sectors;
-		}
-
-		string GetWarpName(int sectorTarget)
-		{
-			string warpText;
-			switch(sectorTarget)
-			{
-				case 32:
-					warpText = "EXIT MAP";
-					break;
-				case 33:
-					warpText = "EXIT A";
-					break;
-				case 34:
-					warpText = "EXIT B";
-					break;
-				default:
-					warpText = "W" + sectorTarget.ToString("D2");
-					break;
-			}
-
-			return warpText;
-		}
-
 		void CollidersToolStripMenuItemClick(object sender, EventArgs e)
 		{
-			Array.Clear(invalidTiles, 0, invalidTiles.Length);
+			levelPictureBox.ClearTileCache();
 			levelPictureBox.Refresh();
 		}
 
@@ -481,7 +214,7 @@ namespace WLEditor
 			}
 		}
 		
-		void SetChanges(bool hasChanges)
+		public void SetChanges(bool hasChanges)
 		{			
 			this.hasChanges = hasChanges;
 			saveToolStripMenuItem.Enabled = hasChanges;
@@ -491,82 +224,7 @@ namespace WLEditor
 		{
 			SaveChanges();
 		}
-
-		void LevelPictureBoxMouseDown(object sender, MouseEventArgs e)
-		{
-			if(e.Button == MouseButtons.Left)
-			{
-				int tileIndex = e.Location.X / 16 / zoom + (e.Location.Y / 16 / zoom) * 256;
-				Region r = new Region(new Rectangle((tileIndex % 256) * 16 * zoom, (tileIndex / 256) * 16 * zoom, 16 * zoom, 16 * zoom));			
-				int selectedPanelIndex = toolboxForm.GetSelectedPanelIndex();
-				
-				if(currentTile != -1 && toolboxForm.Visible && selectedPanelIndex == 0)
-				{
-					int previousTile = Level.levelData[tileIndex + 0x1000];
-					if(previousTile != currentTile)
-					{
-						Level.levelData[tileIndex + 0x1000] = (byte)currentTile;
-						invalidTiles[tileIndex] = false;
-						SetChanges(true);
-						levelPictureBox.Invalidate(r);
-					}
-				}
-
-				if(currentObject != -1 && objectsToolStripMenuItem.Checked && toolboxForm.Visible && selectedPanelIndex == 2)
-				{																		
-					int previousObject = Level.objectsData[tileIndex];
-					if(previousObject != currentObject)
-					{
-						Action<int> addEnemyRegion = enemyIndex =>
-						{
-							if(enemyIndex >= 1 && enemyIndex <= 6)
-							{
-								Rectangle enemyRect = Level.loadedSprites[enemyIndex - 1];
-								if(enemyRect != Rectangle.Empty)
-								{						
-									r.Union(new Rectangle(((tileIndex % 256) * 16 + enemyRect.X - 32 + 8) * zoom, ((tileIndex / 256) * 16 + enemyRect.Y - (enemyIndex - 1) * 64 - 40) * zoom, enemyRect.Width * zoom, enemyRect.Height * zoom));
-								}
-							}
-						};
-						
-						addEnemyRegion(previousObject);
-						addEnemyRegion(currentObject);
-						
-						Level.objectsData[tileIndex] = (byte)currentObject;
-						SetChanges(true);
-						levelPictureBox.Invalidate(r);
-					}
-				}											
-			}
-			else if(e.Button == MouseButtons.Right)
-			{
-				Point coordinates = e.Location;
-				int sector = e.Location.X / 256 / zoom + (e.Location.Y / 256 / zoom) * 16;
-				if(sector != currentSector)
-				{
-					currentSector = sector;
-					int warpTarget = Level.SearchWarp(rom, currentCourseId, currentSector);
-					if(warpTarget != currentWarp)
-					{
-						currentWarp = warpTarget;
-						LoadLevel(false);
-					}
-					else
-					{
-						levelPictureBox.Refresh();
-					}
-				}
-			}
-		}
-
-		void LevelPictureBoxMouseMove(object sender, MouseEventArgs e)
-		{
-			if (levelPictureBox.ClientRectangle.Contains(e.Location))
-			{
-				LevelPictureBoxMouseDown(sender, e);
-			}
-		}
-
+		
 		void MainFormFormClosing(object sender, FormClosingEventArgs e)
 		{
 			e.Cancel = !AskForSavingChanges();
@@ -624,11 +282,8 @@ namespace WLEditor
 			zoom200ToolStripMenuItem.Checked = zoomLevel == 2;	
 			zoom300ToolStripMenuItem.Checked = zoomLevel == 3;	
 			zoom400ToolStripMenuItem.Checked = zoomLevel == 4;	
-			
-			levelPictureBox.Height = 512 * zoom;
-			levelPictureBox.Width = 4096 * zoom;		
-			levelPictureBox.Refresh();
-			
+						
+			levelPictureBox.SetZoom(zoomLevel);
 			toolboxForm.SetZoom(zoomLevel);			
 		}
 						
@@ -650,14 +305,7 @@ namespace WLEditor
 		void Zoom400ToolStripMenuItemClick(object sender, EventArgs e)
 		{
 			SetZoomLevel(4);
-		}
-		
-		void MainFormLoad(object sender, EventArgs e)
-		{
-			toolboxForm = new ToolboxForm();
-			toolboxForm.InitializeControls(this);
-			toolboxForm.FormClosing += (send, ev) => toolboxToolStripMenuItem.Checked = false;
-		}				
+		}			
 		
 		void ToolboxToolStripMenuItemCheckedChanged(object sender, EventArgs e)
 		{
@@ -675,10 +323,60 @@ namespace WLEditor
 					toolboxForm.Hide();	
 				}
 			}		
-		}
+		}		
+		
 		void AboutToolStripMenuItemClick(object sender, EventArgs e)
 		{
-			MessageBox.Show(this.Text+" v0.66\r\nDate : 27.02.2018.\r\nContact me : tigrou.ind@gmail.com");
-		}		
+			MessageBox.Show(Text+" v0.66\r\nDate : 27.02.2018.\r\nContact me : tigrou.ind@gmail.com");
+		}
+
+		public bool ViewRegions
+		{
+			get
+			{
+				return regionsToolStripMenuItem.Checked;
+			}			
+		}
+		
+		public bool ViewScroll
+		{
+			get			
+			{
+				return scrollRegionToolStripMenuItem.Checked;	
+			}			
+		}
+		
+		public bool ViewObjects
+		{
+			get
+			{
+				return objectsToolStripMenuItem.Checked; 
+			}
+			
+		}
+		
+		public bool ViewSwitchA
+		{
+			get
+			{			
+				return aToolStripMenuItem.Checked;
+			}
+		}
+		
+		public bool ViewSwitchB
+		{
+			get
+			{
+				return bToolStripMenuItem.Checked;
+			}
+		}
+		
+		public bool ViewColliders
+		{
+			get
+			{
+				return collidersToolStripMenuItem.Checked;			
+			}
+		}	
 	}
 }
