@@ -7,12 +7,7 @@ namespace WLEditor
 {
 	public partial class MainForm : Form
 	{
-		public Rom rom = new Rom();		
-		public DirectBitmap tiles8x8 = new DirectBitmap(16 * 8, 16 * 8); 
-		public DirectBitmap tiles16x16 = new DirectBitmap(16 * 8, 16 * 16); 
-		public DirectBitmap tilesObjects = new DirectBitmap(16 * 9, 16);
-		public DirectBitmap tilesEnemies = new DirectBitmap(64, 64 * 6); 		
-		public DirectBitmap playerSprite = new DirectBitmap(64, 64 * 2); 		
+		public Rom rom = new Rom();		 		
 		public ToolboxForm toolboxForm = new ToolboxForm();
 		
 		public int currentSector = -1;
@@ -40,7 +35,7 @@ namespace WLEditor
 			if(rom.IsLoaded && levelComboBox.SelectedItem != null)
 			{
 				levelPictureBox.ClearTileCache(); 
-				Level.DumpLevel(rom, currentCourseId, currentWarp, tiles8x8, tiles16x16, tilesEnemies, reloadAll, aToolStripMenuItem.Checked, bToolStripMenuItem.Checked, SelectedPaletteToolStripIndex());
+				Level.DumpLevel(rom, currentCourseId, currentWarp, reloadAll, aToolStripMenuItem.Checked, bToolStripMenuItem.Checked, SelectedPaletteToolStripIndex());
 				while(currentObject >= 1 && currentObject <= 6 && !Level.enemiesAvailable[currentObject - 1]) currentObject--;
 				
 				levelPictureBox.Refresh();				
@@ -84,8 +79,8 @@ namespace WLEditor
 				{
 					rom = newRom;
 					LoadLevelCombobox();
-					Level.DumpBonusSprites(rom, tiles8x8, tilesObjects);
-					Level.DumpPlayerSprite(rom, tiles8x8, playerSprite);
+					Level.DumpBonusSprites(rom);
+					Level.DumpPlayerSprite(rom);
 					romFilePath = openFileDialog1.FileName;
 
 					if(levelComboBox.SelectedIndex == 0)

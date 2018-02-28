@@ -58,7 +58,7 @@ namespace WLEditor
 						Rectangle destRect = new Rectangle((Level.warioPosition % 8192 + playerRectangle.X - 32) * zoom, (Level.warioPosition / 8192 + playerRectangle.Y - 56 - index * 64) * zoom, playerRectangle.Width * zoom, playerRectangle.Height * zoom);
 						if (destRect.IntersectsWith(e.ClipRectangle))
 						{
-							e.Graphics.DrawImage(MainForm.playerSprite.Bitmap, destRect, playerRectangle, GraphicsUnit.Pixel);
+							e.Graphics.DrawImage(Level.playerSprite.Bitmap, destRect, playerRectangle, GraphicsUnit.Pixel);
 						}
 					}
 					
@@ -137,7 +137,7 @@ namespace WLEditor
 
 			for(int i = 0 ; i < 16 ; i++)
 			{
-				Array.Copy(MainForm.tiles16x16.Bits, src.X + (src.Y + i) * MainForm.tiles16x16.Width, levelTiles.Bits, dest.X + (dest.Y + i) * levelTiles.Width, 16);
+				Array.Copy(Level.tiles16x16.Bits, src.X + (src.Y + i) * Level.tiles16x16.Width, levelTiles.Bits, dest.X + (dest.Y + i) * levelTiles.Width, 16);
 			}
 		}
 
@@ -160,7 +160,7 @@ namespace WLEditor
 							
 							if(data > 6)
 							{
-								e.Graphics.DrawImage(MainForm.tilesObjects.Bitmap, destRect, new Rectangle((data - 7) * 16, 0, 16, 16), GraphicsUnit.Pixel);								
+								e.Graphics.DrawImage(Level.tilesObjects.Bitmap, destRect, new Rectangle((data - 7) * 16, 0, 16, 16), GraphicsUnit.Pixel);								
 							}
 							else if(Level.loadedSprites[data - 1] == Rectangle.Empty)
 							{
@@ -175,7 +175,7 @@ namespace WLEditor
 							destRect = new Rectangle((i * 16 + enemyRect.X - 32 + 8) * zoom, (j * 16 + enemyRect.Y - (data - 1) * 64 - 40) * zoom, enemyRect.Width * zoom, enemyRect.Height * zoom);							
 							if(destRect.IntersectsWith(e.ClipRectangle))
 							{																												
-								e.Graphics.DrawImage(MainForm.tilesEnemies.Bitmap, destRect, enemyRect, GraphicsUnit.Pixel);
+								e.Graphics.DrawImage(Level.tilesEnemies.Bitmap, destRect, enemyRect, GraphicsUnit.Pixel);
 							}
 						}			
 					}														

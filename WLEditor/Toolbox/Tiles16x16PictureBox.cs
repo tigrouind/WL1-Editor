@@ -17,7 +17,7 @@ namespace WLEditor
 				
 				e.Graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
 				e.Graphics.PixelOffsetMode = PixelOffsetMode.Half;
-				e.Graphics.DrawImage(MainForm.tiles16x16.Bitmap, 0, 0, 128 * zoom, 256 * zoom);
+				e.Graphics.DrawImage(Level.tiles16x16.Bitmap, 0, 0, 128 * zoom, 256 * zoom);
 	
 				if(MainForm.currentTile != -1)
 				{

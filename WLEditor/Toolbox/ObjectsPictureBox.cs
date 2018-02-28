@@ -51,7 +51,7 @@ namespace WLEditor
 									Rectangle enemyRect = Level.loadedSprites[index - 1];
 									if(enemyRect != Rectangle.Empty)
 									{									
-										e.Graphics.DrawImage(MainForm.tilesEnemies.Bitmap, destRect, new Rectangle(enemyRect.X - 16 + enemyRect.Width / 2, enemyRect.Y - 16 + enemyRect.Height / 2, 32, 32), GraphicsUnit.Pixel);
+										e.Graphics.DrawImage(Level.tilesEnemies.Bitmap, destRect, new Rectangle(enemyRect.X - 16 + enemyRect.Width / 2, enemyRect.Y - 16 + enemyRect.Height / 2, 32, 32), GraphicsUnit.Pixel);
 									}	
 									else
 									{
@@ -61,7 +61,7 @@ namespace WLEditor
 							}
 							else
 							{
-								e.Graphics.DrawImage(MainForm.tilesObjects.Bitmap, new Rectangle((x + 8) * zoom, (y + 8) * zoom, 16 * zoom, 16 * zoom), new Rectangle((index - 7) * 16, 0, 16, 16),  GraphicsUnit.Pixel);
+								e.Graphics.DrawImage(Level.tilesObjects.Bitmap, new Rectangle((x + 8) * zoom, (y + 8) * zoom, 16 * zoom, 16 * zoom), new Rectangle((index - 7) * 16, 0, 16, 16),  GraphicsUnit.Pixel);
 							}
 					    }						
 					}
