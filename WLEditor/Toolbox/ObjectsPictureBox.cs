@@ -25,8 +25,7 @@ namespace WLEditor
 				using (Font font = new Font("Arial", 16 * zoom))
 				{
 					e.Graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
-					e.Graphics.PixelOffsetMode = PixelOffsetMode.Half;
-					
+					e.Graphics.PixelOffsetMode = PixelOffsetMode.Half;					
 					e.Graphics.FillRectangle(enemyBrush, 0, 0, Width, Height);
 					
 					for(int j = 0 ; j < 16 ; j++)

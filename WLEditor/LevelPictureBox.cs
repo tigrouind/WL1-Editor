@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
@@ -18,8 +19,9 @@ namespace WLEditor
 		public bool ShowColliders;
 		public int SwitchMode;
 		public int CurrentSector = -1;		
-		public EventHandler<int> OnTileClick;
-		public EventHandler<int> OnSectorChange;
+		
+		public event EventHandler<int> TileMouseDown;		
+		public event EventHandler<int> SectorChanged;
 				
 		protected override void OnPaint(PaintEventArgs e)
 		{			
@@ -305,7 +307,7 @@ namespace WLEditor
 			if(e.Button == MouseButtons.Left)
 			{
 				int tileIndex = e.Location.X / 16 / zoom + (e.Location.Y / 16 / zoom) * 256;
-				OnTileClick(this, tileIndex);
+				TileMouseDown(this, tileIndex);
 			}
 			else if(e.Button == MouseButtons.Right)
 			{
@@ -314,7 +316,7 @@ namespace WLEditor
 				if(sector != CurrentSector)
 				{
 					CurrentSector = sector;
-					OnSectorChange(this, sector);
+					SectorChanged(this, sector);
 				}
 			}
 		}

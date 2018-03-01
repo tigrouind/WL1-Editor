@@ -2,9 +2,6 @@
 
 namespace WLEditor
 {
-	/// <summary>
-	/// Description of ComboboxItem.
-	/// </summary>
 	public class ComboboxItem
 	{
 		public string Text { get; set; }

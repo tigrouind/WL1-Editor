@@ -12,34 +12,33 @@ namespace WLEditor
 			
 		int currentCourseId = -1;
 		int currentWarp = -1;
+		int paletteIndex;
 		string romFilePath;
 		bool hasChanges;
-		int zoom = 1;
 				
 		public MainForm()
 		{
-			InitializeComponent();						
-			
-			toolboxForm.FormClosing += ToolBoxFormClosing;
-			
-			levelPictureBox.OnTileClick += LevelPictureBoxTileClick;
-			levelPictureBox.OnSectorChange += LevelPictureBoxSectorChanged;
+			InitializeComponent();									
+			toolboxForm.FormClosing += ToolBoxFormClosing;			
 		}
 
 		public void LoadLevel(bool reloadAll)
 		{
 			if(rom.IsLoaded && levelComboBox.SelectedItem != null)
-			{
-				levelPictureBox.ClearTileCache(); 
-				Level.DumpLevel(rom, currentCourseId, currentWarp, reloadAll, levelPictureBox.SwitchMode, SelectedPaletteToolStripIndex());
+			{				
+				Level.DumpLevel(rom, currentCourseId, currentWarp, reloadAll, levelPictureBox.SwitchMode, paletteIndex);
 				
+				levelPictureBox.ClearTileCache();
+				levelPictureBox.Invalidate();	
+				
+				//make sure current object can still be selected, otherwise select first available previous object
 				int currentObject = toolboxForm.CurrentObject;
-				while(currentObject >= 1 && currentObject <= 6 && !Level.enemiesAvailable[currentObject - 1]) currentObject--;
-				toolboxForm.CurrentObject = currentObject;
-				
-				levelPictureBox.Invalidate();				
-				toolboxForm.Invalidate(true);
-				toolboxToolStripMenuItem.Enabled = true;
+				while(currentObject >= 1 && currentObject <= 6 && !Level.enemiesAvailable[currentObject - 1])
+				{
+					currentObject--;
+				}
+				toolboxForm.CurrentObject = currentObject;									
+				toolboxForm.Invalidate(true);				
 			}
 		}			
 
@@ -87,6 +86,7 @@ namespace WLEditor
 					else
 						levelComboBox.SelectedIndex = 0;
 					
+					toolboxToolStripMenuItem.Enabled = true;
 					saveAsToolStripMenuItem.Enabled = true;
 					levelComboBox.Visible = true;
 					LevelPanel.Visible = true;					
@@ -146,30 +146,27 @@ namespace WLEditor
 
 		void NoneToolStripMenuItemClick(object sender, EventArgs e)
 		{
-			levelPictureBox.SwitchMode = 0;
-			SetSwitchMode(noneToolStripMenuItem);
-			LoadLevel(false);
+			SetSwitchMode(0);
 		}
 
 		void AToolStripMenuItemClick(object sender, EventArgs e)
 		{
-			levelPictureBox.SwitchMode = 1;
-			SetSwitchMode(aToolStripMenuItem);
-			LoadLevel(false);
+			SetSwitchMode(1);			
 		}
 
 		void BToolStripMenuItemClick(object sender, EventArgs e)
-		{
-			levelPictureBox.SwitchMode = 2;
-			SetSwitchMode(bToolStripMenuItem);
-			LoadLevel(false);
+		{			
+			SetSwitchMode(2);
 		}
 
-		void SetSwitchMode(ToolStripItem toolStrip)
+		void SetSwitchMode(int switchMode)
 		{
-			noneToolStripMenuItem.Checked = toolStrip == noneToolStripMenuItem;
-			aToolStripMenuItem.Checked = toolStrip == aToolStripMenuItem;
-			bToolStripMenuItem.Checked = toolStrip == bToolStripMenuItem;
+			noneToolStripMenuItem.Checked = switchMode == 0;
+			aToolStripMenuItem.Checked = switchMode == 1;
+			bToolStripMenuItem.Checked = switchMode == 2;			
+			levelPictureBox.SwitchMode = switchMode;
+			
+			LoadLevel(false);
 		}
 
 		bool SaveChanges()
@@ -245,40 +242,31 @@ namespace WLEditor
 
 		void ClassicToolStripMenuItemClick(object sender, EventArgs e)
 		{
-			SetPalette(classicToolStripMenuItem);
-			LoadLevel(false);
+			SetPalette(0);			
 		}
 
 		void BlackWhiteToolStripMenuItemClick(object sender, EventArgs e)
 		{
-			SetPalette(blackWhiteToolStripMenuItem);
-			LoadLevel(false);
+			SetPalette(1);
 		}
 
 		void AutumnToolStripMenuItemClick(object sender, EventArgs e)
 		{
-			SetPalette(autumnToolStripMenuItem);
+			SetPalette(2);
+		}
+		
+		void SetPalette(int index)
+		{
+			paletteIndex = index;
+			classicToolStripMenuItem.Checked = index == 0;
+			blackWhiteToolStripMenuItem.Checked = index == 1;
+			autumnToolStripMenuItem.Checked = index == 2;
+			
 			LoadLevel(false);
-		}
-
-		int SelectedPaletteToolStripIndex()
-		{
-			if(classicToolStripMenuItem.Checked) return 0;
-			if(blackWhiteToolStripMenuItem.Checked) return 1;
-			return 2;
-		}
-
-		void SetPalette(ToolStripMenuItem toolStrip)
-		{
-			classicToolStripMenuItem.Checked = toolStrip == classicToolStripMenuItem;
-			blackWhiteToolStripMenuItem.Checked = toolStrip == blackWhiteToolStripMenuItem;
-			autumnToolStripMenuItem.Checked = toolStrip == autumnToolStripMenuItem;
 		}
 		
 		void SetZoomLevel(int zoomLevel)
 		{
-			zoom = zoomLevel;
-			
 			zoom100ToolStripMenuItem.Checked = zoomLevel == 1;
 			zoom200ToolStripMenuItem.Checked = zoomLevel == 2;	
 			zoom300ToolStripMenuItem.Checked = zoomLevel == 3;	
@@ -331,33 +319,36 @@ namespace WLEditor
 			toolboxToolStripMenuItem.Checked = false;
 		}
 		
-		void LevelPictureBoxTileClick(object sender, int tileIndex)
+		void LevelPictureBoxTileMouseDown(object sender, int tileIndex)
 		{
-			int selectedPanelIndex = toolboxForm.SelectedPanelIndex;
-			int currentTile = toolboxForm.CurrentTile;
-			int currentObject = toolboxForm.CurrentObject;
-			
-			if(currentTile != -1 && toolboxForm.Visible && selectedPanelIndex == 0)
+			if(toolboxForm.Visible)
 			{
-				int previousTile = Level.levelData[tileIndex + 0x1000];
-		        if(previousTile != currentTile)
-		        {
-		        	Level.levelData[tileIndex + 0x1000] = (byte)currentTile;
-		        	levelPictureBox.InvalidateTile(tileIndex);
-		            SetChanges(true);
-		        }						
-			}
-			
-			if(currentObject != -1 && levelPictureBox.ShowObjects && toolboxForm.Visible && selectedPanelIndex == 2)
-			{	
-				int previousObject = Level.objectsData[tileIndex];
-				if(previousObject != currentObject)
+				int selectedPanelIndex = toolboxForm.SelectedPanelIndex;
+				int currentTile = toolboxForm.CurrentTile;
+				int currentObject = toolboxForm.CurrentObject;
+				
+				if(currentTile != -1 &&  selectedPanelIndex == 0)
 				{
-					Level.objectsData[tileIndex] = (byte)currentObject;
-					levelPictureBox.InvalidateObject(tileIndex, currentObject, previousObject);
-					SetChanges(true);
-				}				
-			}
+					int previousTile = Level.levelData[tileIndex + 0x1000];
+			        if(previousTile != currentTile)
+			        {
+			        	Level.levelData[tileIndex + 0x1000] = (byte)currentTile;
+			        	levelPictureBox.InvalidateTile(tileIndex);
+			            SetChanges(true);
+			        }						
+				}
+				
+				if(currentObject != -1 && levelPictureBox.ShowObjects && selectedPanelIndex == 2)
+				{	
+					int previousObject = Level.objectsData[tileIndex];
+					if(previousObject != currentObject)
+					{
+						Level.objectsData[tileIndex] = (byte)currentObject;
+						levelPictureBox.InvalidateObject(tileIndex, currentObject, previousObject);
+						SetChanges(true);
+					}				
+				}	
+			}			
 		}
 		
 		void LevelPictureBoxSectorChanged(object sender, int currentSector)
