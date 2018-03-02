@@ -55,6 +55,8 @@ namespace WLEditor
 			this.zoom200ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.zoom300ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.zoom400ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.zoomInToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.zoomOutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.paletteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.classicToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.blackWhiteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -67,6 +69,7 @@ namespace WLEditor
 			this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
 			this.LevelPanel = new System.Windows.Forms.Panel();
 			this.levelPictureBox = new WLEditor.LevelPictureBox();
+			this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
 			this.menuStrip1.SuspendLayout();
 			this.tableLayoutPanel1.SuspendLayout();
 			this.LevelPanel.SuspendLayout();
@@ -163,6 +166,7 @@ namespace WLEditor
 			this.toolboxToolStripMenuItem.Enabled = false;
 			this.toolboxToolStripMenuItem.Name = "toolboxToolStripMenuItem";
 			this.toolboxToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
+			this.toolboxToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F1;
 			this.toolboxToolStripMenuItem.Text = "Toolbox";
 			this.toolboxToolStripMenuItem.CheckedChanged += new System.EventHandler(this.ToolboxToolStripMenuItemCheckedChanged);
 			// 
@@ -173,6 +177,7 @@ namespace WLEditor
 			this.regionsToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.regionsToolStripMenuItem.Name = "regionsToolStripMenuItem";
 			this.regionsToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
+			this.regionsToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F2;
 			this.regionsToolStripMenuItem.Text = "Sectors";
 			this.regionsToolStripMenuItem.Click += new System.EventHandler(this.RegionsToolStripMenuItemClick);
 			// 
@@ -183,6 +188,7 @@ namespace WLEditor
 			this.objectsToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.objectsToolStripMenuItem.Name = "objectsToolStripMenuItem";
 			this.objectsToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
+			this.objectsToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F3;
 			this.objectsToolStripMenuItem.Text = "Objects";
 			this.objectsToolStripMenuItem.Click += new System.EventHandler(this.ObjectsToolStripMenuItemClick);
 			// 
@@ -193,6 +199,7 @@ namespace WLEditor
 			this.scrollRegionToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.scrollRegionToolStripMenuItem.Name = "scrollRegionToolStripMenuItem";
 			this.scrollRegionToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
+			this.scrollRegionToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F4;
 			this.scrollRegionToolStripMenuItem.Text = "Scroll boundaries";
 			this.scrollRegionToolStripMenuItem.Click += new System.EventHandler(this.ScrollRegionToolStripMenuItemClick);
 			// 
@@ -201,6 +208,7 @@ namespace WLEditor
 			this.collidersToolStripMenuItem.CheckOnClick = true;
 			this.collidersToolStripMenuItem.Name = "collidersToolStripMenuItem";
 			this.collidersToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
+			this.collidersToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F5;
 			this.collidersToolStripMenuItem.Text = "Colliders";
 			this.collidersToolStripMenuItem.Click += new System.EventHandler(this.CollidersToolStripMenuItemClick);
 			// 
@@ -210,7 +218,10 @@ namespace WLEditor
 			this.zoom100ToolStripMenuItem,
 			this.zoom200ToolStripMenuItem,
 			this.zoom300ToolStripMenuItem,
-			this.zoom400ToolStripMenuItem});
+			this.zoom400ToolStripMenuItem,
+			this.toolStripMenuItem1,
+			this.zoomInToolStripMenuItem,
+			this.zoomOutToolStripMenuItem});
 			this.zoomToolStripMenuItem.Name = "zoomToolStripMenuItem";
 			this.zoomToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
 			this.zoomToolStripMenuItem.Text = "Zoom";
@@ -244,6 +255,22 @@ namespace WLEditor
 			this.zoom400ToolStripMenuItem.Size = new System.Drawing.Size(102, 22);
 			this.zoom400ToolStripMenuItem.Text = "400%";
 			this.zoom400ToolStripMenuItem.Click += new System.EventHandler(this.Zoom400ToolStripMenuItemClick);
+			// 
+			// zoomInToolStripMenuItem
+			// 
+			this.zoomInToolStripMenuItem.Name = "zoomInToolStripMenuItem";
+			this.zoomInToolStripMenuItem.ShortcutKeyDisplayString = "Ctrl +";
+			this.zoomInToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
+			this.zoomInToolStripMenuItem.Text = "Zoom in";
+			this.zoomInToolStripMenuItem.Click += new System.EventHandler(this.ZoomInToolStripMenuItemClick);
+			// 
+			// zoomOutToolStripMenuItem
+			// 
+			this.zoomOutToolStripMenuItem.Name = "zoomOutToolStripMenuItem";
+			this.zoomOutToolStripMenuItem.ShortcutKeyDisplayString = "Ctrl -";
+			this.zoomOutToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
+			this.zoomOutToolStripMenuItem.Text = "Zoom out";
+			this.zoomOutToolStripMenuItem.Click += new System.EventHandler(this.ZoomOutToolStripMenuItemClick);
 			// 
 			// paletteToolStripMenuItem
 			// 
@@ -357,6 +384,11 @@ namespace WLEditor
 			this.levelPictureBox.TileMouseDown += new System.EventHandler<int>(this.LevelPictureBoxTileMouseDown);
 			this.levelPictureBox.SectorChanged += new System.EventHandler<int>(this.LevelPictureBoxSectorChanged);
 			// 
+			// toolStripMenuItem1
+			// 
+			this.toolStripMenuItem1.Name = "toolStripMenuItem1";
+			this.toolStripMenuItem1.Size = new System.Drawing.Size(158, 6);
+			// 
 			// MainForm
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -407,6 +439,9 @@ namespace WLEditor
 		private System.Windows.Forms.ToolStripMenuItem zoom400ToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem toolboxToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem zoomInToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem zoomOutToolStripMenuItem;
+		private System.Windows.Forms.ToolStripSeparator toolStripMenuItem1;
 
 			
 	

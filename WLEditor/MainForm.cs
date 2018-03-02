@@ -15,6 +15,7 @@ namespace WLEditor
 		int paletteIndex;
 		string romFilePath;
 		bool hasChanges;
+		int zoom = 1;
 				
 		public MainForm()
 		{
@@ -267,6 +268,7 @@ namespace WLEditor
 		
 		void SetZoomLevel(int zoomLevel)
 		{
+			zoom = zoomLevel;
 			zoom100ToolStripMenuItem.Checked = zoomLevel == 1;
 			zoom200ToolStripMenuItem.Checked = zoomLevel == 2;	
 			zoom300ToolStripMenuItem.Checked = zoomLevel == 3;	
@@ -294,7 +296,38 @@ namespace WLEditor
 		void Zoom400ToolStripMenuItemClick(object sender, EventArgs e)
 		{
 			SetZoomLevel(4);
-		}			
+		}
+		
+		protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+		{
+		    if (keyData == (Keys.Control | Keys.Add))
+		    {
+		    	ZoomInToolStripMenuItemClick(this, EventArgs.Empty);
+		        return true;
+		    }
+		    if (keyData == (Keys.Control | Keys.Subtract))
+		    {
+		        ZoomOutToolStripMenuItemClick(this, EventArgs.Empty);
+		        return true;
+		    }
+		    return base.ProcessCmdKey(ref msg, keyData);
+		}
+		
+		void ZoomOutToolStripMenuItemClick(object sender, EventArgs e)
+		{
+			if(zoom > 1)
+			{
+				SetZoomLevel(zoom - 1);
+			}
+		}
+		
+		void ZoomInToolStripMenuItemClick(object sender, EventArgs e)
+		{
+			if(zoom < 4)
+			{
+				SetZoomLevel(zoom + 1);
+			}
+		}		
 		
 		void ToolboxToolStripMenuItemCheckedChanged(object sender, EventArgs e)
 		{
@@ -364,10 +397,10 @@ namespace WLEditor
 				levelPictureBox.Invalidate();
 			}
 		}
-		
+
 		void AboutToolStripMenuItemClick(object sender, EventArgs e)
 		{
 			MessageBox.Show(Text+" v0.66\r\nDate : 27.02.2018.\r\nContact me : tigrou.ind@gmail.com");
-		}
+		}		
 	}
 }
