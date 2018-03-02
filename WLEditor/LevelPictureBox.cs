@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
@@ -39,10 +38,7 @@ namespace WLEditor
 				using (Graphics g = Graphics.FromImage(levelTiles.Bitmap))
 				{
 					//draw tiles to cache
-					foreach (Point point in sectorsToDraw)
-					{
-						DrawTiles(point.X, point.Y, redBrush, g, e.ClipRectangle, ShowColliders);
-					}
+					DrawTiles(redBrush, g, e.ClipRectangle, ShowColliders);
 
 					//draw tiles from cache
 					e.Graphics.InterpolationMode = InterpolationMode.NearestNeighbor;					
@@ -52,7 +48,7 @@ namespace WLEditor
 					//sector objects (enemies, powerups)
 					if(ShowObjects)
 					{
-						DrawSectorObjects(font, format, e, enemyBrush);			
+						DrawObjects(font, format, e, enemyBrush);			
 						
 						//wario position
 						int index = Level.warioRightFacing ? 0 : 1;
@@ -99,31 +95,27 @@ namespace WLEditor
 			}
 		}
 		
-		void DrawTiles(int x, int y, Brush brush, Graphics g, Rectangle clipRectangle, bool viewColliders)
+		void DrawTiles(Brush brush, Graphics g, Rectangle clipRectangle, bool viewColliders)
 		{			
-			for(int j = y * 16 ; j < (y + 1) * 16 ; j++)
+			clipRectangle = GetClipRectangle(clipRectangle, 16 * zoom);			
+			
+			for(int j = clipRectangle.Top ; j < clipRectangle.Bottom ; j++)
 			{
-				for(int i = x * 16 ; i < (x + 1) * 16 ; i++)
+				for(int i = clipRectangle.Left ; i < clipRectangle.Right ; i++)
 				{
-					Rectangle destRect = new Rectangle(i * 16 * zoom, j * 16 * zoom, 16 * zoom, 16 * zoom);
-
-					if(destRect.IntersectsWith(clipRectangle))
+					if(!invalidTiles[i + j * 256])
 					{
-						if(!invalidTiles[i + j * 256])
-						{
-							invalidTiles[i + j * 256] = true;
-							DrawTileToBitmap(i, j);
+						invalidTiles[i + j * 256] = true;
+						DrawTileToBitmap(i, j);
 
-							if(viewColliders)
+						if(viewColliders)
+						{
+							byte tileIndex = Level.levelData[i + j * 256 + 0x1000];
+							if(Level.IsCollidable(Level.SwitchTile(tileIndex, SwitchMode)))
 							{
-								byte tileIndex = Level.levelData[i + j * 256 + 0x1000];
-								if(Level.IsCollidable(Level.SwitchTile(tileIndex, SwitchMode)))
-								{
-									g.FillRectangle(brush, new Rectangle(destRect.X / zoom, destRect.Y / zoom, destRect.Width / zoom, destRect.Height / zoom));
-								}
+								g.FillRectangle(brush, new Rectangle(i * 16, j * 16, 16, 16));
 							}
 						}
-
 					}
 				}
 			}
@@ -141,7 +133,7 @@ namespace WLEditor
 			}
 		}
 
-		void DrawSectorObjects(Font font, StringFormat format, PaintEventArgs e, Brush brush)
+		void DrawObjects(Font font, StringFormat format, PaintEventArgs e, Brush brush)
 		{			
 			for(int j = 0 ; j < 32 ; j++)
 			{
@@ -234,22 +226,25 @@ namespace WLEditor
 		}
 		
 		List<Point> GetVisibleSectors(Rectangle clipRectangle)
-		{
-			List<Point> sectors = new List<Point>();
-			
-			for(int y = 0 ; y < 2 ; y++)
+		{					
+			clipRectangle = GetClipRectangle(clipRectangle, 256 * zoom);
+			List<Point> sectors = new List<Point>(clipRectangle.Width * clipRectangle.Height);
+			for(int y = clipRectangle.Top ; y < clipRectangle.Bottom ; y++)
 			{
-				for(int x = 0 ; x < 16 ; x++)
+				for(int x = clipRectangle.Left ; x < clipRectangle.Right ; x++)
 				{
-					Rectangle destRect = new Rectangle(x * 256 * zoom, y * 256 * zoom, 256 * zoom, 256 * zoom);
-					if(destRect.IntersectsWith(clipRectangle))
-					{
-						sectors.Add(new Point(x, y));
-					}
+					sectors.Add(new Point(x, y));
 				}
 			}
 			
 			return sectors;
+		}
+		
+		Rectangle GetClipRectangle(Rectangle clipRectangle, int size)
+		{
+			Point start = new Point(clipRectangle.Left / size, clipRectangle.Top / size);
+			Point end = new Point((clipRectangle.Right - 1) / size + 1, (clipRectangle.Bottom - 1) / size + 1);			
+			return new Rectangle(start.X, start.Y, end.X - start.X, end.Y - start.Y);
 		}
 
 		string GetWarpName(int sectorTarget)
@@ -278,7 +273,7 @@ namespace WLEditor
 		{
 			Region r = new Region(new Rectangle((tileIndex % 256) * 16 * zoom, (tileIndex / 256) * 16 * zoom, 16 * zoom, 16 * zoom));						
 			invalidTiles[tileIndex] = false;                
-            Invalidate(r);						
+			Invalidate(r);						
 		}
 		
 		public void InvalidateObject(int tileIndex, int currentObject, int previousObject)
