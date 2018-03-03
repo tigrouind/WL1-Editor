@@ -20,7 +20,8 @@ namespace WLEditor
 		public MainForm()
 		{
 			InitializeComponent();									
-			toolboxForm.FormClosing += ToolBoxFormClosing;			
+			toolboxForm.FormClosing += ToolBoxFormClosing;	
+			toolboxForm.ProcessCommandKey += ToolBoxProcessCommandKey;
 		}
 
 		public void LoadLevel(bool reloadAll)
@@ -300,21 +301,78 @@ namespace WLEditor
 			SetZoomLevel(4);
 		}
 		
+		void ToolBoxProcessCommandKey(object sender, ProcessCmdKeyEventArgs e)
+		{
+			if(DispatchCommandKey(e.KeyData))
+			{
+				e.Processed = true;
+			}    
+		}
+			
 		protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
 		{
-		    if (keyData == (Keys.Control | Keys.Add))
+			if(DispatchCommandKey(keyData))
+			{
+				return true;
+			}
+			
+		    return base.ProcessCmdKey(ref msg, keyData);
+		}
+		
+		bool DispatchCommandKey(Keys keyData)
+		{
+			if (keyData == (Keys.Control | Keys.Add))
 		    {
-		    	if(zoomInToolStripMenuItem.Enabled)
-		    		ZoomInToolStripMenuItemClick(this, EventArgs.Empty);
-		        return true;
+		    	zoomInToolStripMenuItem.PerformClick();
+		    	return true;
 		    }
 		    if (keyData == (Keys.Control | Keys.Subtract))
 		    {
-		    	if(zoomOutToolStripMenuItem.Enabled)
-		        	ZoomOutToolStripMenuItemClick(this, EventArgs.Empty);
+		    	zoomOutToolStripMenuItem.PerformClick();
 		        return true;
 		    }
-		    return base.ProcessCmdKey(ref msg, keyData);
+		    
+		    ToolStripMenuItem toolStrip = SearchMenuItemWithKeyShortCut(menuStrip1, keyData);
+		    if(toolStrip != null)
+		    {
+		    	toolStrip.PerformClick();
+		    	return true;
+		    }
+
+		    return false;
+		}
+		
+		ToolStripMenuItem SearchMenuItemWithKeyShortCut(MenuStrip menuStrip, Keys keyData)
+		{
+			Queue<ToolStripItem> queue = new Queue<ToolStripItem>();
+		    foreach(ToolStripItem item in menuStrip.Items)
+		    {
+		    	queue.Enqueue(item);
+		    }		    
+		    
+		    while(queue.Count > 0)
+		    {							    
+		    	ToolStripItem item = queue.Dequeue();
+		    	ToolStripMenuItem toolStrip = item as ToolStripMenuItem;		
+		    	if(toolStrip != null)
+		    	{
+				    if(toolStrip.ShortcutKeys == keyData)
+				    {
+				    	return toolStrip;
+				    }
+		    	}
+		    	
+			    ToolStripDropDownItem toolStripDropDown = item as ToolStripDropDownItem;	
+			    if(toolStripDropDown != null)
+			    {
+		    		foreach(ToolStripItem child in toolStripDropDown.DropDownItems)
+			    	{
+				    	queue.Enqueue(child);
+			    	}
+			    }
+		    }
+		    
+		    return null;
 		}
 		
 		void ZoomOutToolStripMenuItemClick(object sender, EventArgs e)

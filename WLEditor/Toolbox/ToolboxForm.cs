@@ -5,7 +5,9 @@ using System.Windows.Forms;
 namespace WLEditor
 {
 	public partial class ToolboxForm : Form
-	{		
+	{				
+		public event EventHandler<ProcessCmdKeyEventArgs> ProcessCommandKey;		
+		
 		public ToolboxForm()
 		{				
 			InitializeComponent();
@@ -52,6 +54,19 @@ namespace WLEditor
 		        e.Cancel = true;
 		        Hide();
 		    }
+		}
+		
+		protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+		{
+			ProcessCmdKeyEventArgs args = new ProcessCmdKeyEventArgs(keyData);
+			
+			ProcessCommandKey(this, args);
+			if(args.Processed)
+			{
+				return true;
+			}
+			
+		    return base.ProcessCmdKey(ref msg, keyData);
 		}
 		
 		public int CurrentObject
