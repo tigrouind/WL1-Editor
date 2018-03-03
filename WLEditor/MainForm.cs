@@ -13,6 +13,7 @@ namespace WLEditor
 		int currentCourseId = -1;
 		int currentWarp = -1;
 		int paletteIndex;
+		int switchMode;
 		string romFilePath;
 		bool hasChanges;
 		int zoom = 1;
@@ -28,7 +29,7 @@ namespace WLEditor
 		{
 			if(rom.IsLoaded && levelComboBox.SelectedItem != null)
 			{				
-				Level.DumpLevel(rom, currentCourseId, currentWarp, reloadAll, levelPictureBox.SwitchMode, paletteIndex);
+				Level.DumpLevel(rom, currentCourseId, currentWarp, reloadAll, switchMode, paletteIndex);
 				
 				levelPictureBox.ClearTileCache();
 				levelPictureBox.Invalidate();	
@@ -161,12 +162,13 @@ namespace WLEditor
 			SetSwitchMode(2);
 		}
 
-		void SetSwitchMode(int switchMode)
+		void SetSwitchMode(int value)
 		{
-			noneToolStripMenuItem.Checked = switchMode == 0;
-			aToolStripMenuItem.Checked = switchMode == 1;
-			bToolStripMenuItem.Checked = switchMode == 2;			
-			levelPictureBox.SwitchMode = switchMode;
+			switchMode = value;
+			noneToolStripMenuItem.Checked = value == 0;
+			aToolStripMenuItem.Checked = value == 1;
+			bToolStripMenuItem.Checked = value == 2;			
+			levelPictureBox.SwitchMode = value;
 			
 			LoadLevel(false);
 		}
@@ -330,6 +332,18 @@ namespace WLEditor
 		    {
 		    	zoomOutToolStripMenuItem.PerformClick();
 		        return true;
+		    }
+		    
+		    if (keyData == Keys.P)
+		    {
+		     	SetPalette((paletteIndex + 1) % 3);
+		    	return true;
+		    }
+		    
+		    if (keyData == Keys.B)
+		    {
+		     	SetSwitchMode((switchMode + 1) % 3);
+		    	return true;
 		    }
 		    
 		    ToolStripMenuItem toolStrip = SearchMenuItemWithKeyShortCut(menuStrip1, keyData);
