@@ -266,6 +266,7 @@ namespace WLEditor
 			// 
 			// zoomOutToolStripMenuItem
 			// 
+			this.zoomOutToolStripMenuItem.Enabled = false;
 			this.zoomOutToolStripMenuItem.Name = "zoomOutToolStripMenuItem";
 			this.zoomOutToolStripMenuItem.ShortcutKeyDisplayString = "Ctrl -";
 			this.zoomOutToolStripMenuItem.Size = new System.Drawing.Size(161, 22);

@@ -273,7 +273,9 @@ namespace WLEditor
 			zoom200ToolStripMenuItem.Checked = zoomLevel == 2;	
 			zoom300ToolStripMenuItem.Checked = zoomLevel == 3;	
 			zoom400ToolStripMenuItem.Checked = zoomLevel == 4;	
-						
+			zoomOutToolStripMenuItem.Enabled = zoomLevel > 1;
+			zoomInToolStripMenuItem.Enabled = zoomLevel < 4;
+									
 			levelPictureBox.SetZoom(zoomLevel);
 			toolboxForm.SetZoom(zoomLevel);			
 		}
@@ -302,12 +304,14 @@ namespace WLEditor
 		{
 		    if (keyData == (Keys.Control | Keys.Add))
 		    {
-		    	ZoomInToolStripMenuItemClick(this, EventArgs.Empty);
+		    	if(zoomInToolStripMenuItem.Enabled)
+		    		ZoomInToolStripMenuItemClick(this, EventArgs.Empty);
 		        return true;
 		    }
 		    if (keyData == (Keys.Control | Keys.Subtract))
 		    {
-		        ZoomOutToolStripMenuItemClick(this, EventArgs.Empty);
+		    	if(zoomOutToolStripMenuItem.Enabled)
+		        	ZoomOutToolStripMenuItemClick(this, EventArgs.Empty);
 		        return true;
 		    }
 		    return base.ProcessCmdKey(ref msg, keyData);
@@ -315,18 +319,12 @@ namespace WLEditor
 		
 		void ZoomOutToolStripMenuItemClick(object sender, EventArgs e)
 		{
-			if(zoom > 1)
-			{
-				SetZoomLevel(zoom - 1);
-			}
+			SetZoomLevel(zoom - 1);
 		}
 		
 		void ZoomInToolStripMenuItemClick(object sender, EventArgs e)
 		{
-			if(zoom < 4)
-			{
-				SetZoomLevel(zoom + 1);
-			}
+			SetZoomLevel(zoom + 1);
 		}		
 		
 		void ToolboxToolStripMenuItemCheckedChanged(object sender, EventArgs e)
