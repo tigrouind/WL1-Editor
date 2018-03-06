@@ -323,12 +323,12 @@ namespace WLEditor
 		
 		bool DispatchCommandKey(Keys keyData)
 		{
-			if (keyData == (Keys.Control | Keys.Add))
+			if (keyData == (Keys.Control | Keys.Add) || keyData == (Keys.Control | Keys.Oemplus))
 		    {
 		    	zoomInToolStripMenuItem.PerformClick();
 		    	return true;
 		    }
-		    if (keyData == (Keys.Control | Keys.Subtract))
+		    if (keyData == (Keys.Control | Keys.Subtract) || keyData == (Keys.Control | Keys.OemMinus))
 		    {
 		    	zoomOutToolStripMenuItem.PerformClick();
 		        return true;
