@@ -438,24 +438,25 @@ namespace WLEditor
 		{
 			for(int n = 0 ; n < tiles ; n++)
 			{
-				for(int j = 0 ; j < 8 ; j++)
+				int tilePosX = ((n + pos) % 16) * 8;
+				int tilePosY = ((n + pos) / 16) * 8;
+								
+				for(int y = 0 ; y < 8 ; y++)
 				{
 					byte data0 = rom.ReadByte(gfxaddress++);
 					byte data1 = rom.ReadByte(gfxaddress++);
+					int destIndex = tilePosX + (y + tilePosY) * tiles8x8.Width;
 
-					for(int i = 0 ; i < 8 ; i++)
+					for(int x = 0 ; x < 8 ; x++)
 					{
-						int pixelA = (data0 >> (7 - i)) & 0x1;
-						int pixelB = (data1 >> (7 - i)) & 0x1;
+						int pixelA = (data0 >> (7 - x)) & 0x1;
+						int pixelB = (data1 >> (7 - x)) & 0x1;
 						int pixel = pixelA + pixelB * 2;
 						
 						if(!transparency || pixel != 0)
 						{
 							int palindex = (palette >> pixel * 2) & 0x3;
-
-							int x = i + ((n + pos) % 16) * 8;
-							int y = j + ((n + pos) / 16) * 8;
-							tiles8x8.Bits[x + tiles8x8.Width * y] = customPalette[palindex].ToArgb();
+							tiles8x8.Bits[destIndex + x] = customPalette[palindex].ToArgb();
 						}
 					}
 				}
