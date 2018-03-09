@@ -470,7 +470,7 @@ namespace WLEditor
 
 		void AboutToolStripMenuItemClick(object sender, EventArgs e)
 		{
-			MessageBox.Show(Text+" v0.66\r\nDate : 27.02.2018.\r\nContact me : tigrou.ind@gmail.com");
+			MessageBox.Show(Text+" v0.67\r\nDate : 09.03.2018.\r\nContact me : tigrou.ind@gmail.com");
 		}		
 	}
 }
