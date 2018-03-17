@@ -154,44 +154,51 @@ namespace WLEditor
 		public static DirectBitmap playerSprite = new DirectBitmap(64, 64 * 2);
 		
 		public static void DumpLevel(Rom rom, int course, int warp, bool reloadAll, int switchMode, int paletteIndex)
-		{
+		{			
+			int tilebank;
+			int tileaddressB;
+			int tileaddressA;
+			int tileanimated;			
+			int blockindex ;
+			int animatedTilesMask;
+			byte palette;
+			int enemiesData;
+			
 			rom.SetBank(0xC);
 			int header = rom.ReadWord(0x4560 + course * 2);
-
-			int tilebank = rom.ReadByte(header + 0);
-			int tileaddressB = rom.ReadWord(header + 1);
-			int tileaddressA = rom.ReadWord(header + 3);
-			int tileanimated = rom.ReadWord(header + 7);
-
-			int blockbank = rom.ReadByte(header + 9);
-			int blockubbank = rom.ReadByte(header + 10);
-			int blockindex = rom.ReadWord(header + 11);
-			int animatedTilesMask = rom.ReadByte(header + 26);
-			byte palette = rom.ReadByte(header + 27);
-			int enemiesIdsPointer, enemiesTiles;
-			
-			//load warp
+						
 			if(warp != -1)
-			{
-				animatedTilesMask = rom.ReadByte(warp + 9);
+			{				
+				//load warp
 				tilebank = rom.ReadByte(warp + 11);
 				tileaddressB = rom.ReadWord(warp + 12);
 				tileaddressA = rom.ReadWord(warp + 14);
 				tileanimated = rom.ReadWord(warp + 18);
 				blockindex = rom.ReadWord(warp + 20);
+				animatedTilesMask = rom.ReadByte(warp + 9);
 				palette = rom.ReadByte(warp + 10);
-				FindEnemiesData(rom, rom.ReadWord(warp + 22), out enemiesIdsPointer, out enemiesTiles);
+				enemiesData = rom.ReadWord(warp + 22);				
 			}
 			else
 			{
-				FindEnemiesData(rom, rom.ReadWord(header + 28), out enemiesIdsPointer, out enemiesTiles);
+				//or header
+				tilebank = rom.ReadByte(header + 0);
+				tileaddressB = rom.ReadWord(header + 1);
+				tileaddressA = rom.ReadWord(header + 3);
+				tileanimated = rom.ReadWord(header + 7);							
+				blockindex = rom.ReadWord(header + 11);
+				animatedTilesMask = rom.ReadByte(header + 26);
+				palette = rom.ReadByte(header + 27);			
+				enemiesData = rom.ReadWord(header + 28);
 			}
-			
-			Color[] paletteColors = palettes[paletteIndex];
-								
-			DumpEnemiesSprites(rom, enemiesIdsPointer, enemiesTiles);				
 
-			//dump 8x8 blocks
+			int enemiesIdsPointer, enemiesTiles;
+			FindEnemiesData(rom, enemiesData, out enemiesIdsPointer, out enemiesTiles);
+			DumpEnemiesSprites(rom, enemiesIdsPointer, enemiesTiles);				
+			
+			Color[] paletteColors = palettes[paletteIndex];									
+
+			//dump 8x8 tiles
 			Array.Clear(tiles8x8.Bits, 0, tiles8x8.Width * tiles8x8.Height);
 			rom.SetBank(0x11);
 			Dump8x8Tiles(rom, tileaddressA, 2*16, 0*16, palette, paletteColors);
@@ -204,13 +211,17 @@ namespace WLEditor
 				Dump8x8Tiles(rom, tileanimated, 4, 2*16, palette, paletteColors);			
 			}				
 
-			//dump 16x16 blocks
+			//dump 16x16 tiles
 			rom.SetBank(0xB);
 			Dump16x16Tiles(rom, blockindex, switchMode, paletteColors[0]);
 
 			if(reloadAll)
-			{
-				//dump level
+			{						
+				//dump 16x16 blocks
+				rom.SetBank(0xC);
+				int blockbank = rom.ReadByte(header + 9);
+				int blockubbank = rom.ReadByte(header + 10);
+				
 				rom.SetBank(blockbank);
 				int tilesdata = rom.ReadWord(0x4000 + blockubbank * 2);
 				levelData = RLEDecompressTiles(rom, tilesdata);
@@ -463,7 +474,7 @@ namespace WLEditor
 			}
 		}
 		
-		static void FindEnemiesData(Rom rom, int position, out int enemyId, out int tilesPointer)
+		static void FindEnemiesData(Rom rom, int enemiesPointer, out int enemyId, out int tilesPointer)
 		{
 			byte[] pattern = { 
 				0x3E, 0x00,       //ld  a, ..
@@ -473,8 +484,9 @@ namespace WLEditor
 				0x01, 0x00, 0x00, //ld  bc, ..
 				0xCD, 0xA7, 0x40  //call 40A7
 			};
-			
+							
 			rom.SetBank(0x7);
+			int position = enemiesPointer;
 			while(rom.ReadByte(position) != 0xC9) //ret
 			{				
 				bool match = true;
