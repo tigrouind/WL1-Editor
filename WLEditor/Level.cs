@@ -252,18 +252,14 @@ namespace WLEditor
 		public static int SearchWarp(Rom rom, int course, int sector)
 		{
 			rom.SetBank(0xC);
-			int warp = rom.ReadWord(0x4F30 + course * 64 + sector * 2);
-			if(rom.ReadByte(warp) != 32)
+			//search sector that target that sector
+			for(int i = 0 ; i < 32 ; i++)
 			{
-				//search sector that target that sector
-				for(int i = 0 ; i < 32 ; i++)
-				{
-					warp = rom.ReadWord(0x4F30 + course * 64 + i * 2);
+				int warp = rom.ReadWord(0x4F30 + course * 64 + i * 2);
 
-					if(rom.ReadByte(warp) == sector)
-					{
-						return warp;
-					}
+				if(rom.ReadByte(warp) == sector)
+				{
+					return warp;
 				}
 			}
 
