@@ -239,8 +239,12 @@ namespace WLEditor
 
 			if (saveFileDialog.ShowDialog() == DialogResult.OK)
 			{
+				string previousRomFilePath = romFilePath;
 				romFilePath = saveFileDialog.FileName;
-				SaveChanges();
+				if (!SaveChanges())
+				{
+					romFilePath = previousRomFilePath;
+				}
 			}
 		}
 
