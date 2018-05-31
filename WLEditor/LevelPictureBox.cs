@@ -11,6 +11,7 @@ namespace WLEditor
 		readonly bool[] invalidTiles = new bool[256 * 32];	
 		DirectBitmap levelTiles = new DirectBitmap(4096, 512);		
 		int zoom = 1;
+		int lastTileIndex = -1;
 				
 		public bool ShowSectors = true;
 		public bool ShowScrollInfo = true;
@@ -296,13 +297,17 @@ namespace WLEditor
 			
 			Invalidate(r);
 		}
-				
-		protected override void OnMouseDown(MouseEventArgs e)
+		
+		void OnMouseEvent(MouseEventArgs e)
 		{
 			if(e.Button == MouseButtons.Left)
 			{
 				int tileIndex = e.Location.X / 16 / zoom + (e.Location.Y / 16 / zoom) * 256;
-				TileMouseDown(this, tileIndex);
+				if(tileIndex != lastTileIndex)
+				{
+					TileMouseDown(this, tileIndex);
+					lastTileIndex = tileIndex;
+				}
 			}
 			else if(e.Button == MouseButtons.Right)
 			{
@@ -315,12 +320,18 @@ namespace WLEditor
 				}
 			}
 		}
+				
+		protected override void OnMouseDown(MouseEventArgs e)
+		{
+			lastTileIndex = -1;
+			OnMouseEvent(e);
+		}
 
 		protected override void OnMouseMove(MouseEventArgs e)
 		{
 			if (ClientRectangle.Contains(e.Location))
 			{
-				OnMouseDown(e);
+				OnMouseEvent(e);
 			}
 		}
 	
