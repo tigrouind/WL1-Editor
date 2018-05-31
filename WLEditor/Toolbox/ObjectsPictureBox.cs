@@ -36,8 +36,8 @@ namespace WLEditor
 						
 						Rectangle destRect = new Rectangle(x * zoom, y * zoom, 32 * zoom, 32 * zoom);							
 						if (destRect.IntersectsWith(e.ClipRectangle))
-					    {
-						   	if(index == 0)
+						{
+							if(index == 0)
 							{							
 								e.Graphics.DrawLine(pen, (x + 8) * zoom, (y + 8) * zoom, (x + 24) * zoom, (y + 24) * zoom);
 								e.Graphics.DrawLine(pen, (x + 24) * zoom, (y + 8) * zoom, (x + 8) * zoom, (y + 24) * zoom);
@@ -61,7 +61,7 @@ namespace WLEditor
 							{
 								e.Graphics.DrawImage(Level.tilesObjects.Bitmap, new Rectangle((x + 8) * zoom, (y + 8) * zoom, 16 * zoom, 16 * zoom), new Rectangle((index - 7) * 16, 0, 16, 16),  GraphicsUnit.Pixel);
 							}
-					    }						
+						}						
 					}
 					
 					if(CurrentObject != -1)

@@ -312,7 +312,7 @@ namespace WLEditor
 			if(DispatchCommandKey(e.KeyData))
 			{
 				e.Processed = true;
-			}    
+			}	
 		}
 			
 		protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
@@ -322,75 +322,75 @@ namespace WLEditor
 				return true;
 			}
 			
-		    return base.ProcessCmdKey(ref msg, keyData);
+			return base.ProcessCmdKey(ref msg, keyData);
 		}
 		
 		bool DispatchCommandKey(Keys keyData)
 		{
 			if (keyData == (Keys.Control | Keys.Add) || keyData == (Keys.Control | Keys.Oemplus))
-		    {
-		    	zoomInToolStripMenuItem.PerformClick();
-		    	return true;
-		    }
-		    if (keyData == (Keys.Control | Keys.Subtract) || keyData == (Keys.Control | Keys.OemMinus))
-		    {
-		    	zoomOutToolStripMenuItem.PerformClick();
-		        return true;
-		    }
-		    
-		    if (keyData == Keys.P)
-		    {
-		     	SetPalette((paletteIndex + 1) % 3);
-		    	return true;
-		    }
-		    
-		    if (keyData == Keys.B)
-		    {
-		     	SetSwitchMode((switchMode + 1) % 3);
-		    	return true;
-		    }
-		    
-		    ToolStripMenuItem toolStrip = SearchMenuItemWithKeyShortCut(menuStrip1, keyData);
-		    if(toolStrip != null)
-		    {
-		    	toolStrip.PerformClick();
-		    	return true;
-		    }
+			{
+				zoomInToolStripMenuItem.PerformClick();
+				return true;
+			}
+			if (keyData == (Keys.Control | Keys.Subtract) || keyData == (Keys.Control | Keys.OemMinus))
+			{
+				zoomOutToolStripMenuItem.PerformClick();
+				return true;
+			}
+			
+			if (keyData == Keys.P)
+			{
+			 	SetPalette((paletteIndex + 1) % 3);
+				return true;
+			}
+			
+			if (keyData == Keys.B)
+			{
+			 	SetSwitchMode((switchMode + 1) % 3);
+				return true;
+			}
+			
+			ToolStripMenuItem toolStrip = SearchMenuItemWithKeyShortCut(menuStrip1, keyData);
+			if(toolStrip != null)
+			{
+				toolStrip.PerformClick();
+				return true;
+			}
 
-		    return false;
+			return false;
 		}
 		
 		ToolStripMenuItem SearchMenuItemWithKeyShortCut(MenuStrip menuStrip, Keys keyData)
 		{
 			Queue<ToolStripItem> queue = new Queue<ToolStripItem>();
-		    foreach(ToolStripItem item in menuStrip.Items)
-		    {
-		    	queue.Enqueue(item);
-		    }		    
-		    
-		    while(queue.Count > 0)
-		    {							    
-		    	ToolStripItem item = queue.Dequeue();
-		    	ToolStripMenuItem toolStrip = item as ToolStripMenuItem;		
-		    	if(toolStrip != null)
-		    	{
-				    if(toolStrip.ShortcutKeys == keyData)
-				    {
-				    	return toolStrip;
-				    }
-		    	}
-		    	
-			    ToolStripDropDownItem toolStripDropDown = item as ToolStripDropDownItem;	
-			    if(toolStripDropDown != null)
-			    {
-		    		foreach(ToolStripItem child in toolStripDropDown.DropDownItems)
-			    	{
-				    	queue.Enqueue(child);
-			    	}
-			    }
-		    }
-		    
-		    return null;
+			foreach(ToolStripItem item in menuStrip.Items)
+			{
+				queue.Enqueue(item);
+			}			
+			
+			while(queue.Count > 0)
+			{								
+				ToolStripItem item = queue.Dequeue();
+				ToolStripMenuItem toolStrip = item as ToolStripMenuItem;		
+				if(toolStrip != null)
+				{
+					if(toolStrip.ShortcutKeys == keyData)
+					{
+						return toolStrip;
+					}
+				}
+				
+				ToolStripDropDownItem toolStripDropDown = item as ToolStripDropDownItem;	
+				if(toolStripDropDown != null)
+				{
+					foreach(ToolStripItem child in toolStripDropDown.DropDownItems)
+					{
+						queue.Enqueue(child);
+					}
+				}
+			}
+			
+			return null;
 		}
 		
 		void ZoomOutToolStripMenuItemClick(object sender, EventArgs e)
@@ -437,12 +437,12 @@ namespace WLEditor
 				if(currentTile != -1 &&  selectedPanelIndex == 0)
 				{
 					int previousTile = Level.levelData[tileIndex + 0x1000];
-			        if(previousTile != currentTile)
-			        {
-			        	Level.levelData[tileIndex + 0x1000] = (byte)currentTile;
-			        	levelPictureBox.InvalidateTile(tileIndex);
-			            SetChanges(true);
-			        }						
+					if(previousTile != currentTile)
+					{
+						Level.levelData[tileIndex + 0x1000] = (byte)currentTile;
+						levelPictureBox.InvalidateTile(tileIndex);
+						SetChanges(true);
+					}
 				}
 				
 				if(currentObject != -1 && levelPictureBox.ShowObjects && selectedPanelIndex == 2)

@@ -50,10 +50,10 @@ namespace WLEditor
 		void ToolBoxFormClosing(object sender, FormClosingEventArgs e)
 		{
 			if (e.CloseReason == CloseReason.UserClosing) 
-		    {
-		        e.Cancel = true;
-		        Hide();
-		    }
+			{
+				e.Cancel = true;
+				Hide();
+			}
 		}
 		
 		protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
@@ -66,7 +66,7 @@ namespace WLEditor
 				return true;
 			}
 			
-		    return base.ProcessCmdKey(ref msg, keyData);
+			return base.ProcessCmdKey(ref msg, keyData);
 		}
 		
 		public int CurrentObject
