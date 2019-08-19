@@ -27,17 +27,17 @@ namespace WLEditor
 		{			
 			if(Level.levelData != null)
 			{
-				StringFormat format = new StringFormat();
-				format.LineAlignment = StringAlignment.Center;
-				format.Alignment = StringAlignment.Center;	
-			
 				var sectorsToDraw = GetVisibleSectors(e.ClipRectangle);
-
+				
+				using (StringFormat format = new StringFormat())
 				using (Brush enemyBrush = new SolidBrush(Level.enemyPalette[2]))
 				using (Brush redBrush = new SolidBrush(Color.FromArgb(128, 255, 0, 0)))
 				using (Font font = new Font("Arial", 8 * zoom))				
 				using (Graphics g = Graphics.FromImage(levelTiles.Bitmap))
 				{
+					format.LineAlignment = StringAlignment.Center;
+					format.Alignment = StringAlignment.Center;				
+				
 					//draw tiles to cache
 					DrawTiles(redBrush, g, e.ClipRectangle, ShowColliders);
 
@@ -272,30 +272,52 @@ namespace WLEditor
 		
 		public void InvalidateTile(int tileIndex)
 		{
-			Region r = new Region(new Rectangle((tileIndex % 256) * 16 * zoom, (tileIndex / 256) * 16 * zoom, 16 * zoom, 16 * zoom));						
-			invalidTiles[tileIndex] = false;                
-			Invalidate(r);						
+			using(Region r = new Region(new Rectangle((tileIndex % 256) * 16 * zoom, (tileIndex / 256) * 16 * zoom, 16 * zoom, 16 * zoom)))
+			{
+				invalidTiles[tileIndex] = false;                
+				Invalidate(r);						
+			}
+		}
+		
+		public void InvalidateAnimatedTiles()
+		{		
+			using(Region r = new Region(Rectangle.Empty))
+			{
+				for (int tileIndex = 0 ; tileIndex < 8192 ; tileIndex++)
+				{
+					byte data = Level.levelData[tileIndex + 0x1000];
+					if(Level.animatedTiles[data])
+					{
+						r.Union(new Region(new Rectangle((tileIndex % 256) * 16 * zoom, (tileIndex / 256) * 16 * zoom, 16 * zoom, 16 * zoom)));
+						invalidTiles[tileIndex] = false;    
+					}				
+				}
+				
+				Invalidate(r);		
+			}
 		}
 		
 		public void InvalidateObject(int tileIndex, int currentObject, int previousObject)
 		{
-			Region r = new Region(new Rectangle((tileIndex % 256) * 16 * zoom, (tileIndex / 256) * 16 * zoom, 16 * zoom, 16 * zoom));									
-			Action<int> addEnemyRegion = enemyIndex =>
+			using(Region r = new Region(new Rectangle((tileIndex % 256) * 16 * zoom, (tileIndex / 256) * 16 * zoom, 16 * zoom, 16 * zoom)))
 			{
-				if(enemyIndex >= 1 && enemyIndex <= 6)
+				Action<int> addEnemyRegion = enemyIndex =>
 				{
-					Rectangle enemyRect = Level.loadedSprites[enemyIndex - 1];
-					if(enemyRect != Rectangle.Empty)
-					{						
-						r.Union(new Rectangle(((tileIndex % 256) * 16 + enemyRect.X - 32 + 8) * zoom, ((tileIndex / 256) * 16 + enemyRect.Y - (enemyIndex - 1) * 64 - 40) * zoom, enemyRect.Width * zoom, enemyRect.Height * zoom));
+					if(enemyIndex >= 1 && enemyIndex <= 6)
+					{
+						Rectangle enemyRect = Level.loadedSprites[enemyIndex - 1];
+						if(enemyRect != Rectangle.Empty)
+						{						
+							r.Union(new Rectangle(((tileIndex % 256) * 16 + enemyRect.X - 32 + 8) * zoom, ((tileIndex / 256) * 16 + enemyRect.Y - (enemyIndex - 1) * 64 - 40) * zoom, enemyRect.Width * zoom, enemyRect.Height * zoom));
+						}	
 					}
-				}
-			};
-			
-			addEnemyRegion(previousObject);
-			addEnemyRegion(currentObject);
-			
-			Invalidate(r);
+				};
+				
+				addEnemyRegion(previousObject);
+				addEnemyRegion(currentObject);
+				
+				Invalidate(r);
+			}
 		}
 		
 		void OnMouseEvent(MouseEventArgs e)

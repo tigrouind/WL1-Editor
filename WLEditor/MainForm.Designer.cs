@@ -36,6 +36,7 @@ namespace WLEditor
 		/// </summary>
 		private void InitializeComponent()
 		{
+			this.components = new System.ComponentModel.Container();
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
 			this.levelComboBox = new System.Windows.Forms.ComboBox();
 			this.menuStrip1 = new System.Windows.Forms.MenuStrip();
@@ -70,6 +71,8 @@ namespace WLEditor
 			this.LevelPanel = new System.Windows.Forms.Panel();
 			this.levelPictureBox = new WLEditor.LevelPictureBox();
 			this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
+			this.timer = new System.Windows.Forms.Timer(this.components);
+			this.animationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.menuStrip1.SuspendLayout();
 			this.tableLayoutPanel1.SuspendLayout();
 			this.LevelPanel.SuspendLayout();
@@ -153,6 +156,7 @@ namespace WLEditor
 			this.objectsToolStripMenuItem,
 			this.scrollRegionToolStripMenuItem,
 			this.collidersToolStripMenuItem,
+			this.animationToolStripMenuItem,
 			this.zoomToolStripMenuItem,
 			this.paletteToolStripMenuItem,
 			this.switchToolStripMenuItem});
@@ -390,6 +394,21 @@ namespace WLEditor
 			this.toolStripMenuItem1.Name = "toolStripMenuItem1";
 			this.toolStripMenuItem1.Size = new System.Drawing.Size(158, 6);
 			// 
+			// timer
+			// 
+			this.timer.Enabled = true;
+			this.timer.Tick += new System.EventHandler(this.TimerTick);
+			// 
+			// animationToolStripMenuItem
+			// 
+			this.animationToolStripMenuItem.Checked = true;
+			this.animationToolStripMenuItem.CheckOnClick = true;
+			this.animationToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
+			this.animationToolStripMenuItem.Name = "animationToolStripMenuItem";
+			this.animationToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
+			this.animationToolStripMenuItem.Text = "Animation";
+			this.animationToolStripMenuItem.Click += new System.EventHandler(this.AnimationToolStripMenuItemClick);
+			// 
 			// MainForm
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -443,6 +462,8 @@ namespace WLEditor
 		private System.Windows.Forms.ToolStripMenuItem zoomInToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem zoomOutToolStripMenuItem;
 		private System.Windows.Forms.ToolStripSeparator toolStripMenuItem1;
+		private System.Windows.Forms.Timer timer;
+		private System.Windows.Forms.ToolStripMenuItem animationToolStripMenuItem;
 
 			
 	

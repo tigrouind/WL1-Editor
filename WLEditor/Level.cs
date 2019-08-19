@@ -144,6 +144,8 @@ namespace WLEditor
 		public static int warioPosition;
 		public static Rectangle[] loadedSprites;
 		public static bool[] enemiesAvailable;
+		public static bool[] animatedTiles;
+		public static int animatedTilesMask;
 		public static bool warioRightFacing;
 		public static Rectangle[] playerRectangles;
 		
@@ -153,14 +155,13 @@ namespace WLEditor
 		public static DirectBitmap tilesEnemies = new DirectBitmap(64, 64 * 6); 		
 		public static DirectBitmap playerSprite = new DirectBitmap(64, 64 * 2);
 		
-		public static void DumpLevel(Rom rom, int course, int warp, bool reloadAll, int switchMode, int paletteIndex)
+		public static void DumpLevel(Rom rom, int course, int warp, bool reloadAll, int switchMode, int paletteIndex, int animatedTileIndex, bool reloadAnimatedTilesOnly)
 		{			
 			int tilebank;
 			int tileaddressB;
 			int tileaddressA;
 			int tileanimated;			
-			int blockindex ;
-			int animatedTilesMask;
+			int blockindex;			
 			byte palette;
 			int enemiesData;
 			
@@ -192,28 +193,30 @@ namespace WLEditor
 				enemiesData = rom.ReadWord(header + 28);
 			}
 
-			int enemiesIdsPointer, enemiesTiles;
-			FindEnemiesData(rom, enemiesData, out enemiesIdsPointer, out enemiesTiles);
-			DumpEnemiesSprites(rom, enemiesIdsPointer, enemiesTiles);				
-			
 			Color[] paletteColors = palettes[paletteIndex];									
+			if(!reloadAnimatedTilesOnly)
+			{
+				int enemiesIdsPointer, enemiesTiles;
+				FindEnemiesData(rom, enemiesData, out enemiesIdsPointer, out enemiesTiles);
+				DumpEnemiesSprites(rom, enemiesIdsPointer, enemiesTiles);	
 
-			//dump 8x8 tiles
-			Array.Clear(tiles8x8.Bits, 0, tiles8x8.Width * tiles8x8.Height);
-			rom.SetBank(0x11);
-			Dump8x8Tiles(rom, tileaddressA, 2*16, 0*16, palette, paletteColors);
-			rom.SetBank(tilebank);
-			Dump8x8Tiles(rom, tileaddressB, 6*16, 2*16, palette, paletteColors);
+				//dump 8x8 tiles
+				Array.Clear(tiles8x8.Bits, 0, tiles8x8.Width * tiles8x8.Height);
+				rom.SetBank(0x11);
+				Dump8x8Tiles(rom, tileaddressA, 2*16, 0*16, palette, paletteColors);
+				rom.SetBank(tilebank);
+				Dump8x8Tiles(rom, tileaddressB, 6*16, 2*16, palette, paletteColors);				
+			}
 						
 			if(animatedTilesMask != 0)
 			{
 				rom.SetBank(0x11);
-				Dump8x8Tiles(rom, tileanimated, 4, 2*16, palette, paletteColors);			
+				Dump8x8Tiles(rom, tileanimated + animatedTileIndex * 16 * 4, 4, 2*16, palette, paletteColors);			
 			}				
 
 			//dump 16x16 tiles
 			rom.SetBank(0xB);
-			Dump16x16Tiles(rom, blockindex, switchMode, paletteColors[0]);
+			Dump16x16Tiles(rom, blockindex, switchMode, paletteColors[0], reloadAnimatedTilesOnly, out animatedTiles);
 
 			if(reloadAll)
 			{						
@@ -323,14 +326,14 @@ namespace WLEditor
 			return decompressed;
 		}
 
-		static IEnumerable<byte> RLECompressTiles(byte[] levelData)
+		static IEnumerable<byte> RLECompressTiles(byte[] tilesdata)
 		{
 			int current = 0;
-			while(current < levelData.Length)
+			while(current < tilesdata.Length)
 			{
 				byte repeat = 0;
-				byte data = levelData[current++];
-				while(current < levelData.Length && levelData[current] == data && repeat < 255 && current % 256 != 0)
+				byte data = tilesdata[current++];
+				while(current < tilesdata.Length && tilesdata[current] == data && repeat < 255 && current % 256 != 0)
 				{
 					current++;
 					repeat++;
@@ -398,44 +401,59 @@ namespace WLEditor
 			}
 		}
 
-		static void Dump16x16Tiles(Rom rom, int tileindexaddress, int switchMode, Color defaultColor)
-		{	
+		static void Dump16x16Tiles(Rom rom, int tileindexaddress, int switchMode, Color defaultColor, bool reloadAnimatedTilesOnly, out bool[] animTiles)
+		{						
+			animTiles = new bool[16 * 8];	
+			
 			for(int n = 0 ; n < 16 ; n++)
 			{
 				for(int i = 0 ; i < 8 ; i++)
 				{
 					int tileIndex = i + n * 8;
-					tileIndex = SwitchTile(tileIndex, switchMode);
+					int newTileIndex = SwitchTile(tileIndex, switchMode);
 
+					bool isAnimatedTile = false;
 					for(int k = 0 ; k < 2 ; k++)
 					{
 						for(int j = 0 ; j < 2 ; j++)
 						{
-							byte subTileIndex = rom.ReadByte(tileindexaddress + tileIndex * 4 + k * 2 + j);
-							Point dest = new Point(j * 8 + i * 16, k * 8 + n * 16);
-
-							if(subTileIndex < 128)
-							{
-								Point source = new Point((subTileIndex % 16) * 8, (subTileIndex / 16) * 8);
-															
-								for(int y = 0 ; y < 8 ; y++)
-								{
-									Array.Copy(tiles8x8.Bits, source.X + (source.Y + y) * tiles8x8.Width, tiles16x16.Bits, dest.X + (dest.Y + y) * tiles16x16.Width, 8);
-								}
-							}
-							else
-							{
-								int defaultColorInt = defaultColor.ToArgb();								
-								for(int y = 0 ; y < 8 ; y++)
-								{
-									int destIndex = dest.X + (dest.Y + y) * tiles16x16.Width;									
-									for(int x = 0 ; x < 8 ; x++)
-									{
-										tiles16x16.Bits[destIndex + x] = defaultColorInt;
-									}
-								}
+							byte subTileIndex = rom.ReadByte(tileindexaddress + newTileIndex * 4 + k * 2 + j);
+							bool isAnimated = subTileIndex >= 2*16 && subTileIndex < 2*16+4;	
+							isAnimatedTile |= isAnimated;
+														
+							if(!reloadAnimatedTilesOnly || isAnimated)
+							{								
+								Point dest = new Point(j * 8 + i * 16, k * 8 + n * 16);
+								Dump8x8Tile(dest, subTileIndex, defaultColor);
 							}
 						}
+					}
+					
+					animTiles[tileIndex] = isAnimatedTile;
+				}
+			}
+		}
+		
+		static void Dump8x8Tile(Point dest, int subTileIndex, Color defaultColor)
+		{
+			if(subTileIndex < 128)
+			{
+				Point source = new Point((subTileIndex % 16) * 8, (subTileIndex / 16) * 8);										
+				for(int y = 0 ; y < 8 ; y++)
+				{
+					Array.Copy(tiles8x8.Bits, source.X + (source.Y + y) * tiles8x8.Width, tiles16x16.Bits, dest.X + (dest.Y + y) * tiles16x16.Width, 8);
+				}
+			}
+			else
+			{
+				//fill 8x8 block with default color
+				int defaultColorInt = defaultColor.ToArgb();								
+				for(int y = 0 ; y < 8 ; y++)
+				{
+					int destIndex = dest.X + (dest.Y + y) * tiles16x16.Width;									
+					for(int x = 0 ; x < 8 ; x++)
+					{
+						tiles16x16.Bits[destIndex + x] = defaultColorInt;
 					}
 				}
 			}

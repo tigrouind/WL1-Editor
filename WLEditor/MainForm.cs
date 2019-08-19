@@ -14,6 +14,8 @@ namespace WLEditor
 		int currentWarp = -1;
 		int paletteIndex;
 		int switchMode;
+		int animatedTileIndex;
+		int timerTicks;
 		string romFilePath;
 		bool hasChanges;
 		int zoom = 1;
@@ -29,7 +31,7 @@ namespace WLEditor
 		{
 			if(rom.IsLoaded && levelComboBox.SelectedItem != null)
 			{				
-				Level.DumpLevel(rom, currentCourseId, currentWarp, reloadAll, switchMode, paletteIndex);
+				Level.DumpLevel(rom, currentCourseId, currentWarp, reloadAll, switchMode, paletteIndex, animatedTileIndex, false);
 				
 				levelPictureBox.ClearTileCache();
 				levelPictureBox.Invalidate();	
@@ -41,7 +43,7 @@ namespace WLEditor
 					currentObject--;
 				}
 				toolboxForm.CurrentObject = currentObject;									
-				toolboxForm.Invalidate(true);				
+				toolboxForm.Invalidate(true);		
 			}
 		}			
 
@@ -471,10 +473,46 @@ namespace WLEditor
 				levelPictureBox.Invalidate();
 			}
 		}
+				
+		void TimerTick(object sender, EventArgs e)
+		{
+			if(rom.IsLoaded && levelComboBox.SelectedItem != null && Level.animatedTilesMask != 0)
+			{				
+				timerTicks++;				
+				if((timerTicks & (Level.animatedTilesMask >> 2)) == 0)
+				{
+					animatedTileIndex = (animatedTileIndex + 1) % 4;
+					RefreshAnimatedTiles();
+				}
+			}
+		}
+		
+		void RefreshAnimatedTiles()
+		{
+			Level.DumpLevel(rom, currentCourseId, currentWarp, false, switchMode, paletteIndex, animatedTileIndex, true);
+				
+			//redraw
+			levelPictureBox.InvalidateAnimatedTiles();
+			if(toolboxForm.Visible)
+			{
+				switch(toolboxForm.SelectedPanelIndex)
+				{
+					case 0: //16x16 tiles
+					case 1: //8x8 tiles
+						toolboxForm.Invalidate(true);		
+						break;
+				}
+			}
+		}
 
 		void AboutToolStripMenuItemClick(object sender, EventArgs e)
 		{
-			MessageBox.Show(Text+" v0.67\r\nDate : 09.03.2018.\r\nContact me : tigrou.ind@gmail.com");
+			MessageBox.Show(Text+" v0.68\r\nDate : 19.08.2019.\r\nContact me : tigrou.ind@gmail.com");
+		}
+		
+		void AnimationToolStripMenuItemClick(object sender, EventArgs e)
+		{
+			timer.Enabled = animationToolStripMenuItem.Checked;
 		}		
 	}
 }
