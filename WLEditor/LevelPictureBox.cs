@@ -286,7 +286,7 @@ namespace WLEditor
 				for (int tileIndex = 0 ; tileIndex < 8192 ; tileIndex++)
 				{
 					byte data = Level.levelData[tileIndex + 0x1000];
-					if(Level.animatedTiles[data])
+					if(Level.animated16x16Tiles[data])
 					{
 						r.Union(new Region(new Rectangle((tileIndex % 256) * 16 * zoom, (tileIndex / 256) * 16 * zoom, 16 * zoom, 16 * zoom)));
 						invalidTiles[tileIndex] = false;    

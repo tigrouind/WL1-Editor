@@ -144,7 +144,8 @@ namespace WLEditor
 		public static int warioPosition;
 		public static Rectangle[] loadedSprites;
 		public static bool[] enemiesAvailable;
-		public static bool[] animatedTiles;
+		public static bool[] animated16x16Tiles;
+		public static int[] animated8x8Tiles;
 		public static int animatedTilesMask;
 		public static bool warioRightFacing;
 		public static Rectangle[] playerRectangles;
@@ -214,9 +215,16 @@ namespace WLEditor
 				Dump8x8Tiles(rom, tileanimated + animatedTileIndex * 16 * 4, 4, 2*16, palette, paletteColors);			
 			}				
 
-			//dump 16x16 tiles
-			rom.SetBank(0xB);
-			Dump16x16Tiles(rom, blockindex, switchMode, paletteColors[0], reloadAnimatedTilesOnly, out animatedTiles);
+			//dump 16x16 tiles			
+			if(reloadAnimatedTilesOnly)
+			{
+				DumpAnimated16x16Tiles(paletteColors[0]);
+			}
+			else
+			{
+				rom.SetBank(0xB);
+				Dump16x16Tiles(rom, blockindex, switchMode, paletteColors[0], out animated16x16Tiles, out animated8x8Tiles);
+			}
 
 			if(reloadAll)
 			{						
@@ -400,11 +408,36 @@ namespace WLEditor
 				yield return count;
 			}
 		}
+		
+		static void DumpAnimated16x16Tiles(Color defaultColor)
+		{
+			int m = 0;
+			for(int n = 0 ; n < 16 ; n++)
+			{
+				for(int i = 0 ; i < 8 ; i++)
+				{				
+					for(int k = 0 ; k < 2 ; k++)
+					{
+						for(int j = 0 ; j < 2 ; j++)
+						{							
+							int subTileIndex = animated8x8Tiles[m++];
+							if(subTileIndex != -1)
+							{
+								Point dest = new Point(j * 8 + i * 16, k * 8 + n * 16);
+								Dump8x8Tile(dest, subTileIndex, defaultColor);	
+							}							
+						}
+					}
+				}
+			}
+		}
 
-		static void Dump16x16Tiles(Rom rom, int tileindexaddress, int switchMode, Color defaultColor, bool reloadAnimatedTilesOnly, out bool[] animTiles)
+		static void Dump16x16Tiles(Rom rom, int tileindexaddress, int switchMode, Color defaultColor, out bool[] anim16x16Tiles, out int[] anim8x8Tiles)
 		{						
-			animTiles = new bool[16 * 8];	
+			anim16x16Tiles = new bool[16 * 8];	
+			anim8x8Tiles = new int[16 * 8 * 2 * 2];
 			
+			int m = 0;
 			for(int n = 0 ; n < 16 ; n++)
 			{
 				for(int i = 0 ; i < 8 ; i++)
@@ -418,18 +451,16 @@ namespace WLEditor
 						for(int j = 0 ; j < 2 ; j++)
 						{
 							byte subTileIndex = rom.ReadByte(tileindexaddress + newTileIndex * 4 + k * 2 + j);
-							bool isAnimated = subTileIndex >= 2*16 && subTileIndex < 2*16+4;	
+							bool isAnimated = subTileIndex >= (2 * 16) && subTileIndex < (2 * 16 + 4);
 							isAnimatedTile |= isAnimated;
+							animated8x8Tiles[m++] = isAnimated ? subTileIndex : -1;
 														
-							if(!reloadAnimatedTilesOnly || isAnimated)
-							{								
-								Point dest = new Point(j * 8 + i * 16, k * 8 + n * 16);
-								Dump8x8Tile(dest, subTileIndex, defaultColor);
-							}
+							Point dest = new Point(j * 8 + i * 16, k * 8 + n * 16);
+							Dump8x8Tile(dest, subTileIndex, defaultColor);
 						}
 					}
 					
-					animTiles[tileIndex] = isAnimatedTile;
+					anim16x16Tiles[tileIndex] = isAnimatedTile;
 				}
 			}
 		}
