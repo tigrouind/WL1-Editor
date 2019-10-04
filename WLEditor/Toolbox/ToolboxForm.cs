@@ -97,5 +97,21 @@ namespace WLEditor
 				return comboBox1.SelectedIndex;	
 			}			
 		}
+		
+		public bool ShowColliders
+		{
+			set
+			{
+				tiles16x16PictureBox.ShowColliders = value;
+			}
+		}
+		
+		public int SwitchMode
+		{
+			set
+			{
+				tiles16x16PictureBox.SwitchMode = value;
+			}
+		}
 	}
 }

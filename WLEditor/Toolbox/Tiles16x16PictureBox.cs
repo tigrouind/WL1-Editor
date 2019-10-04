@@ -8,6 +8,8 @@ namespace WLEditor
 	public class Tiles16x16PictureBox : PictureBox
 	{
 		public int CurrentTile = -1;
+		public bool ShowColliders;
+		public int SwitchMode;		
 		int zoom;
 				
 		protected override void OnPaint(PaintEventArgs e)
@@ -17,6 +19,29 @@ namespace WLEditor
 				e.Graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
 				e.Graphics.PixelOffsetMode = PixelOffsetMode.Half;
 				e.Graphics.DrawImage(Level.tiles16x16.Bitmap, 0, 0, 128 * zoom, 256 * zoom);
+										
+				if(ShowColliders)
+				{						
+					for(int j = 0 ; j < 16 ; j++)
+					{
+						for(int i = 0 ; i < 8 ; i++)
+						{						
+							Rectangle destRect = new Rectangle(i * 16 * zoom, j * 16 * zoom, 16 * zoom, 16 * zoom);
+	
+							if(destRect.IntersectsWith(e.ClipRectangle))
+							{
+								int tileIndex = i + j * 8;
+								tileIndex = Level.SwitchTile(tileIndex, SwitchMode);
+								
+								int specialTile = Level.IsSpecialTile(tileIndex);
+								if(specialTile != -1)
+								{
+									e.Graphics.FillRectangle(Level.transparentBrushes[specialTile], destRect);
+								}	
+							}
+						}	
+					}						
+				}				
 	
 				if(CurrentTile != -1)
 				{

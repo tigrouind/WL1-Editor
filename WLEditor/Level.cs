@@ -18,6 +18,18 @@ namespace WLEditor
 		{
 			Color.White, Color.FromArgb(255, 157, 201, 253), Color.FromArgb(255, 50, 50, 155), Color.FromArgb(255, 0, 0, 41)
 		};
+		
+		public static Brush[] transparentBrushes = 
+		{
+			new SolidBrush(Color.FromArgb(128, 255, 0, 0)),   //red
+			new SolidBrush(Color.FromArgb(128, 0, 255, 0)),   //green
+			new SolidBrush(Color.FromArgb(128, 0, 255, 255)), //light blue
+			new SolidBrush(Color.FromArgb(128, 255, 255, 0)), //yellow
+			new SolidBrush(Color.FromArgb(128, 0, 0, 255)),   //blue
+			new SolidBrush(Color.FromArgb(128, 128, 64, 0)),  //brown
+			new SolidBrush(Color.FromArgb(128, 255, 128, 0)), //orange
+			new SolidBrush(Color.FromArgb(255, 128, 64, 128)),  //purple
+		};	
 
 		public static string[] levelNames =
 		{
@@ -732,10 +744,58 @@ namespace WLEditor
 			
 			return courseIdToNo;
 		}
-
-		public static bool IsCollidable(int tileIndex)
+		
+		public static int IsSpecialTile(int tileIndex)
 		{
-			return (tileIndex & 64) != 64;
+			switch(tileIndex)
+			{
+				case 46: //door
+				case 72:
+				case 75:
+				case 84:					
+					return 7;
+					
+				case 68: //ladder
+				case 69:					
+					return 4;		
+
+				case 71: //coins
+				case 70:
+				case 83:										
+					return 3;	
+					
+				case 62: //sand								
+					return 3;	
+				
+				case 89: //spikes
+				case 93:
+				case 94:										
+					return 6;
+					
+				case 58: //plateform
+				case 59:
+				case 64:
+				case 65:
+				case 66:
+				case 67:					
+					return 1;	
+
+				case 76:
+				case 77:
+				case 78:
+				case 79:
+				case 85: 	
+				case 88: //water										
+					return 2;		
+
+				case 92: //sand										
+					return 5;						
+			}	
+
+			if((tileIndex & 64) != 64)
+				return 0;
+			
+			return -1;
 		}
 
 		//replace tiles when a (!) block is hit

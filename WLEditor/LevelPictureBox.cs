@@ -31,15 +31,14 @@ namespace WLEditor
 				
 				using (StringFormat format = new StringFormat())
 				using (Brush enemyBrush = new SolidBrush(Level.enemyPalette[2]))
-				using (Brush redBrush = new SolidBrush(Color.FromArgb(128, 255, 0, 0)))
-				using (Font font = new Font("Arial", 8 * zoom))				
+				using (Font font = new Font("Arial", 8 * zoom))								
 				using (Graphics g = Graphics.FromImage(levelTiles.Bitmap))
 				{
 					format.LineAlignment = StringAlignment.Center;
 					format.Alignment = StringAlignment.Center;				
 				
 					//draw tiles to cache
-					DrawTiles(redBrush, g, e.ClipRectangle, ShowColliders);
+					DrawTiles(g, e.ClipRectangle, ShowColliders);
 
 					//draw tiles from cache
 					e.Graphics.InterpolationMode = InterpolationMode.NearestNeighbor;					
@@ -96,7 +95,7 @@ namespace WLEditor
 			}
 		}
 		
-		void DrawTiles(Brush brush, Graphics g, Rectangle clipRectangle, bool viewColliders)
+		void DrawTiles(Graphics g, Rectangle clipRectangle, bool viewColliders)
 		{			
 			clipRectangle = GetClipRectangle(clipRectangle, 16 * zoom);			
 			
@@ -112,9 +111,12 @@ namespace WLEditor
 						if(viewColliders)
 						{
 							byte tileIndex = Level.levelData[i + j * 256 + 0x1000];
-							if(Level.IsCollidable(Level.SwitchTile(tileIndex, SwitchMode)))
+							tileIndex = (byte)Level.SwitchTile(tileIndex, SwitchMode);
+															
+							int specialTile = Level.IsSpecialTile(tileIndex);
+							if(specialTile != -1)
 							{
-								g.FillRectangle(brush, new Rectangle(i * 16, j * 16, 16, 16));
+								g.FillRectangle(Level.transparentBrushes[specialTile], new Rectangle(i * 16, j * 16, 16, 16));
 							}
 						}
 					}

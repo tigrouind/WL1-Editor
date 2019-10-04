@@ -144,9 +144,12 @@ namespace WLEditor
 
 		void CollidersToolStripMenuItemClick(object sender, EventArgs e)
 		{
-			levelPictureBox.ShowColliders = collidersToolStripMenuItem.Checked;
+			bool showColliders = collidersToolStripMenuItem.Checked;
+			levelPictureBox.ShowColliders = showColliders;
 			levelPictureBox.ClearTileCache();
 			levelPictureBox.Invalidate();
+			toolboxForm.ShowColliders = showColliders;
+			toolboxForm.Invalidate(true);	
 		}
 
 		void NoneToolStripMenuItemClick(object sender, EventArgs e)
@@ -171,6 +174,8 @@ namespace WLEditor
 			aToolStripMenuItem.Checked = value == 1;
 			bToolStripMenuItem.Checked = value == 2;			
 			levelPictureBox.SwitchMode = value;
+			toolboxForm.SwitchMode = value;
+			toolboxForm.Invalidate(true);		
 			
 			LoadLevel(false);
 		}
