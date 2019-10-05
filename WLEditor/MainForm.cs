@@ -357,7 +357,9 @@ namespace WLEditor
 				return true;
 			}
 			
-			ToolStripMenuItem toolStrip = SearchMenuItemWithKeyShortCut(menuStrip1, keyData);
+			ToolStripMenuItem toolStrip = GetAllMenuItems(menuStrip1)
+				.FirstOrDefault(x => x.ShortcutKeys == keyData);
+			
 			if(toolStrip != null)
 			{
 				toolStrip.PerformClick();
@@ -366,8 +368,8 @@ namespace WLEditor
 
 			return false;
 		}
-		
-		ToolStripMenuItem SearchMenuItemWithKeyShortCut(MenuStrip menuStrip, Keys keyData)
+				
+		IEnumerable<ToolStripMenuItem> GetAllMenuItems(MenuStrip menuStrip)
 		{
 			Queue<ToolStripItem> queue = new Queue<ToolStripItem>();
 			foreach(ToolStripItem item in menuStrip.Items)
@@ -381,10 +383,7 @@ namespace WLEditor
 				ToolStripMenuItem toolStrip = item as ToolStripMenuItem;		
 				if(toolStrip != null)
 				{
-					if(toolStrip.ShortcutKeys == keyData)
-					{
-						return toolStrip;
-					}
+					yield return toolStrip;
 				}
 				
 				ToolStripDropDownItem toolStripDropDown = item as ToolStripDropDownItem;	
@@ -396,8 +395,6 @@ namespace WLEditor
 					}
 				}
 			}
-			
-			return null;
 		}
 		
 		void ZoomOutToolStripMenuItemClick(object sender, EventArgs e)
