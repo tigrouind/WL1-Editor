@@ -113,5 +113,13 @@ namespace WLEditor
 				tiles16x16PictureBox.SwitchMode = value;
 			}
 		}
+		
+		public bool ShowTileNumbers
+		{
+			set
+			{
+				tiles16x16PictureBox.ShowTileNumbers = value;
+			}
+		}
 	}
 }

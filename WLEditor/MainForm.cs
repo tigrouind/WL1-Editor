@@ -512,12 +512,21 @@ namespace WLEditor
 
 		void AboutToolStripMenuItemClick(object sender, EventArgs e)
 		{
-			MessageBox.Show(Text+" v0.68\r\nDate : 19.08.2019.\r\nContact me : tigrou.ind@gmail.com");
+			MessageBox.Show(Text+" v0.69\r\nDate : 05.10.2019.\r\nContact me : tigrou.ind@gmail.com");
 		}
 		
 		void AnimationToolStripMenuItemClick(object sender, EventArgs e)
 		{
 			timer.Enabled = animationToolStripMenuItem.Checked;
+		}
+		
+		void TileNumbersToolStripMenuItemClick(object sender, EventArgs e)
+		{
+			bool showTileNumbers = tileNumbersToolStripMenuItem.Checked;
+			levelPictureBox.ShowTileNumbers = showTileNumbers;
+			levelPictureBox.Invalidate();
+			toolboxForm.ShowTileNumbers = showTileNumbers;
+			toolboxForm.Invalidate(true);
 		}		
 	}
 }

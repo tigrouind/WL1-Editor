@@ -17,6 +17,7 @@ namespace WLEditor
 		public bool ShowScrollInfo = true;
 		public bool ShowObjects = true;		
 		public bool ShowColliders;
+		public bool ShowTileNumbers;
 		public int SwitchMode;
 		public int CurrentSector = -1;		
 		
@@ -44,6 +45,11 @@ namespace WLEditor
 					e.Graphics.InterpolationMode = InterpolationMode.NearestNeighbor;					
 					e.Graphics.PixelOffsetMode = PixelOffsetMode.Half;
 					e.Graphics.DrawImage(levelTiles.Bitmap, 0, 0, 4096 * zoom, 512 * zoom);					
+
+					if(ShowTileNumbers)
+					{
+						DrawTileNumber(e, format);
+					}
 					
 					//sector objects (enemies, powerups)
 					if(ShowObjects)
@@ -118,6 +124,30 @@ namespace WLEditor
 							{
 								g.FillRectangle(Level.transparentBrushes[specialTile], new Rectangle(i * 16, j * 16, 16, 16));
 							}
+						}
+					}
+				}
+			}
+		}
+		
+		void DrawTileNumber(PaintEventArgs e, StringFormat format)
+		{
+			using (Brush brush = new SolidBrush(Color.FromArgb(64, 0, 0, 0)))
+			{
+				e.Graphics.FillRectangle(brush, 0, 0, 256 * 16 * zoom, 32 * 16 * zoom);
+			}			
+			
+			using (Font font = new Font("Arial", Level.textSize[zoom - 1], FontStyle.Bold))
+			{
+				for(int j = 0 ; j < 32 ; j++)
+				{
+					for(int i = 0 ; i < 256 ; i++)
+					{
+						Rectangle destRect = new Rectangle(i * 16 * zoom, j * 16 * zoom, 16 * zoom, 16 * zoom);
+						if(destRect.IntersectsWith(e.ClipRectangle))
+						{
+							byte tileIndex = Level.levelData[i + j * 256 + 0x1000];							
+							e.Graphics.DrawString(tileIndex.ToString("X2"), font, Brushes.White, (i * 16 + 8) * zoom, (j * 16 + 8) * zoom, format);
 						}
 					}
 				}

@@ -51,6 +51,7 @@ namespace WLEditor
 			this.objectsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.scrollRegionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.collidersToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.tileNumbersToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.zoomToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.zoom100ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.zoom200ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -156,6 +157,7 @@ namespace WLEditor
 			this.objectsToolStripMenuItem,
 			this.scrollRegionToolStripMenuItem,
 			this.collidersToolStripMenuItem,
+			this.tileNumbersToolStripMenuItem,
 			this.animationToolStripMenuItem,
 			this.zoomToolStripMenuItem,
 			this.paletteToolStripMenuItem,
@@ -216,6 +218,14 @@ namespace WLEditor
 			this.collidersToolStripMenuItem.Text = "Colliders";
 			this.collidersToolStripMenuItem.Click += new System.EventHandler(this.CollidersToolStripMenuItemClick);
 			// 
+			// tileNumbersToolStripMenuItem
+			// 
+			this.tileNumbersToolStripMenuItem.Name = "tileNumbersToolStripMenuItem";
+			this.tileNumbersToolStripMenuItem.CheckOnClick = true;
+			this.tileNumbersToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F6;
+			this.tileNumbersToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
+			this.tileNumbersToolStripMenuItem.Text = "Tile numbers";
+			this.tileNumbersToolStripMenuItem.Click += new System.EventHandler(this.TileNumbersToolStripMenuItemClick);
 			// zoomToolStripMenuItem
 			// 
 			this.zoomToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -464,6 +474,7 @@ namespace WLEditor
 		private System.Windows.Forms.ToolStripSeparator toolStripMenuItem1;
 		private System.Windows.Forms.Timer timer;
 		private System.Windows.Forms.ToolStripMenuItem animationToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem tileNumbersToolStripMenuItem;
 
 			
 	
