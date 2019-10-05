@@ -137,16 +137,19 @@ namespace WLEditor
 				e.Graphics.FillRectangle(brush, 0, 0, 256 * 16 * zoom, 32 * 16 * zoom);
 			}			
 			
-			using (Font font = new Font("Arial", Level.textSize[zoom - 1], FontStyle.Bold))
+			using (Font font = new Font("Fixedsys", Level.textSize[zoom - 1], FontStyle.Bold))
 			{
-				for(int j = 0 ; j < 32 ; j++)
+				var clipRectangle = GetClipRectangle(e.ClipRectangle, 16 * zoom);
+				for(int j = clipRectangle.Top ; j < clipRectangle.Bottom ; j++)
 				{
-					for(int i = 0 ; i < 256 ; i++)
+					for(int i = clipRectangle.Left ; i < clipRectangle.Right ; i++)
 					{
 						Rectangle destRect = new Rectangle(i * 16 * zoom, j * 16 * zoom, 16 * zoom, 16 * zoom);
 						if(destRect.IntersectsWith(e.ClipRectangle))
 						{
-							byte tileIndex = Level.levelData[i + j * 256 + 0x1000];							
+							byte tileIndex = Level.levelData[i + j * 256 + 0x1000];		
+							tileIndex = (byte)Level.SwitchTile(tileIndex, SwitchMode);							
+							
 							e.Graphics.DrawString(tileIndex.ToString("X2"), font, Brushes.White, (i * 16 + 8) * zoom, (j * 16 + 8) * zoom, format);
 						}
 					}

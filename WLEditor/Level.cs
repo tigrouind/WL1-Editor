@@ -33,9 +33,9 @@ namespace WLEditor
 		
 		public static int[] textSize =
  		{
-			8, 
-			12, 
-			16, 
+			7, 
+			10, 
+			14, 
 			16
 		};
 
@@ -757,47 +757,52 @@ namespace WLEditor
 		{
 			switch(tileIndex)
 			{
-				case 46: //door
-				case 72:
-				case 75:
-				case 84:					
-					return 7;
+				case 0x2E: 
+				case 0x48:
+				case 0x4B:
+				case 0x54:					
+					return 7; //door
 					
-				case 68: //ladder
-				case 69:					
-					return 4;		
+				case 0x44: 
+				case 0x45:					
+					return 4; //ladder		
 
-				case 71: //coins
-				case 70:
-				case 83:										
-					return 3;	
+				case 0x47: 
+				case 0x46:
+				case 0x53:	
+				case 0x3E: 							
+					return 3; //coins or sand
+									
+				case 0x59: 
+				case 0x5A:
+				case 0x5C: 	
+				case 0x5D:
+				case 0x5E:	
+				case 0x5F:							
+					return 6; //damage
 					
-				case 62: //sand								
-					return 3;	
-				
-				case 89: //spikes
-				case 93:
-				case 94:										
-					return 6;
-					
-				case 58: //plateform
-				case 59:
-				case 64:
-				case 65:
-				case 66:
-				case 67:					
-					return 1;	
+				case 0x3A: 
+				case 0x3B:
+				case 0x40:
+				case 0x41:
+				case 0x42:
+				case 0x43:					
+					return 1; //plateform	 
 
-				case 76:
-				case 77:
-				case 78:
-				case 79:
-				case 85: 	
-				case 88: //water										
-					return 2;		
-
-				case 92: //sand										
-					return 5;						
+				case 0x4A:
+				case 0x4C:
+				case 0x4D:
+				case 0x4E:
+				case 0x4F:
+				case 0x50: 	
+				case 0x51: 	
+				case 0x52: 	
+				case 0x55: 	
+				case 0x56: 		
+				case 0x57: 	
+				case 0x58: 
+				case 0x5B: 					
+					return 2; //water		 					
 			}	
 
 			if((tileIndex & 64) != 64)

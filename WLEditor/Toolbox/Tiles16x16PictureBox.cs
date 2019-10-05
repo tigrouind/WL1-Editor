@@ -51,7 +51,7 @@ namespace WLEditor
 						e.Graphics.FillRectangle(brush, 0, 0, 8 * 16 * zoom, 16 * 16 * zoom);
 					}
 						
-					using (Font font = new Font("Arial", Level.textSize[zoom - 1], FontStyle.Bold))
+					using (Font font = new Font("Fixedsys", Level.textSize[zoom - 1], FontStyle.Bold))
 					using (StringFormat format = new StringFormat())
 					{
 						format.Alignment = StringAlignment.Center;
@@ -64,7 +64,8 @@ namespace WLEditor
 								Rectangle destRect = new Rectangle(i * 16 * zoom, j * 16 * zoom, 16 * zoom, 16 * zoom);		
 								if(destRect.IntersectsWith(e.ClipRectangle))
 								{
-									int tileIndex = i + j * 8;									
+									int tileIndex = i + j * 8;	
+									tileIndex = Level.SwitchTile(tileIndex, SwitchMode);									
 									e.Graphics.DrawString(tileIndex.ToString("X2"), font, Brushes.White, (i * 16 + 8) * zoom, (j * 16 + 8) * zoom, format);									
 								}
 							}	
