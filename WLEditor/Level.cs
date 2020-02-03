@@ -28,7 +28,7 @@ namespace WLEditor
 			new SolidBrush(Color.FromArgb(128, 0, 0, 255)),   //blue
 			new SolidBrush(Color.FromArgb(128, 128, 64, 0)),  //brown
 			new SolidBrush(Color.FromArgb(128, 255, 128, 0)), //orange
-			new SolidBrush(Color.FromArgb(255, 128, 64, 128)),  //purple
+			new SolidBrush(Color.FromArgb(128, 192, 64, 192)),//purple
 		};	
 		
 		public static int[] textSize =
