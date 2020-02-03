@@ -357,7 +357,7 @@ namespace WLEditor
 				return true;
 			}
 			
-			ToolStripMenuItem toolStrip = GetAllMenuItems(menuStrip1)
+			ToolStripMenuItem toolStrip = GetAllMenuItems(menuStrip1.Items)
 				.FirstOrDefault(x => x.ShortcutKeys == keyData);
 			
 			if(toolStrip != null)
@@ -369,17 +369,10 @@ namespace WLEditor
 			return false;
 		}
 				
-		IEnumerable<ToolStripMenuItem> GetAllMenuItems(MenuStrip menuStrip)
+		IEnumerable<ToolStripMenuItem> GetAllMenuItems(ToolStripItemCollection items)
 		{
-			Queue<ToolStripItem> queue = new Queue<ToolStripItem>();
-			foreach(ToolStripItem item in menuStrip.Items)
+			foreach(ToolStripItem item in items)
 			{
-				queue.Enqueue(item);
-			}			
-			
-			while(queue.Count > 0)
-			{								
-				ToolStripItem item = queue.Dequeue();
 				ToolStripMenuItem toolStrip = item as ToolStripMenuItem;		
 				if(toolStrip != null)
 				{
@@ -389,9 +382,9 @@ namespace WLEditor
 				ToolStripDropDownItem toolStripDropDown = item as ToolStripDropDownItem;	
 				if(toolStripDropDown != null)
 				{
-					foreach(ToolStripItem child in toolStripDropDown.DropDownItems)
+					foreach(var child in GetAllMenuItems(toolStripDropDown.DropDownItems))
 					{
-						queue.Enqueue(child);
+						yield return child;
 					}
 				}
 			}
@@ -481,7 +474,7 @@ namespace WLEditor
 			if(rom.IsLoaded && levelComboBox.SelectedItem != null && Level.animatedTilesMask != 0)
 			{				
 				timerTicks++;				
-				if((timerTicks & (Level.animatedTilesMask >> 2)) == 0)
+				if((timerTicks & Level.animatedTilesMask) == 0)
 				{
 					animatedTileIndex = (animatedTileIndex + 1) % 4;
 					RefreshAnimatedTiles();
