@@ -24,6 +24,20 @@ namespace WLEditor
 		
 		public event EventHandler<int> TileMouseDown;		
 		public event EventHandler<int> SectorChanged;
+		
+		public static Brush[] TransparentBrushes = 
+		{
+			new SolidBrush(Color.FromArgb(128, 255, 0, 0)),   //red
+			new SolidBrush(Color.FromArgb(128, 0, 255, 0)),   //green
+			new SolidBrush(Color.FromArgb(128, 0, 255, 255)), //light blue
+			new SolidBrush(Color.FromArgb(128, 255, 255, 0)), //yellow
+			new SolidBrush(Color.FromArgb(128, 0, 0, 255)),   //blue
+			new SolidBrush(Color.FromArgb(128, 128, 64, 0)),  //brown
+			new SolidBrush(Color.FromArgb(128, 255, 128, 0)), //orange
+			new SolidBrush(Color.FromArgb(128, 192, 64, 192)),//purple
+		};	
+		
+		public static Brush EnemyBrush = new SolidBrush(Color.FromArgb(255, 50, 50, 155));
 				
 		protected override void OnPaint(PaintEventArgs e)
 		{			
@@ -32,7 +46,6 @@ namespace WLEditor
 				var sectorsToDraw = GetVisibleSectors(e.ClipRectangle);
 				
 				using (StringFormat format = new StringFormat())
-				using (Brush enemyBrush = new SolidBrush(Level.enemyPalette[2]))
 				using (Font font = new Font("Arial", 8 * zoom))		
 				using (Font smallFont = new Font("Verdana", 7))		
 				using (Brush transparentBrush = new SolidBrush(Color.FromArgb(64, 0, 0, 0)))								
@@ -52,7 +65,7 @@ namespace WLEditor
 					//sector objects (enemies, powerups)
 					if(ShowObjects)
 					{
-						DrawObjects(font, format, e, enemyBrush);			
+						DrawObjects(font, format, e, EnemyBrush);			
 						
 						//wario position
 						int index = Level.WarioRightFacing ? 0 : 1;
@@ -120,7 +133,7 @@ namespace WLEditor
 							int specialTile = Level.IsSpecialTile(tileIndex);
 							if(specialTile != -1)
 							{
-								g.FillRectangle(Level.transparentBrushes[specialTile], new Rectangle(i * 16, j * 16, 16, 16));
+								g.FillRectangle(TransparentBrushes[specialTile], new Rectangle(i * 16, j * 16, 16, 16));
 							}
 						}
 						

@@ -7,78 +7,19 @@ namespace WLEditor
 {
 	public static class Level
 	{
-		public static Color[][] palettes =
+		static Color[][] palettes =
 		{
 			new[] { Color.FromArgb(255, 224, 248, 208), Color.FromArgb(255, 135, 201, 140), Color.FromArgb(255, 52, 104, 86), Color.FromArgb(255, 8, 24, 32) },
 			new[] { Color.White, Color.FromArgb(255, 170, 170, 170), Color.FromArgb(255, 85, 85, 85), Color.Black },
 			new[] { Color.White, Color.FromArgb(255, 230, 214, 156), Color.FromArgb(255, 180, 165, 106), Color.FromArgb(255, 57, 56, 41) }			
 		};
 		
-		public static Color[] enemyPalette =
+		static Color[] enemyPalette =
 		{
-			Color.White, Color.FromArgb(255, 157, 201, 253), Color.FromArgb(255, 50, 50, 155), Color.FromArgb(255, 0, 0, 41)
+			Color.White, Color.FromArgb(255, 157, 201, 253), Color.Magenta, Color.FromArgb(255, 0, 0, 41)
 		};
-		
-		public static Brush[] transparentBrushes = 
-		{
-			new SolidBrush(Color.FromArgb(128, 255, 0, 0)),   //red
-			new SolidBrush(Color.FromArgb(128, 0, 255, 0)),   //green
-			new SolidBrush(Color.FromArgb(128, 0, 255, 255)), //light blue
-			new SolidBrush(Color.FromArgb(128, 255, 255, 0)), //yellow
-			new SolidBrush(Color.FromArgb(128, 0, 0, 255)),   //blue
-			new SolidBrush(Color.FromArgb(128, 128, 64, 0)),  //brown
-			new SolidBrush(Color.FromArgb(128, 255, 128, 0)), //orange
-			new SolidBrush(Color.FromArgb(128, 192, 64, 192)),//purple
-		};	
-
-		public static string[] levelNames =
-		{
-			"SS Teacup 1",
-			"Parsley Woods 3",
-			"Sherbet Land 2",
-			"Stove Canyon 1",
-			"Sherbet Land 3",
-			"Mt. Teapot 4",
-			"Mt. Teapot 1",
-			"Rice Beach 1",
-			"Sherbet Land 4",
-			"Mt. Teapot 6",
-			"Mt. Teapot 7",
-			"SS Teacup 4",
-			"Rice Beach 4",
-			"Mt. Teapot 3",
-			"Rice Beach 3",
-			"Rice Beach 2",
-			"Mt. Teapot 2",
-			"Mt. Teapot 5",
-			"Parsley Woods 5",
-			"Parsley Woods 4",
-			"SS Teacup 5",
-			"Stove Canyon 2",
-			"Stove Canyon 3",
-			"Rice Beach 1 - FLOODED",
-			"Sherbet Land 6",
-			"Rice Beach 5",
-			"Parsley Woods 6",
-			"Stove Canyon 5",
-			"Stove Canyon 6",
-			"Parsley Woods 2",
-			"SS Teacup 2",
-			"SS Teacup 3",
-			"Sherbet Land 5",
-			"Sherbet Land 1",
-			"Syrup Castle 2",
-			"Syrup Castle 3",
-			"Rice Beach 3 - FLOODED",
-			"Syrup Castle 1",
-			"Parsley Woods 1 - FLOODED",
-			"Stove Canyon 4",
-			"Syrup Castle 4",
-			"Rice Beach 6",
-			"Parsley Woods 1 - DRAINED"
-		};
-		
-		public static Dictionary<int, int> enemiesIdsToSpriteData = new Dictionary<int, int>
+				
+		static Dictionary<int, int> enemiesIdsToSpriteData = new Dictionary<int, int>
 		{
 			{ 0x5313, 0x4FAA },
 			{ 0x5323, 0x6C70 },
@@ -157,7 +98,7 @@ namespace WLEditor
 		public static Rectangle[] LoadedSprites;
 		public static bool[] EnemiesAvailable;
 		public static bool[] Animated16x16Tiles;
-		public static int[] animated8x8Tiles;
+		private static int[] animated8x8Tiles;
 		public static int AnimatedTilesMask;
 		public static bool WarioRightFacing;
 		public static Rectangle[] PlayerRectangles;
@@ -866,7 +807,7 @@ namespace WLEditor
 			return true;
 		}
 
-		public static void SaveBlocksToRom(Rom rom, int course)
+		static void SaveBlocksToRom(Rom rom, int course)
 		{
 			//grab all levels data at once
 			byte[][] allTiles = new byte[0x2B][];
@@ -917,7 +858,7 @@ namespace WLEditor
 			}
 		}
 
-		public static bool SaveObjectsToRom(Rom rom, int course, out string errorMessage)
+		static bool SaveObjectsToRom(Rom rom, int course, out string errorMessage)
 		{
 			byte[][] enemyData = new byte[0x2B][];
 

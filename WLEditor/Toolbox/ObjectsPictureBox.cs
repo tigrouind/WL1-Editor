@@ -19,14 +19,13 @@ namespace WLEditor
 				format.LineAlignment = StringAlignment.Center;
 				format.Alignment = StringAlignment.Center;
 
-				using (Brush enemyBrush = new SolidBrush(Level.enemyPalette[2]))
 				using (Brush brush = new SolidBrush(Color.FromArgb(128, 255, 0, 0)))
 				using (Pen pen = new Pen(Color.White, 1.5f * zoom))
 				using (Font font = new Font("Arial", 16 * zoom))
 				{
 					e.Graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
 					e.Graphics.PixelOffsetMode = PixelOffsetMode.Half;					
-					e.Graphics.FillRectangle(enemyBrush, 0, 0, Width, Height);
+					e.Graphics.FillRectangle(LevelPictureBox.EnemyBrush, 0, 0, Width, Height);
 					
 					for(int j = 0 ; j < 16 ; j++)
 					{

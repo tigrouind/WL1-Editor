@@ -39,7 +39,7 @@ namespace WLEditor
 									int specialTile = Level.IsSpecialTile(tileIndex);
 									if(specialTile != -1)
 									{
-										g.FillRectangle(Level.transparentBrushes[specialTile], destRect);
+										g.FillRectangle(LevelPictureBox.TransparentBrushes[specialTile], destRect);
 									}	
 								}
 							}	
