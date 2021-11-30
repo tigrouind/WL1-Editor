@@ -17,11 +17,11 @@ namespace WLEditor
 				
 		protected override void OnPaint(PaintEventArgs e)
 		{						
-			if(Level.levelData != null)
+			if(Level.LevelData != null)
 			{				
 				using (Graphics g = Graphics.FromImage(tiles.Bitmap))
 				{			
-					g.DrawImage(Level.tiles16x16.Bitmap, 0, 0, 128, 256);
+					g.DrawImage(Level.Tiles16x16.Bitmap, 0, 0, 128, 256);
 					
 					if(ShowColliders)
 					{						

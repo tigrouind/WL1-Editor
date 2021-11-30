@@ -38,7 +38,7 @@ namespace WLEditor
 				
 				//make sure current object can still be selected, otherwise select first available previous object
 				int currentObject = toolboxForm.CurrentObject;
-				while(currentObject >= 1 && currentObject <= 6 && !Level.enemiesAvailable[currentObject - 1])
+				while(currentObject >= 1 && currentObject <= 6 && !Level.EnemiesAvailable[currentObject - 1])
 				{
 					currentObject--;
 				}
@@ -438,10 +438,10 @@ namespace WLEditor
 				
 				if(currentTile != -1 &&  selectedPanelIndex == 0)
 				{
-					int previousTile = Level.levelData[tileIndex + 0x1000];
+					int previousTile = Level.LevelData[tileIndex + 0x1000];
 					if(previousTile != currentTile)
 					{
-						Level.levelData[tileIndex + 0x1000] = (byte)currentTile;
+						Level.LevelData[tileIndex + 0x1000] = (byte)currentTile;
 						levelPictureBox.InvalidateTile(tileIndex);
 						SetChanges(true);
 					}
@@ -449,10 +449,10 @@ namespace WLEditor
 				
 				if(currentObject != -1 && levelPictureBox.ShowObjects && selectedPanelIndex == 2)
 				{	
-					int previousObject = Level.objectsData[tileIndex];
+					int previousObject = Level.ObjectsData[tileIndex];
 					if(previousObject != currentObject)
 					{
-						Level.objectsData[tileIndex] = (byte)currentObject;
+						Level.ObjectsData[tileIndex] = (byte)currentObject;
 						levelPictureBox.InvalidateObject(tileIndex, currentObject, previousObject);
 						SetChanges(true);
 					}				
@@ -476,10 +476,10 @@ namespace WLEditor
 				
 		void TimerTick(object sender, EventArgs e)
 		{
-			if(rom.IsLoaded && levelComboBox.SelectedItem != null && Level.animatedTilesMask != 0)
+			if(rom.IsLoaded && levelComboBox.SelectedItem != null && Level.AnimatedTilesMask != 0)
 			{				
 				timerTicks++;				
-				if((timerTicks & Level.animatedTilesMask) == 0)
+				if((timerTicks & Level.AnimatedTilesMask) == 0)
 				{
 					animatedTileIndex = (animatedTileIndex + 1) % 4;
 					RefreshAnimatedTiles();

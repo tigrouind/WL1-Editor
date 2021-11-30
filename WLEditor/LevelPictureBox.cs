@@ -27,7 +27,7 @@ namespace WLEditor
 				
 		protected override void OnPaint(PaintEventArgs e)
 		{			
-			if(Level.levelData != null)
+			if(Level.LevelData != null)
 			{
 				var sectorsToDraw = GetVisibleSectors(e.ClipRectangle);
 				
@@ -55,12 +55,12 @@ namespace WLEditor
 						DrawObjects(font, format, e, enemyBrush);			
 						
 						//wario position
-						int index = Level.warioRightFacing ? 0 : 1;
-						Rectangle playerRectangle = Level.playerRectangles[index];
-						Rectangle destRect = new Rectangle((Level.warioPosition % 8192 + playerRectangle.X - 32) * zoom, (Level.warioPosition / 8192 + playerRectangle.Y - 56 - index * 64) * zoom, playerRectangle.Width * zoom, playerRectangle.Height * zoom);
+						int index = Level.WarioRightFacing ? 0 : 1;
+						Rectangle playerRectangle = Level.PlayerRectangles[index];
+						Rectangle destRect = new Rectangle((Level.WarioPosition % 8192 + playerRectangle.X - 32) * zoom, (Level.WarioPosition / 8192 + playerRectangle.Y - 56 - index * 64) * zoom, playerRectangle.Width * zoom, playerRectangle.Height * zoom);
 						if (destRect.IntersectsWith(e.ClipRectangle))
 						{
-							e.Graphics.DrawImage(Level.playerSprite.Bitmap, destRect, playerRectangle, GraphicsUnit.Pixel);
+							e.Graphics.DrawImage(Level.PlayerSprite.Bitmap, destRect, playerRectangle, GraphicsUnit.Pixel);
 						}
 					}
 
@@ -114,7 +114,7 @@ namespace WLEditor
 
 						if(viewColliders)
 						{
-							byte tileIndex = Level.levelData[i + j * 256 + 0x1000];
+							byte tileIndex = Level.LevelData[i + j * 256 + 0x1000];
 							tileIndex = (byte)Level.SwitchTile(tileIndex, SwitchMode);
 															
 							int specialTile = Level.IsSpecialTile(tileIndex);
@@ -126,7 +126,7 @@ namespace WLEditor
 						
 						if(viewTileNumbers)
 						{
-							byte tileIndex = Level.levelData[i + j * 256 + 0x1000];		
+							byte tileIndex = Level.LevelData[i + j * 256 + 0x1000];		
 							tileIndex = (byte)Level.SwitchTile(tileIndex, SwitchMode);				
 							
 							g.FillRectangle(transparentBrush, i * 16, j * 16, 16, 16);
@@ -141,13 +141,13 @@ namespace WLEditor
 
 		void DrawTileToBitmap(int x, int y)
 		{
-			byte tileIndex = Level.levelData[x + y * 256 + 0x1000];
+			byte tileIndex = Level.LevelData[x + y * 256 + 0x1000];
 			Point dest = new Point(x * 16, y * 16);
 			Point src = new Point((tileIndex % 8) * 16, (tileIndex / 8) * 16);
 
 			for(int i = 0 ; i < 16 ; i++)
 			{
-				Array.Copy(Level.tiles16x16.Bits, src.X + (src.Y + i) * Level.tiles16x16.Width, levelTiles.Bits, dest.X + (dest.Y + i) * levelTiles.Width, 16);
+				Array.Copy(Level.Tiles16x16.Bits, src.X + (src.Y + i) * Level.Tiles16x16.Width, levelTiles.Bits, dest.X + (dest.Y + i) * levelTiles.Width, 16);
 			}
 		}
 
@@ -157,7 +157,7 @@ namespace WLEditor
 			{
 				for(int i = 0 ; i < 256 ; i++)
 				{
-					byte data = Level.objectsData[i + j * 256];
+					byte data = Level.ObjectsData[i + j * 256];
 					if(data > 0)
 					{
 						Rectangle destRect = new Rectangle(i * 16 * zoom, j * 16 * zoom, 16 * zoom, 16 * zoom);
@@ -168,22 +168,22 @@ namespace WLEditor
 							
 							if(data > 6)
 							{
-								e.Graphics.DrawImage(Level.tilesObjects.Bitmap, destRect, new Rectangle((data - 7) * 16, 0, 16, 16), GraphicsUnit.Pixel);								
+								e.Graphics.DrawImage(Level.TilesObjects.Bitmap, destRect, new Rectangle((data - 7) * 16, 0, 16, 16), GraphicsUnit.Pixel);								
 							}
-							else if(Level.loadedSprites[data - 1] == Rectangle.Empty)
+							else if(Level.LoadedSprites[data - 1] == Rectangle.Empty)
 							{
 								e.Graphics.DrawString(data.ToString(), font, Brushes.White, (i * 16 + 8) * zoom, (j * 16 + 8) * zoom, format);								
 							}
 						}
 						
 						//objects sprites																	
-						if(data <= 6 && Level.loadedSprites[data - 1] != Rectangle.Empty)
+						if(data <= 6 && Level.LoadedSprites[data - 1] != Rectangle.Empty)
 						{
-							Rectangle enemyRect = Level.loadedSprites[data - 1];
+							Rectangle enemyRect = Level.LoadedSprites[data - 1];
 							destRect = new Rectangle((i * 16 + enemyRect.X - 32 + 8) * zoom, (j * 16 + enemyRect.Y - (data - 1) * 64 - 40) * zoom, enemyRect.Width * zoom, enemyRect.Height * zoom);							
 							if(destRect.IntersectsWith(e.ClipRectangle))
 							{																												
-								e.Graphics.DrawImage(Level.tilesEnemies.Bitmap, destRect, enemyRect, GraphicsUnit.Pixel);
+								e.Graphics.DrawImage(Level.TilesEnemies.Bitmap, destRect, enemyRect, GraphicsUnit.Pixel);
 							}
 						}			
 					}														
@@ -195,7 +195,7 @@ namespace WLEditor
 		{
 			int drawSector = x + y * 16;
 			
-			byte scroll = Level.scrollData[drawSector];
+			byte scroll = Level.ScrollData[drawSector];
 			if ((scroll & 2) == 2)
 				g.FillRectangle(Brushes.Yellow, x * 256 * zoom, y * 256 * zoom, 6 * zoom, 256 * zoom);
 
@@ -210,7 +210,7 @@ namespace WLEditor
 			g.FillRectangle(Brushes.Blue, x * 256 * zoom, y * 256 * zoom, 16 * zoom, 16 * zoom);
 			g.DrawString(drawSector.ToString("D2"), font, Brushes.White, (x * 256 + 8) * zoom, (y * 256 + 8) * zoom, format);
 											
-			int sectorTarget = Level.warps[drawSector];
+			int sectorTarget = Level.Warps[drawSector];
 			if(sectorTarget != 255)
 			{
 				string text = GetWarpName(sectorTarget);
@@ -302,8 +302,8 @@ namespace WLEditor
 			{
 				for (int tileIndex = 0 ; tileIndex < 8192 ; tileIndex++)
 				{
-					byte data = Level.levelData[tileIndex + 0x1000];
-					if(Level.animated16x16Tiles[data])
+					byte data = Level.LevelData[tileIndex + 0x1000];
+					if(Level.Animated16x16Tiles[data])
 					{
 						r.Union(new Region(new Rectangle((tileIndex % 256) * 16 * zoom, (tileIndex / 256) * 16 * zoom, 16 * zoom, 16 * zoom)));
 						invalidTiles[tileIndex] = false;    
@@ -322,7 +322,7 @@ namespace WLEditor
 				{
 					if(enemyIndex >= 1 && enemyIndex <= 6)
 					{
-						Rectangle enemyRect = Level.loadedSprites[enemyIndex - 1];
+						Rectangle enemyRect = Level.LoadedSprites[enemyIndex - 1];
 						if(enemyRect != Rectangle.Empty)
 						{						
 							r.Union(new Rectangle(((tileIndex % 256) * 16 + enemyRect.X - 32 + 8) * zoom, ((tileIndex / 256) * 16 + enemyRect.Y - (enemyIndex - 1) * 64 - 40) * zoom, enemyRect.Width * zoom, enemyRect.Height * zoom));

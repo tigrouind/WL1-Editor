@@ -13,7 +13,7 @@ namespace WLEditor
 		
 		protected override void OnPaint(PaintEventArgs e)
 		{			
-			if(Level.levelData != null)
+			if(Level.LevelData != null)
 			{
 				StringFormat format = new StringFormat();
 				format.LineAlignment = StringAlignment.Center;
@@ -44,12 +44,12 @@ namespace WLEditor
 							}
 							else if(index <= 6)
 							{																	
-								if(Level.enemiesAvailable[index - 1])
+								if(Level.EnemiesAvailable[index - 1])
 								{
-									Rectangle enemyRect = Level.loadedSprites[index - 1];
+									Rectangle enemyRect = Level.LoadedSprites[index - 1];
 									if(enemyRect != Rectangle.Empty)
 									{									
-										e.Graphics.DrawImage(Level.tilesEnemies.Bitmap, destRect, new Rectangle(enemyRect.X - 16 + enemyRect.Width / 2, enemyRect.Y - 16 + enemyRect.Height / 2, 32, 32), GraphicsUnit.Pixel);
+										e.Graphics.DrawImage(Level.TilesEnemies.Bitmap, destRect, new Rectangle(enemyRect.X - 16 + enemyRect.Width / 2, enemyRect.Y - 16 + enemyRect.Height / 2, 32, 32), GraphicsUnit.Pixel);
 									}	
 									else
 									{
@@ -59,7 +59,7 @@ namespace WLEditor
 							}
 							else
 							{
-								e.Graphics.DrawImage(Level.tilesObjects.Bitmap, new Rectangle((x + 8) * zoom, (y + 8) * zoom, 16 * zoom, 16 * zoom), new Rectangle((index - 7) * 16, 0, 16, 16),  GraphicsUnit.Pixel);
+								e.Graphics.DrawImage(Level.TilesObjects.Bitmap, new Rectangle((x + 8) * zoom, (y + 8) * zoom, 16 * zoom, 16 * zoom), new Rectangle((index - 7) * 16, 0, 16, 16),  GraphicsUnit.Pixel);
 							}
 						}						
 					}
@@ -78,7 +78,7 @@ namespace WLEditor
 			int index = e.Location.X / 32 / zoom + (e.Location.Y / 32 / zoom) * 4;
 			index = GUIToObjectIndex(index);
 			
-			if(!(index >= 1 && index <= 6) || Level.enemiesAvailable[index - 1])
+			if(!(index >= 1 && index <= 6) || Level.EnemiesAvailable[index - 1])
 			{
 				CurrentObject = index;
 				Invalidate();
