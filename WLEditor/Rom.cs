@@ -1,22 +1,26 @@
 ﻿using System;
+using System.IO;
+using System.Text;
 
 namespace WLEditor
 {
 	public class Rom
 	{
-		private byte[] data;
+		byte[] data;
 
-		private int bank;
+		int bank;
 
 		public void Load(string filePath)
 		{
-			data = System.IO.File.ReadAllBytes(filePath);
+			data = File.ReadAllBytes(filePath);
 		}
 
 		public void Save(string filePath)
 		{
-			System.IO.File.WriteAllBytes(filePath, data);
+			File.WriteAllBytes(filePath, data);
 		}
+		
+		#region Read/Write
 
 		public byte ReadByte(int position)
 		{
@@ -24,10 +28,8 @@ namespace WLEditor
 			{
 				return data[position];
 			}
-			else
-			{
-				return data[position + (bank - 1) * 0x4000];
-			}
+			
+			return data[position + (bank - 1) * 0x4000];
 		}
 
 		public void WriteByte(int position, byte value)
@@ -59,28 +61,47 @@ namespace WLEditor
 		{
 			return (ushort)(ReadByte(position) << 8 | ReadByte(position + 1));
 		}
-
-
+		
 		public void WriteWord(int position, ushort value)
 		{
 			WriteByte(position, (byte)(value & 0xFF));
 			WriteByte(position + 1, (byte)((value >> 8) & 0xFF));
 		}
+		
+		public void WriteWordSwap(int position, ushort value)
+		{
+			WriteByte(position, (byte)((value >> 8) & 0xFF));
+			WriteByte(position + 1, (byte)(value & 0xFF));			
+		}
 
 		public byte[] ReadBytes(int position, int size)
 		{
-			byte[] data = new byte[size];
+			byte[] result = new byte[size];
 			for(int i = 0 ; i < size ; i++)
 			{
-				data[i] = ReadByte(position + i);
+				result[i] = ReadByte(position + i);
 			}
 
-			return data;
+			return result;
+		}
+		
+		#endregion
+
+		#region CRC
+		
+		public bool CheckCRC()
+		{
+			return GetHeaderCRC() == ReadByte(0x14d) && GetGlobalCRC() == ReadWordSwap(0x14e);
 		}
 
 		public void FixCRC()
 		{
-			//fix header CRC
+			WriteByte(0x14d, GetHeaderCRC());
+			WriteWordSwap(0x14e, GetGlobalCRC());
+		}
+		
+		byte GetHeaderCRC()
+		{
 			ushort headerCRC = 0;
 			for (int i = 0x134; i <= 0x14c; i++)
 			{
@@ -89,13 +110,16 @@ namespace WLEditor
 					headerCRC = (ushort)(headerCRC - data[i] - 1);
 				}
 			}
-			data[0x14d] = (byte)(headerCRC & 0xFF);
-
-			//fix global CRC
+			
+			return (byte)(headerCRC & 0xFF);
+		}
+		
+		ushort GetGlobalCRC()
+		{
 			ushort globalCRC = 0;
 			for (int i = 0 ; i < data.Length ; i++)
 			{
-				if(i != 0x14e && i != 0x14f)
+				if(i != 0x14e && i != 0x14f) //skip CRC itself
 				{
 					unchecked
 					{
@@ -103,15 +127,18 @@ namespace WLEditor
 					}
 				}
 			}
-			data[0x14e] = (byte)(globalCRC >> 8);
-			data[0x14f] = (byte)(globalCRC & 0xFF);
+			
+			return globalCRC;
 		}
-
+		
+		#endregion
+		
 		public void ExpandTo1MB()
 		{
-			data[0x0147] = 0x13; //MBC3+RAM+BATTERY
-			data[0x0148] = 0x05; //1MB
-			if(data.Length == 512*1024)
+			WriteByte(0x0147, 0x13); //MBC3+RAM+BATTERY
+			WriteByte(0x0148, 0x05); //1MB
+			
+			if (data.Length == 512*1024)
 			{
 				Array.Resize(ref data, 1024*1024);
 			}
@@ -121,14 +148,12 @@ namespace WLEditor
 		{
 			get
 			{
-				if(data.Length >= 0x150)
+				if(data.Length >= 0x150) //header size
 				{
-					return System.Text.Encoding.ASCII.GetString(data, 0x134, 16).TrimEnd('\0');
+					return Encoding.ASCII.GetString(data, 0x134, 16).TrimEnd('\0');
 				}
-				else
-				{
-					return string.Empty;
-				}
+				
+				return string.Empty;
 			}
 		}
 

@@ -80,6 +80,11 @@ namespace WLEditor
 				newRom.Load(openFileDialog1.FileName);
 				if (newRom.Title == "SUPERMARIOLAND3")
 				{
+					if (!newRom.CheckCRC())
+					{
+						MessageBox.Show("ROM checksum failed", Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);						
+					}
+					
 					rom = newRom;
 					LoadLevelCombobox();
 					Level.DumpBonusSprites(rom);
