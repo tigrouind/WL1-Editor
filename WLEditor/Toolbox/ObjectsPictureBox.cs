@@ -21,7 +21,7 @@ namespace WLEditor
 
 				using (Brush brush = new SolidBrush(Color.FromArgb(128, 255, 0, 0)))
 				using (Pen pen = new Pen(Color.White, 1.5f * zoom))
-				using (Font font = new Font("Arial", 16 * zoom))
+				using (Font font = new Font("Arial", 8 * zoom))
 				{
 					e.Graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
 					e.Graphics.PixelOffsetMode = PixelOffsetMode.Half;					
@@ -36,12 +36,12 @@ namespace WLEditor
 						Rectangle destRect = new Rectangle(x * zoom, y * zoom, 32 * zoom, 32 * zoom);							
 						if (destRect.IntersectsWith(e.ClipRectangle))
 						{
-							if(index == 0)
+							if(index == 0) //cross / delete
 							{							
 								e.Graphics.DrawLine(pen, (x + 8) * zoom, (y + 8) * zoom, (x + 24) * zoom, (y + 24) * zoom);
 								e.Graphics.DrawLine(pen, (x + 24) * zoom, (y + 8) * zoom, (x + 8) * zoom, (y + 24) * zoom);
 							}
-							else if(index <= 6)
+							else if(index <= 6) //enemy
 							{																	
 								if(Level.EnemiesAvailable[index - 1])
 								{
@@ -52,11 +52,11 @@ namespace WLEditor
 									}	
 									else
 									{
-										e.Graphics.DrawString(index.ToString(), font,  Brushes.White, (x + 16) * zoom, (y + 16) * zoom, format);
+										e.Graphics.DrawString(index.ToString(), font, Brushes.White, (x + 16) * zoom, (y + 16) * zoom, format);
 									}
 								}
 							}
-							else
+							else //power up
 							{
 								e.Graphics.DrawImage(Level.TilesObjects.Bitmap, new Rectangle((x + 8) * zoom, (y + 8) * zoom, 16 * zoom, 16 * zoom), new Rectangle((index - 7) * 16, 0, 16, 16),  GraphicsUnit.Pixel);
 							}
