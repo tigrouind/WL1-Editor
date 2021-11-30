@@ -23,60 +23,10 @@ namespace WLEditor
 				{			
 					g.DrawImage(Level.Tiles16x16.Bitmap, 0, 0, 128, 256);
 					
-					if(ShowColliders)
-					{						
-						for(int j = 0 ; j < 16 ; j++)
-						{
-							for(int i = 0 ; i < 8 ; i++)
-							{						
-								Rectangle destRect = new Rectangle(i * 16, j * 16, 16, 16);
-		
-								if(destRect.IntersectsWith(e.ClipRectangle))
-								{
-									int tileIndex = i + j * 8;
-									tileIndex = Level.SwitchTile(tileIndex, SwitchMode);
-									
-									int specialTile = Level.IsSpecialTile(tileIndex);
-									if(specialTile != -1)
-									{
-										g.FillRectangle(LevelPictureBox.TransparentBrushes[specialTile], destRect);
-									}	
-								}
-							}	
-						}						
-					}				
-	
-					if(ShowTileNumbers)
-					{
-						using (Brush brush = new SolidBrush(Color.FromArgb(64, 0, 0, 0)))
-						{
-							g.FillRectangle(brush, 0, 0, 8 * 16, 16 * 16);
-						}
-							
-						using (Font font = new Font("Verdana", 7))
-						using (StringFormat format = new StringFormat())
-						{							
-							format.Alignment = StringAlignment.Center;
-							format.LineAlignment = StringAlignment.Center;
-							
-							for(int j = 0 ; j < 16 ; j++)
-							{
-								for(int i = 0 ; i < 8 ; i++)
-								{						
-									Rectangle destRect = new Rectangle(i * 16, j * 16, 16, 16);		
-									if(destRect.IntersectsWith(e.ClipRectangle))
-									{
-										int tileIndex = i + j * 8;	
-										tileIndex = Level.SwitchTile(tileIndex, SwitchMode);
-										
-										g.TextRenderingHint = TextRenderingHint.SingleBitPerPixelGridFit;
-										g.DrawString(tileIndex.ToString("X2"), font, Brushes.White, i * 16 + 8, j * 16 + 8, format);	
-										g.TextRenderingHint = TextRenderingHint.SystemDefault;
-									}
-								}	
-							}							
-						}
-					}
+					if (ShowColliders || ShowTileNumbers)
+					{			
+						DrawTiles(g, e.ClipRectangle);
+					}	
 					
 					e.Graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
 					e.Graphics.PixelOffsetMode = PixelOffsetMode.Half;
@@ -92,6 +42,46 @@ namespace WLEditor
 				}
 			}
 		}		
+		
+		void DrawTiles(Graphics g, Rectangle clipRectangle)
+		{
+			using (Font font = new Font("Verdana", 7))
+			using (StringFormat format = new StringFormat())
+			{
+				format.Alignment = StringAlignment.Center;
+				format.LineAlignment = StringAlignment.Center;
+				
+				for(int j = 0 ; j < 16 ; j++)
+				{
+					for(int i = 0 ; i < 8 ; i++)
+					{						
+						Rectangle destRect = new Rectangle(i * 16, j * 16, 16, 16);
+
+						if(destRect.IntersectsWith(clipRectangle))
+						{
+							int tileIndex = i + j * 8;
+							tileIndex = Level.SwitchTile(tileIndex, SwitchMode);
+							
+							if (ShowColliders)
+							{
+								int specialTile = Level.IsSpecialTile(tileIndex);
+								if(specialTile != -1)
+								{
+									g.FillRectangle(LevelPictureBox.TransparentBrushes[specialTile], destRect);
+								}		
+							}
+							
+							if (ShowTileNumbers)
+							{
+								g.TextRenderingHint = TextRenderingHint.SingleBitPerPixelGridFit;
+								g.DrawString(tileIndex.ToString("X2"), font, Brushes.White, i * 16 + 8, j * 16 + 8, format);	
+								g.TextRenderingHint = TextRenderingHint.SystemDefault;
+							}
+						}
+					}	
+				}	
+			}
+		}
 					
 		protected override void OnMouseDown(MouseEventArgs e)
 		{
