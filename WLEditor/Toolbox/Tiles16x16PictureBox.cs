@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Drawing.Text;
 using System.Windows.Forms;
 
 namespace WLEditor
@@ -11,66 +12,75 @@ namespace WLEditor
 		public bool ShowColliders;
 		public bool ShowTileNumbers;
 		public int SwitchMode;		
+		DirectBitmap tiles = new DirectBitmap(128, 256);
 		int zoom;
 				
 		protected override void OnPaint(PaintEventArgs e)
-		{			
+		{						
 			if(Level.levelData != null)
 			{				
-				e.Graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
-				e.Graphics.PixelOffsetMode = PixelOffsetMode.Half;
-				e.Graphics.DrawImage(Level.tiles16x16.Bitmap, 0, 0, 128 * zoom, 256 * zoom);
-										
-				if(ShowColliders)
-				{						
-					for(int j = 0 ; j < 16 ; j++)
-					{
-						for(int i = 0 ; i < 8 ; i++)
-						{						
-							Rectangle destRect = new Rectangle(i * 16 * zoom, j * 16 * zoom, 16 * zoom, 16 * zoom);
-	
-							if(destRect.IntersectsWith(e.ClipRectangle))
-							{
-								int tileIndex = i + j * 8;
-								tileIndex = Level.SwitchTile(tileIndex, SwitchMode);
-								
-								int specialTile = Level.IsSpecialTile(tileIndex);
-								if(specialTile != -1)
-								{
-									e.Graphics.FillRectangle(Level.transparentBrushes[specialTile], destRect);
-								}	
-							}
-						}	
-					}						
-				}				
-
-				if(ShowTileNumbers)
-				{
-					using (Brush brush = new SolidBrush(Color.FromArgb(64, 0, 0, 0)))
-					{
-						e.Graphics.FillRectangle(brush, 0, 0, 8 * 16 * zoom, 16 * 16 * zoom);
-					}
-						
-					using (Font font = new Font("Fixedsys", Level.textSize[zoom - 1], FontStyle.Bold))
-					using (StringFormat format = new StringFormat())
-					{
-						format.Alignment = StringAlignment.Center;
-						format.LineAlignment = StringAlignment.Center;
-						
+				using (Graphics g = Graphics.FromImage(tiles.Bitmap))
+				{			
+					g.DrawImage(Level.tiles16x16.Bitmap, 0, 0, 128, 256);
+					
+					if(ShowColliders)
+					{						
 						for(int j = 0 ; j < 16 ; j++)
 						{
 							for(int i = 0 ; i < 8 ; i++)
 							{						
-								Rectangle destRect = new Rectangle(i * 16 * zoom, j * 16 * zoom, 16 * zoom, 16 * zoom);		
+								Rectangle destRect = new Rectangle(i * 16, j * 16, 16, 16);
+		
 								if(destRect.IntersectsWith(e.ClipRectangle))
 								{
-									int tileIndex = i + j * 8;	
-									tileIndex = Level.SwitchTile(tileIndex, SwitchMode);									
-									e.Graphics.DrawString(tileIndex.ToString("X2"), font, Brushes.White, (i * 16 + 8) * zoom, (j * 16 + 8) * zoom, format);									
+									int tileIndex = i + j * 8;
+									tileIndex = Level.SwitchTile(tileIndex, SwitchMode);
+									
+									int specialTile = Level.IsSpecialTile(tileIndex);
+									if(specialTile != -1)
+									{
+										g.FillRectangle(Level.transparentBrushes[specialTile], destRect);
+									}	
 								}
 							}	
+						}						
+					}				
+	
+					if(ShowTileNumbers)
+					{
+						using (Brush brush = new SolidBrush(Color.FromArgb(64, 0, 0, 0)))
+						{
+							g.FillRectangle(brush, 0, 0, 8 * 16, 16 * 16);
+						}
+							
+						using (Font font = new Font("Verdana", 7))
+						using (StringFormat format = new StringFormat())
+						{							
+							format.Alignment = StringAlignment.Center;
+							format.LineAlignment = StringAlignment.Center;
+							
+							for(int j = 0 ; j < 16 ; j++)
+							{
+								for(int i = 0 ; i < 8 ; i++)
+								{						
+									Rectangle destRect = new Rectangle(i * 16, j * 16, 16, 16);		
+									if(destRect.IntersectsWith(e.ClipRectangle))
+									{
+										int tileIndex = i + j * 8;	
+										tileIndex = Level.SwitchTile(tileIndex, SwitchMode);
+										
+										g.TextRenderingHint = TextRenderingHint.SingleBitPerPixelGridFit;
+										g.DrawString(tileIndex.ToString("X2"), font, Brushes.White, i * 16 + 8, j * 16 + 8, format);	
+										g.TextRenderingHint = TextRenderingHint.SystemDefault;
+									}
+								}	
+							}							
 						}
 					}
+					
+					e.Graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
+					e.Graphics.PixelOffsetMode = PixelOffsetMode.Half;
+					e.Graphics.DrawImage(tiles.Bitmap, 0, 0, 128 * zoom, 256 * zoom);	
 				}
 	
 				if(CurrentTile != -1)

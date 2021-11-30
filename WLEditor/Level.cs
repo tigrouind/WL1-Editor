@@ -30,14 +30,6 @@ namespace WLEditor
 			new SolidBrush(Color.FromArgb(128, 255, 128, 0)), //orange
 			new SolidBrush(Color.FromArgb(128, 192, 64, 192)),//purple
 		};	
-		
-		public static int[] textSize =
- 		{
-			7, 
-			10, 
-			14, 
-			16
-		};
 
 		public static string[] levelNames =
 		{

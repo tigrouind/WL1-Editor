@@ -514,6 +514,7 @@ namespace WLEditor
 		{
 			bool showTileNumbers = tileNumbersToolStripMenuItem.Checked;
 			levelPictureBox.ShowTileNumbers = showTileNumbers;
+			levelPictureBox.ClearTileCache();
 			levelPictureBox.Invalidate();
 			toolboxForm.ShowTileNumbers = showTileNumbers;
 			toolboxForm.Invalidate(true);

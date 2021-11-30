@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Drawing.Text;
 using System.Windows.Forms;
 
 namespace WLEditor
@@ -32,24 +33,21 @@ namespace WLEditor
 				
 				using (StringFormat format = new StringFormat())
 				using (Brush enemyBrush = new SolidBrush(Level.enemyPalette[2]))
-				using (Font font = new Font("Arial", 8 * zoom))								
+				using (Font font = new Font("Arial", 8 * zoom))		
+				using (Font smallFont = new Font("Verdana", 7))		
+				using (Brush transparentBrush = new SolidBrush(Color.FromArgb(64, 0, 0, 0)))								
 				using (Graphics g = Graphics.FromImage(levelTiles.Bitmap))
 				{
 					format.LineAlignment = StringAlignment.Center;
 					format.Alignment = StringAlignment.Center;				
 				
 					//draw tiles to cache
-					DrawTiles(g, e.ClipRectangle, ShowColliders);
+					DrawTiles(g, e.ClipRectangle, ShowColliders, ShowTileNumbers, smallFont, format, transparentBrush);
 
 					//draw tiles from cache
 					e.Graphics.InterpolationMode = InterpolationMode.NearestNeighbor;					
 					e.Graphics.PixelOffsetMode = PixelOffsetMode.Half;
 					e.Graphics.DrawImage(levelTiles.Bitmap, 0, 0, 4096 * zoom, 512 * zoom);					
-
-					if(ShowTileNumbers)
-					{
-						DrawTileNumber(e, format);
-					}
 					
 					//sector objects (enemies, powerups)
 					if(ShowObjects)
@@ -65,7 +63,7 @@ namespace WLEditor
 							e.Graphics.DrawImage(Level.playerSprite.Bitmap, destRect, playerRectangle, GraphicsUnit.Pixel);
 						}
 					}
-					
+
 					//scroll
 					if(ShowScrollInfo)
 					{
@@ -101,7 +99,7 @@ namespace WLEditor
 			}
 		}
 		
-		void DrawTiles(Graphics g, Rectangle clipRectangle, bool viewColliders)
+		void DrawTiles(Graphics g, Rectangle clipRectangle, bool viewColliders, bool viewTileNumbers, Font smallFont, StringFormat format, Brush transparentBrush)
 		{			
 			clipRectangle = GetClipRectangle(clipRectangle, 16 * zoom);			
 			
@@ -125,32 +123,16 @@ namespace WLEditor
 								g.FillRectangle(Level.transparentBrushes[specialTile], new Rectangle(i * 16, j * 16, 16, 16));
 							}
 						}
-					}
-				}
-			}
-		}
-		
-		void DrawTileNumber(PaintEventArgs e, StringFormat format)
-		{
-			using (Brush brush = new SolidBrush(Color.FromArgb(64, 0, 0, 0)))
-			{
-				e.Graphics.FillRectangle(brush, 0, 0, 256 * 16 * zoom, 32 * 16 * zoom);
-			}			
-			
-			using (Font font = new Font("Fixedsys", Level.textSize[zoom - 1], FontStyle.Bold))
-			{
-				var clipRectangle = GetClipRectangle(e.ClipRectangle, 16 * zoom);
-				for(int j = clipRectangle.Top ; j < clipRectangle.Bottom ; j++)
-				{
-					for(int i = clipRectangle.Left ; i < clipRectangle.Right ; i++)
-					{
-						Rectangle destRect = new Rectangle(i * 16 * zoom, j * 16 * zoom, 16 * zoom, 16 * zoom);
-						if(destRect.IntersectsWith(e.ClipRectangle))
+						
+						if(viewTileNumbers)
 						{
 							byte tileIndex = Level.levelData[i + j * 256 + 0x1000];		
-							tileIndex = (byte)Level.SwitchTile(tileIndex, SwitchMode);							
+							tileIndex = (byte)Level.SwitchTile(tileIndex, SwitchMode);				
 							
-							e.Graphics.DrawString(tileIndex.ToString("X2"), font, Brushes.White, (i * 16 + 8) * zoom, (j * 16 + 8) * zoom, format);
+							g.FillRectangle(transparentBrush, i * 16, j * 16, 16, 16);
+							g.TextRenderingHint = TextRenderingHint.SingleBitPerPixelGridFit;
+							g.DrawString(tileIndex.ToString("X2"), smallFont, Brushes.White, i * 16 + 8, j * 16 + 8, format);							
+							g.TextRenderingHint = TextRenderingHint.SystemDefault;
 						}
 					}
 				}
