@@ -317,8 +317,8 @@ namespace WLEditor
 				{
 					byte data = Level.LevelData[tileIndex + 0x1000];
 					if(Level.Animated16x16Tiles[data])
-					{
-						r.Union(new Region(new Rectangle((tileIndex % 256) * 16 * zoom, (tileIndex / 256) * 16 * zoom, 16 * zoom, 16 * zoom)));
+					{						
+				      	r.Union(new Rectangle((tileIndex % 256) * 16 * zoom, (tileIndex / 256) * 16 * zoom, 16 * zoom, 16 * zoom));
 						invalidTiles[tileIndex] = false;    
 					}				
 				}
