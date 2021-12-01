@@ -19,13 +19,24 @@ namespace WLEditor
 			Color.White, Color.FromArgb(255, 157, 201, 253), Color.Magenta, Color.FromArgb(255, 0, 0, 41)
 		};
 				
-		static int[] enemySpriteDataAddress = new []
+		static short[] enemySpriteAddress = 
 		{
 			0x0000, 0x4FAA, 0x6FBC, 0x74E9, 0x6B4E, 0x6C70, 0x4DB0, 0x0000, 0x5BAF, 0x66A0, 0x66A0, 0x686C, 0x60D1, 0x6373, 0x4035, 0x40F5, 
 			0x4308, 0x459E, 0x4AA0, 0x53A3, 0x5C86, 0x5E0F, 0x64D4, 0x6D16, 0x6726, 0x6C2F, 0x0000, 0x7C56, 0x435D, 0x4D26, 0x5ECA, 0x460F, 
 			0x54F8, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x6E87, 0x736F, 0x75BA, 0x6082, 0x64BA, 0x0000, 0x6933, 0x6933, 0x6BEE, 0x6F27, 
 			0x72BF, 0x7570, 0x7B10, 0x4F33, 0x0000, 0x0000, 0x0000, 0x6B39, 0x7AB7, 0x7ABB, 0x7AC3, 0x7ABF, 0x6F1F, 0x6D59, 0x6F84, 0x7338, 
 			0x6D56, 0x6D8E, 0x730D, 0x7567, 0x7B16, 0x778B, 0x776D, 0x6D56, 0x796C, 0x7992, 0x7572, 0x7C24, 0x7DE6, 0x7F1F, 0x7153
+		};
+		
+		static short[] bonusSpriteAddress = { 0x4ACB, 0x4AEB, 0x4ADB, 0x4AFB, 0x4B0B, 0x4B1B, 0x4B2B, 0x4B4B, 0x4B5B };
+		
+		static byte[] enemyCodePattern = { 
+			0x3E, 0x00,       //ld  a, ..
+			0xEA, 0x2F, 0xA3, //ld  (A32F),a
+			0x3E, 0x00,       //ld  a, ..
+			0xEA, 0x30, 0xA3, //ld  (A330),a
+			0x01, 0x00, 0x00, //ld  bc, ..
+			0xCD, 0xA7, 0x40  //call 40A7
 		};
 		
 		public static byte[] LevelData;
@@ -191,11 +202,10 @@ namespace WLEditor
 			rom.SetBank(0x11);
 			Dump8x8Tiles(rom, 0x7300, 4, 16+23, 0x1E, enemyPalette, true); 
 			
-			rom.SetBank(0xF);
-			int[] sprites = { 0x4ACB, 0x4AEB, 0x4ADB, 0x4AFB, 0x4B0B, 0x4B1B, 0x4B2B, 0x4B4B, 0x4B5B };
-			for (int i = 0 ; i < sprites.Length ; i++)
+			rom.SetBank(0xF);			
+			for (int i = 0 ; i < bonusSpriteAddress.Length ; i++)
 			{			
-				DumpSprite(rom, 8 + i * 16, 16, sprites[i], TilesObjects);
+				DumpSprite(rom, 8 + i * 16, 16, bonusSpriteAddress[i], TilesObjects);
 			}
 		}
 
@@ -412,24 +422,15 @@ namespace WLEditor
 		
 		static void FindEnemiesData(Rom rom, int enemiesPointer, out int enemyId, out int tilesPointer)
 		{
-			byte[] pattern = { 
-				0x3E, 0x00,       //ld  a, ..
-				0xEA, 0x2F, 0xA3, //ld  (A32F),a
-				0x3E, 0x00,       //ld  a, ..
-				0xEA, 0x30, 0xA3, //ld  (A330),a
-				0x01, 0x00, 0x00, //ld  bc, ..
-				0xCD, 0xA7, 0x40  //call 40A7
-			};
-							
 			rom.SetBank(0x7);
 			int position = enemiesPointer;
 			while(rom.ReadByte(position) != 0xC9) //ret
 			{				
 				bool match = true;
-				for(int j = 0 ; j < pattern.Length ; j++)
+				for(int j = 0 ; j < enemyCodePattern.Length ; j++)
 				{
 					byte valueFromRom = rom.ReadByte(position + j);
-					byte valueToCompare = pattern[j];
+					byte valueToCompare = enemyCodePattern[j];
 					
 					if(valueToCompare != 0x00 && valueFromRom != valueToCompare)
 					{
@@ -556,10 +557,10 @@ namespace WLEditor
 				int enemyId = rom.ReadWord(enemiesIdsPointer + (i + 1) * 2);
 				enemyId = (enemyId - 0x530F) / 4;
 				
-				if(enemyId > 0 && enemyId < enemySpriteDataAddress.Length)
+				if(enemyId > 0 && enemyId < enemySpriteAddress.Length)
 				{
 					EnemiesAvailable[i] = true;
-					int spriteDataAddress = enemySpriteDataAddress[enemyId];
+					int spriteDataAddress = enemySpriteAddress[enemyId];
 					if(spriteDataAddress != 0)
 					{		
 						if (LoadEnemiesTiles(rom, i, spriteDataAddress, tilesDataAddress))
