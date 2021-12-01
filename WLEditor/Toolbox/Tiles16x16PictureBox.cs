@@ -22,7 +22,7 @@ namespace WLEditor
 				using (Graphics g = Graphics.FromImage(tiles.Bitmap))
 				{			
 					g.DrawImage(Level.Tiles16x16.Bitmap, 0, 0, 128, 256);
-					
+									
 					if (ShowColliders || ShowTileNumbers)
 					{			
 						DrawTiles(g, e.ClipRectangle);
@@ -47,10 +47,11 @@ namespace WLEditor
 		{
 			using (Font font = new Font("Verdana", 7))
 			using (StringFormat format = new StringFormat())
+			using (Brush brush = new SolidBrush(Color.FromArgb(64, 0, 0, 0)))
 			{
 				format.Alignment = StringAlignment.Center;
 				format.LineAlignment = StringAlignment.Center;
-				
+
 				for(int j = 0 ; j < 16 ; j++)
 				{
 					for(int i = 0 ; i < 8 ; i++)
@@ -73,6 +74,7 @@ namespace WLEditor
 							
 							if (ShowTileNumbers)
 							{
+								g.FillRectangle(brush, destRect);
 								g.TextRenderingHint = TextRenderingHint.SingleBitPerPixelGridFit;
 								g.DrawString(tileIndex.ToString("X2"), font, Brushes.White, i * 16 + 8, j * 16 + 8, format);	
 								g.TextRenderingHint = TextRenderingHint.SystemDefault;

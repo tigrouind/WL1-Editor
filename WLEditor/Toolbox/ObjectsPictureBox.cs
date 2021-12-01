@@ -27,40 +27,9 @@ namespace WLEditor
 					e.Graphics.PixelOffsetMode = PixelOffsetMode.Half;					
 					e.Graphics.FillRectangle(LevelPictureBox.EnemyBrush, 0, 0, Width, Height);
 					
-					for(int j = 0 ; j < 16 ; j++)
+					for(int index = 0 ; index < 16 ; index++)
 					{
-						int index = GUIToObjectIndex(j);
-						int x = (j % 4) * 32;
-						int y = (j / 4) * 32;
-						
-						Rectangle destRect = new Rectangle(x * zoom, y * zoom, 32 * zoom, 32 * zoom);							
-						if (destRect.IntersectsWith(e.ClipRectangle))
-						{
-							if(index == 0) //cross / delete
-							{							
-								e.Graphics.DrawLine(pen, (x + 8) * zoom, (y + 8) * zoom, (x + 24) * zoom, (y + 24) * zoom);
-								e.Graphics.DrawLine(pen, (x + 24) * zoom, (y + 8) * zoom, (x + 8) * zoom, (y + 24) * zoom);
-							}
-							else if(index <= 6) //enemy
-							{																	
-								if(Level.EnemiesAvailable[index - 1])
-								{
-									Rectangle enemyRect = Level.LoadedSprites[index - 1];
-									if(enemyRect != Rectangle.Empty)
-									{									
-										e.Graphics.DrawImage(Level.TilesEnemies.Bitmap, destRect, new Rectangle(enemyRect.X - 16 + enemyRect.Width / 2, enemyRect.Y - 16 + enemyRect.Height / 2, 32, 32), GraphicsUnit.Pixel);
-									}	
-									else
-									{
-										e.Graphics.DrawString(index.ToString(), font, Brushes.White, (x + 16) * zoom, (y + 16) * zoom, format);
-									}
-								}
-							}
-							else //power up
-							{
-								e.Graphics.DrawImage(Level.TilesObjects.Bitmap, new Rectangle((x + 8) * zoom, (y + 8) * zoom, 16 * zoom, 16 * zoom), new Rectangle((index - 7) * 16, 0, 16, 16),  GraphicsUnit.Pixel);
-							}
-						}						
+						DrawTile(e.Graphics, e.ClipRectangle, pen, font, format, index);
 					}
 					
 					if(CurrentObject != -1)
@@ -70,6 +39,42 @@ namespace WLEditor
 					}
 				}
 			}		
+		}
+		
+		void DrawTile(Graphics g, Rectangle clipRectangle, Pen pen, Font font, StringFormat format, int index)
+		{			
+			int x = (index % 4) * 32;
+			int y = (index / 4) * 32;
+			index = GUIToObjectIndex(index);
+			
+			Rectangle destRect = new Rectangle(x * zoom, y * zoom, 32 * zoom, 32 * zoom);							
+			if (destRect.IntersectsWith(clipRectangle))
+			{
+				if(index == 0) //cross / delete
+				{							
+					g.DrawLine(pen, (x + 8) * zoom, (y + 8) * zoom, (x + 24) * zoom, (y + 24) * zoom);
+					g.DrawLine(pen, (x + 24) * zoom, (y + 8) * zoom, (x + 8) * zoom, (y + 24) * zoom);
+				}
+				else if(index <= 6) //enemy
+				{																	
+					if(Level.EnemiesAvailable[index - 1])
+					{
+						Rectangle enemyRect = Level.LoadedSprites[index - 1];
+						if(enemyRect != Rectangle.Empty)
+						{									
+							g.DrawImage(Level.TilesEnemies.Bitmap, destRect, new Rectangle(enemyRect.X - 16 + enemyRect.Width / 2, enemyRect.Y - 16 + enemyRect.Height / 2, 32, 32), GraphicsUnit.Pixel);
+						}	
+						else
+						{
+							g.DrawString(index.ToString(), font, Brushes.White, (x + 16) * zoom, (y + 16) * zoom, format);
+						}
+					}
+				}
+				else //power up
+				{
+					g.DrawImage(Level.TilesObjects.Bitmap, new Rectangle((x + 8) * zoom, (y + 8) * zoom, 16 * zoom, 16 * zoom), new Rectangle((index - 7) * 16, 0, 16, 16),  GraphicsUnit.Pixel);
+				}
+			}
 		}
 		
 		protected override void OnMouseDown(MouseEventArgs e)
