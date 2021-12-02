@@ -124,28 +124,28 @@ namespace WLEditor
 					{
 						invalidTiles[i + j * 256] = true;
 						DrawTileToBitmap(i, j);
-
-						if(viewColliders)
-						{
+						
+						if(viewColliders || viewTileNumbers)
+						{						
 							byte tileIndex = Level.LevelData[i + j * 256 + 0x1000];
 							tileIndex = (byte)Level.SwitchTile(tileIndex, SwitchMode);
-															
-							int specialTile = Level.IsSpecialTile(tileIndex);
-							if(specialTile != -1)
-							{
-								g.FillRectangle(TransparentBrushes[specialTile], new Rectangle(i * 16, j * 16, 16, 16));
+	
+							if(viewColliders)
+							{											
+								int specialTile = Level.IsSpecialTile(tileIndex);
+								if(specialTile != -1)
+								{
+									g.FillRectangle(TransparentBrushes[specialTile], new Rectangle(i * 16, j * 16, 16, 16));
+								}
 							}
-						}
-						
-						if(viewTileNumbers)
-						{
-							byte tileIndex = Level.LevelData[i + j * 256 + 0x1000];		
-							tileIndex = (byte)Level.SwitchTile(tileIndex, SwitchMode);				
 							
-							g.FillRectangle(transparentBrush, i * 16, j * 16, 16, 16);
-							g.TextRenderingHint = TextRenderingHint.SingleBitPerPixelGridFit;
-							g.DrawString(tileIndex.ToString("X2"), smallFont, Brushes.White, i * 16 + 8, j * 16 + 8, format);							
-							g.TextRenderingHint = TextRenderingHint.SystemDefault;
+							if(viewTileNumbers)
+							{
+								g.FillRectangle(transparentBrush, i * 16, j * 16, 16, 16);
+								g.TextRenderingHint = TextRenderingHint.SingleBitPerPixelGridFit;
+								g.DrawString(tileIndex.ToString("X2"), smallFont, Brushes.White, i * 16 + 8, j * 16 + 8, format);							
+								g.TextRenderingHint = TextRenderingHint.SystemDefault;
+							}
 						}
 					}
 				}
