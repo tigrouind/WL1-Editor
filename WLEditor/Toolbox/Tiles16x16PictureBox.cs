@@ -9,7 +9,7 @@ namespace WLEditor
 	public class Tiles16x16PictureBox : PictureBox
 	{
 		public int CurrentTile = -1;
-		public bool ShowColliders;
+		public bool ShowColliders = true;
 		public bool ShowTileNumbers;
 		public int SwitchMode;		
 		DirectBitmap tiles = new DirectBitmap(128, 256);

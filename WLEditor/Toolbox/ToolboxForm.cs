@@ -10,10 +10,7 @@ namespace WLEditor
 		
 		public ToolboxForm()
 		{				
-			InitializeComponent();
-			tiles8x8PictureBox.SetZoom(1);						
-			tiles16x16PictureBox.SetZoom(1);											
-			objectsPictureBox.SetZoom(1);				
+			InitializeComponent();			
 		}	
 		
 		public void SetZoom(int zoom)

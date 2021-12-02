@@ -11,13 +11,13 @@ namespace WLEditor
 	{			
 		readonly bool[] invalidTiles = new bool[256 * 32];	
 		DirectBitmap levelTiles = new DirectBitmap(4096, 512);		
-		int zoom = 1;
+		int zoom;
 		int lastTileIndex = -1;
 				
 		public bool ShowSectors = true;
 		public bool ShowScrollInfo = true;
 		public bool ShowObjects = true;		
-		public bool ShowColliders;
+		public bool ShowColliders = true;
 		public bool ShowTileNumbers;
 		public int SwitchMode;
 		public int CurrentSector = -1;		
@@ -27,14 +27,13 @@ namespace WLEditor
 		
 		public static Brush[] TransparentBrushes = 
 		{
-			new SolidBrush(Color.FromArgb(128, 255, 0, 0)),   //red
-			new SolidBrush(Color.FromArgb(128, 0, 255, 0)),   //green
-			new SolidBrush(Color.FromArgb(128, 0, 255, 255)), //light blue
-			new SolidBrush(Color.FromArgb(128, 255, 255, 0)), //yellow
-			new SolidBrush(Color.FromArgb(128, 0, 0, 255)),   //blue
-			new SolidBrush(Color.FromArgb(128, 128, 64, 0)),  //brown
-			new SolidBrush(Color.FromArgb(128, 255, 128, 0)), //orange
-			new SolidBrush(Color.FromArgb(128, 192, 64, 192)),//purple
+			new SolidBrush(Color.FromArgb(64, 128, 64, 0)),  //brown
+			new SolidBrush(Color.FromArgb(64, 0, 255, 0)),   //green
+			new SolidBrush(Color.FromArgb(64, 0, 255, 255)), //light blue
+			new SolidBrush(Color.FromArgb(64, 255, 255, 0)), //yellow
+			new SolidBrush(Color.FromArgb(64, 0, 0, 255)),   //blue
+			new SolidBrush(Color.FromArgb(64, 255, 0, 0)),   //red
+			new SolidBrush(Color.FromArgb(128, 0, 128, 0)),  //dark green
 		};	
 		
 		public static Brush EnemyBrush = new SolidBrush(Color.FromArgb(255, 50, 50, 155));

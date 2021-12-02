@@ -59,7 +59,6 @@ namespace WLEditor
 			this.zoom400ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.zoomInToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.zoomOutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.paletteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.classicToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.blackWhiteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.autumnToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -160,7 +159,6 @@ namespace WLEditor
 			this.tileNumbersToolStripMenuItem,
 			this.animationToolStripMenuItem,
 			this.zoomToolStripMenuItem,
-			this.paletteToolStripMenuItem,
 			this.switchToolStripMenuItem});
 			this.viewToolStripMenuItem.Name = "viewToolStripMenuItem";
 			this.viewToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
@@ -210,8 +208,10 @@ namespace WLEditor
 			this.scrollRegionToolStripMenuItem.Click += new System.EventHandler(this.ScrollRegionToolStripMenuItemClick);
 			// 
 			// collidersToolStripMenuItem
-			// 
-			this.collidersToolStripMenuItem.CheckOnClick = true;
+			//
+			this.collidersToolStripMenuItem.Checked = true;
+			this.collidersToolStripMenuItem.CheckOnClick = true;			
+			this.collidersToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.collidersToolStripMenuItem.Name = "collidersToolStripMenuItem";
 			this.collidersToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
 			this.collidersToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F5;
@@ -286,39 +286,6 @@ namespace WLEditor
 			this.zoomOutToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
 			this.zoomOutToolStripMenuItem.Text = "Zoom out";
 			this.zoomOutToolStripMenuItem.Click += new System.EventHandler(this.ZoomOutToolStripMenuItemClick);
-			// 
-			// paletteToolStripMenuItem
-			// 
-			this.paletteToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-			this.classicToolStripMenuItem,
-			this.blackWhiteToolStripMenuItem,
-			this.autumnToolStripMenuItem});
-			this.paletteToolStripMenuItem.Name = "paletteToolStripMenuItem";
-			this.paletteToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
-			this.paletteToolStripMenuItem.Text = "Palette";
-			// 
-			// classicToolStripMenuItem
-			// 
-			this.classicToolStripMenuItem.Checked = true;
-			this.classicToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
-			this.classicToolStripMenuItem.Name = "classicToolStripMenuItem";
-			this.classicToolStripMenuItem.Size = new System.Drawing.Size(147, 22);
-			this.classicToolStripMenuItem.Text = "Classic";
-			this.classicToolStripMenuItem.Click += new System.EventHandler(this.ClassicToolStripMenuItemClick);
-			// 
-			// blackWhiteToolStripMenuItem
-			// 
-			this.blackWhiteToolStripMenuItem.Name = "blackWhiteToolStripMenuItem";
-			this.blackWhiteToolStripMenuItem.Size = new System.Drawing.Size(147, 22);
-			this.blackWhiteToolStripMenuItem.Text = "Black && white";
-			this.blackWhiteToolStripMenuItem.Click += new System.EventHandler(this.BlackWhiteToolStripMenuItemClick);
-			// 
-			// autumnToolStripMenuItem
-			// 
-			this.autumnToolStripMenuItem.Name = "autumnToolStripMenuItem";
-			this.autumnToolStripMenuItem.Size = new System.Drawing.Size(147, 22);
-			this.autumnToolStripMenuItem.Text = "Autumn";
-			this.autumnToolStripMenuItem.Click += new System.EventHandler(this.AutumnToolStripMenuItemClick);
 			// 
 			// switchToolStripMenuItem
 			// 
@@ -458,7 +425,6 @@ namespace WLEditor
 		private System.Windows.Forms.Panel LevelPanel;
 		LevelPictureBox levelPictureBox;
 		private System.Windows.Forms.ToolStripMenuItem saveAsToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem paletteToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem classicToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem blackWhiteToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem autumnToolStripMenuItem;

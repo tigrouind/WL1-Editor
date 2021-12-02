@@ -59,26 +59,26 @@ namespace WLEditor
 			
 		int currentCourseId = -1;
 		int currentWarp = -1;
-		int paletteIndex;
 		int switchMode;
 		int animatedTileIndex;
 		int timerTicks;
 		string romFilePath;
 		bool hasChanges;
-		int zoom = 1;
+		int zoom;
 				
 		public MainForm()
 		{
 			InitializeComponent();									
 			toolboxForm.FormClosing += ToolBoxFormClosing;	
 			toolboxForm.ProcessCommandKey += ToolBoxProcessCommandKey;
+			SetZoomLevel(2);
 		}
 
 		public void LoadLevel(bool reloadAll)
 		{
 			if(rom.IsLoaded && levelComboBox.SelectedItem != null)
 			{				
-				Level.DumpLevel(rom, currentCourseId, currentWarp, reloadAll, switchMode, paletteIndex, animatedTileIndex, false);
+				Level.DumpLevel(rom, currentCourseId, currentWarp, reloadAll, switchMode, animatedTileIndex, false);
 				
 				levelPictureBox.ClearTileCache();
 				levelPictureBox.Invalidate();	
@@ -306,31 +306,6 @@ namespace WLEditor
 				}
 			}
 		}
-
-		void ClassicToolStripMenuItemClick(object sender, EventArgs e)
-		{
-			SetPalette(0);			
-		}
-
-		void BlackWhiteToolStripMenuItemClick(object sender, EventArgs e)
-		{
-			SetPalette(1);
-		}
-
-		void AutumnToolStripMenuItemClick(object sender, EventArgs e)
-		{
-			SetPalette(2);
-		}
-		
-		void SetPalette(int index)
-		{
-			paletteIndex = index;
-			classicToolStripMenuItem.Checked = index == 0;
-			blackWhiteToolStripMenuItem.Checked = index == 1;
-			autumnToolStripMenuItem.Checked = index == 2;
-			
-			LoadLevel(false);
-		}
 		
 		void SetZoomLevel(int zoomLevel)
 		{
@@ -396,13 +371,7 @@ namespace WLEditor
 				zoomOutToolStripMenuItem.PerformClick();
 				return true;
 			}
-			
-			if (keyData == Keys.P)
-			{
-			 	SetPalette((paletteIndex + 1) % 3);
-				return true;
-			}
-			
+						
 			if (keyData == Keys.B)
 			{
 			 	SetSwitchMode((switchMode + 1) % 3);
@@ -536,7 +505,7 @@ namespace WLEditor
 		
 		void RefreshAnimatedTiles()
 		{
-			Level.DumpLevel(rom, currentCourseId, currentWarp, false, switchMode, paletteIndex, animatedTileIndex, true);
+			Level.DumpLevel(rom, currentCourseId, currentWarp, false, switchMode, animatedTileIndex, true);
 				
 			//redraw
 			levelPictureBox.InvalidateAnimatedTiles();

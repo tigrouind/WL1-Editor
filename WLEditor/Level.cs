@@ -7,12 +7,7 @@ namespace WLEditor
 {
 	public static class Level
 	{
-		static Color[][] palettes =
-		{
-			new[] { Color.FromArgb(255, 224, 248, 208), Color.FromArgb(255, 135, 201, 140), Color.FromArgb(255, 52, 104, 86), Color.FromArgb(255, 8, 24, 32) },
-			new[] { Color.White, Color.FromArgb(255, 170, 170, 170), Color.FromArgb(255, 85, 85, 85), Color.Black },
-			new[] { Color.White, Color.FromArgb(255, 230, 214, 156), Color.FromArgb(255, 180, 165, 106), Color.FromArgb(255, 57, 56, 41) }			
-		};
+		static Color[] paletteColors =  { Color.White, Color.FromArgb(255, 170, 170, 170), Color.FromArgb(255, 85, 85, 85), Color.Black };
 		
 		static Color[] enemyPalette =
 		{
@@ -58,7 +53,7 @@ namespace WLEditor
 		public static DirectBitmap TilesEnemies = new DirectBitmap(64, 64 * 6); 		
 		public static DirectBitmap PlayerSprite = new DirectBitmap(64, 64 * 2);
 		
-		public static void DumpLevel(Rom rom, int course, int warp, bool reloadAll, int switchMode, int paletteIndex, int animatedTileIndex, bool reloadAnimatedTilesOnly)
+		public static void DumpLevel(Rom rom, int course, int warp, bool reloadAll, int switchMode, int animatedTileIndex, bool reloadAnimatedTilesOnly)
 		{			
 			int tilebank;
 			int tileaddressB;
@@ -95,8 +90,7 @@ namespace WLEditor
 				palette = rom.ReadByte(header + 27);			
 				enemiesData = rom.ReadWord(header + 28);
 			}
-
-			Color[] paletteColors = palettes[paletteIndex];									
+							
 			if(!reloadAnimatedTilesOnly)
 			{
 				int enemiesIdsPointer, enemiesTiles;
@@ -634,7 +628,7 @@ namespace WLEditor
 				case 0x48:
 				case 0x4B:
 				case 0x54:					
-					return 7; //door
+					return 6; //door
 					
 				case 0x44: 
 				case 0x45:					
@@ -652,7 +646,7 @@ namespace WLEditor
 				case 0x5D:
 				case 0x5E:	
 				case 0x5F:							
-					return 6; //damage
+					return 5; //damage
 					
 				case 0x3A: 
 				case 0x3B:
