@@ -74,15 +74,12 @@ namespace WLEditor
 			WriteByte(position + 1, (byte)(value & 0xFF));			
 		}
 
-		public byte[] ReadBytes(int position, int size)
+		public void ReadBytes(int position, int size, byte[] result)
 		{
-			byte[] result = new byte[size];
 			for(int i = 0 ; i < size ; i++)
 			{
 				result[i] = ReadByte(position + i);
 			}
-
-			return result;
 		}
 		
 		#endregion

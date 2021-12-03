@@ -9,10 +9,7 @@ namespace WLEditor
 	{
 		static Color[] paletteColors =  { Color.White, Color.FromArgb(255, 170, 170, 170), Color.FromArgb(255, 85, 85, 85), Color.Black };
 		
-		static Color[] enemyPalette =
-		{
-			Color.White, Color.FromArgb(255, 157, 201, 253), Color.Magenta, Color.FromArgb(255, 0, 0, 41)
-		};
+		static Color[] enemyPalette = { Color.White, Color.FromArgb(255, 157, 201, 253), Color.Magenta, Color.FromArgb(255, 0, 0, 41) };
 				
 		static ushort[] enemySpriteAddress = 
 		{
@@ -34,18 +31,18 @@ namespace WLEditor
 			0xCD, 0xA7, 0x40  //call 40A7
 		};
 		
-		public static byte[] LevelData;
-		public static byte[] ObjectsData;
-		public static byte[] ScrollData;
-		public static byte[] Warps;
+		public static byte[] LevelData = new byte[0x3000];
+		public static byte[] ObjectsData = new byte[0x2000];
+		public static byte[] ScrollData = new byte[32];
+		public static byte[] Warps = new byte[32];
 		public static int WarioPosition;
-		public static Rectangle[] LoadedSprites;
-		public static bool[] EnemiesAvailable;
-		public static bool[] Animated16x16Tiles;
-		private static int[] animated8x8Tiles;
+		public static Rectangle[] LoadedSprites = new Rectangle[6];
+		public static bool[] EnemiesAvailable = new bool[6];
+		public static bool[] Animated16x16Tiles = new bool[16 * 8];
+		private static int[] animated8x8Tiles = new int[16 * 8 * 2 * 2];
 		public static int AnimatedTilesMask;
 		public static bool WarioRightFacing;
-		public static Rectangle[] PlayerRectangles;
+		public static Rectangle[] PlayerRectangles = new Rectangle[2];
 		
 		public static DirectBitmap Tiles8x8 = new DirectBitmap(16 * 8, 16 * 8); 
 		public static DirectBitmap Tiles16x16 = new DirectBitmap(16 * 8, 16 * 16); 
@@ -119,7 +116,7 @@ namespace WLEditor
 			else
 			{
 				rom.SetBank(0xB);
-				Dump16x16Tiles(rom, blockindex, switchMode, paletteColors[0], out Animated16x16Tiles, out animated8x8Tiles);
+				Dump16x16Tiles(rom, blockindex, switchMode, paletteColors[0]);
 			}
 
 			if(reloadAll)
@@ -131,20 +128,19 @@ namespace WLEditor
 				
 				rom.SetBank(blockbank);
 				int tilesdata = rom.ReadWord(0x4000 + blockubbank * 2);
-				LevelData = RLEDecompressTiles(rom, tilesdata);
+				RLEDecompressTiles(rom, tilesdata, LevelData);
 
 				//dump scroll
 				rom.SetBank(0xC);
-				ScrollData = rom.ReadBytes(0x4000 + course * 32, 32);
+				rom.ReadBytes(0x4000 + course * 32, 32, ScrollData);
 
 				//dump objects
 				rom.SetBank(0x7);
 				int objectsPosition = rom.ReadWord(0x4199 + course * 2);
-				ObjectsData = RLEDecompressObjects(rom, objectsPosition);
+				RLEDecompressObjects(rom, objectsPosition, ObjectsData);
 
 				//dump warps
-				rom.SetBank(0xC);
-				Warps = new Byte[32];
+				rom.SetBank(0xC);				
 				for(int i = 0 ; i < 32 ; i++)
 				{
 					int warpdata = rom.ReadWord(0x4F30 + course * 64 + i * 2);
@@ -179,11 +175,8 @@ namespace WLEditor
 			
 			rom.SetBank(0x5);			
 			Dump8x8Tiles(rom, 0x42F1, 64, 0, 0x1E, enemyPalette, true);			
-			PlayerRectangles = new []
-			{
-				DumpSpritePlayer(rom, 32, 56, 0x603B, false),
-				DumpSpritePlayer(rom, 32, 56 + 64, 0x603B, true)
-			};
+			PlayerRectangles[0] = DumpSpritePlayer(rom, 32, 56, 0x603B, false);
+			PlayerRectangles[1] = DumpSpritePlayer(rom, 32, 56 + 64, 0x603B, true);
 		}
 		
 		public static void DumpBonusSprites(Rom rom)
@@ -203,9 +196,8 @@ namespace WLEditor
 			}
 		}
 
-		static byte[] RLEDecompressTiles(Rom rom, int tilesdata)
+		static void RLEDecompressTiles(Rom rom, int tilesdata, byte[] decompressed)
 		{
-			byte[] decompressed = new byte[0x3000];
 			int position = 0;
 			
 			while(position < decompressed.Length)
@@ -225,8 +217,6 @@ namespace WLEditor
 					decompressed[position++] = data;
 				}
 			}
-			
-			return decompressed;
 		}
 
 		static IEnumerable<byte> RLECompressTiles(byte[] tilesdata)
@@ -254,10 +244,9 @@ namespace WLEditor
 			}
 		}
 
-		static byte[] RLEDecompressObjects(Rom rom, int enemiesData)
+		static void RLEDecompressObjects(Rom rom, int enemiesData, byte[] decompressed)
 		{
 			int position = 0;
-			byte[] decompressed = new byte[0x2000];
 			
 			while(position < decompressed.Length)
 			{
@@ -272,8 +261,6 @@ namespace WLEditor
 					decompressed[position++] = 0;
 				}
 			}
-			
-			return decompressed;
 		}
 
 		static IEnumerable<byte> RLECompressObjectsHelper(byte[] data)
@@ -327,11 +314,8 @@ namespace WLEditor
 			}
 		}
 
-		static void Dump16x16Tiles(Rom rom, int tileindexaddress, int switchMode, Color defaultColor, out bool[] anim16x16Tiles, out int[] anim8x8Tiles)
+		static void Dump16x16Tiles(Rom rom, int tileindexaddress, int switchMode, Color defaultColor)
 		{						
-			anim16x16Tiles = new bool[16 * 8];	
-			anim8x8Tiles = new int[16 * 8 * 2 * 2];
-			
 			int m = 0;
 			for(int n = 0 ; n < 16 ; n++)
 			{
@@ -355,7 +339,7 @@ namespace WLEditor
 						}
 					}
 					
-					anim16x16Tiles[tileIndex] = isAnimatedTile;
+					Animated16x16Tiles[tileIndex] = isAnimatedTile;
 				}
 			}
 		}
@@ -541,9 +525,8 @@ namespace WLEditor
 		
 		static void DumpEnemiesSprites(Rom rom, int enemiesIdsPointer, int tilesDataAddress)
 		{
-			LoadedSprites = new Rectangle[6];
-			EnemiesAvailable = new bool[6];		
 			Array.Clear(TilesEnemies.Bits, 0, TilesEnemies.Bits.Length);
+			Array.Clear(EnemiesAvailable, 0, EnemiesAvailable.Length);
 											
 			for(int i = 0 ; i < 6 ; i++)
 			{
@@ -755,8 +738,8 @@ namespace WLEditor
 
 				rom.SetBank(tilebank);
 				int tilePosition = rom.ReadWord(0x4000 + tilesubbank * 2);
-				byte[] tileData = RLEDecompressTiles(rom, tilePosition);
-				allTiles[i] = tileData;
+				allTiles[i] = new byte[0x3000];
+				RLEDecompressTiles(rom, tilePosition, allTiles[i]);
 			}
 
 			Array.Copy(LevelData, allTiles[course], 0x3000);
@@ -801,14 +784,16 @@ namespace WLEditor
 			for(int i = 0 ; i < 0x2B ; i++)
 			{
 				int objectsPos = rom.ReadWord(0x4199 + i * 2);
-				enemyData[i] = RLEDecompressObjects(rom, objectsPos);
+				enemyData[i] = new byte[0x2000];
+				RLEDecompressObjects(rom, objectsPos, enemyData[i]);
 			}
 			enemyData[course]= ObjectsData;
 
+			const int maxSize = 4198;
 			int objectSize = enemyData.Sum(x => RLECompressObjects(x).Count());
-			if(objectSize > 4198)
+			if(objectSize > maxSize)
 			{
-				errorMessage = string.Format("Object data is too big to fit in ROM.\r\nPlease remove some objects to free at least {0} byte(s).", objectSize - 4198);
+				errorMessage = string.Format("Object data is too big to fit in ROM.\r\nPlease remove some objects to free at least {0} byte(s).", objectSize - maxSize);
 				return false;
 			}
 
