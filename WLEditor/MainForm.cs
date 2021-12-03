@@ -524,7 +524,7 @@ namespace WLEditor
 
 		void AboutToolStripMenuItemClick(object sender, EventArgs e)
 		{
-			MessageBox.Show(Text+" v0.69\r\nDate : 05.10.2019.\r\nContact me : tigrou.ind@gmail.com");
+			MessageBox.Show(Text+" v0.70\r\nDate : 04.12.2021\r\nContact me : tigrou.ind@gmail.com");
 		}
 		
 		void AnimationToolStripMenuItemClick(object sender, EventArgs e)
