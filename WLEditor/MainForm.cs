@@ -341,11 +341,11 @@ namespace WLEditor
 			SetZoomLevel(4);
 		}
 		
-		void ToolBoxProcessCommandKey(object sender, ProcessCmdKeyEventArgs e)
+		void ToolBoxProcessCommandKey(object sender, KeyEventArgs e)
 		{
 			if(DispatchCommandKey(e.KeyData))
 			{
-				e.Processed = true;
+				e.Handled = true;
 			}	
 		}
 			

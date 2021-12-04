@@ -6,7 +6,7 @@ namespace WLEditor
 {
 	public partial class ToolboxForm : Form
 	{				
-		public event EventHandler<ProcessCmdKeyEventArgs> ProcessCommandKey;		
+		public event EventHandler<KeyEventArgs> ProcessCommandKey;		
 		
 		public ToolboxForm()
 		{				
@@ -55,10 +55,10 @@ namespace WLEditor
 		
 		protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
 		{
-			ProcessCmdKeyEventArgs args = new ProcessCmdKeyEventArgs(keyData);
+			KeyEventArgs args = new KeyEventArgs(keyData);
 			
 			ProcessCommandKey(this, args);
-			if(args.Processed)
+			if(args.Handled)
 			{
 				return true;
 			}
