@@ -12,8 +12,7 @@ namespace WLEditor
 		readonly bool[] invalidTiles = new bool[256 * 32];	
 		DirectBitmap levelTiles = new DirectBitmap(4096, 512);		
 		int zoom;
-		int lastTileIndex = -1;
-				
+						
 		public bool ShowSectors = true;
 		public bool ShowScrollInfo = true;
 		public bool ShowObjects = true;		
@@ -21,9 +20,10 @@ namespace WLEditor
 		public bool ShowTileNumbers;
 		public int SwitchMode;
 		public int CurrentSector = -1;		
+		public int CurrentTileIndex = -1;
 		
-		public event EventHandler<int> TileMouseDown;		
-		public event EventHandler<int> SectorChanged;
+		public event EventHandler TileMouseDown;		
+		public event EventHandler SectorChanged;
 		
 		public static Brush[] TransparentBrushes = 
 		{
@@ -354,10 +354,10 @@ namespace WLEditor
 			if(e.Button == MouseButtons.Left)
 			{
 				int tileIndex = e.Location.X / 16 / zoom + (e.Location.Y / 16 / zoom) * 256;
-				if(tileIndex != lastTileIndex)
+				if(tileIndex != CurrentTileIndex)
 				{
-					TileMouseDown(this, tileIndex);
-					lastTileIndex = tileIndex;
+					CurrentTileIndex = tileIndex;
+					TileMouseDown(this, EventArgs.Empty);										
 				}
 			}
 			else if(e.Button == MouseButtons.Right)
@@ -367,14 +367,14 @@ namespace WLEditor
 				if(sector != CurrentSector)
 				{
 					CurrentSector = sector;
-					SectorChanged(this, sector);
+					SectorChanged(this, EventArgs.Empty);
 				}
 			}
 		}
 				
 		protected override void OnMouseDown(MouseEventArgs e)
 		{
-			lastTileIndex = -1;
+			CurrentTileIndex = -1;
 			OnMouseEvent(e);
 		}
 

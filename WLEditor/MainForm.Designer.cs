@@ -363,8 +363,8 @@ namespace WLEditor
 			this.levelPictureBox.Size = new System.Drawing.Size(4096, 512);
 			this.levelPictureBox.TabIndex = 2;
 			this.levelPictureBox.TabStop = false;
-			this.levelPictureBox.TileMouseDown += new System.EventHandler<int>(this.LevelPictureBoxTileMouseDown);
-			this.levelPictureBox.SectorChanged += new System.EventHandler<int>(this.LevelPictureBoxSectorChanged);
+			this.levelPictureBox.TileMouseDown += this.LevelPictureBoxTileMouseDown;
+			this.levelPictureBox.SectorChanged += this.LevelPictureBoxSectorChanged;
 			// 
 			// toolStripMenuItem1
 			// 

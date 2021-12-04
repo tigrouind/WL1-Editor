@@ -97,15 +97,15 @@ namespace WLEditor
 				//dump 8x8 tiles
 				Array.Clear(Tiles8x8.Bits, 0, Tiles8x8.Width * Tiles8x8.Height);
 				rom.SetBank(0x11);
-				Dump8x8Tiles(rom, tileaddressA, 2*16, 0*16, palette, paletteColors);
+				Dump8x8Tiles(rom, tileaddressA, 2*16, 0*16, palette, paletteColors, false);
 				rom.SetBank(tilebank);
-				Dump8x8Tiles(rom, tileaddressB, 6*16, 2*16, palette, paletteColors);				
+				Dump8x8Tiles(rom, tileaddressB, 6*16, 2*16, palette, paletteColors, false);				
 			}
 						
 			if(AnimatedTilesMask != 0)
 			{
 				rom.SetBank(0x11);
-				Dump8x8Tiles(rom, tileanimated + animatedTileIndex * 16 * 4, 4, 2*16, palette, paletteColors);			
+				Dump8x8Tiles(rom, tileanimated + animatedTileIndex * 16 * 4, 4, 2*16, palette, paletteColors, false);			
 			}				
 
 			//dump 16x16 tiles			
@@ -369,7 +369,7 @@ namespace WLEditor
 			}
 		}
 
-		static void Dump8x8Tiles(Rom rom, int gfxaddress, int tiles, int pos, byte palette, Color[] customPalette, bool transparency = false)
+		static void Dump8x8Tiles(Rom rom, int gfxaddress, int tiles, int pos, byte palette, Color[] customPalette, bool transparency)
 		{
 			for(int n = 0 ; n < tiles ; n++)
 			{

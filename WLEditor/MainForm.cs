@@ -444,15 +444,16 @@ namespace WLEditor
 			toolboxToolStripMenuItem.Checked = false;
 		}
 		
-		void LevelPictureBoxTileMouseDown(object sender, int tileIndex)
+		void LevelPictureBoxTileMouseDown(object sender, EventArgs e)
 		{
 			if(toolboxForm.Visible)
 			{
+				int tileIndex = levelPictureBox.CurrentTileIndex;
 				int selectedPanelIndex = toolboxForm.SelectedPanelIndex;
 				int currentTile = toolboxForm.CurrentTile;
 				int currentObject = toolboxForm.CurrentObject;
 				
-				if(currentTile != -1 &&  selectedPanelIndex == 0)
+				if(currentTile != -1 && selectedPanelIndex == 0)
 				{
 					int previousTile = Level.LevelData[tileIndex + 0x1000];
 					if(previousTile != currentTile)
@@ -476,9 +477,9 @@ namespace WLEditor
 			}			
 		}
 		
-		void LevelPictureBoxSectorChanged(object sender, int currentSector)
+		void LevelPictureBoxSectorChanged(object sender, EventArgs e)
 		{
-			int warpTarget = Level.SearchWarp(rom, currentCourseId, currentSector);
+			int warpTarget = Level.SearchWarp(rom, currentCourseId, levelPictureBox.CurrentSector);
 			if(warpTarget != currentWarp)
 			{
 				currentWarp = warpTarget;
