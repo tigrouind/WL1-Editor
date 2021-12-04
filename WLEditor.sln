@@ -1,6 +1,6 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
 # SharpDevelop 5.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WLEditor", "WLEditor\WLEditor.csproj", "{9AF489D5-BCAC-487E-83AE-4A3E0CBDD1CB}"
 EndProject
