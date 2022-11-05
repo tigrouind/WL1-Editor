@@ -20,16 +20,15 @@ namespace WLEditor
 				format.Alignment = StringAlignment.Center;
 
 				using (Brush brush = new SolidBrush(Color.FromArgb(128, 255, 0, 0)))
-				using (Pen pen = new Pen(Color.White, 1.5f * zoom))
 				using (Font font = new Font("Arial", 8 * zoom))
 				{
 					e.Graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
 					e.Graphics.PixelOffsetMode = PixelOffsetMode.Half;					
 					e.Graphics.FillRectangle(LevelPictureBox.EnemyBrush, 0, 0, Width, Height);
 					
-					for(int index = 0 ; index < 16 ; index++)
+					for(int index = 0 ; index < 15 ; index++)
 					{
-						DrawTile(e.Graphics, e.ClipRectangle, pen, font, format, index);
+						DrawTile(e.Graphics, e.ClipRectangle, font, format, index);
 					}
 					
 					if(CurrentObject != -1)
@@ -41,7 +40,7 @@ namespace WLEditor
 			}		
 		}
 		
-		void DrawTile(Graphics g, Rectangle clipRectangle, Pen pen, Font font, StringFormat format, int index)
+		void DrawTile(Graphics g, Rectangle clipRectangle, Font font, StringFormat format, int index)
 		{			
 			int x = (index % 4) * 32;
 			int y = (index / 4) * 32;
@@ -50,12 +49,7 @@ namespace WLEditor
 			Rectangle destRect = new Rectangle(x * zoom, y * zoom, 32 * zoom, 32 * zoom);							
 			if (destRect.IntersectsWith(clipRectangle))
 			{
-				if(index == 0) //cross / delete
-				{							
-					g.DrawLine(pen, (x + 8) * zoom, (y + 8) * zoom, (x + 24) * zoom, (y + 24) * zoom);
-					g.DrawLine(pen, (x + 24) * zoom, (y + 8) * zoom, (x + 8) * zoom, (y + 24) * zoom);
-				}
-				else if(index <= 6) //enemy
+				if(index <= 6) //enemy
 				{																	
 					if(Level.EnemiesAvailable[index - 1])
 					{
@@ -80,13 +74,16 @@ namespace WLEditor
 		protected override void OnMouseDown(MouseEventArgs e)
 		{
 			int index = e.Location.X / 32 / zoom + (e.Location.Y / 32 / zoom) * 4;
-			index = GUIToObjectIndex(index);
-			
-			if(!(index >= 1 && index <= 6) || Level.EnemiesAvailable[index - 1])
+			if (index < 15)
 			{
-				CurrentObject = index;
-				Invalidate();
-			}					
+				index = GUIToObjectIndex(index);
+				
+				if(!(index >= 1 && index <= 6) || Level.EnemiesAvailable[index - 1])
+				{
+					CurrentObject = index;
+					Invalidate();
+				}					
+			}
 		}
 		
 		public void SetZoom(int zoomlevel)
@@ -99,15 +96,15 @@ namespace WLEditor
 		
 		int ObjectIndexToGUI(int index)
 		{
-			if(index >= 1 && index <= 6) return index + 9;
-			if(index > 6) return index - 6;
+			if(index >= 1 && index <= 6) return index + 8;
+			if(index > 6) return index - 7;
 			return 0;
 		}
 		
 		int GUIToObjectIndex(int index)
 		{
-			if(index >= 1 && index <= 9) return index + 6;
-			if(index > 9) return index - 9;
+			if(index >= 0 && index <= 8) return index + 7;
+			if(index > 8) return index - 8;
 			return 0;
 		}							
 	}

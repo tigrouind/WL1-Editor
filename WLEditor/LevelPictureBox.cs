@@ -22,7 +22,7 @@ namespace WLEditor
 		public int CurrentSector = -1;		
 		public int CurrentTileIndex = -1;
 		
-		public event EventHandler TileMouseDown;		
+		public event MouseEventHandler TileMouseDown;		
 		public event EventHandler SectorChanged;
 		
 		public static Brush[] TransparentBrushes = 
@@ -351,16 +351,16 @@ namespace WLEditor
 		
 		void OnMouseEvent(MouseEventArgs e)
 		{
-			if(e.Button == MouseButtons.Left)
+			if(e.Button == MouseButtons.Left || e.Button == MouseButtons.Right)
 			{
 				int tileIndex = e.Location.X / 16 / zoom + (e.Location.Y / 16 / zoom) * 256;
 				if(tileIndex != CurrentTileIndex)
 				{
 					CurrentTileIndex = tileIndex;
-					TileMouseDown(this, EventArgs.Empty);										
+					TileMouseDown(this, e);										
 				}
 			}
-			else if(e.Button == MouseButtons.Right)
+			else if(e.Button == MouseButtons.Middle)
 			{
 				Point coordinates = e.Location;
 				int sector = e.Location.X / 256 / zoom + (e.Location.Y / 256 / zoom) * 16;
