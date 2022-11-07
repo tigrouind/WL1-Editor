@@ -69,6 +69,8 @@ namespace WLEditor
 		public MainForm()
 		{
 			InitializeComponent();									
+			levelPictureBox.MouseWheel += MainFormMouseWheel;
+			toolboxForm.MouseWheel += MainFormMouseWheel;
 			toolboxForm.FormClosing += ToolBoxFormClosing;	
 			toolboxForm.ProcessCommandKey += ToolBoxProcessCommandKey;
 			SetZoomLevel(2);
@@ -420,6 +422,23 @@ namespace WLEditor
 		{
 			SetZoomLevel(zoom + 1);
 		}		
+		
+		void MainFormMouseWheel(object sender, MouseEventArgs e)
+		{
+			Control control = (Control)sender;
+			if (Control.ModifierKeys == Keys.Control &&
+				LevelPanel.RectangleToScreen(LevelPanel.ClientRectangle).Contains(control.PointToScreen(e.Location)))
+			{
+				if(e.Delta > 0 && zoom < 4)
+				{
+					SetZoomLevel(zoom + 1);
+				}
+				else if(e.Delta < 0 && zoom > 1)
+				{
+					SetZoomLevel(zoom - 1);
+				}
+			}
+		}
 		
 		void ToolboxToolStripMenuItemCheckedChanged(object sender, EventArgs e)
 		{

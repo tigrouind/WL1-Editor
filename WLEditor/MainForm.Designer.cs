@@ -68,7 +68,7 @@ namespace WLEditor
 			this.bToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-			this.LevelPanel = new System.Windows.Forms.Panel();
+			this.LevelPanel = new PanelUnScrollable();
 			this.levelPictureBox = new WLEditor.LevelPictureBox();
 			this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
 			this.timer = new System.Windows.Forms.Timer(this.components);
@@ -397,6 +397,7 @@ namespace WLEditor
 			this.MainMenuStrip = this.menuStrip1;
 			this.Name = "MainForm";
 			this.Text = "WLEditor";
+			this.MouseWheel += MainFormMouseWheel;
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainFormFormClosing);
 			this.menuStrip1.ResumeLayout(false);
 			this.menuStrip1.PerformLayout();
