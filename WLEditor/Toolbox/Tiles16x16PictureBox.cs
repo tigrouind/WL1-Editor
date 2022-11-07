@@ -17,7 +17,7 @@ namespace WLEditor
 				
 		protected override void OnPaint(PaintEventArgs e)
 		{						
-			if(Level.LevelData != null)
+			if(Level.LevelData != null && !DesignMode)
 			{				
 				using (Graphics g = Graphics.FromImage(tiles.Bitmap))
 				{			

@@ -13,7 +13,7 @@ namespace WLEditor
 		
 		protected override void OnPaint(PaintEventArgs e)
 		{			
-			if(Level.LevelData != null)
+			if(Level.LevelData != null && !DesignMode)
 			{
 				StringFormat format = new StringFormat();
 				format.LineAlignment = StringAlignment.Center;
