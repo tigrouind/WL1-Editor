@@ -326,25 +326,24 @@ namespace WLEditor
 			}
 		}
 		
+		void AddEnemyRegion(Region region, int tileIndex, int enemyIndex)
+		{
+			if(enemyIndex >= 1 && enemyIndex <= 6)
+			{
+				Rectangle enemyRect = Level.LoadedSprites[enemyIndex - 1];
+				if(enemyRect != Rectangle.Empty)
+				{						
+					region.Union(new Rectangle(((tileIndex % 256) * 16 + enemyRect.X - 32 + 8) * zoom, ((tileIndex / 256) * 16 + enemyRect.Y - (enemyIndex - 1) * 64 - 40) * zoom, enemyRect.Width * zoom, enemyRect.Height * zoom));
+				}	
+			}
+		}
+		
 		public void InvalidateObject(int tileIndex, int currentObject, int previousObject)
 		{
 			using(Region r = new Region(new Rectangle((tileIndex % 256) * 16 * zoom, (tileIndex / 256) * 16 * zoom, 16 * zoom, 16 * zoom)))
-			{
-				Action<int> addEnemyRegion = enemyIndex =>
-				{
-					if(enemyIndex >= 1 && enemyIndex <= 6)
-					{
-						Rectangle enemyRect = Level.LoadedSprites[enemyIndex - 1];
-						if(enemyRect != Rectangle.Empty)
-						{						
-							r.Union(new Rectangle(((tileIndex % 256) * 16 + enemyRect.X - 32 + 8) * zoom, ((tileIndex / 256) * 16 + enemyRect.Y - (enemyIndex - 1) * 64 - 40) * zoom, enemyRect.Width * zoom, enemyRect.Height * zoom));
-						}	
-					}
-				};
-				
-				addEnemyRegion(previousObject);
-				addEnemyRegion(currentObject);
-				
+			{				
+				AddEnemyRegion(r, tileIndex, previousObject);
+				AddEnemyRegion(r, tileIndex, currentObject);				
 				Invalidate(r);
 			}
 		}
