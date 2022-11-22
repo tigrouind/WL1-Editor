@@ -708,7 +708,7 @@ namespace WLEditor
 			return tileData;
 		}
 
-		public static bool SaveChanges(Rom rom, int course, string filePath, out string errorMessage)
+		public static bool SaveChanges(Rom rom, int course, out string errorMessage)
 		{
 			//rom expansion give new banks for level data
 			rom.ExpandTo1MB();
@@ -720,7 +720,6 @@ namespace WLEditor
 			}
 
 			rom.FixCRC();
-			rom.Save(filePath);
 			return true;
 		}
 

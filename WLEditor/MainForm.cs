@@ -65,6 +65,7 @@ namespace WLEditor
 		string romFilePath;
 		bool hasChanges;
 		int zoom;
+		bool ignoreEvents;
 				
 		public MainForm()
 		{
@@ -76,7 +77,7 @@ namespace WLEditor
 			SetZoomLevel(2);
 		}
 
-		public void LoadLevel(bool reloadAll)
+		void LoadLevel(bool reloadAll)
 		{
 			if(rom.IsLoaded && levelComboBox.SelectedItem != null)
 			{				
@@ -98,9 +99,9 @@ namespace WLEditor
 
 		void LevelComboBoxSelectedIndexChanged(object sender, EventArgs e)
 		{
-			if(levelComboBox.SelectedItem != null)
+			if(!ignoreEvents && levelComboBox.SelectedItem != null)
 			{
-				if(AskForSavingChanges())
+				if(SaveChanges(false))
 				{
 					currentWarp = -1;
 					levelPictureBox.CurrentSector = -1;
@@ -111,9 +112,9 @@ namespace WLEditor
 				else
 				{
 					//restore previous item
-					levelComboBox.SelectedIndexChanged -= LevelComboBoxSelectedIndexChanged;
+					ignoreEvents = true;
 					levelComboBox.SelectedItem = levelComboBox.Items.Cast<ComboboxItem>().First(x => (int)x.Value == currentCourseId);
-					levelComboBox.SelectedIndexChanged += LevelComboBoxSelectedIndexChanged;
+					ignoreEvents = false;
 				}
 			}
 		}
@@ -140,10 +141,11 @@ namespace WLEditor
 					Level.DumpPlayerSprite(rom);
 					romFilePath = openFileDialog1.FileName;
 
-					if(levelComboBox.SelectedIndex == 0)
-						LevelComboBoxSelectedIndexChanged(sender, e);
-					else
-						levelComboBox.SelectedIndex = 0;
+					SetChanges(false);
+					ignoreEvents = true;
+					levelComboBox.SelectedIndex = 0;
+					ignoreEvents = false;
+					LevelComboBoxSelectedIndexChanged(sender, e);						
 					
 					toolboxToolStripMenuItem.Enabled = true;
 					saveAsToolStripMenuItem.Enabled = true;
@@ -234,19 +236,27 @@ namespace WLEditor
 			LoadLevel(false);
 		}
 
-		bool SaveChanges()
+		bool SaveChanges(bool saveFile)
 		{
-			if(rom.IsLoaded)
+			if (rom.IsLoaded)
 			{
-				string message;
-				if(!Level.SaveChanges(rom, currentCourseId, romFilePath, out message))
+				if (hasChanges)
 				{
-					MessageBox.Show(message, Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
-					return false;
+					string message;
+					if(!Level.SaveChanges(rom, currentCourseId, out message))
+					{
+						MessageBox.Show(message, Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
+						return false;
+					}
+				}
+				
+				if(saveFile)
+				{
+					rom.Save(romFilePath);
+					SetChanges(false);
 				}
 			}
-
-			SetChanges(false);
+			
 			return true;
 		}
 
@@ -258,10 +268,9 @@ namespace WLEditor
 				switch(result)
 				{
 					case DialogResult.Yes:
-						return SaveChanges();
+						return SaveChanges(true);
 
 					case DialogResult.No:
-						SetChanges(false);
 						return true;
 
 					case DialogResult.Cancel:
@@ -271,13 +280,11 @@ namespace WLEditor
 						throw new NotImplementedException();
 				}
 			}
-			else
-			{
-				return true;
-			}
+			
+			return true;
 		}
 		
-		public void SetChanges(bool hasChanges)
+		void SetChanges(bool hasChanges)
 		{			
 			this.hasChanges = hasChanges;
 			saveToolStripMenuItem.Enabled = hasChanges;
@@ -285,7 +292,7 @@ namespace WLEditor
 
 		void SaveToolStripMenuItemClick(object sender, EventArgs e)
 		{
-			SaveChanges();
+			SaveChanges(true);
 		}
 		
 		void MainFormFormClosing(object sender, FormClosingEventArgs e)
@@ -302,7 +309,7 @@ namespace WLEditor
 			{
 				string previousRomFilePath = romFilePath;
 				romFilePath = saveFileDialog.FileName;
-				if (!SaveChanges())
+				if (!SaveChanges(true))
 				{
 					romFilePath = previousRomFilePath;
 				}
