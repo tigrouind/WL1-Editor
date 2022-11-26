@@ -77,7 +77,7 @@
       <DependentUpon>MainForm.Designer.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Toolbox\ToolboxForm.resx">
-      <DependentUpon>ToolboxForm.Designer.cs</DependentUpon>
+      <DependentUpon>ToolboxForm.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

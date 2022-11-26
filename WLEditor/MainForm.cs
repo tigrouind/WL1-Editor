@@ -105,15 +105,15 @@ namespace WLEditor
 				{
 					currentWarp = -1;
 					levelPictureBox.CurrentSector = -1;
-					ComboboxItem item = (ComboboxItem)levelComboBox.SelectedItem;
-					currentCourseId = (int)item.Value;
+					var item = (ComboboxItem<int>)levelComboBox.SelectedItem;
+					currentCourseId = item.Value;
 					LoadLevel(true);
 				}
 				else
 				{
 					//restore previous item
 					ignoreEvents = true;
-					levelComboBox.SelectedItem = levelComboBox.Items.Cast<ComboboxItem>().First(x => (int)x.Value == currentCourseId);
+					levelComboBox.SelectedItem = levelComboBox.Items.Cast<ComboboxItem<int>>().First(x => x.Value == currentCourseId);
 					ignoreEvents = false;
 				}
 			}
@@ -165,10 +165,10 @@ namespace WLEditor
 			levelComboBox.SelectedItem = null;
 			levelComboBox.Items.Clear();
 			
-			List<ComboboxItem> items = new List<ComboboxItem>();			
+			var items = new List<ComboboxItem<int>>();			
 			foreach(var levelInfo in Level.GetCourseIds(rom).OrderBy(x => x.Value))
 			{
-				ComboboxItem item = new ComboboxItem(string.Format("{0:D2} {1}", levelInfo.Value, levelNames[levelInfo.Key]), levelInfo.Key);
+				var item = new ComboboxItem<int>(string.Format("{0:D2} {1}", levelInfo.Value, levelNames[levelInfo.Key]), levelInfo.Key);
 				items.Add(item);				
 			}
 

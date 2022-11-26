@@ -2,12 +2,12 @@
 
 namespace WLEditor
 {
-	public class ComboboxItem
+	public class ComboboxItem<T>
 	{
 		public string Text { get; set; }
-		public object Value { get; set; }
+		public T Value { get; set; }
 
-		public ComboboxItem(string text, object value)
+		public ComboboxItem(string text, T value)
 		{
 			Text = text;
 			Value = value;

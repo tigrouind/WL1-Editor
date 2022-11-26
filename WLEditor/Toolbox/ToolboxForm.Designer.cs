@@ -1,12 +1,4 @@
-﻿/*
- * Created by SharpDevelop.
- * User: Admin
- * Date: 26/02/2018
- * Time: 21:52
- * 
- * To change this template use Tools | Options | Coding | Edit Standard Headers.
- */
-namespace WLEditor
+﻿namespace WLEditor
 {
 	partial class ToolboxForm
 	{
