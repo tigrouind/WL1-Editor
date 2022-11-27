@@ -22,7 +22,13 @@ namespace WLEditor
 		public int CurrentSector = -1;		
 		public int CurrentTileIndex = -1;
 		
-		public event MouseEventHandler TileMouseDown;		
+		bool Selection;
+		Point SelectionStart, SelectionEnd;
+		int SelectionWidth, SelectionHeight;
+		readonly List<byte> SelectionLevelData = new List<byte>();
+		readonly List<byte> SelectionObjectData = new List<byte>();		
+		
+		public event EventHandler<TileEventArgs> TileMouseDown;		
 		public event EventHandler SectorChanged;
 		
 		public static Brush[] TransparentBrushes = 
@@ -107,6 +113,8 @@ namespace WLEditor
 							}
 						}														
 					}
+					
+					DrawSelection(e.Graphics);
 				}			
 			}
 		}
@@ -255,6 +263,40 @@ namespace WLEditor
 			}			
 		}
 		
+		void DrawSelection(Graphics g)
+		{
+			if (Selection)
+			{
+				using (SolidBrush brush = new SolidBrush(Color.FromArgb(128, 255, 255, 0)))
+				{
+					var rect = GetSelectionRectangle();					
+					g.FillRectangle(brush, rect);						
+				}
+			}
+		}
+		
+		public void GetSelection(out Point start, out Point end)
+		{
+			int startX = Math.Min(SelectionStart.X, SelectionEnd.X);
+			int startY = Math.Min(SelectionStart.Y, SelectionEnd.Y);
+			int endX = Math.Max(SelectionStart.X, SelectionEnd.X);
+            int endY = Math.Max(SelectionStart.Y, SelectionEnd.Y);
+			
+			start = new Point(startX, startY);
+			end = new Point(endX, endY);
+		}
+		
+		Rectangle GetSelectionRectangle()
+		{
+			Point start, end;
+			GetSelection(out start, out end);
+			return new Rectangle(
+				start.X * 16 * zoom, 
+				start.Y * 16 * zoom, 
+				((end.X - start.X + 1) * 16) * zoom,
+				((end.Y - start.Y + 1) * 16) * zoom);
+		}
+		
 		List<Point> GetVisibleSectors(Rectangle clipRectangle)
 		{					
 			clipRectangle = GetClipRectangle(clipRectangle, 256 * zoom);
@@ -348,7 +390,7 @@ namespace WLEditor
 			}
 		}
 		
-		void OnMouseEvent(MouseEventArgs e)
+		void OnMouseEvent(TileEventArgs e)
 		{
 			if(e.Button == MouseButtons.Left || e.Button == MouseButtons.Right)
 			{
@@ -374,14 +416,14 @@ namespace WLEditor
 		protected override void OnMouseDown(MouseEventArgs e)
 		{
 			CurrentTileIndex = -1;
-			OnMouseEvent(e);
+			OnMouseEvent(new TileEventArgs(e, 0));
 		}
 
 		protected override void OnMouseMove(MouseEventArgs e)
 		{
 			if (ClientRectangle.Contains(e.Location))
 			{
-				OnMouseEvent(e);
+				OnMouseEvent(new TileEventArgs(e, 1));
 			}
 		}
 	
@@ -396,6 +438,93 @@ namespace WLEditor
 		public void ClearTileCache()
 		{
 			Array.Clear(invalidTiles, 0, invalidTiles.Length);
+		}
+		
+		public void CopySelection()
+		{
+			if (Selection)
+			{
+				var selection = GetSelectionRectangle();
+				
+				SelectionLevelData.Clear();
+				SelectionObjectData.Clear();
+				
+				Point start, end;
+				GetSelection(out start, out end);
+				
+				for(int y = start.Y ; y <= end.Y ; y++)
+				{
+					for(int x = start.X ; x <= end.X ; x++)	
+					{
+						SelectionLevelData.Add(Level.LevelData[x + y * 256 + 0x1000]);
+						SelectionObjectData.Add(Level.ObjectsData[x + y * 256]);
+					}
+				}
+				
+				SelectionWidth = end.X - start.X + 1;
+				SelectionHeight = end.Y - start.Y + 1;
+				ClearSelection();
+			}
+		}
+		
+		public void PasteSelection()
+		{
+			if (Selection)
+			{
+				if (SelectionHeight > 0 && SelectionWidth > 0)
+				{
+					Point start, end;
+					GetSelection(out start, out end);
+					
+					for (int ty = start.Y ; ty <= end.Y ; ty += SelectionHeight)
+					for (int tx = start.X ; tx <= end.X ; tx += SelectionWidth)
+					for (int y = 0 ; y < SelectionHeight ; y++)
+					for (int x = 0 ; x < SelectionWidth ; x++)	
+					{
+						int destX = Math.Min(tx + x, 255);
+						int destY = Math.Min(ty + y, 31);
+						if ((destX <= end.X && destY <= end.Y) || (start.X == end.X && start.Y == end.Y))
+						{
+							Level.LevelData[destX + destY * 256 + 0x1000] = SelectionLevelData[x + y * SelectionWidth];
+							Level.ObjectsData[destX + destY * 256] = SelectionObjectData[x + y * SelectionWidth];
+							invalidTiles[destX + destY * 256] = false;
+						}
+					}									
+				}
+				
+				Invalidate();
+				Selection = false;
+			}		
+		}
+		
+		public void SetSelection(int start, int end)
+		{
+			if (Selection)
+			{
+				Invalidate(GetSelectionRectangle());
+			}
+			
+			if (start != -1)
+			{
+				SelectionStart = new Point(start % 256, start / 256);	
+				Selection = true;	
+			}
+			
+			SelectionEnd = new Point(end % 256, end / 256);	
+			
+			if (Selection)
+			{
+				Invalidate(GetSelectionRectangle());	
+			}
+		}
+		
+		public void ClearSelection()
+		{
+			if (Selection)
+			{
+				Selection = false;
+				Invalidate(GetSelectionRectangle());
+			}
 		}
 	}
 }

@@ -108,6 +108,7 @@ namespace WLEditor
 					var item = (ComboboxItem<int>)levelComboBox.SelectedItem;
 					currentCourseId = item.Value;
 					LoadLevel(true);
+					levelPictureBox.ClearSelection();
 				}
 				else
 				{
@@ -387,6 +388,19 @@ namespace WLEditor
 				return true;
 			}
 			
+			if (keyData == (Keys.Control | Keys.C))
+			{
+				levelPictureBox.CopySelection();
+				return true;
+			}
+			
+			if (keyData == (Keys.Control | Keys.V))
+			{
+				levelPictureBox.PasteSelection();
+				SetChanges(true);
+				return true;
+			}
+			
 			ToolStripMenuItem toolStrip = GetAllMenuItems(menuStrip1.Items)
 				.FirstOrDefault(x => x.ShortcutKeys == keyData);
 			
@@ -454,6 +468,7 @@ namespace WLEditor
 				if(!toolboxForm.Visible)
 				{
 					toolboxForm.Show(this);	
+					levelPictureBox.ClearSelection();
 				}	
 			}
 			else
@@ -470,7 +485,8 @@ namespace WLEditor
 			toolboxToolStripMenuItem.Checked = false;
 		}
 		
-		void LevelPictureBoxTileMouseDown(object sender, MouseEventArgs e)
+		
+		void LevelPictureBoxTileMouseDown(object sender, TileEventArgs e)
 		{				
 			if(toolboxForm.Visible)
 			{
@@ -481,7 +497,6 @@ namespace WLEditor
 				
 				if (e.Button == MouseButtons.Left)
 				{
-				
 					if(currentTile != -1 && selectedPanelIndex == 0)
 					{
 						int previousTile = Level.LevelData[tileIndex + 0x1000];
@@ -491,9 +506,8 @@ namespace WLEditor
 							levelPictureBox.InvalidateTile(tileIndex);
 							SetChanges(true);
 						}
-					}
-					
-					if(currentObject != -1 && levelPictureBox.ShowObjects && selectedPanelIndex == 2)
+					}					
+					else if(currentObject != -1 && levelPictureBox.ShowObjects && selectedPanelIndex == 2)
 					{	
 						int previousObject = Level.ObjectsData[tileIndex];
 						if(previousObject != currentObject)
@@ -518,6 +532,21 @@ namespace WLEditor
 					}
 				}
 			}			
+			else if (e.Button == MouseButtons.Left)
+			{
+				if (e.Status == 0)
+				{
+					levelPictureBox.SetSelection(levelPictureBox.CurrentTileIndex, levelPictureBox.CurrentTileIndex);					
+				}
+				else
+				{
+					levelPictureBox.SetSelection(-1, levelPictureBox.CurrentTileIndex);					
+				}
+			}
+			else
+			{
+				levelPictureBox.ClearSelection();
+			}
 		}
 		
 		void LevelPictureBoxSectorChanged(object sender, EventArgs e)
@@ -532,6 +561,7 @@ namespace WLEditor
 			{
 				levelPictureBox.Invalidate();
 			}
+			levelPictureBox.ClearSelection();
 		}
 				
 		void TimerTick(object sender, EventArgs e)
