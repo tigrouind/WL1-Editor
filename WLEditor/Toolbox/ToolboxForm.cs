@@ -17,14 +17,28 @@ namespace WLEditor
 		{
 			tiles16x16PictureBox.SetZoom(zoom);
 			tiles8x8PictureBox.SetZoom(zoom);
-			objectsPictureBox.SetZoom(zoom);			
+			objectsPictureBox.SetZoom(zoom);
+			sectorForm.SetSize();
+		}
+		
+		public event EventHandler SectorChanged
+		{
+			add			
+			{
+				sectorForm.SectorChanged += value;
+			}	
+
+			remove
+			{
+				sectorForm.SectorChanged -= value;
+			}
 		}
 		
 		void ComboBox1SelectedIndexChanged(object sender, EventArgs e)
 		{
 			SuspendLayout();
 			
-			Control controlToShow = new Control[] { tiles16x16PictureBox, tiles8x8PictureBox, objectsPictureBox }[comboBox1.SelectedIndex];
+			Control controlToShow = new Control[] { tiles16x16PictureBox, tiles8x8PictureBox, objectsPictureBox, sectorForm }[comboBox1.SelectedIndex];
 			controlToShow.Visible = true;
 			controlToShow.Location = new Point(controlToShow.Margin.Left, controlToShow.Margin.Top);
 			
@@ -93,6 +107,16 @@ namespace WLEditor
 			{
 				return comboBox1.SelectedIndex;	
 			}			
+		}
+		
+		public void LoadRom(Rom rom)
+		{
+			sectorForm.LoadRom(rom);
+		}
+		
+		public void LoadSector(Rom rom, int course, int sector)
+		{									
+			sectorForm.LoadSector(rom, course, sector);
 		}
 		
 		public bool ShowColliders

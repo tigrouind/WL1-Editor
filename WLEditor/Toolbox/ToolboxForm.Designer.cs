@@ -12,6 +12,7 @@
 		private WLEditor.ObjectsPictureBox objectsPictureBox;
 		private WLEditor.Tiles16x16PictureBox tiles16x16PictureBox;
 		private WLEditor.Tiles8x8PictureBox tiles8x8PictureBox;
+		private WLEditor.SectorForm sectorForm;
 		
 		/// <summary>
 		/// Disposes resources used by the form.
@@ -40,6 +41,7 @@
 			this.objectsPictureBox = new WLEditor.ObjectsPictureBox();
 			this.tiles16x16PictureBox = new WLEditor.Tiles16x16PictureBox();
 			this.tiles8x8PictureBox = new WLEditor.Tiles8x8PictureBox();
+			this.sectorForm = new WLEditor.SectorForm();
 			this.tableLayoutPanel1.SuspendLayout();
 			this.panel1.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.objectsPictureBox)).BeginInit();
@@ -74,7 +76,8 @@
 			this.comboBox1.Items.AddRange(new object[] {
 			"16x16 Tiles ",
 			"8x8 Tiles",
-			"Objects"});
+			"Objects",			
+			"Sector"});
 			this.comboBox1.Location = new System.Drawing.Point(3, 3);
 			this.comboBox1.Name = "comboBox1";
 			this.comboBox1.Size = new System.Drawing.Size(90, 21);
@@ -88,6 +91,7 @@
 			this.panel1.Controls.Add(this.objectsPictureBox);
 			this.panel1.Controls.Add(this.tiles16x16PictureBox);
 			this.panel1.Controls.Add(this.tiles8x8PictureBox);
+			this.panel1.Controls.Add(this.sectorForm);
 			this.panel1.Location = new System.Drawing.Point(0, 27);
 			this.panel1.Margin = new System.Windows.Forms.Padding(0);
 			this.panel1.Name = "panel1";
@@ -116,7 +120,15 @@
 			this.tiles8x8PictureBox.Name = "tiles8x8PictureBox";
 			this.tiles8x8PictureBox.Size = new System.Drawing.Size(47, 50);
 			this.tiles8x8PictureBox.TabIndex = 0;
-			this.tiles8x8PictureBox.TabStop = false;
+			this.tiles8x8PictureBox.TabStop = false;	
+			// 
+			// sector
+			// 
+			this.sectorForm.Location = new System.Drawing.Point(3, 3);
+			this.sectorForm.Name = "sector";
+			this.sectorForm.Size = new System.Drawing.Size(47, 50);
+			this.sectorForm.TabIndex = 0;
+			this.sectorForm.TabStop = false;
 			// 
 			// ToolboxForm
 			// 

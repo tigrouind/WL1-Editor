@@ -10,7 +10,7 @@ namespace WLEditor
 		Rom rom = new Rom();		 		
 		ToolboxForm toolboxForm = new ToolboxForm();
 
-		static string[] levelNames =
+		public static string[] LevelNames =
 		{
 			"SS Teacup 1",
 			"Parsley Woods 3",
@@ -74,6 +74,7 @@ namespace WLEditor
 			toolboxForm.MouseWheel += MainFormMouseWheel;
 			toolboxForm.FormClosing += ToolBoxFormClosing;	
 			toolboxForm.ProcessCommandKey += ToolBoxProcessCommandKey;
+			toolboxForm.SectorChanged += ToolBoxSectorChanged;
 			SetZoomLevel(2);
 		}
 
@@ -108,6 +109,7 @@ namespace WLEditor
 					var item = (ComboboxItem<int>)levelComboBox.SelectedItem;
 					currentCourseId = item.Value;
 					LoadLevel(true);
+					toolboxForm.LoadSector(rom, -1, -1);
 					levelPictureBox.ClearSelection();
 				}
 				else
@@ -140,6 +142,7 @@ namespace WLEditor
 					LoadLevelCombobox();
 					Level.DumpBonusSprites(rom);
 					Level.DumpPlayerSprite(rom);
+					toolboxForm.LoadRom(rom);
 					romFilePath = openFileDialog1.FileName;
 
 					SetChanges(false);
@@ -169,7 +172,7 @@ namespace WLEditor
 			var items = new List<ComboboxItem<int>>();			
 			foreach(var levelInfo in Level.GetCourseIds(rom).OrderBy(x => x.Value))
 			{
-				var item = new ComboboxItem<int>(string.Format("{0:D2} {1}", levelInfo.Value, levelNames[levelInfo.Key]), levelInfo.Key);
+				var item = new ComboboxItem<int>(levelInfo.Key, string.Format("{0:D2} {1}", levelInfo.Value, LevelNames[levelInfo.Key]));
 				items.Add(item);				
 			}
 
@@ -194,6 +197,13 @@ namespace WLEditor
 			levelPictureBox.Invalidate();
 		}
 
+		void ToolBoxSectorChanged(object sender, EventArgs e)
+		{
+			currentWarp = Level.SearchWarp(rom, currentCourseId, levelPictureBox.CurrentSector);
+			LoadLevel(false);
+			SetChanges(true);
+		}
+		
 		void ExitToolStripMenuItemClick(object sender, EventArgs e)
 		{
 			Application.Exit();
@@ -561,6 +571,7 @@ namespace WLEditor
 			{
 				levelPictureBox.Invalidate();
 			}
+			toolboxForm.LoadSector(rom, currentCourseId, levelPictureBox.CurrentSector);
 			levelPictureBox.ClearSelection();
 		}
 				

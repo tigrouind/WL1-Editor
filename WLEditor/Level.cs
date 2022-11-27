@@ -22,7 +22,8 @@ namespace WLEditor
 		
 		static ushort[] bonusSpriteAddress = { 0x4ACB, 0x4AEB, 0x4ADB, 0x4AFB, 0x4B0B, 0x4B1B, 0x4B2B, 0x4B4B, 0x4B5B };
 		
-		static byte[] enemyCodePattern = { 
+		static byte[] enemyCodePattern = 
+		{
 			0x3E, 0x00,       //ld  a, ..
 			0xEA, 0x2F, 0xA3, //ld  (A32F),a
 			0x3E, 0x00,       //ld  a, ..
@@ -31,11 +32,29 @@ namespace WLEditor
 			0xCD, 0xA7, 0x40  //call 40A7
 		};
 		
+		static byte[] treasurePattern = 
+		{
+			0x3E, 0x00,      // ld a, ..
+			0xEA, 0x82, 0xA3 // ld (A382), a
+		};
+		
+		static byte[] treasureCheckPattern = 
+		{
+			0xCD, 0x6A, 0x42 //call 426A
+		};
+		
+		static byte[] exitPattern = 
+		{
+			0x3E, 0x02,      // ld a, 02
+			0xEA, 0x76, 0xA3 // ld (A376), a
+		};
+		
 		public static byte[] LevelData = new byte[0x3000];
 		public static byte[] ObjectsData = new byte[0x2000];
 		public static byte[] ScrollData = new byte[32];
 		public static byte[] Warps = new byte[32];
 		public static int WarioPosition;
+		public static int CameraPosition;
 		public static Rectangle[] LoadedSprites = new Rectangle[6];
 		public static bool[] EnemiesAvailable = new bool[6];
 		public static bool[] Animated16x16Tiles = new bool[16 * 8];
@@ -65,33 +84,31 @@ namespace WLEditor
 						
 			if(warp != -1)
 			{				
-				//load warp
 				tilebank = rom.ReadByte(warp + 11);
 				tileaddressB = rom.ReadWord(warp + 12);
 				tileaddressA = rom.ReadWord(warp + 14);
 				tileanimated = rom.ReadWord(warp + 18);
 				blockindex = rom.ReadWord(warp + 20);
-				AnimatedTilesMask = rom.ReadByte(warp + 9);
 				palette = rom.ReadByte(warp + 10);
 				enemiesData = rom.ReadWord(warp + 22);				
 			}
 			else
 			{
-				//or header
 				tilebank = rom.ReadByte(header + 0);
 				tileaddressB = rom.ReadWord(header + 1);
 				tileaddressA = rom.ReadWord(header + 3);
 				tileanimated = rom.ReadWord(header + 7);							
 				blockindex = rom.ReadWord(header + 11);
-				AnimatedTilesMask = rom.ReadByte(header + 26);
 				palette = rom.ReadByte(header + 27);			
 				enemiesData = rom.ReadWord(header + 28);
 			}
 							
 			if(!reloadAnimatedTilesOnly)
 			{
-				int enemiesIdsPointer, enemiesTiles;
-				FindEnemiesData(rom, enemiesData, out enemiesIdsPointer, out enemiesTiles);
+				int enemiesIdsPointer, enemiesTiles, treasureID;
+				bool exitOpen, treasureCheck;
+				
+				FindEnemiesData(rom, enemiesData, out enemiesIdsPointer, out enemiesTiles, out treasureID, out treasureCheck, out exitOpen);
 				DumpEnemiesSprites(rom, enemiesIdsPointer, enemiesTiles);	
 
 				//dump 8x8 tiles
@@ -100,6 +117,40 @@ namespace WLEditor
 				Dump8x8Tiles(rom, tileaddressA, 2*16, 0*16, palette, paletteColors, false);
 				rom.SetBank(tilebank);
 				Dump8x8Tiles(rom, tileaddressB, 6*16, 2*16, palette, paletteColors, false);				
+
+				//dump scroll
+				rom.SetBank(0xC);
+				rom.ReadBytes(0x4000 + course * 32, 32, ScrollData);
+				
+				//dump warps
+				rom.SetBank(0xC);				
+				for(int i = 0 ; i < 32 ; i++)
+				{
+					int warpdata = rom.ReadWord(0x4F30 + course * 64 + i * 2);
+					Warps[i] = rom.ReadByte(warpdata);
+				}
+				
+				rom.SetBank(0xC);
+				if (warp != -1)
+				{
+					int targetSector = rom.ReadByte(warp);					
+					WarioPosition = (targetSector % 16) * 256 + rom.ReadByte(warp + 2) 
+						         + ((targetSector / 16) * 256 + rom.ReadByte(warp + 1)) * 4096;
+					WarioRightFacing = false;
+					
+					int cameraSector = rom.ReadByte(warp + 4);			
+					CameraPosition = rom.ReadByte(warp + 6) + (cameraSector % 16) * 256 + 16 
+						          + (rom.ReadByte(warp + 5) + (cameraSector / 16) * 256 + 16) * 4096;
+					AnimatedTilesMask = rom.ReadByte(warp + 9);
+				}
+				else 
+				{
+					WarioPosition = rom.ReadWordSwap(header + 15) + rom.ReadWordSwap(header + 13) * 4096;								
+					WarioRightFacing = (rom.ReadByte(header + 18) & 0x20) == 0;					
+					CameraPosition = rom.ReadWordSwap(header + 21) + 16
+						          + (rom.ReadWordSwap(header + 19) + 16) * 4096;
+					AnimatedTilesMask = rom.ReadByte(header + 26);					
+				}
 			}
 						
 			if(AnimatedTilesMask != 0)
@@ -111,6 +162,7 @@ namespace WLEditor
 			//dump 16x16 tiles			
 			if(reloadAnimatedTilesOnly)
 			{
+				rom.SetBank(0x11);
 				DumpAnimated16x16Tiles(paletteColors[0]);
 			}
 			else
@@ -129,44 +181,210 @@ namespace WLEditor
 				rom.SetBank(blockbank);
 				int tilesdata = rom.ReadWord(0x4000 + blockubbank * 2);
 				RLEDecompressTiles(rom, tilesdata, LevelData);
-
-				//dump scroll
-				rom.SetBank(0xC);
-				rom.ReadBytes(0x4000 + course * 32, 32, ScrollData);
-
+				
 				//dump objects
 				rom.SetBank(0x7);
 				int objectsPosition = rom.ReadWord(0x4199 + course * 2);
 				RLEDecompressObjects(rom, objectsPosition, ObjectsData);
-
-				//dump warps
-				rom.SetBank(0xC);				
-				for(int i = 0 ; i < 32 ; i++)
-				{
-					int warpdata = rom.ReadWord(0x4F30 + course * 64 + i * 2);
-					Warps[i] = rom.ReadByte(warpdata);
-				}
-
-				WarioPosition = rom.ReadWordSwap(header + 15) + rom.ReadWordSwap(header + 13) * 8192;								
-				WarioRightFacing = (rom.ReadByte(header + 18) & 0x20) == 0;
 			}
 		}
-
-		public static int SearchWarp(Rom rom, int course, int sector)
+				
+		public static Warp GetLevelHeader(Rom rom, int course)
 		{
 			rom.SetBank(0xC);
-			//search sector that target that sector
-			for(int i = 0 ; i < 32 ; i++)
+			int header = rom.ReadWord(0x4560 + course * 2);
+			
+			Warp warp = new Warp
 			{
-				int warp = rom.ReadWord(0x4F30 + course * 64 + i * 2);
-
-				if(rom.ReadByte(warp) == sector)
+				Bank = rom.ReadByte(header + 0),
+				TileSetB = rom.ReadWord(header + 1),
+				TileSetA = rom.ReadWord(header + 3),
+				TileAnimation = rom.ReadWord(header + 7),						
+				BlockIndex = rom.ReadWord(header + 11),
+				WarioY = rom.ReadWordSwap(header + 13) / 8,
+				WarioX = rom.ReadWordSwap(header + 15) / 8,	
+				WarioSpriteAttributes = rom.ReadByte(header + 18),
+				CameraY = rom.ReadWordSwap(header + 19) / 8,
+				CameraX = rom.ReadWordSwap(header + 21) / 8,
+				CameraType = rom.ReadByte(header + 24),
+				AnimationSpeed = rom.ReadByte(header + 26),
+				Palette = rom.ReadByte(header + 27),
+				Enemy = rom.ReadWord(header + 28),
+				Music = rom.ReadWord(0x7E73 + course * 2)	
+			};
+			
+			return warp;
+		}
+		
+		public static void SaveLevelHeader(Rom rom, int course, Warp warp)
+		{			
+			rom.SetBank(0xC);
+			int header = rom.ReadWord(0x4560 + course * 2);
+			int warioSector = warp.WarioX / 32 + warp.WarioY / 32 * 16;
+			int scroll = GetScroll(rom, course, warioSector);
+			
+			rom.WriteByte(header + 0, (byte)warp.Bank);
+			rom.WriteWord(header + 1, (ushort)warp.TileSetB);
+			rom.WriteWord(header + 3, (ushort)warp.TileSetA);
+			rom.WriteWord(header + 7, (ushort)warp.TileAnimation); 			
+			rom.WriteWord(header + 11, (ushort)warp.BlockIndex);		
+			rom.WriteWordSwap(header + 13, (ushort)(warp.WarioY * 8));
+			rom.WriteWordSwap(header + 15, (ushort)(warp.WarioX * 8));
+			rom.WriteByte(header + 18, (byte)warp.WarioSpriteAttributes);
+			rom.WriteWordSwap(header + 19, (ushort)(warp.CameraY * 8));
+			rom.WriteWordSwap(header + 21, (ushort)(warp.CameraX * 8));
+			rom.WriteByte(header + 23, (byte)scroll);
+			rom.WriteByte(header + 24, (byte)warp.CameraType);
+			rom.WriteByte(header + 26, (byte)warp.AnimationSpeed);
+			rom.WriteByte(header + 27, (byte)warp.Palette);					
+			rom.WriteWord(header + 28, (ushort)warp.Enemy);  
+			rom.WriteWord(0x7E73 + course * 2, (ushort)warp.Music);
+		}
+				
+		public static int SearchWarp(Rom rom, int course, int sector)
+		{
+			if (sector != -1)
+			{
+				rom.SetBank(0xC);
+				int warp = rom.ReadWord(0x4F30 + course * 64 + sector * 2);		
+				if (warp >= 0x5B7A)
 				{
 					return warp;
 				}
 			}
 
 			return -1;
+		}
+		
+		public static int GetWarp(Rom rom, int course, int sector)
+		{
+			rom.SetBank(0xC);
+			return rom.ReadWord(0x4F30 + course * 64 + sector * 2);		
+		}
+		
+		public static Warp GetWarp(Rom rom, int warp)		
+		{
+			rom.SetBank(0xC);
+			
+			Warp warpInfo = new Warp();
+			
+			if (warp >= 0x5B7A)
+			{
+				int warioSector = rom.ReadByte(warp);
+				int cameraSector = rom.ReadByte(warp+4);
+				
+				warpInfo.WarioY = rom.ReadByte(warp+1) / 8 + (warioSector / 16) * 32;
+				warpInfo.WarioX = rom.ReadByte(warp+2) / 8 + (warioSector % 16) * 32;
+				warpInfo.CameraY = rom.ReadByte(warp+5) / 8 + (cameraSector / 16) * 32;
+				warpInfo.CameraX = rom.ReadByte(warp+6) / 8 + (cameraSector % 16) * 32;
+				warpInfo.CameraType = rom.ReadByte(warp+7);
+				warpInfo.AnimationSpeed = rom.ReadByte(warp + 9);
+				warpInfo.Palette = rom.ReadByte(warp + 10);
+				warpInfo.Bank = rom.ReadByte(warp + 11);
+				warpInfo.TileSetB = rom.ReadWord(warp + 12);
+				warpInfo.TileSetA = rom.ReadWord(warp + 14);
+				warpInfo.TileAnimation = rom.ReadWord(warp + 18);
+				warpInfo.BlockIndex = rom.ReadWord(warp + 20);
+				warpInfo.Enemy = rom.ReadWord(warp + 22);
+			}
+			
+			return warpInfo;				
+		}
+		
+		public static void SaveWarp(Rom rom, int course, int sector, int warp)
+		{
+			rom.SetBank(0xC);	
+			rom.WriteWord(0x4F30 + course * 64 + sector * 2, (ushort)warp);
+		}
+		
+		public static void SaveWarp(Rom rom, int course, int sector, Warp warpInfo)
+		{			
+			rom.SetBank(0xC);
+			int warp = rom.ReadWord(0x4F30 + course * 64 + sector * 2);
+			rom.WriteByte(warp, (byte)(warpInfo.WarioX / 32 + (warpInfo.WarioY / 32) * 16));
+			rom.WriteByte(warp + 1, (byte)((warpInfo.WarioY % 32) * 8));
+			rom.WriteByte(warp + 2, (byte)((warpInfo.WarioX % 32) * 8));
+			rom.WriteByte(warp + 4, (byte)(warpInfo.CameraX / 32 + (warpInfo.CameraY / 32) * 16));
+          	rom.WriteByte(warp + 5, (byte)((warpInfo.CameraY % 32) * 8));
+            rom.WriteByte(warp + 6, (byte)((warpInfo.CameraX % 32) * 8));
+			rom.WriteByte(warp + 7, (byte)warpInfo.CameraType);
+			rom.WriteByte(warp + 9, (byte)warpInfo.AnimationSpeed);
+			rom.WriteByte(warp + 10, (byte)warpInfo.Palette);
+			rom.WriteByte(warp + 11, (byte)warpInfo.Bank);
+			rom.WriteWord(warp + 12, (ushort)warpInfo.TileSetB);
+			rom.WriteWord(warp + 14, (ushort)warpInfo.TileSetA);
+			rom.WriteWord(warp + 18, (ushort)warpInfo.TileAnimation); 			
+			rom.WriteWord(warp + 20, (ushort)warpInfo.BlockIndex);
+			rom.WriteWord(warp + 22, (ushort)warpInfo.Enemy);  
+		}
+		
+		public static HashSet<int> GetWarpUsage(Rom rom)
+		{			
+			HashSet<int> used = new HashSet<int>();
+			
+			rom.SetBank(0xC);
+			for(int i = 0 ; i < 43 ;i++)
+			{
+				int header = rom.ReadWord(0x4560 + i * 2);
+				
+				for(int j = 0 ; j < 32 ; j++)
+				{
+					int warp = rom.ReadWord(0x4F30 + i * 64 + j * 2);
+					if (warp >= 0x5B7A)
+					{
+						used.Add(warp);
+					}
+				}
+			}
+			
+			return used;
+		}
+		
+		public static int GetScroll(Rom rom, int course, int sector)
+		{
+			rom.SetBank(0xC);
+			return rom.ReadByte(0x4000 + course * 32 + sector);
+		}
+		
+		public static void SaveScroll(Rom rom, int course, int sector, int scroll)
+		{
+			rom.SetBank(0xC);
+			rom.WriteByte(0x4000 + course * 32 + sector, (byte)scroll);
+			
+			int header = rom.ReadWord(0x4560 + course * 2);
+			int warioSector = rom.ReadWordSwap(header + 15) / 256 + rom.ReadWordSwap(header + 13) / 256 * 16;
+			if (sector == warioSector)
+			{
+				rom.WriteByte(header + 23, (byte)scroll);
+			}
+		}
+				
+		public static bool FindDoorInSector(int sector, out int posX, out int posY)
+		{
+			int startX = (sector % 16) * 16;
+			int startY = (sector / 16) * 16;
+			
+			for (int y = 0 ; y < 16 ; y++)
+			{
+				for (int x = 0 ; x < 16 ; x++)
+				{
+					int block = LevelData[(x + startX) + (y + startY) * 256 + 0x1000];
+					switch (block)
+					{
+						case 0x2E: 
+						case 0x48:
+						case 0x4B:				
+						case 0x54:
+							posX = x;
+							posY = y;
+							return true;
+					}
+				}
+			}
+			
+			posX = -1;
+			posY = -1;
+			return false;
 		}
 		
 		public static void DumpPlayerSprite(Rom rom)
@@ -398,29 +616,39 @@ namespace WLEditor
 			}
 		}
 		
-		static void FindEnemiesData(Rom rom, int enemiesPointer, out int enemyId, out int tilesPointer)
+		public static List<int> GetEnemyIds(Rom rom, int enemyPointer)
+		{			
+			rom.SetBank(0x7);
+			List<int> enemyIds = new List<int>();
+			for(int i = 0 ; i < 6 ; i++)
+			{
+				int enemyId = rom.ReadWord(enemyPointer + (i + 1) * 2);
+				enemyId = (enemyId - 0x530F) / 4;	
+				if (enemyId == 0)
+				{
+					break;
+				}
+				
+				enemyIds.Add(enemyId);
+			}
+			
+			return enemyIds;
+		}
+		
+		public static void FindEnemiesData(Rom rom, int enemiesPointer, out int enemyId, out int tilesPointer, 
+		                                   out int treasureID, out bool treasureCheck, out bool exitOpen)
 		{
 			rom.SetBank(0x7);
 			int position = enemiesPointer;
 			while(rom.ReadByte(position) != 0xC9) //ret
-			{				
-				bool match = true;
-				for(int j = 0 ; j < enemyCodePattern.Length ; j++)
-				{
-					byte valueFromRom = rom.ReadByte(position + j);
-					byte valueToCompare = enemyCodePattern[j];
-					
-					if(valueToCompare != 0x00 && valueFromRom != valueToCompare)
-					{
-						match = false;
-						break;
-					}
-				}
-				
-				if(match)
+			{		
+				if (MatchPattern(rom, position, enemyCodePattern))
 				{
 					enemyId = rom.ReadByte(position + 6) << 8 | rom.ReadByte(position + 1);
-					tilesPointer = rom.ReadByte(position + 12) << 8 | rom.ReadByte(position + 11);
+					tilesPointer = rom.ReadWord(position + 11);
+					
+					position += enemyCodePattern.Length;
+					CheckExtraCode(rom, position, out treasureID, out treasureCheck, out exitOpen);
 					return;
 				}
 				
@@ -428,6 +656,53 @@ namespace WLEditor
 			}	
 
 			throw new Exception("cannot find enemies data");
+		}
+		
+		static void CheckExtraCode(Rom rom, int position, out int treasureID, out bool treasureCheck, out bool exitOpen)
+		{			
+			treasureCheck = false;
+			exitOpen = false;
+			treasureID = -1;
+			
+			while (rom.ReadByte(position) != 0xC9) //ret
+			{
+				if (MatchPattern(rom, position, treasurePattern))
+				{
+					treasureID = rom.ReadByte(position + 1);							
+					position += treasurePattern.Length;							
+					
+					if (MatchPattern(rom, position, treasureCheckPattern))
+					{
+						treasureCheck = true;
+						position += treasureCheckPattern.Length;								
+					}
+				}
+				else if (MatchPattern(rom, position, exitPattern))
+				{
+					exitOpen = true;
+					position += exitPattern.Length;		
+				}
+				else 
+				{
+					position++;
+				}
+			}
+		}
+		
+		static bool MatchPattern(Rom rom, int position, byte[] pattern)
+		{
+			for(int j = 0 ; j < pattern.Length ; j++)
+			{
+				byte valueFromRom = rom.ReadByte(position + j);
+				byte valueToCompare = pattern[j];
+				
+				if(valueToCompare != 0x00 && valueFromRom != valueToCompare)
+				{
+					return false;
+				}
+			}
+			
+			return true;
 		}
 		
 		static Rectangle DumpSpritePlayer(Rom rom, int posx, int posy, int spriteAddress, bool horizontalFlip)

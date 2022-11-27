@@ -75,7 +75,7 @@ namespace WLEditor
 						//wario position
 						int index = Level.WarioRightFacing ? 0 : 1;
 						Rectangle playerRectangle = Level.PlayerRectangles[index];
-						Rectangle destRect = new Rectangle((Level.WarioPosition % 8192 + playerRectangle.X - 32) * zoom, (Level.WarioPosition / 8192 + playerRectangle.Y - 56 - index * 64) * zoom, playerRectangle.Width * zoom, playerRectangle.Height * zoom);
+						Rectangle destRect = new Rectangle((Level.WarioPosition % 4096 + playerRectangle.X - 32) * zoom, (Level.WarioPosition / 4096 + playerRectangle.Y - 56 - index * 64) * zoom, playerRectangle.Width * zoom, playerRectangle.Height * zoom);
 						if (destRect.IntersectsWith(e.ClipRectangle))
 						{
 							e.Graphics.DrawImage(Level.PlayerSprite.Bitmap, destRect, playerRectangle, GraphicsUnit.Pixel);
@@ -94,28 +94,46 @@ namespace WLEditor
 					//sectors
 					if(ShowSectors)
 					{			
-						foreach (Point point in sectorsToDraw)
-						{						
-							DrawSectorInfo(point.X, point.Y, e.Graphics, font, format);
-						}
-						
-						DrawSectorBorders(e.Graphics, e.ClipRectangle);
-						
-						if (CurrentSector != -1)
-						{
-							Rectangle sectorRect = new Rectangle((CurrentSector % 16) * 256 * zoom, (CurrentSector / 16) * 256 * zoom, 256 * zoom, 256 * zoom);
-							if (sectorRect.IntersectsWith(e.ClipRectangle))
-							{
-								using (Brush blue = new SolidBrush(Color.FromArgb(64, 0, 0, 255)))
-								{
-									e.Graphics.FillRectangle(blue, sectorRect);
-								}
-							}
-						}														
+						DrawSectors(e.Graphics, e.ClipRectangle, font, format, sectorsToDraw);
 					}
 					
 					DrawSelection(e.Graphics);
 				}			
+			}
+		}
+		
+		void DrawSectors(Graphics g, Rectangle clipRectangle, Font font, StringFormat format, List<Point> sectorsToDraw)
+		{
+			foreach (Point point in sectorsToDraw)
+			{						
+				DrawSectorInfo(point.X, point.Y, g, font, format);
+			}
+			
+			DrawSectorBorders(g, clipRectangle);
+			
+			//camera
+			if (Level.CameraPosition != -1)
+			{
+				Rectangle camera = new Rectangle((Level.CameraPosition % 4096) * zoom, (Level.CameraPosition / 4096) * zoom, 10 * 16 * zoom, 9 * 16 * zoom);
+				if (camera.IntersectsWith(clipRectangle))
+				{
+					using (Brush red = new SolidBrush(Color.FromArgb(128, 0, 0, 255)))
+					{
+						g.FillRectangle(red, camera);
+					}
+				}
+			}
+			
+			if (CurrentSector != -1)
+			{
+				Rectangle sectorRect = new Rectangle((CurrentSector % 16) * 256 * zoom, (CurrentSector / 16) * 256 * zoom, 256 * zoom, 256 * zoom);
+				if (sectorRect.IntersectsWith(clipRectangle))
+				{
+					using (Brush blue = new SolidBrush(Color.FromArgb(64, 0, 0, 255)))
+					{
+						g.FillRectangle(blue, sectorRect);
+					}
+				}
 			}
 		}
 		
@@ -334,7 +352,7 @@ namespace WLEditor
 					warpText = "EXIT B";
 					break;
 				default:
-					warpText = "W" + sectorTarget.ToString("D2");
+					warpText = "S" + sectorTarget.ToString("D2");
 					break;
 			}
 
@@ -398,7 +416,10 @@ namespace WLEditor
 				if(tileIndex != CurrentTileIndex)
 				{
 					CurrentTileIndex = tileIndex;
-					TileMouseDown(this, e);										
+					if (TileMouseDown != null) 
+					{
+						TileMouseDown(this, e);										
+					}
 				}
 			}
 			else if(e.Button == MouseButtons.Middle)
@@ -408,7 +429,10 @@ namespace WLEditor
 				if(sector != CurrentSector)
 				{
 					CurrentSector = sector;
-					SectorChanged(this, EventArgs.Empty);
+					if (SectorChanged != null)
+					{
+						SectorChanged(this, EventArgs.Empty);
+					}
 				}
 			}
 		}
