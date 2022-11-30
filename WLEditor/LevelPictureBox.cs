@@ -201,29 +201,32 @@ namespace WLEditor
 						Rectangle destRect = new Rectangle(i * 16 * zoom, j * 16 * zoom, 16 * zoom, 16 * zoom);
 						if(destRect.IntersectsWith(e.ClipRectangle))
 						{
-							//objects						
 							e.Graphics.FillRectangle(brush, destRect);
 							
-							if(data > 6)
+							//power up
+							if (data > 6)
 							{
-								e.Graphics.DrawImage(Level.TilesObjects.Bitmap, destRect, new Rectangle((data - 7) * 16, 0, 16, 16), GraphicsUnit.Pixel);								
-							}
-							else if(Level.LoadedSprites[data - 1] == Rectangle.Empty)
-							{
-								e.Graphics.DrawString(data.ToString(), font, Brushes.White, (i * 16 + 8) * zoom, (j * 16 + 8) * zoom, format);								
+								e.Graphics.DrawImage(Level.TilesObjects.Bitmap, destRect, new Rectangle((data - 7) * 16, 0, 16, 16), GraphicsUnit.Pixel);		
 							}
 						}
 						
-						//objects sprites																	
-						if(data <= 6 && Level.LoadedSprites[data - 1] != Rectangle.Empty)
+						//enemy																	
+						if(data <= 6)
 						{
-							Rectangle enemyRect = Level.LoadedSprites[data - 1];
-							destRect = new Rectangle((i * 16 + enemyRect.X - 32 + 8) * zoom, (j * 16 + enemyRect.Y - (data - 1) * 64 - 40) * zoom, enemyRect.Width * zoom, enemyRect.Height * zoom);							
-							if(destRect.IntersectsWith(e.ClipRectangle))
-							{																												
-								e.Graphics.DrawImage(Level.TilesEnemies.Bitmap, destRect, enemyRect, GraphicsUnit.Pixel);
+							if (Level.LoadedSprites[data - 1] != Rectangle.Empty)
+							{
+								Rectangle enemyRect = Level.LoadedSprites[data - 1];
+								destRect = new Rectangle((i * 16 + enemyRect.X - 32 + 8) * zoom, (j * 16 + enemyRect.Y - (data - 1) * 64 - 40) * zoom, enemyRect.Width * zoom, enemyRect.Height * zoom);							
+								if(destRect.IntersectsWith(e.ClipRectangle))
+								{																												
+									e.Graphics.DrawImage(Level.TilesEnemies.Bitmap, destRect, enemyRect, GraphicsUnit.Pixel);
+								}							
 							}
-						}			
+							else
+							{
+								e.Graphics.DrawString(data.ToString(), font, Brushes.White, (i * 16 + 8) * zoom, (j * 16 + 8) * zoom, format);								
+							}						
+						}
 					}														
 				}
 			}

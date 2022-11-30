@@ -56,7 +56,6 @@ namespace WLEditor
 		public static int WarioPosition;
 		public static int CameraPosition;
 		public static Rectangle[] LoadedSprites = new Rectangle[6];
-		public static bool[] EnemiesAvailable = new bool[6];
 		public static bool[] Animated16x16Tiles = new bool[16 * 8];
 		private static int[] animated8x8Tiles = new int[16 * 8 * 2 * 2];
 		public static int AnimatedTilesMask;
@@ -801,7 +800,7 @@ namespace WLEditor
 		static void DumpEnemiesSprites(Rom rom, int enemiesIdsPointer, int tilesDataAddress)
 		{
 			Array.Clear(TilesEnemies.Bits, 0, TilesEnemies.Bits.Length);
-			Array.Clear(EnemiesAvailable, 0, EnemiesAvailable.Length);
+			Array.Clear(LoadedSprites, 0, LoadedSprites.Length);
 											
 			for(int i = 0 ; i < 6 ; i++)
 			{
@@ -811,7 +810,6 @@ namespace WLEditor
 				
 				if(enemyId > 0 && enemyId < enemySpriteAddress.Length)
 				{
-					EnemiesAvailable[i] = true;
 					int spriteDataAddress = enemySpriteAddress[enemyId];
 					if(spriteDataAddress != 0)
 					{		

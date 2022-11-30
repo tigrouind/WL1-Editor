@@ -86,14 +86,7 @@ namespace WLEditor
 				
 				levelPictureBox.ClearTileCache();
 				levelPictureBox.Invalidate();	
-				
-				//make sure current object can still be selected, otherwise select first available previous object
-				int currentObject = toolboxForm.CurrentObject;
-				while(currentObject >= 1 && currentObject <= 6 && !Level.EnemiesAvailable[currentObject - 1])
-				{
-					currentObject--;
-				}
-				toolboxForm.CurrentObject = currentObject;									
+												
 				toolboxForm.Invalidate(true);		
 			}
 		}			
