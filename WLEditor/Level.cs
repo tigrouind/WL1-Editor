@@ -7,9 +7,9 @@ namespace WLEditor
 {
 	public static class Level
 	{
-		static Color[] paletteColors =  { Color.White, Color.FromArgb(255, 170, 170, 170), Color.FromArgb(255, 85, 85, 85), Color.Black };
+		static uint[] paletteColors =  { 0xFFFFFFFF, 0xFFAAAAAA, 0xFF555555, 0xFF000000 };
 		
-		static Color[] enemyPalette = { Color.White, Color.FromArgb(255, 157, 201, 253), Color.Magenta, Color.FromArgb(255, 0, 0, 41) };
+		static uint[] enemyPalette = { 0xFFFFFFFF, 0xFF9DC9FD, 0xFFFF00FF, 0xFF000029 };
 				
 		static ushort[] enemySpriteAddress = 
 		{
@@ -508,7 +508,7 @@ namespace WLEditor
 			}
 		}
 		
-		static void DumpAnimated16x16Tiles(Color defaultColor)
+		static void DumpAnimated16x16Tiles(uint defaultColor)
 		{
 			int m = 0;
 			for(int n = 0 ; n < 16 ; n++)
@@ -531,7 +531,7 @@ namespace WLEditor
 			}
 		}
 
-		static void Dump16x16Tiles(Rom rom, int tileindexaddress, int switchMode, Color defaultColor)
+		static void Dump16x16Tiles(Rom rom, int tileindexaddress, int switchMode, uint defaultColor)
 		{						
 			int m = 0;
 			for(int n = 0 ; n < 16 ; n++)
@@ -561,7 +561,7 @@ namespace WLEditor
 			}
 		}
 		
-		static void Dump8x8Tile(Point dest, int subTileIndex, Color defaultColor)
+		static void Dump8x8Tile(Point dest, int subTileIndex, uint defaultColor)
 		{
 			if(subTileIndex < 128)
 			{
@@ -573,20 +573,19 @@ namespace WLEditor
 			}
 			else
 			{
-				//fill 8x8 block with default color
-				int defaultColorInt = defaultColor.ToArgb();								
+				//fill 8x8 block with default color							
 				for(int y = 0 ; y < 8 ; y++)
 				{
 					int destIndex = dest.X + (dest.Y + y) * Tiles16x16.Width;									
 					for(int x = 0 ; x < 8 ; x++)
 					{
-						Tiles16x16.Bits[destIndex + x] = defaultColorInt;
+						Tiles16x16.Bits[destIndex + x] = defaultColor;
 					}
 				}
 			}
 		}
 
-		static void Dump8x8Tiles(Rom rom, int gfxaddress, int tiles, int pos, byte palette, Color[] customPalette, bool transparency)
+		static void Dump8x8Tiles(Rom rom, int gfxaddress, int tiles, int pos, byte palette, uint[] customPalette, bool transparency)
 		{
 			for(int n = 0 ; n < tiles ; n++)
 			{
@@ -608,7 +607,7 @@ namespace WLEditor
 						if(!transparency || pixel != 0)
 						{
 							int palindex = (palette >> pixel * 2) & 0x3;
-							Tiles8x8.Bits[destIndex + x] = customPalette[palindex].ToArgb();
+							Tiles8x8.Bits[destIndex + x] = customPalette[palindex];
 						}
 					}
 				}
