@@ -979,6 +979,25 @@ namespace WLEditor
 
 			return tileData;
 		}
+		
+		public static int GetTypeOfSwitch()
+		{
+			for (int tileIndex = 0 ; tileIndex < 8192 ; tileIndex++)
+			{
+				byte data = Level.LevelData[tileIndex + 0x1000];
+				if(data == 0x39)
+				{
+					return 1;
+				}
+				
+				if(data == 0x32)
+				{
+					return 2;
+				}
+			}
+			
+			return 0;
+		}
 
 		public static bool SaveChanges(Rom rom, int course, out string errorMessage)
 		{

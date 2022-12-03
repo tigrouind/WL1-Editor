@@ -386,8 +386,23 @@ namespace WLEditor
 			}
 						
 			if (keyData == Keys.B)
-			{
-			 	SetSwitchMode((switchMode + 1) % 3);
+			{				
+				int typeOfSwitch = Level.GetTypeOfSwitch();
+				switch(typeOfSwitch)
+				{
+					case 1:
+						SetSwitchMode(switchMode == 1 ? 0 : 1);
+						break;
+						
+					case 2:
+						SetSwitchMode(switchMode == 2 ? 0 : 2);
+						break;
+						
+					default:
+						SetSwitchMode((switchMode + 1) % 3);	
+						break;
+				}					
+			 	
 				return true;
 			}
 			
