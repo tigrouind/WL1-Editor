@@ -70,8 +70,8 @@ namespace WLEditor
 		public MainForm()
 		{
 			InitializeComponent();									
-			levelPictureBox.MouseWheel += MainFormMouseWheel;
-			toolboxForm.MouseWheel += MainFormMouseWheel;
+			LevelPanel.MouseWheel += LevelPanelMouseWheel;
+			toolboxForm.MouseWheel += LevelPanelMouseWheel;
 			toolboxForm.FormClosing += ToolBoxFormClosing;	
 			toolboxForm.ProcessCommandKey += ToolBoxProcessCommandKey;
 			toolboxForm.SectorChanged += ToolBoxSectorChanged;
@@ -462,11 +462,9 @@ namespace WLEditor
 			SetZoomLevel(zoom + 1);
 		}		
 		
-		void MainFormMouseWheel(object sender, MouseEventArgs e)
+		void LevelPanelMouseWheel(object sender, MouseEventArgs e)
 		{
-			Control control = (Control)sender;
-			if (Control.ModifierKeys == Keys.Control &&
-				LevelPanel.RectangleToScreen(LevelPanel.ClientRectangle).Contains(control.PointToScreen(e.Location)))
+			if (Control.ModifierKeys == Keys.Control)
 			{
 				if(e.Delta > 0 && zoom < 4)
 				{

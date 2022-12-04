@@ -397,7 +397,6 @@ namespace WLEditor
 			this.MainMenuStrip = this.menuStrip1;
 			this.Name = "MainForm";
 			this.Text = "WLEditor";
-			this.MouseWheel += MainFormMouseWheel;
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainFormFormClosing);
 			this.menuStrip1.ResumeLayout(false);
 			this.menuStrip1.PerformLayout();
@@ -423,7 +422,7 @@ namespace WLEditor
 		private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
 		private System.Windows.Forms.MenuStrip menuStrip1;
 		private System.Windows.Forms.ComboBox levelComboBox;
-		private System.Windows.Forms.Panel LevelPanel;
+		PanelUnScrollable LevelPanel;
 		LevelPictureBox levelPictureBox;
 		private System.Windows.Forms.ToolStripMenuItem saveAsToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem classicToolStripMenuItem;
