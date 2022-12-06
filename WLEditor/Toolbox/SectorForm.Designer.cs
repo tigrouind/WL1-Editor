@@ -335,7 +335,7 @@
 			this.ddlEnemies.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
 			| System.Windows.Forms.AnchorStyles.Right)));
 			this.ddlEnemies.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.ddlEnemies.DropDownWidth = 300;
+			this.ddlEnemies.DropDownWidth = 350;
 			this.ddlEnemies.FormattingEnabled = true;
 			this.ddlEnemies.Location = new System.Drawing.Point(88, 76);
 			this.ddlEnemies.Name = "ddlEnemies";
