@@ -51,6 +51,7 @@
   <ItemGroup>
     <Compile Include="ComboboxItem.cs" />
     <Compile Include="DirectBitmap.cs" />
+    <Compile Include="Extensions.cs" />
     <Compile Include="Level.cs" />
     <Compile Include="LevelPictureBox.cs" />
     <Compile Include="MainForm.cs" />

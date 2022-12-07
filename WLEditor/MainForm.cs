@@ -109,7 +109,7 @@ namespace WLEditor
 				{
 					//restore previous item
 					ignoreEvents = true;
-					levelComboBox.SelectedItem = levelComboBox.Items.Cast<ComboboxItem<int>>().First(x => x.Value == currentCourseId);
+					levelComboBox.SelectedIndex = levelComboBox.Items.Cast<ComboboxItem<int>>().FindIndex(x => x.Value == currentCourseId);
 					ignoreEvents = false;
 				}
 			}

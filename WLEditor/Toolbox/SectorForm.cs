@@ -510,21 +510,21 @@ namespace WLEditor
 		void LoadDropdown(ComboBox combo, int value)
 		{				
 			ignoreEvents = true;
-			combo.SelectedItem = combo.Items.Cast<ComboboxItem<int>>().FirstOrDefault(x => x.Value == value);
+			combo.SelectedIndex = combo.Items.Cast<ComboboxItem<int>>().FindIndex(x => x.Value == value);
 			ignoreEvents = false;
 		}
 		
 		void LoadDropdownAny(ComboBox combo, int value)
 		{		
 			ignoreEvents = true;			
-			combo.SelectedItem = combo.Items.Cast<ComboboxItem<int[]>>().FirstOrDefault(x => x.Value.Contains(value));
+			combo.SelectedIndex = combo.Items.Cast<ComboboxItem<int[]>>().FindIndex(x => x.Value.Contains(value));
 			ignoreEvents = false;
 		}
 		
 		void LoadDropdown(ComboBox combo, int[] value)
 		{		
 			ignoreEvents = true;			
-			combo.SelectedItem = combo.Items.Cast<ComboboxItem<int[]>>().FirstOrDefault(x => x.Value.SequenceEqual(value));
+			combo.SelectedIndex = combo.Items.Cast<ComboboxItem<int[]>>().FindIndex(x => x.Value.SequenceEqual(value));
 			ignoreEvents = false;
 		}
 		
