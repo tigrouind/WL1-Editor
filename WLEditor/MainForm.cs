@@ -586,7 +586,7 @@ namespace WLEditor
 			if(rom.IsLoaded && levelComboBox.SelectedItem != null && Level.AnimatedTilesMask != 0)
 			{				
 				timerTicks++;				
-				if((timerTicks & Level.AnimatedTilesMask) == 0)
+				if((timerTicks & (Level.AnimatedTilesMask >> 2)) == 0)
 				{
 					animatedTileIndex = (animatedTileIndex + 1) % 4;
 					RefreshAnimatedTiles();
