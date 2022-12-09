@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
+using Microsoft.VisualBasic;
 
 namespace WLEditor
 {	
@@ -768,7 +769,16 @@ namespace WLEditor
 		void CmdCalculatePosClick(object sender, EventArgs e)
 		{
 			int sector = currentWarp.WarioX / 32 + currentWarp.WarioY / 32 * 16;
-				
+			
+			string sectorTxt = Interaction.InputBox(string.Empty, "Enter sector number (0-31)", sector.ToString(), -1, -1);
+			if (!(int.TryParse(sectorTxt, out sector) && sector >= 0 && sector <= 31))
+			{
+				return;
+			}
+			
+			currentWarp.WarioX = (sector % 16) * 32 + currentWarp.WarioX % 32;
+			currentWarp.WarioY = (sector / 16) * 32 + currentWarp.WarioY % 32;
+			
 			int doorX, doorY;
 			if (Level.FindDoorInSector(sector, out doorX, out doorY))
 			{				
