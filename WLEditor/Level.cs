@@ -358,10 +358,14 @@ namespace WLEditor
 			}
 		}
 				
-		public static bool FindDoorInSector(int sector, out int posX, out int posY)
+		public static bool FindDoorInSector(int sector, int warioX, int warioY, out int posX, out int posY)
 		{
 			int startX = (sector % 16) * 16;
 			int startY = (sector / 16) * 16;
+			int distance = int.MaxValue;
+			
+			posX = -1;
+			posY = -1;
 			
 			for (int y = 0 ; y < 16 ; y++)
 			{
@@ -374,16 +378,21 @@ namespace WLEditor
 						case 0x48:
 						case 0x4B:				
 						case 0x54:
-							posX = x;
-							posY = y;
-							return true;
+							int dx = (x * 2 - (warioX - 1));
+							int dy = (y * 2 - (warioY - 2));
+							int length = dx * dx + dy * dy;
+							if (length < distance)
+							{
+								distance = length;
+								posX = x;
+								posY = y;
+							}
+							break;
 					}
 				}
 			}
 			
-			posX = -1;
-			posY = -1;
-			return false;
+			return (posX != -1 && posY != -1);
 		}
 		
 		public static void DumpPlayerSprite(Rom rom)

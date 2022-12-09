@@ -780,7 +780,7 @@ namespace WLEditor
 			currentWarp.WarioY = (sector / 16) * 32 + currentWarp.WarioY % 32;
 			
 			int doorX, doorY;
-			if (Level.FindDoorInSector(sector, out doorX, out doorY))
+			if (Level.FindDoorInSector(sector, currentWarp.WarioX % 32, currentWarp.WarioY % 32, out doorX, out doorY))
 			{				
 				//player position
 				currentWarp.WarioX = (sector % 16) * 32 + Math.Min(doorX * 2 + 1, 31);
