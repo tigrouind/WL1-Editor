@@ -270,7 +270,8 @@ namespace WLEditor
 			new ComboboxItem<int>(0x5B76, "None"),
 			new ComboboxItem<int>(0x5B77, "Exit map"),
 			new ComboboxItem<int>(0x5B78, "Exit A"),		
-			new ComboboxItem<int>(0x5B79, "Exit B")
+			new ComboboxItem<int>(0x5B79, "Exit B"),
+			new ComboboxItem<int>(0x5B7A, "Sector")
 		};
 		
 		Dictionary<int, string> enemyNames = new Dictionary<int, string>
@@ -395,6 +396,9 @@ namespace WLEditor
 			ddlMusic.Items.Clear();
 			ddlMusic.Items.AddRange(music);
 			
+			ddlWarp.Items.Clear();
+			ddlWarp.Items.AddRange(warps);
+			
 			ddlTileSet.Items.Clear();
 			ddlTileSet.Items.AddRange(tileSets);
 			
@@ -470,8 +474,7 @@ namespace WLEditor
 		
 		void LoadWarp(int warp)
 		{					
-			LoadWarpsDropdown(warp);
-			LoadDropdown(ddlWarp, warp);	
+			LoadDropdown(ddlWarp, Math.Min(warp, 0x5B7A));
 			
 			if(warp >= 0x5B7A)
 			{
@@ -487,21 +490,19 @@ namespace WLEditor
 			LoadWarp();
 		}
 				
-		void LoadWarpsDropdown(int selectedWarp)
+		int GetFreeWarp()
 		{
 			var used = Level.GetWarpUsage(rom);
-						
-			ddlWarp.Items.Clear();
-			ddlWarp.Items.AddRange(warps);
-						
 			for (int i = 0 ; i < 370 ; i++)
 			{
 				int warp = 0x5B7A + i * 24;
-				if (!used.Contains(warp) || warp == selectedWarp)
+				if (!used.Contains(warp))
 				{
-					ddlWarp.Items.Add(new ComboboxItem<int>(warp, string.Format("{0:D3}", i)));	
+					return warp;
 				}				
 			}
+			
+			return -1;
 		}
 							
 		void LoadScroll()
@@ -605,6 +606,25 @@ namespace WLEditor
 			{
 				var item = (ComboboxItem<int>)ddlWarp.SelectedItem;
 				int warp = item.Value;
+					
+				if (warp == 0x5B7A)
+				{			
+					int previousWarp = Level.GetWarp(rom, currentCourseId, currentSector);
+					if (previousWarp >= 0x5B7A)
+					{
+						warp = previousWarp;
+					}
+					else
+					{
+						warp = GetFreeWarp();
+						if (warp == -1)
+						{
+							MessageBox.Show("No more warps available.\r\nPlease free a warp in another sector (any level)", Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+							LoadDropdown(ddlWarp, previousWarp);
+							return;
+						}
+					}
+				}
 				
 				Level.SaveWarp(rom, currentCourseId, currentSector, warp);				
 				LoadWarp(warp);									

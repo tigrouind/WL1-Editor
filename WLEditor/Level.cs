@@ -324,8 +324,6 @@ namespace WLEditor
 			rom.SetBank(0xC);
 			for(int i = 0 ; i < 43 ;i++)
 			{
-				int header = rom.ReadWord(0x4560 + i * 2);
-				
 				for(int j = 0 ; j < 32 ; j++)
 				{
 					int warp = rom.ReadWord(0x4F30 + i * 64 + j * 2);
