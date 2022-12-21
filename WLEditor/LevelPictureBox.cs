@@ -216,7 +216,7 @@ namespace WLEditor
 							if (Level.LoadedSprites[data - 1] != Rectangle.Empty)
 							{
 								Rectangle enemyRect = Level.LoadedSprites[data - 1];
-								destRect = new Rectangle((i * 16 + enemyRect.X - 32 + 8) * zoom, (j * 16 + enemyRect.Y - (data - 1) * 64 - 40) * zoom, enemyRect.Width * zoom, enemyRect.Height * zoom);							
+								destRect = new Rectangle((i * 16 + enemyRect.X - 32 + 8) * zoom, (j * 16 + enemyRect.Y - (data - 1) * 128 - 104) * zoom, enemyRect.Width * zoom, enemyRect.Height * zoom);							
 								if(destRect.IntersectsWith(e.ClipRectangle))
 								{																												
 									e.Graphics.DrawImage(Level.TilesEnemies.Bitmap, destRect, enemyRect, GraphicsUnit.Pixel);
@@ -396,7 +396,7 @@ namespace WLEditor
 				Rectangle enemyRect = Level.LoadedSprites[enemyIndex - 1];
 				if(enemyRect != Rectangle.Empty)
 				{						
-					region.Union(new Rectangle(((tileIndex % 256) * 16 + enemyRect.X - 32 + 8) * zoom, ((tileIndex / 256) * 16 + enemyRect.Y - (enemyIndex - 1) * 64 - 40) * zoom, enemyRect.Width * zoom, enemyRect.Height * zoom));
+					region.Union(new Rectangle(((tileIndex % 256) * 16 + enemyRect.X - 32 + 8) * zoom, ((tileIndex / 256) * 16 + enemyRect.Y - (enemyIndex - 1) * 128 - 104) * zoom, enemyRect.Width * zoom, enemyRect.Height * zoom));
 				}	
 			}
 		}
