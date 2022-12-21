@@ -274,78 +274,94 @@ namespace WLEditor
 			new ComboboxItem<int>(0x5B7A, "Sector")
 		};
 		
-		Dictionary<int, string> enemyNames = new Dictionary<int, string>
+		string[] enemyNames = 
 		{
-			{ 1, "Wanderin' Goom" },
-			{ 2, "Sparky" },
-			{ 3, "Big" },
-			{ 4, "Spiked ball" },
-			{ 5, "Pirate Goom" },
-			{ 6, "Helmut" },
-			{ 8, "100 Coin" },
-			{ 9, "Pouncer" },
-			{ 10, "Pouncer" },
-			{ 11, "Dropper" },
-			{ 12, "White puff" },
-			{ 13, "Bō" },
-			{ 14, "Door" },
-			{ 15, "Exit" },
-			{ 16, "Cart" },
-			{ 17, "Cart" },
-			{ 18, "Gaugau" },
-			{ 19, "Penkoon" },
-			{ 20, "D.D." },
-			{ 21, "Checkpoint" },
-			{ 22, "Chest" },
-			{ 23, "Flame" },
-			{ 24, "Treasure" },
-			{ 25, "Halo" },			
-			{ 27, "Watch" },
-			{ 28, "Chicken Duck" },			
-			{ 38, "Floater" },
-			{ 39, "Treasure door" },
-			{ 40, "Bridge" },
-			{ 41, "Bucket Head" },
-			{ 42, "! Block" },
-			{ 43, "Lava" },
-			{ 44, "Elevator up" },
-			{ 45, "Elevator down" },
-			{ 46, "Yadorā" },
-			{ 47, "Yarikuri Obake" },
-			{ 48, "Pinwheel" },
-			{ 49, "Giant block" },
-			{ 50, "Mine" },
-			{ 55, "Pecan" },
-			{ 56, "Skewer" },
-			{ 57, "Skewer" },
-			{ 58, "Skewer" },
-			{ 59, "Skewer" },
-			{ 60, "Maizō" },
-			{ 61, "Sinking platform" },
-			{ 62, "Togemaru" },
-			{ 63, "Pikkarikun" },			
-			{ 64, "Guragura" },
-			{ 65, "Spike ball" },
-			{ 66, "Ukiwani" },
-			{ 67, "Goboten" },
-			{ 68, "3-Up heart" },
-			{ 69, "Paidan" },
-			{ 70, "Harisu" },
-			{ 71, "Guragura" },
-			{ 72, "Kōmori Missile" },
-			{ 73, "Konotako" },
-			{ 74, "Knight" },
-			{ 75, "Door" },
-			{ 76, "Bee Fly" },
-			{ 77, "Skull" },
-			{ 78, "Demon Bat" }
+			"Wanderin' Goom",
+			"Sparky",
+			"Big",
+			"Spiked ball",
+			"Pirate Goom",
+			"Helmut",
+			"Bobo",
+			"100 Coin",
+			"Pouncer",
+			"Pouncer",
+			"Dropper",
+			"White puff",
+			"Bō",
+			"Door",
+			"Exit",
+			"Cart",
+			"Cart",
+			"Gaugau",
+			"Penkoon",
+			"D.D.",
+			"Checkpoint",
+			"Chest",
+			"Flame",
+			"Treasure",
+			"Halo",
+			"Watch",
+			"Watch",
+			"Chicken Duck",
+			"Minotaur",
+			"Penguin",
+			"Spiked Koopa",
+			"Ghost",
+			"Yarikuri Obake",
+			"Devil's Head",
+			"Devil's Eyes",
+			"Devil's Tongue",
+			"Rock",
+			"Floater",
+			"Treasure door",
+			"Bridge",
+			"Bucket Head",
+			"! Block",
+			"Lava",
+			"Elevator up",
+			"Elevator down",
+			"Yadorā",
+			"Yarikuri Obake",
+			"Pinwheel",
+			"Giant block",
+			"Mine",
+			"Captain Syrup",
+			"Lamp",
+			"Cloud",
+			"Mini genie",
+			"Pecan",
+			"Skewer",
+			"Skewer",
+			"Skewer",
+			"Skewer",
+			"Maizō",
+			"Sinking platform",
+			"Togemaru",
+			"Pikkarikun",
+			"Guragura",
+			"Spike ball",
+			"Ukiwani",
+			"Goboten",
+			"3-Up heart",
+			"Paidan",
+			"Harisu",
+			"Guragura",
+			"Kōmori Missile",
+			"Konotako",
+			"Knight",
+			"Door",
+			"Bee Fly",
+			"Skull",
+			"Demon Bat"
 		};
 		
 		string EnemyToString(int enemyId, bool exitOpen)
 		{			
 			string enemyName;
-			if (enemyNames.TryGetValue(enemyId, out enemyName))
+			if (enemyId >= 1 && enemyId <= enemyNames.Length)
 			{
+				enemyName = enemyNames[enemyId - 1];
 				if (enemyId == 15 && exitOpen)
 				{
 					enemyName += " open";
@@ -359,25 +375,32 @@ namespace WLEditor
 		
 		string GetEnemyInfo(int enemyPointer)
 		{
+			string prefix = string.Empty;
+			
 			//boss
 			int[] boss = { 0x4CA9, 0x460D, 0x4C0C, 0x4E34, 0x4B06, 0x4D1A, 0x527D };
 			int bossId = Array.IndexOf(boss, enemyPointer);
 			if (bossId != -1)
 			{
-				return string.Format("[Boss {0}]", bossId + 1);
+				prefix += string.Format("[Boss {0}]   ", bossId + 1);
 			}
 			
 			//treasure/exit open
 			int enemiesIdsPointer, tilesPointer, treasureId;
-			bool exitOpen, treasureCheck;
+			bool exitOpen, treasureCheck, bonus;
 			
-			Level.FindEnemiesData(rom, enemyPointer, out enemiesIdsPointer, out tilesPointer, out treasureId, out treasureCheck, out exitOpen);
+			Level.FindEnemiesData(rom, enemyPointer, out enemiesIdsPointer, out tilesPointer, out treasureId, out treasureCheck, out exitOpen, out bonus);
 			
-			string prefix = string.Empty;
+			
 			char[] treasureNames = { 'C', 'I', 'F', 'O', 'A', 'N', 'H', 'M', 'L', 'K', 'B', 'D', 'G', 'J', 'E' };			
 			if (treasureId >= 1 && treasureId <= 15)
 			{
-				prefix = string.Format("[Treasure {0}]{1}   ", treasureNames[treasureId - 1], treasureCheck ? " [X]" : string.Empty);
+				prefix += string.Format("[Treasure {0}]{1}   ", treasureNames[treasureId - 1], treasureCheck ? " [X]" : string.Empty);
+			}
+			
+			if (bonus)
+			{
+				prefix += "[Heart]   ";
 			}
 					
 			//enemy ids

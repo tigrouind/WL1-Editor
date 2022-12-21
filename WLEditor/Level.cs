@@ -49,6 +49,12 @@ namespace WLEditor
 			0xEA, 0x76, 0xA3 // ld (A376), a
 		};
 		
+		static byte[] bonusPattern = 
+		{
+			0x3E, 0x00,      // ld a, ..
+			0xEA, 0xB6, 0xA3 // ld (A3B6), a
+		};		
+		
 		public static byte[] LevelData = new byte[0x3000];
 		public static byte[] ObjectsData = new byte[0x2000];
 		public static byte[] ScrollData = new byte[32];
@@ -105,9 +111,9 @@ namespace WLEditor
 			if(!reloadAnimatedTilesOnly)
 			{
 				int enemiesIdsPointer, enemiesTiles, treasureID;
-				bool exitOpen, treasureCheck;
+				bool exitOpen, treasureCheck, bonus;
 				
-				FindEnemiesData(rom, enemiesData, out enemiesIdsPointer, out enemiesTiles, out treasureID, out treasureCheck, out exitOpen);
+				FindEnemiesData(rom, enemiesData, out enemiesIdsPointer, out enemiesTiles, out treasureID, out treasureCheck, out exitOpen, out bonus);
 				DumpEnemiesSprites(rom, enemiesIdsPointer, enemiesTiles);	
 
 				//dump 8x8 tiles
@@ -641,7 +647,7 @@ namespace WLEditor
 		}
 		
 		public static void FindEnemiesData(Rom rom, int enemiesPointer, out int enemyId, out int tilesPointer, 
-		                                   out int treasureID, out bool treasureCheck, out bool exitOpen)
+		                                   out int treasureID, out bool treasureCheck, out bool exitOpen, out bool bonus)
 		{
 			rom.SetBank(0x7);
 			int position = enemiesPointer;
@@ -653,7 +659,7 @@ namespace WLEditor
 					tilesPointer = rom.ReadWord(position + 11);
 					
 					position += enemyCodePattern.Length;
-					CheckExtraCode(rom, position, out treasureID, out treasureCheck, out exitOpen);
+					CheckExtraCode(rom, position, out treasureID, out treasureCheck, out exitOpen, out bonus);
 					return;
 				}
 				
@@ -663,10 +669,11 @@ namespace WLEditor
 			throw new Exception("cannot find enemies data");
 		}
 		
-		static void CheckExtraCode(Rom rom, int position, out int treasureID, out bool treasureCheck, out bool exitOpen)
+		static void CheckExtraCode(Rom rom, int position, out int treasureID, out bool treasureCheck, out bool exitOpen, out bool bonus)
 		{			
 			treasureCheck = false;
 			exitOpen = false;
+			bonus = false;
 			treasureID = -1;
 			
 			while (rom.ReadByte(position) != 0xC9) //ret
@@ -686,6 +693,11 @@ namespace WLEditor
 				{
 					exitOpen = true;
 					position += exitPattern.Length;		
+				}
+				else if (MatchPattern(rom, position, bonusPattern))
+				{
+					bonus = true;
+					position += bonusPattern.Length;		
 				}
 				else 
 				{
