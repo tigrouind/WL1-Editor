@@ -52,6 +52,7 @@ namespace WLEditor
 			this.scrollRegionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.collidersToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.tileNumbersToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.overworldToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.zoomToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.zoom100ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.zoom200ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -157,6 +158,7 @@ namespace WLEditor
 			this.scrollRegionToolStripMenuItem,
 			this.collidersToolStripMenuItem,
 			this.tileNumbersToolStripMenuItem,
+			this.overworldToolStripMenuItem,
 			this.animationToolStripMenuItem,
 			this.zoomToolStripMenuItem,
 			this.switchToolStripMenuItem});
@@ -226,6 +228,16 @@ namespace WLEditor
 			this.tileNumbersToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
 			this.tileNumbersToolStripMenuItem.Text = "Tile numbers";
 			this.tileNumbersToolStripMenuItem.Click += new System.EventHandler(this.TileNumbersToolStripMenuItemClick);
+			// 
+			// overworldToolStripMenuItem
+			// 
+			this.overworldToolStripMenuItem.CheckOnClick = true;
+			this.overworldToolStripMenuItem.Enabled = false;
+			this.overworldToolStripMenuItem.Name = "overworldToolStripMenuItem";
+			this.overworldToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F7;
+			this.overworldToolStripMenuItem.Size = new System.Drawing.Size(217, 24);
+			this.overworldToolStripMenuItem.Text = "Overworld";
+			this.overworldToolStripMenuItem.CheckedChanged += new System.EventHandler(this.OverworldToolStripMenuItemCheckedChanged);
 			// zoomToolStripMenuItem
 			// 
 			this.zoomToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -416,6 +428,7 @@ namespace WLEditor
 		private System.Windows.Forms.ToolStripMenuItem scrollRegionToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem objectsToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem overworldToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem loadToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem regionsToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem viewToolStripMenuItem;

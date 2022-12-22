@@ -51,10 +51,23 @@
     <Compile Include="MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Overworld\EventForm.cs" />
+    <Compile Include="Overworld\Map.cs" />
+    <Compile Include="Overworld\Overworld.cs" />
+    <Compile Include="Overworld\Overworld.Designer.cs">
+      <DependentUpon>Overworld.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Overworld\PathForm.cs" />
+    <Compile Include="Overworld\WorldPath\WorldPath.cs" />
+    <Compile Include="Overworld\WorldPath\WorldPathDirection.cs" />
+    <Compile Include="Overworld\WorldPath\WorldPathSegment.cs" />
     <Compile Include="PanelUnscrollable.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Rom.cs" />
+    <Compile Include="Selection\Selection.cs" />
+    <Compile Include="Selection\SelectionChange.cs" />
+    <Compile Include="Selection\SelectionEventArgs.cs" />
     <Compile Include="TileEventArgs.cs" />
     <Compile Include="Toolbox\ObjectsPictureBox.cs" />
     <Compile Include="Toolbox\SectorForm.cs" />
@@ -76,6 +89,9 @@
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.Designer.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Overworld\Overworld.resx">
+      <DependentUpon>Overworld.Designer.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Toolbox\SectorForm.resx">
       <DependentUpon>SectorForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -84,6 +100,9 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Overworld\WorldPath" />
+    <Folder Include="Selection" />
+    <Folder Include="Overworld" />
     <Folder Include="Toolbox" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

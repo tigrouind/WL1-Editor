@@ -9,6 +9,7 @@ namespace WLEditor
 	{
 		Rom rom = new Rom();		 		
 		ToolboxForm toolboxForm = new ToolboxForm();
+		Overworld overworldForm = new Overworld();
 
 		public static string[] LevelNames =
 		{
@@ -75,6 +76,10 @@ namespace WLEditor
 			toolboxForm.FormClosing += ToolBoxFormClosing;	
 			toolboxForm.ProcessCommandKey += ToolBoxProcessCommandKey;
 			toolboxForm.SectorChanged += ToolBoxSectorChanged;
+			overworldForm.FormClosing += OverworldClosing;
+			overworldForm.ProcessCommandKey += ToolBoxProcessCommandKey;
+			overworldForm.MouseWheel += LevelPanelMouseWheel;
+			overworldForm.WorldMapChanged += WorldMapChanged;
 			SetZoomLevel(2);
 		}
 
@@ -104,6 +109,7 @@ namespace WLEditor
 					LoadLevel(true);
 					toolboxForm.LoadSector(rom, -1, -1);
 					levelPictureBox.ClearSelection();
+					levelPictureBox.ClearUndo();
 				}
 				else
 				{
@@ -136,6 +142,7 @@ namespace WLEditor
 					Level.DumpBonusSprites(rom);
 					Level.DumpPlayerSprite(rom);
 					toolboxForm.LoadRom(rom);
+					overworldForm.LoadRom(rom);
 					romFilePath = openFileDialog1.FileName;
 
 					SetChanges(false);
@@ -145,6 +152,7 @@ namespace WLEditor
 					LevelComboBoxSelectedIndexChanged(sender, e);						
 					
 					toolboxToolStripMenuItem.Enabled = true;
+					overworldToolStripMenuItem.Enabled = true;
 					saveAsToolStripMenuItem.Enabled = true;
 					levelComboBox.Visible = true;
 					LevelPanel.Visible = true;					
@@ -194,6 +202,11 @@ namespace WLEditor
 		{
 			currentWarp = Level.SearchWarp(rom, currentCourseId, levelPictureBox.CurrentSector);
 			LoadLevel(false);
+			SetChanges(true);
+		}
+		
+		void WorldMapChanged(object sender, EventArgs e)
+		{
 			SetChanges(true);
 		}
 		
@@ -254,8 +267,14 @@ namespace WLEditor
 					}
 				}
 				
+				if (saveFile && !overworldForm.SaveChanges())
+				{
+					return false;
+				}
+				
 				if(saveFile)
 				{
+					rom.FixCRC();
 					rom.Save(romFilePath);
 					SetChanges(false);
 				}
@@ -332,6 +351,7 @@ namespace WLEditor
 									
 			levelPictureBox.SetZoom(zoomLevel);
 			toolboxForm.SetZoom(zoomLevel);			
+			overworldForm.SetZoom(zoomLevel);
 		}
 						
 		void Zoom100ToolStripMenuItemClick(object sender, EventArgs e)
@@ -419,6 +439,20 @@ namespace WLEditor
 				return true;
 			}
 			
+			if (keyData == (Keys.Control | Keys.Z))
+			{
+				levelPictureBox.Undo();
+				SetChanges(true);
+				return true;
+			}
+			
+			if (keyData == (Keys.Control | Keys.Y))
+			{
+				levelPictureBox.Redo();
+				SetChanges(true);
+				return true;
+			}
+			
 			ToolStripMenuItem toolStrip = GetAllMenuItems(menuStrip1.Items)
 				.FirstOrDefault(x => x.ShortcutKeys == keyData);
 			
@@ -501,6 +535,10 @@ namespace WLEditor
 			toolboxToolStripMenuItem.Checked = false;
 		}
 		
+		void OverworldClosing(object sender, EventArgs e)
+		{
+			overworldToolStripMenuItem.Checked = false;
+		}
 		
 		void LevelPictureBoxTileMouseDown(object sender, TileEventArgs e)
 		{				
@@ -511,6 +549,11 @@ namespace WLEditor
 				int currentTile = toolboxForm.CurrentTile;
 				int currentObject = toolboxForm.CurrentObject;
 				
+				if (e.Status == 0) //down
+				{
+					levelPictureBox.StartChanges();
+				}
+				
 				if (e.Button == MouseButtons.Left)
 				{
 					if(currentTile != -1 && selectedPanelIndex == 0)
@@ -518,6 +561,7 @@ namespace WLEditor
 						int previousTile = Level.LevelData[tileIndex + 0x1000];
 						if(previousTile != currentTile)
 						{
+							levelPictureBox.AddChange(tileIndex % 256, tileIndex / 256);
 							Level.LevelData[tileIndex + 0x1000] = (byte)currentTile;
 							levelPictureBox.InvalidateTile(tileIndex);
 							SetChanges(true);
@@ -528,6 +572,7 @@ namespace WLEditor
 						int previousObject = Level.ObjectsData[tileIndex];
 						if(previousObject != currentObject)
 						{
+							levelPictureBox.AddChange(tileIndex % 256, tileIndex / 256);
 							Level.ObjectsData[tileIndex] = (byte)currentObject;
 							levelPictureBox.InvalidateObject(tileIndex, currentObject, previousObject);
 							SetChanges(true);
@@ -541,22 +586,28 @@ namespace WLEditor
 						int previousObject = Level.ObjectsData[tileIndex];
 						if(previousObject != 0)
 						{
+							levelPictureBox.AddChange(tileIndex % 256, tileIndex / 256);
 							Level.ObjectsData[tileIndex] = 0;
 							levelPictureBox.InvalidateObject(tileIndex, 0, previousObject);
 							SetChanges(true);
 						}			
 					}
 				}
+
+				if (e.Status == 2) //up
+				{
+					levelPictureBox.CommitChanges();
+				}				
 			}			
 			else if (e.Button == MouseButtons.Left)
 			{
-				if (e.Status == 0)
+				if (e.Status == 0) //down
 				{
-					levelPictureBox.SetSelection(levelPictureBox.CurrentTileIndex, levelPictureBox.CurrentTileIndex);					
+					levelPictureBox.StartSelection(levelPictureBox.CurrentTileIndex % 256, levelPictureBox.CurrentTileIndex / 256);
 				}
 				else
 				{
-					levelPictureBox.SetSelection(-1, levelPictureBox.CurrentTileIndex);					
+					levelPictureBox.SetSelection(levelPictureBox.CurrentTileIndex % 256, levelPictureBox.CurrentTileIndex / 256);
 				}
 			}
 			else
@@ -614,7 +665,7 @@ namespace WLEditor
 
 		void AboutToolStripMenuItemClick(object sender, EventArgs e)
 		{
-			MessageBox.Show(Text + " v0.74\r\nDate : 09.12.2022\r\nContact me : tigrou.ind@gmail.com");
+			MessageBox.Show(Text + " v0.75\r\nDate : 05.01.2023\r\nContact me : tigrou.ind@gmail.com");
 		}
 		
 		void AnimationToolStripMenuItemClick(object sender, EventArgs e)
@@ -630,6 +681,24 @@ namespace WLEditor
 			levelPictureBox.Invalidate();
 			toolboxForm.ShowTileNumbers = showTileNumbers;
 			toolboxForm.Invalidate(true);
+		}
+		
+		void OverworldToolStripMenuItemCheckedChanged(object sender, EventArgs e)
+		{
+			if (overworldToolStripMenuItem.Checked)
+			{
+				if (!overworldForm.Visible)
+				{
+					overworldForm.Show(this);	
+				}	
+			}
+			else
+			{
+				if (overworldForm.Visible)
+				{
+					overworldForm.Hide();	
+				}
+			}
 		}		
 	}
 }

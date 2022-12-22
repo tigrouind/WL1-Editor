@@ -21,13 +21,9 @@ namespace WLEditor
 		public int SwitchMode;
 		public int CurrentSector = -1;		
 		public int CurrentTileIndex = -1;
-		
-		bool selection;
-		Point selectionStart, selectionEnd;
-		int selectionWidth, selectionHeight;
-		readonly List<byte> selectionLevelData = new List<byte>();
-		readonly List<byte> selectionObjectData = new List<byte>();		
-		
+		readonly Selection selection = new Selection(16);
+		List<SelectionChange> changes = new List<SelectionChange>();
+				
 		public event EventHandler<TileEventArgs> TileMouseDown;		
 		public event EventHandler SectorChanged;
 		
@@ -43,6 +39,11 @@ namespace WLEditor
 		};	
 		
 		public static Brush EnemyBrush = new SolidBrush(Color.FromArgb(255, 50, 50, 155));
+		
+		public LevelPictureBox()
+		{
+			selection.InvalidatePictureBox += (s, e) => Invalidate(e.ClipRectangle);
+		}
 				
 		protected override void OnPaint(PaintEventArgs e)
 		{			
@@ -97,7 +98,7 @@ namespace WLEditor
 						DrawSectors(e.Graphics, e.ClipRectangle, font, format, sectorsToDraw);
 					}
 					
-					DrawSelection(e.Graphics);
+					selection.DrawSelection(e.Graphics);
 				}			
 			}
 		}
@@ -283,41 +284,7 @@ namespace WLEditor
 				g.DrawLine(penBlue, 0, 256 * zoom, 4096 * zoom, 256 * zoom);					
 			}			
 		}
-		
-		void DrawSelection(Graphics g)
-		{
-			if (selection)
-			{
-				using (SolidBrush brush = new SolidBrush(Color.FromArgb(128, 255, 255, 0)))
-				{
-					var rect = GetSelectionRectangle();					
-					g.FillRectangle(brush, rect);						
-				}
-			}
-		}
-		
-		public void GetSelection(out Point start, out Point end)
-		{
-			int startX = Math.Min(selectionStart.X, selectionEnd.X);
-			int startY = Math.Min(selectionStart.Y, selectionEnd.Y);
-			int endX = Math.Max(selectionStart.X, selectionEnd.X);
-            int endY = Math.Max(selectionStart.Y, selectionEnd.Y);
-			
-			start = new Point(startX, startY);
-			end = new Point(endX, endY);
-		}
-		
-		Rectangle GetSelectionRectangle()
-		{
-			Point start, end;
-			GetSelection(out start, out end);
-			return new Rectangle(
-				start.X * 16 * zoom, 
-				start.Y * 16 * zoom, 
-				((end.X - start.X + 1) * 16) * zoom,
-				((end.Y - start.Y + 1) * 16) * zoom);
-		}
-		
+				
 		List<Point> GetVisibleSectors(Rectangle clipRectangle)
 		{					
 			clipRectangle = GetClipRectangle(clipRectangle, 256 * zoom);
@@ -453,12 +420,19 @@ namespace WLEditor
 				OnMouseEvent(new TileEventArgs(e, 1));
 			}
 		}
+		
+		protected override void OnMouseUp(MouseEventArgs e)
+		{
+			CurrentTileIndex = -1;
+			OnMouseEvent(new TileEventArgs(e, 2));
+		}
 	
 		public void SetZoom(int zoomLevel)
 		{
 			Height = 512 * zoomLevel;
 			Width = 4096 * zoomLevel;	
 			zoom = zoomLevel;
+			selection.SetZoom(zoomLevel);
 			Invalidate();
 		}
 		
@@ -467,89 +441,96 @@ namespace WLEditor
 			Array.Clear(invalidTiles, 0, invalidTiles.Length);
 		}
 		
+		#region Selection
+		
 		public void CopySelection()
 		{
-			if (selection)
-			{
-				selectionLevelData.Clear();
-				selectionObjectData.Clear();
-				
-				Point start, end;
-				GetSelection(out start, out end);
-				
-				for(int y = start.Y ; y <= end.Y ; y++)
-				{
-					for(int x = start.X ; x <= end.X ; x++)	
-					{
-						selectionLevelData.Add(Level.LevelData[x + y * 256 + 0x1000]);
-						selectionObjectData.Add(Level.ObjectsData[x + y * 256]);
-					}
-				}
-				
-				selectionWidth = end.X - start.X + 1;
-				selectionHeight = end.Y - start.Y + 1;
-				ClearSelection();
-			}
+			selection.CopySelection(GetTileAt);
 		}
 		
 		public void PasteSelection()
 		{
-			if (selection)
+			selection.PasteSelection((x, y, data) => 				                                         
 			{
-				if (selectionHeight > 0 && selectionWidth > 0)
-				{
-					Point start, end;
-					GetSelection(out start, out end);
-					
-					for (int ty = start.Y ; ty <= end.Y ; ty += selectionHeight)
-					for (int tx = start.X ; tx <= end.X ; tx += selectionWidth)
-					for (int y = 0 ; y < selectionHeight ; y++)
-					for (int x = 0 ; x < selectionWidth ; x++)	
-					{
-						int destX = tx + x;
-						int destY = ty + y;
-						if (destX < 256 && destY < 32 && ((destX <= end.X && destY <= end.Y) || (start.X == end.X && start.Y == end.Y)))
-						{
-							Level.LevelData[destX + destY * 256 + 0x1000] = selectionLevelData[x + y * selectionWidth];
-							Level.ObjectsData[destX + destY * 256] = selectionObjectData[x + y * selectionWidth];
-							invalidTiles[destX + destY * 256] = false;
-						}
-					}									
+             	if (x < 256 && y < 32)
+				{             	
+             		int previous = GetTileAt(x, y);
+             		SetTileAt(x, y, data);         
+             		return previous;
 				}
-				
-				Invalidate();
-				selection = false;
-			}		
-		}
-		
-		public void SetSelection(int start, int end)
-		{
-			if (selection)
-			{
-				Invalidate(GetSelectionRectangle());
-			}
+             	
+             	return -1;
+			});
 			
-			if (start != -1)
-			{
-				selectionStart = new Point(start % 256, start / 256);	
-				selection = true;	
-			}
-			
-			selectionEnd = new Point(end % 256, end / 256);	
-			
-			if (selection)
-			{
-				Invalidate(GetSelectionRectangle());	
-			}
+			Invalidate();
 		}
 		
 		public void ClearSelection()
 		{
-			if (selection)
-			{
-				selection = false;
-				Invalidate(GetSelectionRectangle());
-			}
+			selection.ClearSelection();
 		}
+		
+		public void StartSelection(int x, int y)
+		{
+			selection.StartSelection(x, y);
+		}
+		
+		public void SetSelection(int x, int y)
+		{
+			selection.SetSelection(x, y);
+		}
+		
+		int GetTileAt(int x, int y)
+		{
+			int dest = x + y * 256;
+			return (Level.ObjectsData[dest] << 8) | Level.LevelData[dest + 0x1000];
+		}
+		
+		void SetTileAt(int x, int y, int data)
+		{
+			int dest = x + y * 256;
+			Level.ObjectsData[dest] = (byte)(data >> 8);
+			Level.LevelData[dest + 0x1000] = (byte)(data & 0xFF);
+			invalidTiles[dest] = false;	
+		}
+		
+		#endregion
+				
+		#region Undo
+		
+		public void StartChanges()
+		{
+			changes = new List<SelectionChange>();
+		}
+		
+		public void AddChange(int x, int y)
+		{
+			changes.Add(new SelectionChange { X = x, Y = y, Data = GetTileAt(x, y) });
+		}
+		
+		public void CommitChanges()
+		{
+			selection.AddChanges(changes);
+		}
+		
+		public void Undo()
+		{
+			selection.Undo(SetTileAt, GetTileAt);			
+			Invalidate();
+		}
+		
+		public void Redo()
+		{
+			selection.Redo(SetTileAt, GetTileAt);			
+			Invalidate();
+		}
+		
+		public void ClearUndo()
+		{
+			selection.ClearUndo();
+			changes.Clear();
+		}
+		
+		#endregion
 	}
 }

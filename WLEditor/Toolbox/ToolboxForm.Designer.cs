@@ -140,6 +140,7 @@
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
 			this.MaximizeBox = false;
 			this.MinimizeBox = false;
+			this.Text = "Toolbox";
 			this.Name = "ToolboxForm";
 			this.ShowIcon = false;
 			this.ShowInTaskbar = false;

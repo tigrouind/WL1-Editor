@@ -119,9 +119,9 @@ namespace WLEditor
 				//dump 8x8 tiles
 				Array.Clear(Tiles8x8.Bits, 0, Tiles8x8.Width * Tiles8x8.Height);
 				rom.SetBank(0x11);
-				Dump8x8Tiles(rom, tileaddressA, 2*16, 0*16, palette, paletteColors, false);
+				Dump8x8Tiles(rom, Tiles8x8, tileaddressA, 2*16, 0*16, palette, paletteColors, false);
 				rom.SetBank(tilebank);
-				Dump8x8Tiles(rom, tileaddressB, 6*16, 2*16, palette, paletteColors, false);				
+				Dump8x8Tiles(rom, Tiles8x8, tileaddressB, 6*16, 2*16, palette, paletteColors, false);				
 
 				//dump scroll
 				rom.SetBank(0xC);
@@ -161,7 +161,7 @@ namespace WLEditor
 			if(AnimatedTilesMask != 0)
 			{
 				rom.SetBank(0x11);
-				Dump8x8Tiles(rom, tileanimated + animatedTileIndex * 16 * 4, 4, 2*16, palette, paletteColors, false);			
+				Dump8x8Tiles(rom, Tiles8x8, tileanimated + animatedTileIndex * 16 * 4, 4, 2*16, palette, paletteColors, false);			
 			}				
 
 			//dump 16x16 tiles			
@@ -404,7 +404,7 @@ namespace WLEditor
 			Array.Clear(Tiles8x8.Bits, 0, Tiles8x8.Bits.Length);
 			
 			rom.SetBank(0x5);			
-			Dump8x8Tiles(rom, 0x42F1, 64, 0, 0x1E, enemyPalette, true);			
+			Dump8x8Tiles(rom, Tiles8x8, 0x42F1, 64, 0, 0x1E, enemyPalette, true);			
 			PlayerRectangles[0] = DumpSpritePlayer(rom, 32, 56, 0x603B, false);
 			PlayerRectangles[1] = DumpSpritePlayer(rom, 32, 56 + 64, 0x603B, true);
 		}
@@ -414,10 +414,10 @@ namespace WLEditor
 			Array.Clear(Tiles8x8.Bits, 0, Tiles8x8.Bits.Length);
 			//bonus sprites
 			rom.SetBank(0x5);
-			Dump8x8Tiles(rom, 0x4C81, 23, 0, 0x1E, enemyPalette, true); 
+			Dump8x8Tiles(rom, Tiles8x8, 0x4C81, 23, 0, 0x1E, enemyPalette, true); 
 			
 			rom.SetBank(0x11);
-			Dump8x8Tiles(rom, 0x7300, 4, 16+23, 0x1E, enemyPalette, true); 
+			Dump8x8Tiles(rom, Tiles8x8, 0x7300, 4, 16+23, 0x1E, enemyPalette, true); 
 			
 			rom.SetBank(0xF);			
 			for (int i = 0 ; i < bonusSpriteAddress.Length ; i++)
@@ -433,7 +433,7 @@ namespace WLEditor
 			while(position < decompressed.Length)
 			{
 				byte data = rom.ReadByte(tilesdata++);
-				if((data & 0x80) == 0x80)
+				if((data & 0x80) != 0)
 				{
 					data = (byte)(data & 0x7F);
 					byte rep = rom.ReadByte(tilesdata++);
@@ -596,31 +596,41 @@ namespace WLEditor
 					}
 				}
 			}
+		}		
+		
+		static void Dump8x8Tiles(Rom rom, DirectBitmap bitmap, int gfxAddress, int tiles, int pos, byte palette, uint[] customPalette, bool transparency)
+		{
+			Dump8x8Tiles(Enumerable.Range(0, tiles * 16).Select(x => rom.ReadByte(gfxAddress + x)), bitmap, tiles, pos, palette, customPalette, transparency);
 		}
 
-		static void Dump8x8Tiles(Rom rom, int gfxaddress, int tiles, int pos, byte palette, uint[] customPalette, bool transparency)
+		public static void Dump8x8Tiles(IEnumerable<byte> data, DirectBitmap bitmap, int tiles, int pos, byte palette, uint[] customPalette, bool transparency)
 		{
-			for(int n = 0 ; n < tiles ; n++)
+			using (var enumerator = data.GetEnumerator())
 			{
-				int tilePosX = ((n + pos) % 16) * 8;
-				int tilePosY = ((n + pos) / 16) * 8;
-								
-				for(int y = 0 ; y < 8 ; y++)
+				for (int n = 0; n < tiles; n++)
 				{
-					byte data0 = rom.ReadByte(gfxaddress++);
-					byte data1 = rom.ReadByte(gfxaddress++);
-					int destIndex = tilePosX + (y + tilePosY) * Tiles8x8.Width;
-
-					for(int x = 0 ; x < 8 ; x++)
+					int tilePosX = ((n + pos) % 16) * 8;
+					int tilePosY = ((n + pos) / 16) * 8;
+								
+					for(int y = 0 ; y < 8 ; y++)
 					{
-						int pixelA = (data0 >> (7 - x)) & 0x1;
-						int pixelB = (data1 >> (7 - x)) & 0x1;
-						int pixel = pixelA + pixelB * 2;
-						
-						if(!transparency || pixel != 0)
+						enumerator.MoveNext();
+						byte data0 = enumerator.Current;
+						enumerator.MoveNext();
+						byte data1 = enumerator.Current;
+						int destIndex = tilePosX + (y + tilePosY) * Tiles8x8.Width;
+	
+						for(int x = 0 ; x < 8 ; x++)
 						{
-							int palindex = (palette >> pixel * 2) & 0x3;
-							Tiles8x8.Bits[destIndex + x] = customPalette[palindex];
+							int pixelA = (data0 >> (7 - x)) & 0x1;
+							int pixelB = (data1 >> (7 - x)) & 0x1;
+							int pixel = pixelA + pixelB * 2;
+							
+							if(!transparency || pixel != 0)
+							{
+								int palindex = (palette >> pixel * 2) & 0x3;
+								bitmap.Bits[destIndex + x] = customPalette[palindex];
+							}
 						}
 					}
 				}
@@ -876,7 +886,7 @@ namespace WLEditor
 			int palette = (spriteFlags & 0x10) != 0 ? 0xD1 : 0x1E;
 			
 			Array.Clear(Tiles8x8.Bits, 0, Tiles8x8.Bits.Length);
-			Dump8x8Tiles(rom, tilesAddress, tilesCount, 0, (byte)palette, enemyPalette, true);					
+			Dump8x8Tiles(rom, Tiles8x8, tilesAddress, tilesCount, 0, (byte)palette, enemyPalette, true);					
 		}
 				
 		public static List<KeyValuePair<int, int>> GetCourseIds(Rom rom)
@@ -1029,7 +1039,6 @@ namespace WLEditor
 				return false;
 			}
 
-			rom.FixCRC();
 			return true;
 		}
 

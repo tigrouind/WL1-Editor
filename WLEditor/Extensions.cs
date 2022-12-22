@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace WLEditor
 {
@@ -19,5 +20,38 @@ namespace WLEditor
 		    }
 		    return -1;
 		}
+		
+		public static IEnumerable<TResult> GroupByAdjacent<TSource, TKey, TResult>(this IEnumerable<TSource> source, 
+				Func<TSource, TKey> selector, 
+				Func<TKey, IEnumerable<TSource>, TResult> resultSelector)
+		{
+			var comparer = EqualityComparer<TKey>.Default;
+			using (var enumerator = source.GetEnumerator())
+			{
+				if (enumerator.MoveNext())
+				{
+					List<TSource> buffer = new List<TSource>();
+					buffer.Add(enumerator.Current);
+					TKey lastKey = selector(enumerator.Current);
+
+					while (enumerator.MoveNext())
+					{
+						TSource currentItem = enumerator.Current;
+						TKey currentKey = selector(currentItem);
+
+						if (!comparer.Equals(lastKey, currentKey))
+						{
+							yield return resultSelector(lastKey, buffer);
+							buffer = new List<TSource>();
+							lastKey = currentKey;
+						}
+
+						buffer.Add(currentItem);
+					}
+
+					yield return resultSelector(lastKey, buffer);
+				}
+			}
+        }
 	}
 }
