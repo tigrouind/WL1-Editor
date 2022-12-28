@@ -22,11 +22,11 @@ namespace WLEditor
 		public int CurrentSector = -1;		
 		public int CurrentTileIndex = -1;
 		
-		bool Selection;
-		Point SelectionStart, SelectionEnd;
-		int SelectionWidth, SelectionHeight;
-		readonly List<byte> SelectionLevelData = new List<byte>();
-		readonly List<byte> SelectionObjectData = new List<byte>();		
+		bool selection;
+		Point selectionStart, selectionEnd;
+		int selectionWidth, selectionHeight;
+		readonly List<byte> selectionLevelData = new List<byte>();
+		readonly List<byte> selectionObjectData = new List<byte>();		
 		
 		public event EventHandler<TileEventArgs> TileMouseDown;		
 		public event EventHandler SectorChanged;
@@ -286,7 +286,7 @@ namespace WLEditor
 		
 		void DrawSelection(Graphics g)
 		{
-			if (Selection)
+			if (selection)
 			{
 				using (SolidBrush brush = new SolidBrush(Color.FromArgb(128, 255, 255, 0)))
 				{
@@ -298,10 +298,10 @@ namespace WLEditor
 		
 		public void GetSelection(out Point start, out Point end)
 		{
-			int startX = Math.Min(SelectionStart.X, SelectionEnd.X);
-			int startY = Math.Min(SelectionStart.Y, SelectionEnd.Y);
-			int endX = Math.Max(SelectionStart.X, SelectionEnd.X);
-            int endY = Math.Max(SelectionStart.Y, SelectionEnd.Y);
+			int startX = Math.Min(selectionStart.X, selectionEnd.X);
+			int startY = Math.Min(selectionStart.Y, selectionEnd.Y);
+			int endX = Math.Max(selectionStart.X, selectionEnd.X);
+            int endY = Math.Max(selectionStart.Y, selectionEnd.Y);
 			
 			start = new Point(startX, startY);
 			end = new Point(endX, endY);
@@ -469,12 +469,10 @@ namespace WLEditor
 		
 		public void CopySelection()
 		{
-			if (Selection)
+			if (selection)
 			{
-				var selection = GetSelectionRectangle();
-				
-				SelectionLevelData.Clear();
-				SelectionObjectData.Clear();
+				selectionLevelData.Clear();
+				selectionObjectData.Clear();
 				
 				Point start, end;
 				GetSelection(out start, out end);
@@ -483,63 +481,63 @@ namespace WLEditor
 				{
 					for(int x = start.X ; x <= end.X ; x++)	
 					{
-						SelectionLevelData.Add(Level.LevelData[x + y * 256 + 0x1000]);
-						SelectionObjectData.Add(Level.ObjectsData[x + y * 256]);
+						selectionLevelData.Add(Level.LevelData[x + y * 256 + 0x1000]);
+						selectionObjectData.Add(Level.ObjectsData[x + y * 256]);
 					}
 				}
 				
-				SelectionWidth = end.X - start.X + 1;
-				SelectionHeight = end.Y - start.Y + 1;
+				selectionWidth = end.X - start.X + 1;
+				selectionHeight = end.Y - start.Y + 1;
 				ClearSelection();
 			}
 		}
 		
 		public void PasteSelection()
 		{
-			if (Selection)
+			if (selection)
 			{
-				if (SelectionHeight > 0 && SelectionWidth > 0)
+				if (selectionHeight > 0 && selectionWidth > 0)
 				{
 					Point start, end;
 					GetSelection(out start, out end);
 					
-					for (int ty = start.Y ; ty <= end.Y ; ty += SelectionHeight)
-					for (int tx = start.X ; tx <= end.X ; tx += SelectionWidth)
-					for (int y = 0 ; y < SelectionHeight ; y++)
-					for (int x = 0 ; x < SelectionWidth ; x++)	
+					for (int ty = start.Y ; ty <= end.Y ; ty += selectionHeight)
+					for (int tx = start.X ; tx <= end.X ; tx += selectionWidth)
+					for (int y = 0 ; y < selectionHeight ; y++)
+					for (int x = 0 ; x < selectionWidth ; x++)	
 					{
-						int destX = Math.Min(tx + x, 255);
-						int destY = Math.Min(ty + y, 31);
-						if ((destX <= end.X && destY <= end.Y) || (start.X == end.X && start.Y == end.Y))
+						int destX = tx + x;
+						int destY = ty + y;
+						if (destX < 256 && destY < 32 && ((destX <= end.X && destY <= end.Y) || (start.X == end.X && start.Y == end.Y)))
 						{
-							Level.LevelData[destX + destY * 256 + 0x1000] = SelectionLevelData[x + y * SelectionWidth];
-							Level.ObjectsData[destX + destY * 256] = SelectionObjectData[x + y * SelectionWidth];
+							Level.LevelData[destX + destY * 256 + 0x1000] = selectionLevelData[x + y * selectionWidth];
+							Level.ObjectsData[destX + destY * 256] = selectionObjectData[x + y * selectionWidth];
 							invalidTiles[destX + destY * 256] = false;
 						}
 					}									
 				}
 				
 				Invalidate();
-				Selection = false;
+				selection = false;
 			}		
 		}
 		
 		public void SetSelection(int start, int end)
 		{
-			if (Selection)
+			if (selection)
 			{
 				Invalidate(GetSelectionRectangle());
 			}
 			
 			if (start != -1)
 			{
-				SelectionStart = new Point(start % 256, start / 256);	
-				Selection = true;	
+				selectionStart = new Point(start % 256, start / 256);	
+				selection = true;	
 			}
 			
-			SelectionEnd = new Point(end % 256, end / 256);	
+			selectionEnd = new Point(end % 256, end / 256);	
 			
-			if (Selection)
+			if (selection)
 			{
 				Invalidate(GetSelectionRectangle());	
 			}
@@ -547,9 +545,9 @@ namespace WLEditor
 		
 		public void ClearSelection()
 		{
-			if (Selection)
+			if (selection)
 			{
-				Selection = false;
+				selection = false;
 				Invalidate(GetSelectionRectangle());
 			}
 		}
