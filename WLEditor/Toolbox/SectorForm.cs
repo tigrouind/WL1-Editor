@@ -446,26 +446,23 @@ namespace WLEditor
 		public void SetSize()
 		{
 			Width = 339;
-			Height = 320;
+			Height = 270;
 		}
 				
 		void SetControlsVisibility()
 		{
-			bool sectorLoaded = currentSector != -1;
+			tableLayoutPanel1.SuspendLayout();
 			
-			labScroll.Visible = sectorLoaded;
+			panel1.Visible = isWarp;
+			panel2.Visible = !isWarp;			
+			panel3.Visible = !isWarp || Level.GetWarp(rom, currentCourseId, currentSector) >= 0x5B7A;
 			
-			checkBoxLeft.Visible = sectorLoaded;
-			checkBoxRight.Visible = sectorLoaded;			
-			
-			labWarp.Visible = sectorLoaded;
-			ddlWarp.Visible = sectorLoaded;
-			
-			groupBox1.Visible = sectorLoaded;			
-			groupBox1.Text = isWarp ? "Warp" : "Level";
-			
-			labMusic.Visible = !isWarp;
-			ddlMusic.Visible = !isWarp;
+			tableLayoutPanel1.ResumeLayout();
+		}
+		
+		public string GetTitle()
+		{
+			return isWarp ? "Sector" : "Level";
 		}
 		
 		#region Load
@@ -487,28 +484,26 @@ namespace WLEditor
 				LoadWarp(warp);												
 				LoadScroll();												
 			}
-			else
+			else if (currentCourseId != -1)
 			{
-				currentWarp = null;
+				LoadLevel();
 			}				
 						
 			SetControlsVisibility();
 		}
 		
+		void LoadLevel()
+		{
+			currentWarp = Level.GetLevelHeader(rom, currentCourseId);	
+			isWarp = false;
+			LoadWarp();
+		}
+		
 		void LoadWarp(int warp)
 		{					
-			LoadDropdown(ddlWarp, Math.Min(warp, 0x5B7A));
-			
-			if(warp >= 0x5B7A)
-			{
-				currentWarp = Level.GetWarp(rom, warp);									
-				isWarp = true;
-			}
-			else
-			{
-				currentWarp = Level.GetLevelHeader(rom, currentCourseId);	
-				isWarp = false;
-			}
+			LoadDropdown(ddlWarp, Math.Min(warp, 0x5B7A));		
+			currentWarp = Level.GetWarp(rom, warp);									
+			isWarp = true;
 			
 			LoadWarp();
 		}

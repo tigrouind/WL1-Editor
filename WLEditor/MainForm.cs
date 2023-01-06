@@ -107,7 +107,7 @@ namespace WLEditor
 					var item = (ComboboxItem<int>)levelComboBox.SelectedItem;
 					currentCourseId = item.Value;
 					LoadLevel(true);
-					toolboxForm.LoadSector(rom, -1, -1);
+					toolboxForm.LoadSector(rom, currentCourseId, -1);
 					levelPictureBox.ClearSelection();
 					levelPictureBox.ClearUndo();
 				}

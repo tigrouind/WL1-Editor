@@ -21,6 +21,7 @@ namespace WLEditor
 		public int SwitchMode;
 		public int CurrentSector = -1;		
 		public int CurrentTileIndex = -1;
+		int mouseDownSector;
 		readonly Selection selection = new Selection(16);
 		List<SelectionChange> changes = new List<SelectionChange>();
 				
@@ -396,6 +397,25 @@ namespace WLEditor
 			{
 				Point coordinates = e.Location;
 				int sector = e.Location.X / 256 / zoom + (e.Location.Y / 256 / zoom) * 16;
+				
+				switch (e.Status)
+				{
+					case 0: //down
+						mouseDownSector = CurrentSector;
+						break;
+						
+					case 1: //move
+						mouseDownSector = -1;
+						break;
+						
+					case 2: //up
+						if (CurrentSector == mouseDownSector)
+						{
+							sector = -1;
+						}
+						break;
+				}
+				
 				if(sector != CurrentSector)
 				{
 					CurrentSector = sector;
@@ -528,7 +548,6 @@ namespace WLEditor
 		public void ClearUndo()
 		{
 			selection.ClearUndo();
-			changes.Clear();
 		}
 		
 		#endregion

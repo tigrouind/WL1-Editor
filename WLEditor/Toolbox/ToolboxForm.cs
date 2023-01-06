@@ -7,6 +7,7 @@ namespace WLEditor
 	public partial class ToolboxForm : Form
 	{				
 		public event EventHandler<KeyEventArgs> ProcessCommandKey;		
+		bool ignoreEvents;
 		
 		public ToolboxForm()
 		{				
@@ -36,21 +37,24 @@ namespace WLEditor
 		
 		void ComboBox1SelectedIndexChanged(object sender, EventArgs e)
 		{
-			SuspendLayout();
-			
-			Control controlToShow = new Control[] { tiles16x16PictureBox, tiles8x8PictureBox, objectsPictureBox, sectorForm }[comboBox1.SelectedIndex];
-			controlToShow.Visible = true;
-			controlToShow.Location = new Point(controlToShow.Margin.Left, controlToShow.Margin.Top);
-			
-			foreach(Control control in panel1.Controls)
+			if (!ignoreEvents)
 			{
-				if(control != controlToShow)
+				SuspendLayout();
+				
+				Control controlToShow = new Control[] { tiles16x16PictureBox, tiles8x8PictureBox, objectsPictureBox, sectorForm }[comboBox1.SelectedIndex];
+				controlToShow.Visible = true;
+				controlToShow.Location = new Point(controlToShow.Margin.Left, controlToShow.Margin.Top);
+				
+				foreach(Control control in panel1.Controls)
 				{
-					control.Visible = false;
+					if(control != controlToShow)
+					{
+						control.Visible = false;
+					}
 				}
+							
+				ResumeLayout();
 			}
-						
-			ResumeLayout();
 		}		
 		
 		void ToolBoxFormLoad(object sender, EventArgs e)
@@ -117,6 +121,10 @@ namespace WLEditor
 		public void LoadSector(Rom rom, int course, int sector)
 		{									
 			sectorForm.LoadSector(rom, course, sector);
+			
+			ignoreEvents = true;
+			comboBox1.Items[3] = sectorForm.GetTitle();
+			ignoreEvents = false;
 		}
 		
 		public bool ShowColliders
