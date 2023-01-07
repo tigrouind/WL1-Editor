@@ -9,6 +9,17 @@ namespace WLEditor
 		static uint[] paletteColors =  { 0xFFFFFFFF, 0xFFAAAAAA, 0xFF555555, 0xFF000000 };
 		static int[] directions = { 0xF0, 0xFE, 0xE0, 0xEE };
 		
+		static readonly int[][] flagsPosition = 
+		{
+			new int[] { 0x56F5, 0x56E8 },
+			new int[] { 0x5719, 0x570C },
+			new int[] { 0x5738, 0x572B },
+			new int[] { 0x575C, 0x574F },
+			new int[] { 0x5780, 0x5773 },
+			new int[] { 0x57A4, 0x5797 },
+			new int[] { 0x57C3, 0x57B6 },
+		};
+		
 		#region World tiles
 		
 		static void RLEDecompressTiles(Rom rom, int tilesdata, byte[] decompressed)
@@ -301,6 +312,15 @@ namespace WLEditor
 				result[level] = new WorldPath { X = posX, Y = posY, Directions = dirs };
 			}
 			
+			if (overWorld)
+			{
+				LoadFlags(rom, result);
+			}
+			else				
+			{
+				LoadTreasures(rom, result);
+			}
+			
 			return result;		
 		}
 		
@@ -419,12 +439,22 @@ namespace WLEditor
 			SaveProgression(rom, pathData, overWorld);
 			SaveLevelsPosition(rom, pathData, overWorld);
 						
+			if(overWorld)
+			{
+				SaveFlags(rom, pathData);
+			}
+			else
+			{
+				SaveTreasures(rom, pathData);
+			}
+						
 			errorMessage = string.Empty;
 			return true;
 		}
 		
 		static void SaveProgression(Rom rom, WorldPath[] pathData, bool overWorld)
 		{
+			rom.SetBank(8);
 			for (int level = 0 ; level < pathData.Length ; level++)
 			{							
 				var item = pathData[level];
@@ -439,6 +469,7 @@ namespace WLEditor
 		
 		static void SaveLevelsPosition(Rom rom, WorldPath[] pathData, bool overWorld)
 		{
+			rom.SetBank(8);
 			for (int level = 0 ; level < pathData.Length ; level++)
 			{				
 				var item = pathData[level];				
@@ -466,8 +497,6 @@ namespace WLEditor
 				
 		#endregion
 		
-		#region World start position
-				
 		public static void SaveStartPosition(Rom rom, int x, int y, int side, int startPositionAddress, int startFunctionAddress)
 		{
 			rom.SetBank(8);
@@ -490,7 +519,9 @@ namespace WLEditor
 			}	
 		}	
 		
-		public static void ReadFlags(Rom rom, WorldPath[] pathData, int[][] flagsPosition)
+		#region Flags
+		
+		public static void LoadFlags(Rom rom, WorldPath[] pathData)
 		{
 			rom.SetBank(0x14);
 			for (int level = 0 ; level < flagsPosition.Length ; level++)
@@ -501,7 +532,7 @@ namespace WLEditor
 			}
 		}
 		
-		public static void SaveFlags(Rom rom, WorldPath[] pathData, int[][] flagsPosition)
+		public static void SaveFlags(Rom rom, WorldPath[] pathData)
 		{
 			rom.SetBank(0x14);
 			for (int level = 0 ; level < flagsPosition.Length ; level++)
@@ -511,6 +542,44 @@ namespace WLEditor
 				rom.WriteByte(flagsPosition[level][1] + 1, (byte)Math.Max(0, Math.Min(255, item.FlagY + 20)));
 			}
 		}					
+		
+		#endregion
+		
+		#region Treasures
+
+		static void LoadTreasures(Rom rom, WorldPath[] pathData)
+		{
+			rom.SetBank(0x14);
+			for (int level = 0 ; level < pathData.Length ; level++)
+			{				
+				var item = pathData[level];
+								
+				int pointer = rom.ReadByte(0x5A38 + level);
+				if (pointer != 0xFF)
+				{
+					pointer = rom.ReadWord(0x5A63 + pointer * 2);
+					item.TreasureX = rom.ReadByte(pointer + 1) - 12;
+					item.TreasureY = rom.ReadByte(pointer + 0) - 20;
+				}
+			}
+		}
+		
+		static void SaveTreasures(Rom rom, WorldPath[] pathData)
+		{
+			rom.SetBank(0x14);
+			for (int level = 0 ; level < pathData.Length ; level++)
+			{				
+				var item = pathData[level];
+								
+				int pointer = rom.ReadByte(0x5A38 + level);
+				if (pointer != 0xFF)
+				{
+					pointer = rom.ReadWord(0x5A63 + pointer * 2);
+					rom.WriteByte(pointer + 1, (byte)Math.Max(0, Math.Min(255, item.TreasureX + 12)));
+					rom.WriteByte(pointer + 0, (byte)Math.Max(0, Math.Min(255, item.TreasureY + 20)));
+				}
+			}
+		}			
 		
 		#endregion
 	}

@@ -45,17 +45,6 @@ namespace WLEditor
 			new int[][] { new int[] { 0x5539, 0x6081, 0 } }
 		};
 		
-		int[][] flagsPosition = 
-		{
-			new int[] { 0x56F5, 0x56E8 },
-			new int[] { 0x5719, 0x570C },
-			new int[] { 0x5738, 0x572B },
-			new int[] { 0x575C, 0x574F },
-			new int[] { 0x5780, 0x5773 },
-			new int[] { 0x57A4, 0x5797 },
-			new int[] { 0x57C3, 0x57B6 },
-		};
-		
 		public event EventHandler PathChanged;
 		
 		public PathForm(PictureBox box)
@@ -80,16 +69,9 @@ namespace WLEditor
 		{
 			bool result = Map.SavePaths(rom, pathData, currentWorld == 8, out errorMessage);
 			
-			if (result)
+			if (result && currentWorld != 8)
 			{			
-				if(currentWorld != 8)
-				{
-					SaveStartPosition(rom);
-				}
-				else
-				{
-					Map.SaveFlags(rom, pathData, flagsPosition);
-				}
+				SaveStartPosition(rom);
 			}
 			
 			return result;
@@ -104,7 +86,6 @@ namespace WLEditor
 		{
 			worldData = Map.LoadPaths(rom, false);
 			overWorldData = Map.LoadPaths(rom, true);
-			Map.ReadFlags(rom, overWorldData, flagsPosition);
 		}
 		
 		public void LoadWorld(int world)
@@ -244,11 +225,15 @@ namespace WLEditor
 					break;
 			}
 			
-			//update flag position
 			if (currentWorld == 8)
 			{
 				item.FlagX = item.X + 20;
 				item.FlagY = item.Y;
+			}
+			else
+			{
+				item.TreasureX = item.X + 4;
+				item.TreasureY = item.Y + 4;
 			}
 			
 			foreach (var dir in pathData[currentLevel].Directions)
