@@ -94,12 +94,12 @@ namespace WLEditor
 			currentWorld = world;
 			eventId = 0;
 			eventStep = 0;
-			worldEvents = Map.LoadWorldEvents(rom, eventPointersA[currentWorld]);				
+			worldEvents = Map.LoadEvents(rom, eventPointersA[currentWorld]);				
 		}
 		
 		public bool SaveEvents(Rom rom, out string message)
 		{
-			return Map.SaveWorldEvents(rom, worldEvents,
+			return Map.SaveEvents(rom, worldEvents,
                 new int[][][] {
                    	new int[][] { eventPointersA[currentWorld], new [] { 1, 4 } },
                    	new int[][] { eventPointersB[currentWorld], new [] { 1, 4 } },

@@ -78,8 +78,8 @@ namespace WLEditor
 		void LoadWorld()
 		{
 			var data = worldData[currentWorld].Value;
-			Map.DumpWorld8x8Tiles(rom, data[0], data[1], tilesWorld8x8);
-			Map.LoadWorldTiles(rom, data[2], data[3], worldTiles);			
+			Map.Dump8x8Tiles(rom, data[0], data[1], tilesWorld8x8);
+			Map.LoadTiles(rom, data[2], data[3], worldTiles);			
 			
 			eventForm.LoadWorld(rom, currentWorld);
 			pathForm.LoadWorld(currentWorld);
@@ -125,7 +125,7 @@ namespace WLEditor
 				var worldInfo = worldData[currentWorld].Value;
 								
 				string message;				
-				if ((hasChanges & 1) != 0 && !Map.SaveWorldTiles(rom, worldInfo[2], worldInfo[3], 
+				if ((hasChanges & 1) != 0 && !Map.SaveTiles(rom, worldInfo[2], worldInfo[3], 
 				     currentWorld == 8 ? worldTiles : worldTiles.Take(564).ToArray(), worldInfo[4], out message))
 				{
 					//improve tile compression

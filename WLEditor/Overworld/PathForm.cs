@@ -78,7 +78,7 @@ namespace WLEditor
 		
 		public bool SavePaths(Rom rom, out string errorMessage)
 		{
-			bool result = Map.SaveWorldPaths(rom, pathData, currentWorld == 8, out errorMessage);
+			bool result = Map.SavePaths(rom, pathData, currentWorld == 8, out errorMessage);
 			
 			if (result)
 			{			
@@ -88,7 +88,7 @@ namespace WLEditor
 				}
 				else
 				{
-					Map.SaveFlagsPosition(rom, pathData, flagsPosition);
+					Map.SaveFlags(rom, pathData, flagsPosition);
 				}
 			}
 			
@@ -102,9 +102,9 @@ namespace WLEditor
 		
 		public void LoadPaths(Rom rom)
 		{
-			worldData = Map.LoadWorldPaths(rom, false);
-			overWorldData = Map.LoadWorldPaths(rom, true);
-			Map.ReadFlagsPosition(rom, overWorldData, flagsPosition);
+			worldData = Map.LoadPaths(rom, false);
+			overWorldData = Map.LoadPaths(rom, true);
+			Map.ReadFlags(rom, overWorldData, flagsPosition);
 		}
 		
 		public void LoadWorld(int world)
@@ -286,6 +286,26 @@ namespace WLEditor
 				currentDirection = -1;
 			}
 		}
+		
+		void NextLevel()
+		{
+			if (currentPath < levels[currentWorld].Length - 1)
+			{
+				currentPath++;
+				currentDirection = -1;
+				pictureBox.Invalidate();
+			}
+		}
+		
+		void PreviousLevel()
+		{
+			if (currentPath > 0)
+			{
+				currentPath--;
+				currentDirection = -1;
+				pictureBox.Invalidate();
+			}
+		}
 					
 		public bool ProcessPathKey(Keys key)
 		{	
@@ -297,21 +317,11 @@ namespace WLEditor
 			switch(key)
 			{
 				case Keys.PageUp:
-					if (currentPath < levels[currentWorld].Length - 1)
-					{
-						currentPath++;
-						currentDirection = -1;
-						pictureBox.Invalidate();
-					}
+					NextLevel();
 					return true;
 					
 				case Keys.PageDown:
-					if (currentPath > 0)
-					{
-						currentPath--;
-						currentDirection = -1;
-						pictureBox.Invalidate();
-					}
+					PreviousLevel();
 					return true;
 					
 				case Keys.Home:
@@ -553,7 +563,7 @@ namespace WLEditor
 				int posX, posY;
 				if (FindExitPosition(pos[2], out posX, out posY))
 				{
-					Map.SaveWorldStartPosition(rom, posX, posY, FindClosestSide(posX, posY), pos[0], pos[1]);
+					Map.SaveStartPosition(rom, posX, posY, FindClosestSide(posX, posY), pos[0], pos[1]);
 				}
 			}
 		}

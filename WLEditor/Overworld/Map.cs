@@ -41,7 +41,7 @@ namespace WLEditor
 			}
 		}
 				
-		static IEnumerable<byte> DecompressTilesBHelper(byte[] data, int length)
+		static IEnumerable<byte> DecompressTilesHelper(byte[] data, int length)
 		{
 			for(int i = 0 ; i < length; i++)
 			{
@@ -110,21 +110,21 @@ namespace WLEditor
 			yield return 0;
 		}
 		
-		public static void DumpWorld8x8Tiles(Rom rom, int bank, int tileAddress, DirectBitmap bitmap)
+		public static void Dump8x8Tiles(Rom rom, int bank, int tileAddress, DirectBitmap bitmap)
 		{
 			rom.SetBank(bank);		
 			byte[] data = new byte[384 * 8 * 2];
 			RLEDecompressTiles(rom, tileAddress, data);
-			Level.Dump8x8Tiles(DecompressTilesBHelper(data, 384 * 8).Skip(128 * 16), bitmap, 256, 0, 0xE1, paletteColors, false);
+			Level.Dump8x8Tiles(DecompressTilesHelper(data, 384 * 8).Skip(128 * 16), bitmap, 256, 0, 0xE1, paletteColors, false);
 		}
 		
-		public static void LoadWorldTiles(Rom rom, int bank, int tileAddress, byte[] data)
+		public static void LoadTiles(Rom rom, int bank, int tileAddress, byte[] data)
 		{
 			rom.SetBank(bank);
 			RLEDecompressTiles(rom, tileAddress, data);
 		}
 		
-		public static bool SaveWorldTiles(Rom rom, int bank, int address, byte[] data, int maxSize, out string errorMessage)
+		public static bool SaveTiles(Rom rom, int bank, int address, byte[] data, int maxSize, out string errorMessage)
 		{						
 			rom.SetBank(bank);			
 			var compressedData = RLECompressTiles(data).ToArray();
@@ -145,7 +145,7 @@ namespace WLEditor
 		
 		#region Events
 		
-		public static List<List<KeyValuePair<int, byte>>> LoadWorldEvents(Rom rom, int[] events)
+		public static List<List<KeyValuePair<int, byte>>> LoadEvents(Rom rom, int[] events)
 		{
 			rom.SetBank(8);			
 			
@@ -177,7 +177,7 @@ namespace WLEditor
 			return result;
 		}
 		
-		public static bool SaveWorldEvents(Rom rom, List<List<KeyValuePair<int, byte>>> events, 
+		public static bool SaveEvents(Rom rom, List<List<KeyValuePair<int, byte>>> events, 
 			int[][][] eventPointers, int maxSize, out string errorMessage)
 		{			
 			int size = events.Sum(x => x.Sum(y => 3) + 2);
@@ -236,7 +236,7 @@ namespace WLEditor
 		
 		#region Paths
 		
-		public static WorldPath[] LoadWorldPaths(Rom rom, bool overWorld)
+		public static WorldPath[] LoadPaths(Rom rom, bool overWorld)
 		{
 			var result = new WorldPath[overWorld ? 8 : 43];
 			
@@ -304,7 +304,7 @@ namespace WLEditor
 			return result;		
 		}
 		
-		public static bool SaveWorldPaths(Rom rom, WorldPath[] pathData, bool overWorld, out string errorMessage)
+		public static bool SavePaths(Rom rom, WorldPath[] pathData, bool overWorld, out string errorMessage)
 		{			
 			int[][] duplicates = new int[][]
 			{
@@ -466,9 +466,9 @@ namespace WLEditor
 				
 		#endregion
 		
-		#region World start	position
+		#region World start position
 				
-		public static void SaveWorldStartPosition(Rom rom, int x, int y, int side, int startPositionAddress, int startFunctionAddress)
+		public static void SaveStartPosition(Rom rom, int x, int y, int side, int startPositionAddress, int startFunctionAddress)
 		{
 			rom.SetBank(8);
 			rom.WriteByte(startPositionAddress + 3, (byte)Math.Max(0, Math.Min(255, x + 12)));
@@ -490,7 +490,7 @@ namespace WLEditor
 			}	
 		}	
 		
-		public static void ReadFlagsPosition(Rom rom, WorldPath[] pathData, int[][] flagsPosition)
+		public static void ReadFlags(Rom rom, WorldPath[] pathData, int[][] flagsPosition)
 		{
 			rom.SetBank(0x14);
 			for (int level = 0 ; level < flagsPosition.Length ; level++)
@@ -501,7 +501,7 @@ namespace WLEditor
 			}
 		}
 		
-		public static void SaveFlagsPosition(Rom rom, WorldPath[] pathData, int[][] flagsPosition)
+		public static void SaveFlags(Rom rom, WorldPath[] pathData, int[][] flagsPosition)
 		{
 			rom.SetBank(0x14);
 			for (int level = 0 ; level < flagsPosition.Length ; level++)
