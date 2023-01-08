@@ -200,7 +200,7 @@ namespace WLEditor
 
 		void ToolBoxSectorChanged(object sender, EventArgs e)
 		{
-			currentWarp = Level.SearchWarp(rom, currentCourseId, levelPictureBox.CurrentSector);
+			currentWarp = Sector.SearchWarp(rom, currentCourseId, levelPictureBox.CurrentSector);
 			LoadLevel(false);
 			SetChanges(true);
 		}
@@ -618,7 +618,7 @@ namespace WLEditor
 		
 		void LevelPictureBoxSectorChanged(object sender, EventArgs e)
 		{
-			int warpTarget = Level.SearchWarp(rom, currentCourseId, levelPictureBox.CurrentSector);
+			int warpTarget = Sector.SearchWarp(rom, currentCourseId, levelPictureBox.CurrentSector);
 			if(warpTarget != currentWarp)
 			{
 				currentWarp = warpTarget;

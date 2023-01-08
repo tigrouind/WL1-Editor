@@ -70,6 +70,7 @@
     <Compile Include="Selection\SelectionEventArgs.cs" />
     <Compile Include="TileEventArgs.cs" />
     <Compile Include="Toolbox\ObjectsPictureBox.cs" />
+    <Compile Include="Toolbox\Sector.cs" />
     <Compile Include="Toolbox\SectorForm.cs" />
     <Compile Include="Toolbox\SectorForm.Designer.cs">
       <DependentUpon>SectorForm.cs</DependentUpon>

@@ -455,7 +455,7 @@ namespace WLEditor
 			
 			panel1.Visible = isWarp;
 			panel2.Visible = !isWarp;			
-			panel3.Visible = !isWarp || Level.GetWarp(rom, currentCourseId, currentSector) >= 0x5B7A;
+			panel3.Visible = !isWarp || Sector.GetWarp(rom, currentCourseId, currentSector) >= 0x5B7A;
 			
 			tableLayoutPanel1.ResumeLayout();
 		}
@@ -480,7 +480,7 @@ namespace WLEditor
 			
 			if (currentCourseId != -1 && currentSector != -1)
 			{		
-				int warp = Level.GetWarp(rom, currentCourseId, currentSector);				
+				int warp = Sector.GetWarp(rom, currentCourseId, currentSector);				
 				LoadWarp(warp);												
 				LoadScroll();												
 			}
@@ -494,7 +494,7 @@ namespace WLEditor
 		
 		void LoadLevel()
 		{
-			currentWarp = Level.GetLevelHeader(rom, currentCourseId);	
+			currentWarp = Sector.GetLevelHeader(rom, currentCourseId);	
 			isWarp = false;
 			LoadWarp();
 		}
@@ -502,7 +502,7 @@ namespace WLEditor
 		void LoadWarp(int warp)
 		{					
 			LoadDropdown(ddlWarp, Math.Min(warp, 0x5B7A));		
-			currentWarp = Level.GetWarp(rom, warp);									
+			currentWarp = Sector.GetWarp(rom, warp);									
 			isWarp = true;
 			
 			LoadWarp();
@@ -510,7 +510,7 @@ namespace WLEditor
 				
 		int GetFreeWarp()
 		{
-			var used = Level.GetWarpUsage(rom);
+			var used = Sector.GetWarpUsage(rom);
 			for (int i = 0 ; i < 370 ; i++)
 			{
 				int warp = 0x5B7A + i * 24;
@@ -525,7 +525,7 @@ namespace WLEditor
 							
 		void LoadScroll()
 		{
-			scroll = Level.GetScroll(rom, currentCourseId, currentSector);			
+			scroll = Sector.GetScroll(rom, currentCourseId, currentSector);			
 			LoadCheckBox(checkBoxLeft, (scroll & 2) == 2);
 			LoadCheckBox(checkBoxRight, (scroll & 1) == 1);
 		}
@@ -602,7 +602,7 @@ namespace WLEditor
 			{
 				scroll = (scroll & ~0x2) | (checkBoxLeft.Checked ? 0x2 : 0);
 				
-				Level.SaveScroll(rom, currentCourseId, currentSector, scroll);
+				Sector.SaveScroll(rom, currentCourseId, currentSector, scroll);
 				OnSectorChanged();
 			}
 		}
@@ -613,7 +613,7 @@ namespace WLEditor
 			{
 				scroll = (scroll & ~0x1) | (checkBoxRight.Checked ? 0x1 : 0);
 				
-				Level.SaveScroll(rom, currentCourseId, currentSector, scroll);
+				Sector.SaveScroll(rom, currentCourseId, currentSector, scroll);
 				OnSectorChanged();
 			}
 		}
@@ -627,7 +627,7 @@ namespace WLEditor
 					
 				if (warp == 0x5B7A)
 				{			
-					int previousWarp = Level.GetWarp(rom, currentCourseId, currentSector);
+					int previousWarp = Sector.GetWarp(rom, currentCourseId, currentSector);
 					if (previousWarp >= 0x5B7A)
 					{
 						warp = previousWarp;
@@ -644,7 +644,7 @@ namespace WLEditor
 					}
 				}
 				
-				Level.SaveWarp(rom, currentCourseId, currentSector, warp);				
+				Sector.SaveWarp(rom, currentCourseId, currentSector, warp);				
 				LoadWarp(warp);									
 				
 				OnSectorChanged();
@@ -784,11 +784,11 @@ namespace WLEditor
 		{
 			if (isWarp)
 			{
-				Level.SaveWarp(rom, currentCourseId, currentSector, currentWarp);
+				Sector.SaveWarp(rom, currentCourseId, currentSector, currentWarp);
 			}
 			else
 			{
-				Level.SaveLevelHeader(rom, currentCourseId, currentWarp);
+				Sector.SaveLevelHeader(rom, currentCourseId, currentWarp);
 			}
 		}
 		
@@ -810,7 +810,7 @@ namespace WLEditor
 			currentWarp.WarioY = (sector / 16) * 32 + currentWarp.WarioY % 32;
 			
 			int doorX, doorY;
-			if (Level.FindDoorInSector(sector, currentWarp.WarioX % 32, currentWarp.WarioY % 32, out doorX, out doorY))
+			if (Sector.FindDoorInSector(sector, currentWarp.WarioX % 32, currentWarp.WarioY % 32, out doorX, out doorY))
 			{				
 				//player position
 				currentWarp.WarioX = (sector % 16) * 32 + Math.Min(doorX * 2 + 1, 31);
@@ -833,7 +833,7 @@ namespace WLEditor
 							
 		void LimitScroll(int sector, ref int cameraX, ref int cameraY, ref int warioY)
 		{
-			int scrollData = Level.GetScroll(rom, currentCourseId, sector);
+			int scrollData = Sector.GetScroll(rom, currentCourseId, sector);
 			bool allowLeft = (scrollData & 2) != 2;
 			bool allowRight = (scrollData & 1) != 1;
 			int sectorX = sector % 16;			
