@@ -15,6 +15,7 @@ namespace WLEditor
 		int currentPath;
 		int currentDirection = -1;
 		int pathMode;		
+		const int gridSnap = 4;
 
 		int zoom;		
 		int currentWorld;
@@ -714,14 +715,6 @@ namespace WLEditor
 			{
 				return currentWorld == 8 ? 256 : 144;
 			}			
-		}
-		
-		int gridSnap
-		{
-			get
-			{
-				return currentWorld == 8 ? 4 : 8;
-			}
 		}
 	}
 }
