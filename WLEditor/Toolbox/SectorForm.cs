@@ -24,7 +24,7 @@ namespace WLEditor
 		
 		#region Dropdown data
 		
-		ComboboxItem<int[]>[] tileSets =
+		readonly ComboboxItem<int[]>[] tileSets =
 		{
 			//bank, tileSetB, tileSetA, blockIndex, palette
 			new ComboboxItem<int[]>(new[] { 0x06, 0x6E69, 0x5600, 0x640A, 0xE1 }, "00   Beach 1"),			
@@ -58,7 +58,7 @@ namespace WLEditor
 			new ComboboxItem<int[]>(new[] { 0x1D, 0x6A00, 0x6E00, 0x6A0A, 0xE1 }, "28   Boss 7")
 		};	
 		
-		int[][] enemyData =
+		readonly int[][] enemyData =
 		{
 			//same enemyid / tilebank / tileaddress / tilecount / code 
 			new [] { 0x41EF },
@@ -210,7 +210,7 @@ namespace WLEditor
 			new [] { 0x52F6 }
 		};
 		
-		ComboboxItem<int>[] tilesAnimation =
+		readonly ComboboxItem<int>[] tilesAnimation =
 		{
 			new ComboboxItem<int>(0x4000, "00   Platform"),	
 			new ComboboxItem<int>(0x4100, "01   Sand / plant"), 		
@@ -229,7 +229,7 @@ namespace WLEditor
 			new ComboboxItem<int>(0x4D00, "15   Castle")		
 		};
 					
-		ComboboxItem<int>[] music = 
+		readonly ComboboxItem<int>[] music = 
 		{			
 			new ComboboxItem<int>(0x7ED5, "00   Beach 1"),
 			new ComboboxItem<int>(0x7F29, "01   Beach 2"),
@@ -246,7 +246,7 @@ namespace WLEditor
 			new ComboboxItem<int>(0x7F59, "12   Sherbet Land")
 		};
 		
-		ComboboxItem<int>[] animationSpeed = 
+		readonly ComboboxItem<int>[] animationSpeed = 
 		{
 			new ComboboxItem<int>(0x00, "None"),
 			new ComboboxItem<int>(0x1F, "Slow"),			
@@ -255,7 +255,7 @@ namespace WLEditor
 			new ComboboxItem<int>(0x03, "Fastest")
 		};
 		
-		ComboboxItem<int>[] cameraTypes = 
+		readonly ComboboxItem<int>[] cameraTypes = 
 		{
 			new ComboboxItem<int>(0x00, "X scroll"),
 			new ComboboxItem<int>(0x10, "X/Y scroll"),
@@ -265,7 +265,7 @@ namespace WLEditor
 			new ComboboxItem<int>(0xFF, "No scroll (boss fight)")
 		};
 		
-		ComboboxItem<int>[] warps = 
+		readonly ComboboxItem<int>[] warps = 
 		{
 			new ComboboxItem<int>(0x5B76, "None"),
 			new ComboboxItem<int>(0x5B77, "Exit map"),
@@ -274,7 +274,7 @@ namespace WLEditor
 			new ComboboxItem<int>(0x5B7A, "Sector")
 		};
 		
-		string[] enemyNames = 
+		readonly string[] enemyNames = 
 		{
 			"Wanderin' Goom",
 			"Sparky",

@@ -21,7 +21,7 @@ namespace WLEditor
 		public event EventHandler EventChanged;
 		public event EventHandler EventIndexChanged;
 		
-		int[][] eventPointersA = new int[][] //applied when map is show (ld bc, XXXX ld hl, XXXX)
+		readonly int[][] eventPointersA = new int[][] //applied when map is show (ld bc, XXXX ld hl, XXXX)
 		{
 			new int[] { 0x68B9, 0x68C5, 0x68D1, 0x68DD, 0x68E9, 0x68F5 },
 			new int[] { 0x68DD },
@@ -34,7 +34,7 @@ namespace WLEditor
 			new int[] { 0x66C6 },
 		};
 		
-		int[][] eventPointersB = new int[][] //applied after beating level (ld bc, XXXX ld hl, XXXX)
+		readonly int[][] eventPointersB = new int[][] //applied after beating level (ld bc, XXXX ld hl, XXXX)
 		{
 			new int[] { 0x690F, 0x691B, 0x6927, 0x6933, 0x693F, 0x694B },
 			new int[] { 0x6933 },
@@ -47,7 +47,7 @@ namespace WLEditor
 			new int[] { },
 		};
 		
-		int[][] eventPointersC = new int[][] //step by step animation for next path
+		readonly int[][] eventPointersC = new int[][] //step by step animation for next path
 		{
 			new int[] { 0x770B, 0x770F, 0x7713, 0x7717, 0x771B },
 			new int[] { 0x7717 },
@@ -60,7 +60,7 @@ namespace WLEditor
 			new int[] { },
 		};	
 		
-		int[] eventMaxSize = new int[]
+		readonly int[] eventMaxSize = new int[]
 		{
 			150,
 			26,

@@ -45,7 +45,7 @@ namespace WLEditor
 			selection.InvalidatePictureBox += InvalidatePictureBox;
 		}
 		
-		ComboboxItem<int[]>[] worldData = new ComboboxItem<int[]>[]
+		readonly ComboboxItem<int[]>[] worldData = new ComboboxItem<int[]>[]
 		{
 			//bank - 8x8 tiles / bank - map tiles / max tiles size 
 			new ComboboxItem<int[]>(new int[] { 0x09, 0x407A, 0x09, 0x6DBE, 373  }, "1 Rice Beach"), 

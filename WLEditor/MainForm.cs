@@ -11,7 +11,7 @@ namespace WLEditor
 		ToolboxForm toolboxForm = new ToolboxForm();
 		Overworld overworldForm = new Overworld();
 
-		public static string[] LevelNames =
+		public readonly static string[] LevelNames =
 		{
 			"SS Teacup 1",
 			"Parsley Woods 3",
