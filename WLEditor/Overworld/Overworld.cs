@@ -122,24 +122,29 @@ namespace WLEditor
 		{
 			if (hasChanges != 0)
 			{
-				var worldInfo = worldData[currentWorld].Value;
-								
 				string message;				
-				if ((hasChanges & 1) != 0 && !Map.SaveTiles(rom, worldInfo[2], worldInfo[3], 
-				     currentWorld == 8 ? worldTiles : worldTiles.Take(564).ToArray(), worldInfo[4], out message))
+				if ((hasChanges & 1) != 0)
 				{
 					//improve tile compression
 					if (currentWorld != 8)
 					{
-						for (int y =  0; y < 17; y++)				
-						for (int x = 20; x < 32; x++)
+						for (int y =  0; y < 17; y++)	
 						{
-							worldTiles[x + y * 32] = worldTiles[19 + y * 32];
+							var data = worldTiles[19 + y * 32];
+							for (int x = 20; x < 32; x++)
+							{
+								worldTiles[x + y * 32] = data;
+							}
 						}
 					}
 					
-					MessageBox.Show(message, Text, MessageBoxButtons.OK, MessageBoxIcon.Error);										
-					return false;
+					var worldInfo = worldData[currentWorld].Value;					
+					if (!Map.SaveTiles(rom, worldInfo[2], worldInfo[3],
+					                   currentWorld == 8 ? worldTiles : worldTiles.Take(564).ToArray(), worldInfo[4], out message))
+					{									
+						MessageBox.Show(message, Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
+						return false;
+					}					
 				}
 				
 				hasChanges &= ~1;
