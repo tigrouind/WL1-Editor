@@ -20,6 +20,7 @@ namespace WLEditor
 		bool eventMode;
 		bool pathMode;
 		bool ignoreEvents;
+		int timerTicks;
 		
 		int lastTilePos = -1;
 		int hasChanges;		
@@ -79,6 +80,11 @@ namespace WLEditor
 		{
 			var data = worldData[currentWorld].Value;
 			Map.Dump8x8Tiles(rom, data[0], data[1], tilesWorld8x8);
+			if (timerTicks != 0)
+			{
+				DumpAnimatedTiles();
+			}
+			
 			Map.LoadTiles(rom, data[2], data[3], worldTiles);			
 			
 			eventForm.LoadWorld(rom, currentWorld);
@@ -347,6 +353,7 @@ namespace WLEditor
 		{
 			Array.Clear(tilesWorld.Bits, 0, tilesWorld.Bits.Length);
 			RenderTiles();	
+			ScrollLines();
 			
 			pictureBox1.Invalidate();
 			pictureBox2.Invalidate();
@@ -568,5 +575,126 @@ namespace WLEditor
 		}
 				
 		#endregion
+		
+		#region Animation
+				
+		readonly int[] animationSea = 
+		{
+			0x5B18, 208,
+			0x5B49, 209,
+			0x5B7A, 224,
+			0x5BAB, 225,
+			0x5BDC, 226,
+			0x5C0D, 240,
+			0x5C3E, 241,
+			0x5C6F, 242,
+			0x5CA0, 243,
+			0x5CD1, 244
+		};
+		
+		readonly int[] animationLava =
+		{
+			0x5222, 218,
+			0x5242, 202,
+			0x5252, 203,
+			0x5232, 219,
+			0x5232, 218,
+			0x5252, 202,			
+			0x5242, 203,
+			0x5222, 219,			
+		};
+		
+		readonly int[] animationWater =
+		{
+			0x518D, 53,
+			0x519D, 54,
+			0x519D, 53,
+			0x518D, 54,
+		};
+				
+		public void TimerTick()
+		{	
+			timerTicks++;
+			if (Visible)
+			{				
+				switch (currentWorld)
+				{
+					case 0:
+					case 1:
+					case 3:
+					case 4:
+					case 7:		
+					case 8:
+						DumpAnimatedTiles();
+						RenderMap();					
+						break;
+				}				
+			}
+		}
+		
+		public void ResetTimer()
+		{
+			timerTicks = 0;
+			if (Visible)
+			{				
+				RenderMap();		
+			}
+		}
+		
+		void DumpAnimatedTiles()
+		{
+			int animationIndex = timerTicks / 3;
+			switch (currentWorld)
+			{
+				case 0:
+				case 1:
+					for (int i = 0; i < 10; i++)
+					{
+						Map.DumpAnimatedTilesA(rom, animationSea[i * 2], animationSea[i * 2 + 1], tilesWorld8x8, animationIndex % 6, 6);					
+					}
+					break;
+					
+				case 3:
+					for (int i = 0; i < 4; i++)
+					{
+						int index = i + (animationIndex % 2) * 4;
+						Map.DumpAnimatedTilesB(rom, animationLava[index * 2], animationLava[index * 2 + 1], tilesWorld8x8);
+					}
+					break;
+					
+				case 4:
+					for (int i = 0; i < 2; i++)
+					{
+						int index = i + (animationIndex % 2) * 2;
+						Map.DumpAnimatedTilesB(rom, animationWater[index * 2], animationWater[index * 2 + 1], tilesWorld8x8);
+					}
+					break;
+										
+				case 8:
+					Map.DumpAnimatedTilesA(rom, 0x46F6, 42, tilesWorld8x8, animationIndex % 8, 8);
+					break;					
+			}						
+		}
+		
+		void ScrollLines()
+		{
+			if (currentWorld == 7 && timerTicks != 0)
+			{
+				int animationIndex = timerTicks / 2;
+				uint[] line = new uint[160];
+				
+				for(int y = 0 ; y < 54 ; y++)
+				{					
+					int scroll = Map.GetScroll(rom, animationIndex + y);
+					for(int x = 0 ; x < line.Length ; x++)
+					{
+						line[(x + scroll + line.Length) % line.Length] = tilesWorld.Bits[x + y * 256];
+					}
+					Array.Copy(line, 0, tilesWorld.Bits, y * 256, line.Length);
+				}
+			}
+		}
+		
+		#endregion		
 	}
 }

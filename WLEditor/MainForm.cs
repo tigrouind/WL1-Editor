@@ -634,14 +634,19 @@ namespace WLEditor
 				
 		void TimerTick(object sender, EventArgs e)
 		{
-			if(rom.IsLoaded && levelComboBox.SelectedItem != null && Level.AnimatedTilesMask != 0)
-			{				
-				timerTicks++;				
-				if((timerTicks & (Level.AnimatedTilesMask >> 2)) == 0)
+			if(rom.IsLoaded)
+			{
+				timerTicks++;
+				if (levelComboBox.SelectedItem != null && Level.AnimatedTilesMask != 0)
 				{
-					animatedTileIndex = (animatedTileIndex + 1) % 4;
-					RefreshAnimatedTiles();
+					if((timerTicks & (Level.AnimatedTilesMask >> 2)) == 0)
+					{
+						animatedTileIndex = (animatedTileIndex + 1) % 4;
+						RefreshAnimatedTiles();
+					}
 				}
+				
+				overworldForm.TimerTick();
 			}
 		}
 		
@@ -671,6 +676,7 @@ namespace WLEditor
 		void AnimationToolStripMenuItemClick(object sender, EventArgs e)
 		{
 			timer.Enabled = animationToolStripMenuItem.Checked;
+			overworldForm.ResetTimer();
 		}
 		
 		void TileNumbersToolStripMenuItemClick(object sender, EventArgs e)

@@ -129,6 +129,42 @@ namespace WLEditor
 			Level.Dump8x8Tiles(DecompressTilesHelper(data, 384 * 8).Skip(128 * 16), bitmap, 256, 0, 0xE1, paletteColors, false);
 		}
 		
+		public static void DumpAnimatedTilesA(Rom rom, int tileAddress, int tilePosition, DirectBitmap bitmap, int index, int offset)
+		{
+			rom.SetBank(8);
+			Level.Dump8x8Tiles(Zip(Enumerable.Range(0, 8)
+				.Select(x => rom.ReadByte(tileAddress + x * offset + index)), Enumerable.Range(0, 8).Select(x => (byte)0)), bitmap, 1, tilePosition, 0xE1, paletteColors, false);
+		}
+		
+		public static void DumpAnimatedTilesB(Rom rom, int tileAddress, int tilePosition, DirectBitmap bitmap)
+		{
+			rom.SetBank(8);
+			Level.Dump8x8Tiles(Enumerable.Range(0, 16)
+               .Select(x => rom.ReadByte(tileAddress + x)), bitmap, 1, tilePosition, 0xE1, paletteColors, false);
+		}
+		
+		static IEnumerable<byte> Zip(IEnumerable<byte> first, IEnumerable<byte> second)
+		{
+			using (var e1 = first.GetEnumerator())
+            using (var e2 = second.GetEnumerator())
+			{
+                while (e1.MoveNext() && e2.MoveNext())
+                {
+                	yield return e1.Current;
+                	yield return e2.Current;
+                }
+			}
+		}
+		
+		public static int GetScroll(Rom rom, int value)
+		{
+			rom.SetBank(0x14);
+			unchecked
+			{
+				return (sbyte)rom.ReadByte(0x4F13 + value % 16);
+			}			 
+		}
+		
 		public static void LoadTiles(Rom rom, int bank, int tileAddress, byte[] data)
 		{
 			rom.SetBank(bank);
