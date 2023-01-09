@@ -107,7 +107,7 @@ namespace WLEditor
 					var item = (ComboboxItem<int>)levelComboBox.SelectedItem;
 					currentCourseId = item.Value;
 					LoadLevel(true);
-					toolboxForm.LoadSector(rom, currentCourseId, -1);
+					toolboxForm.LoadSector(currentCourseId, -1);
 					levelPictureBox.ClearSelection();
 					levelPictureBox.ClearUndo();
 				}
@@ -628,7 +628,7 @@ namespace WLEditor
 			{
 				levelPictureBox.Invalidate();
 			}
-			toolboxForm.LoadSector(rom, currentCourseId, levelPictureBox.CurrentSector);
+			toolboxForm.LoadSector(currentCourseId, levelPictureBox.CurrentSector);
 			levelPictureBox.ClearSelection();
 		}
 				
@@ -670,7 +670,7 @@ namespace WLEditor
 
 		void AboutToolStripMenuItemClick(object sender, EventArgs e)
 		{
-			MessageBox.Show(Text + " v0.75\r\nDate : 05.01.2023\r\nContact me : tigrou.ind@gmail.com");
+			MessageBox.Show(Text + " v0.76\r\nDate : 09.01.2023\r\nContact me : tigrou.ind@gmail.com");
 		}
 		
 		void AnimationToolStripMenuItemClick(object sender, EventArgs e)

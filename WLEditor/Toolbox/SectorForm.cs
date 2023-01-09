@@ -16,6 +16,7 @@ namespace WLEditor
 		int currentSector;
 		int scroll;
 		bool ignoreEvents, isWarp;
+		bool formLoaded;
 									
 		public SectorForm()
 		{
@@ -410,34 +411,38 @@ namespace WLEditor
 		
 		void InitForm()
 		{					
-			ddlAnimationSpeed.Items.Clear();
-			ddlAnimationSpeed.Items.AddRange(animationSpeed);
-			
-			ddlCameraType.Items.Clear();
-			ddlCameraType.Items.AddRange(cameraTypes);
-			
-			ddlMusic.Items.Clear();
-			ddlMusic.Items.AddRange(music);
-			
-			ddlWarp.Items.Clear();
-			ddlWarp.Items.AddRange(warps);
-			
-			ddlTileSet.Items.Clear();
-			ddlTileSet.Items.AddRange(tileSets);
-			
-			ddlAnimation.Items.Clear();
-			ddlAnimation.Items.AddRange(tilesAnimation);
-						
-			var sorted = enemyData.Select(x => new { Text = GetEnemyInfo(x[0]), Value = x })
-				.OrderBy(x => x.Text[0] == '[')
-				.ThenBy(x => x.Text)
-				.ToArray();
-			
-			ddlEnemies.Items.Clear();
-			for(int i = 0 ; i < sorted.Length; i++)
+			if (!formLoaded)
 			{
-				var item = sorted[i];
-				ddlEnemies.Items.Add(new ComboboxItem<int[]>(item.Value, string.Format("{0:D3}   {1}", i, item.Text)));
+				formLoaded = true;
+				ddlAnimationSpeed.Items.Clear();
+				ddlAnimationSpeed.Items.AddRange(animationSpeed);
+				
+				ddlCameraType.Items.Clear();
+				ddlCameraType.Items.AddRange(cameraTypes);
+				
+				ddlMusic.Items.Clear();
+				ddlMusic.Items.AddRange(music);
+				
+				ddlWarp.Items.Clear();
+				ddlWarp.Items.AddRange(warps);
+				
+				ddlTileSet.Items.Clear();
+				ddlTileSet.Items.AddRange(tileSets);
+				
+				ddlAnimation.Items.Clear();
+				ddlAnimation.Items.AddRange(tilesAnimation);
+						
+				var sorted = enemyData.Select(x => new { Text = GetEnemyInfo(x[0]), Value = x })
+					.OrderBy(x => x.Text[0] == '[')
+					.ThenBy(x => x.Text)
+					.ToArray();
+				
+				ddlEnemies.Items.Clear();
+				for(int i = 0 ; i < sorted.Length; i++)
+				{
+					var item = sorted[i];
+					ddlEnemies.Items.Add(new ComboboxItem<int[]>(item.Value, string.Format("{0:D3}   {1}", i, item.Text)));
+				}
 			}
 		}
 		
@@ -460,24 +465,37 @@ namespace WLEditor
 			tableLayoutPanel1.ResumeLayout();
 		}
 		
-		public string GetTitle()
-		{
-			return isWarp ? "Sector" : "Level";
-		}
-		
 		#region Load
 		
 		public void LoadRom(Rom rom)
 		{
 			this.rom = rom;
-			InitForm();
+			formLoaded = false;
+		}
+		
+		void SectorFormVisibleChanged(object sender, EventArgs e)
+		{
+			if (Visible)
+			{
+				InitForm();
+				LoadSector();
+			}
 		}
 				
-		public void LoadSector(Rom rom, int course, int sector)
+		public void LoadSector(int course, int sector)
 		{		
 			currentCourseId = course;
 			currentSector = sector;	
 			
+			if (Visible)
+			{
+				InitForm();
+				LoadSector();
+			}
+		}
+		
+		void LoadSector()
+		{
 			if (currentCourseId != -1 && currentSector != -1)
 			{		
 				int warp = Sector.GetWarp(rom, currentCourseId, currentSector);				

@@ -127,6 +127,7 @@
 			this.ShowInTaskbar = false;
 			this.Text = "Overworld";
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.OverworldFormClosing);
+			this.VisibleChanged += new System.EventHandler(this.OverworldVisibleChanged);
 			this.tableLayoutPanel1.ResumeLayout(false);
 			((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();

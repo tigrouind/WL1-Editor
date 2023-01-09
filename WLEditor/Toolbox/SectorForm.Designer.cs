@@ -420,6 +420,7 @@
 			this.Controls.Add(this.tableLayoutPanel1);
 			this.Name = "SectorForm";
 			this.Size = new System.Drawing.Size(339, 319);
+			this.VisibleChanged += new System.EventHandler(this.SectorFormVisibleChanged);
 			this.panel3.ResumeLayout(false);
 			((System.ComponentModel.ISupportInitialize)(this.txbCameraX)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.txbCameraY)).EndInit();

@@ -77,7 +77,7 @@
 			"16x16 Tiles ",
 			"8x8 Tiles",
 			"Objects",			
-			"Sector"});
+			"Level / Sector"});
 			this.comboBox1.Location = new System.Drawing.Point(3, 3);
 			this.comboBox1.Name = "comboBox1";
 			this.comboBox1.Size = new System.Drawing.Size(90, 21);

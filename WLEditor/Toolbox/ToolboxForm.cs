@@ -7,7 +7,6 @@ namespace WLEditor
 	public partial class ToolboxForm : Form
 	{				
 		public event EventHandler<KeyEventArgs> ProcessCommandKey;		
-		bool ignoreEvents;
 		
 		public ToolboxForm()
 		{				
@@ -37,26 +36,23 @@ namespace WLEditor
 		
 		void ComboBox1SelectedIndexChanged(object sender, EventArgs e)
 		{
-			if (!ignoreEvents)
+			SuspendLayout();
+				
+			Control controlToShow = new Control[] { tiles16x16PictureBox, tiles8x8PictureBox, objectsPictureBox, sectorForm }[comboBox1.SelectedIndex];			
+			controlToShow.Visible = true;
+			controlToShow.Location = new Point(controlToShow.Margin.Left, controlToShow.Margin.Top);
+
+			foreach(Control control in panel1.Controls)
 			{
-				SuspendLayout();
-				
-				Control controlToShow = new Control[] { tiles16x16PictureBox, tiles8x8PictureBox, objectsPictureBox, sectorForm }[comboBox1.SelectedIndex];
-				controlToShow.Visible = true;
-				controlToShow.Location = new Point(controlToShow.Margin.Left, controlToShow.Margin.Top);
-				
-				foreach(Control control in panel1.Controls)
+				if(control != controlToShow)
 				{
-					if(control != controlToShow)
-					{
-						control.Visible = false;
-					}
+					control.Visible = false;
 				}
-							
-				ResumeLayout();
 			}
+							
+			ResumeLayout();
 		}		
-		
+
 		void ToolBoxFormLoad(object sender, EventArgs e)
 		{			
 			comboBox1.SelectedIndex = 0;
@@ -118,13 +114,9 @@ namespace WLEditor
 			sectorForm.LoadRom(rom);
 		}
 		
-		public void LoadSector(Rom rom, int course, int sector)
+		public void LoadSector(int course, int sector)
 		{									
-			sectorForm.LoadSector(rom, course, sector);
-			
-			ignoreEvents = true;
-			comboBox1.Items[3] = sectorForm.GetTitle();
-			ignoreEvents = false;
+			sectorForm.LoadSector(course, sector);
 		}
 		
 		public bool ShowColliders

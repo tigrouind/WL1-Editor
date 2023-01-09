@@ -21,6 +21,7 @@ namespace WLEditor
 		bool pathMode;
 		bool ignoreEvents;
 		int timerTicks;
+		bool formLoaded;
 		
 		int lastTilePos = -1;
 		int hasChanges;		
@@ -63,17 +64,39 @@ namespace WLEditor
 		public void LoadRom(Rom rom)
 		{	
 			this.rom = rom;					
-			LoadWorldCombobox();
-			
+			formLoaded = false;
 			hasChanges = 0;
-			ignoreEvents = true;
-			WorldComboBox.SelectedIndex = 0;
-			ignoreEvents = false;
 			
-			currentWorld = 0;
-			pathForm.LoadPaths(rom);
-			LoadWorld();
-			SetZoom(zoom);			
+			if (Visible)
+			{
+				InitForm();
+			}
+		}
+		
+		void OverworldVisibleChanged(object sender, EventArgs e)
+		{
+			if (Visible)
+			{
+				InitForm();
+			}
+		}
+		
+		void InitForm()
+		{
+			if (!formLoaded)
+			{
+				formLoaded = true;
+				LoadWorldCombobox();
+				
+				ignoreEvents = true;
+				WorldComboBox.SelectedIndex = 0;
+				ignoreEvents = false;
+				
+				currentWorld = 0;
+				pathForm.LoadPaths(rom);
+				LoadWorld();
+				SetZoom(zoom);			
+			}
 		}
 				
 		void LoadWorld()
