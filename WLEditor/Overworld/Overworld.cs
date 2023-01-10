@@ -20,8 +20,10 @@ namespace WLEditor
 		bool eventMode;
 		bool pathMode;
 		bool ignoreEvents;
-		int timerTicks;
 		bool formLoaded;
+		
+		int timerTicks;
+		int animationIndex;
 		
 		int lastTilePos = -1;
 		int hasChanges;		
@@ -646,10 +648,21 @@ namespace WLEditor
 					case 1:
 					case 3:
 					case 4:
-					case 7:		
 					case 8:
-						DumpAnimatedTiles();
-						RenderMap();					
+						if ((timerTicks % 3) == 0)
+						{
+							animationIndex++;
+							DumpAnimatedTiles();	
+							RenderMap();			
+						}
+						break;
+						
+					case 7:		
+						if ((timerTicks % 2) == 0)
+						{
+							animationIndex++;	
+							RenderMap();			
+						}
 						break;
 				}				
 			}
@@ -666,7 +679,6 @@ namespace WLEditor
 		
 		void DumpAnimatedTiles()
 		{
-			int animationIndex = timerTicks / 3;
 			switch (currentWorld)
 			{
 				case 0:
@@ -703,7 +715,6 @@ namespace WLEditor
 		{
 			if (currentWorld == 7 && timerTicks != 0)
 			{
-				int animationIndex = timerTicks / 2;
 				uint[] line = new uint[160];
 				
 				for(int y = 0 ; y < 54 ; y++)
