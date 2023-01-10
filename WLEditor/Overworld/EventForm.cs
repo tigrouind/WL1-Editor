@@ -117,7 +117,8 @@ namespace WLEditor
 		
 		public bool ProcessEventKey(Keys keyData)
 		{
-			switch (keyData)
+			bool shift = (keyData & Keys.Shift) != 0;
+			switch (keyData & Keys.KeyCode)
 			{
 				case Keys.PageUp:
 					if (eventId < worldEvents.Count - 1)
@@ -165,6 +166,30 @@ namespace WLEditor
 						eventId--;
 						eventStep = worldEvents[eventId].Count;
 					}
+					break;
+					
+				case Keys.Delete:
+					var worldEvent = worldEvents[eventId];					
+					if (shift)
+					{
+						if (worldEvent.Count > 0)
+						{
+							worldEvent.Clear();
+							eventStep = 0;
+						}
+					}
+					else
+					{						
+						if (eventStep > 0)
+						{							
+							worldEvent.RemoveAt(eventStep - 1);	
+							eventStep--;													
+						}
+					}
+					
+					pictureBox.Invalidate();
+					EventIndexChange();
+					SetChanges();
 					break;
 			}
 			
