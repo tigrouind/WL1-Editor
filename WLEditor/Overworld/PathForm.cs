@@ -31,7 +31,7 @@ namespace WLEditor
 			new int[] { 38, 29, 1, 19, 18, 26 },
 			new int[] { 33, 2, 4, 8, 32, 24 },
 			new int[] { 37, 34, 35, 40 },
-			new int[] { 0, 1, 2, 3, 4, 5, 6, 7 }
+			new int[] { 0, 1, 2, 4, 3, 5, 6, 7 }
 		};
 		
 		readonly int[][][] startPositionData = new int[][][]
@@ -133,33 +133,10 @@ namespace WLEditor
 			}
 			else
 			{
-				int status;
-				switch (pathMode)
-				{
-					case 1: //invisible
-						status = 14;
-						break;
-						
-					case 2: //water
-						if (newDir == 2) //up
-						{
-							status = 13; //water back
-						}
-						else 
-						{
-							status = 12; //water front
-						}
-						break;
-					
-					default:
-						status = newDir + 1;
-						break;
-				}
-				
 				dir.Path.Add(new WorldPathSegment 
              	{
 	             	Direction = newDir, 
-	             	Status = status,
+	             	Status = GetStatus(newDir),
 	             	Steps = gridSnap 
 				});
 			}
@@ -436,6 +413,25 @@ namespace WLEditor
 			}
 			
 			return -1;
+		}
+		
+		int GetStatus(int newDir)
+		{
+			switch (pathMode)
+			{
+				case 1: //invisible
+					return 14;
+					
+				case 2: //water
+					if (newDir == 2) //up
+					{
+						return 13; //water back
+					}					
+					return 12; //water front
+				
+				default:
+					return newDir + 1;
+			}
 		}
 		
 		#endregion
