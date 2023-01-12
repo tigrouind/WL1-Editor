@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 
 namespace WLEditor
@@ -19,6 +20,12 @@ namespace WLEditor
 		        index++;
 		    }
 		    return -1;
+		}
+		
+		public static PointF Normalized(this PointF point)
+		{
+			float length = (float)Math.Sqrt(point.X * point.X + point.Y * point.Y);
+			return new PointF(point.X / length, point.Y / length);
 		}
 		
 		public static IEnumerable<TResult> GroupByAdjacent<TSource, TKey, TResult>(this IEnumerable<TSource> source, 

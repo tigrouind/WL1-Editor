@@ -23,7 +23,7 @@ namespace WLEditor
 			"Rice Beach 1",
 			"Sherbet Land 4",
 			"Mt. Teapot 6",
-			"Mt. Teapot 7",
+			"Mt. Teapot 4 - CRUSHED",
 			"SS Teacup 4",
 			"Rice Beach 4",
 			"Mt. Teapot 3",

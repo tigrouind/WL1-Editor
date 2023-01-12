@@ -203,6 +203,7 @@ namespace WLEditor
 		{
 			if(!DesignMode)
 			{
+				e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
 				e.Graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
 				e.Graphics.PixelOffsetMode = PixelOffsetMode.Half;
 				e.Graphics.DrawImage(tilesWorld.Bitmap, 
@@ -216,10 +217,7 @@ namespace WLEditor
 				}	
 				if (pathMode)
 				{					
-					pathForm.DrawPaths(e.Graphics);
-					pathForm.DrawProgress(e.Graphics);
-					pathForm.DrawLevels(e.Graphics);
-					pathForm.DrawExits(e.Graphics);
+					pathForm.Draw(e.Graphics);
 				}
 				if (selectionMode) 
 				{

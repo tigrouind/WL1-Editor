@@ -366,8 +366,8 @@ namespace WLEditor
 			{
 				new int[] { 7, 23 },  // rice beach 1 / flooded
 				new int[] { 14, 36 }, // rice beach 3 / flooded
-				new int[] { 5, 10 },  // mt teapot 4 / 7
-				new int[] { 38, 42 }, // parsley Woods 1 / flooded				
+				new int[] { 5, 10 },  // mt teapot 4 / crushed
+				new int[] { 38, 42 }, // parsley woods 1 / flooded				
 			};
 			
 			if (!overWorld)
