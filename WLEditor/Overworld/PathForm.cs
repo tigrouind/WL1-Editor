@@ -121,8 +121,7 @@ namespace WLEditor
 			{							
 				currentDirection.Path.Last().Steps += gridSnap;
 			}						
-			else if ((previousDir == 0 && newDir == 1) || (previousDir == 1 && newDir == 0) || //opposite direction
-			         (previousDir == 2 && newDir == 3) || (previousDir == 3 && newDir == 2)) 
+			else if (previousDir == GetReverseDir(newDir))
 			{				
 				if (currentDirection.Path.Last().Steps > gridSnap)
 				{
@@ -146,8 +145,8 @@ namespace WLEditor
 		
 		void RemovePath()
 		{
-			currentDirection.Path.RemoveAt(currentDirection.Path.Count - 1);
 			UnbindPath(currentDirection);
+			currentDirection.Path.RemoveAt(currentDirection.Path.Count - 1);
 			
 			if (currentDirection.Path.Count == 0)
 			{
@@ -165,8 +164,8 @@ namespace WLEditor
 		{
 			foreach(var dir in currentPath.Directions)
 			{
-				dir.Path.Clear();
 				UnbindPath(dir);
+				dir.Path.Clear();
 				dir.Progress = 0xFD;
 			}
 			
@@ -230,6 +229,7 @@ namespace WLEditor
 		
 		void SetExit()
 		{
+			RemoveReversePath(currentDirection);
 			if (currentWorld == 8)
 			{
 				currentDirection.Next = 0xF8;
@@ -246,7 +246,12 @@ namespace WLEditor
 		{			
 			int[] flags = { 0xFD, 1, 2, 4, 8, 16, 32 };
 			int progress = Array.IndexOf(flags, currentDirection.Progress);			
-			currentDirection.Progress = flags[(progress + 1) % flags.Length];
+			currentDirection.Progress = flags[(progress + 1) % flags.Length];			
+			var reverseDir = GetReverseDir(currentDirection);
+			if (reverseDir != null)
+			{
+				reverseDir.Progress = currentDirection.Progress;			
+			}
 		}
 		
 		void ChangeDirection(Keys key)
@@ -692,7 +697,11 @@ namespace WLEditor
 					int nextLevel;
 					if (levelPositions.TryGetValue(posX + posY * 256, out nextLevel))
 					{
-						dir.Next = nextLevel;
+						if (dir.Next != nextLevel)
+						{
+							dir.Next = nextLevel;
+							CreateReversePath(dir);
+						}
 					}
 				}
 			}
@@ -700,8 +709,9 @@ namespace WLEditor
 		
 		void UnbindPath(WorldPathDirection dir)
 		{
-			if (dir.Path.Count == 0 || (dir.Next != 0xFA && dir.Next != 0xF9 && dir.Next != 0xF8))
+			if (dir.Path.Count == 0 || (dir.Next != 0xFA && dir.Next != 0xF9 && dir.Next != 0xF8 && dir.Next != 0xFD))
 			{
+				RemoveReversePath(dir);
 				dir.Next = currentWorld == 8 ? 0xF8 : 0xFD;
 			}
 		}
@@ -754,5 +764,65 @@ namespace WLEditor
 				return currentWorld == 8 ? 256 : 144;
 			}			
 		}
+				
+		#region Reverse
+		
+		void CreateReversePath(WorldPathDirection dir)
+		{			
+			var reverseDir = GetReverseDir(dir);
+			if (reverseDir != null && reverseDir != dir)
+			{
+				reverseDir.Path = dir.Path.AsEnumerable().Reverse()
+					.Select(x => new WorldPathSegment
+					{
+			        	Status = GetStatus(GetReverseDir(x.Direction), x.Status),
+			        	Direction = GetReverseDir(x.Direction),
+						Steps = x.Steps
+			        })
+					.ToList();
+				
+				reverseDir.Next = currentLevel;
+				reverseDir.Progress = dir.Progress;
+			}
+		}								
+		
+		int GetReverseDir(int dir)
+		{
+			switch(dir)
+			{
+				case 0:
+					return 1;
+				case 1:
+					return 0;
+				case 2:
+					return 3;
+				case 3:
+					return 2;
+			}
+			
+			return -1;
+		}
+		
+		WorldPathDirection GetReverseDir(WorldPathDirection dir)
+		{
+			if (dir.Path.Count > 0 && dir.Next != 0xFA && dir.Next != 0xF9 && dir.Next != 0xF8 && dir.Next != 0xFD)
+			{
+				int reverseDir = GetReverseDir(dir.Path.Last().Direction);
+				return pathData[dir.Next].Directions[reverseDir];
+			}
+			
+			return null;
+		}
+		
+		void RemoveReversePath(WorldPathDirection dir)
+		{
+			var reverseDir = GetReverseDir(dir);
+			if (reverseDir != null && reverseDir != dir && dir == GetReverseDir(reverseDir))
+			{
+				reverseDir.Path.Clear();
+			}
+		}
+		
+		#endregion
 	}
 }
