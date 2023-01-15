@@ -371,7 +371,7 @@ namespace WLEditor
 					pathMode = pathMode == 2 ? 0 : 2;
 					return true;
 					
-				case Keys.T:
+				case Keys.X:
 					if (currentDirection != -1)
 					{
 						SetExit();
@@ -381,7 +381,7 @@ namespace WLEditor
 					}
 					return true;
 				
-				case Keys.R:
+				case Keys.F:
 					if (currentDirection != -1)
 					{
 						SetProgress();
