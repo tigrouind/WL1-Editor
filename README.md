@@ -3,11 +3,9 @@
 This a level editor for Super Mario Land 3 / WarioLand 1 (1993).
 
 ## Features
-- edit level blocks
-- edit object data (enemies / power-ups)
-- rom expansion (for level blocks only)
-- edit level headers / sectors / warps 
+- edit levels (tiles / enemies / sectors / warps)
 - edit world maps and overworld (tiles / events / paths)
+- rom expansion (for level tiles only)
 
 ## How to use 
 Click on "File" > "Load". Select a valid WL1 rom.
@@ -22,7 +20,7 @@ In the editor, near the sector number, a label "S.." indicate if sector will war
 
 <kbd>Middle-click</kbd> on a sector to select it. If selected sector is associated with a warp (usually there is a door in it), it will load related tiles and enemies.
 
-### Editing level blocks
+### Editing level tiles
 Toolbox must be active (go to "View" > "Toolbox" or press <kbd>F1</kbd>). Select "16x16 Tiles" view.
 - Select a tile in the toolbox by clicking on it.
 - Then, click inside level view. 
@@ -105,8 +103,8 @@ Events allows to update map tiles depending current game progress (eg: paths, la
 | <kbd>Shift</kbd> + <kbd>Delete</kbd>  | Delete all paths in all directions.
 | <kbd>I</kbd>  | Enable / disable hidden path. Next path segment will be set as hidden (eg: player won't be visible when walking on that path segment).
 | <kbd>W</kbd>  | Enable / disable underwater path mode. 
-| <kbd>R</kbd> | Set progress required to take that path. A direction must be selected. A number is shown near level to indicate progression required. Nothing shown means no progress is required.
-| <kbd>T</kbd> | Set end of path exit target. A = Overworld. B = Sherbet Land. C = Mt Teapot.
+| <kbd>F</kbd> | Set progress required to take that path. A direction must be selected. A number is shown near level to indicate progression required. Nothing shown means no progress is required.
+| <kbd>X</kbd> | Set end of path exit target. A = Overworld. B = Sherbet Land. C = Mt Teapot.
 
 Tips for paths : 
 
