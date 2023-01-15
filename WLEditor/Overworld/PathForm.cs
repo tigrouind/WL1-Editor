@@ -634,10 +634,8 @@ namespace WLEditor
 			foreach (var pos in startPositionData[currentWorld])
 			{
 				int posX, posY;
-				if (FindExitPosition(pos[2], out posX, out posY))
-				{
-					Map.SaveStartPosition(rom, posX, posY, FindClosestSide(posX, posY), pos[0], pos[1]);
-				}
+				FindExitPosition(pos[2], out posX, out posY);
+				Map.SaveStartPosition(rom, posX, posY, FindClosestSide(posX, posY), pos[0], pos[1]);
 			}
 		}
 		
@@ -658,21 +656,21 @@ namespace WLEditor
 			return bestSide;
 		}		
 		
-		bool FindExitPosition(int startLevel, out int posX, out int posY)
+		void FindExitPosition(int startLevel, out int posX, out int posY)
 		{
 			int level = levels[currentWorld][startLevel];
 			
-			var item = pathData[level];				
-			foreach(var dir in item.Directions
-			        .Where(x => x.Path.Count > 0 && (x.Next == 0xFD || x.Next == 0xFA || x.Next == 0xF9 || x.Next == 0xF8)))
+			var item = pathData[level];	
+			var dir = item.Directions.FirstOrDefault(x => x.Path.Count > 0 && (x.Next == 0xFD || x.Next == 0xFA || x.Next == 0xF9 || x.Next == 0xF8));
+			if (dir != null)
 			{
 				GetPathPosition(item, dir, out posX, out posY);					
-				return true;
 			}
-			
-			posX = -1;
-			posY = -1;
-			return false;
+			else
+			{			
+				posX = item.X;
+				posY = item.Y;
+			}
 		}
 		
 		void BindPaths()
