@@ -12,8 +12,10 @@ namespace WLEditor
 		WorldPath[] worldData;	
 		WorldPath[] overWorldData;
 
-		int currentPath;
-		int currentDirection = -1;
+		WorldPath currentPath;
+		WorldPathDirection currentDirection;
+		int currentLevel;
+		
 		int pathMode;		
 		const int gridSnap = 4;
 
@@ -45,6 +47,8 @@ namespace WLEditor
 			new int[][] { new int[] { 0x5527, 0x608D, 0 } },
 			new int[][] { new int[] { 0x5539, 0x6081, 0 } }
 		};
+		
+		readonly Color[] pathColors = { Color.Lime, Color.Red, Color.Blue, Color.MediumSeaGreen, Color.Brown, Color.SteelBlue };
 		
 		public event EventHandler PathChanged;
 		
@@ -92,39 +96,37 @@ namespace WLEditor
 		public void LoadWorld(int world)
 		{			
 			currentWorld = world;
-			currentPath = 0;
-			currentDirection = -1;
+			currentLevel = levels[currentWorld][0];
+			currentPath = pathData[currentLevel];
+			currentDirection = null;
 		}
 		
 		#region Commands
 		
 		void AddPath(Keys key)
 		{		
-			int level = levels[currentWorld][currentPath];
-		
 			//set direction if needed
-			if (currentDirection == -1)
+			if (currentDirection == null)
 			{							
-				currentDirection = GetDirection(key);
+				currentDirection = currentPath.Directions[GetDirection(key)];
 			}
 			
-			var dir = pathData[level].Directions[currentDirection];	
-			UnbindPath(dir);
+			UnbindPath(currentDirection);
 			
 			//check previous step
 			int newDir = GetDirection(key);
-			int previousDir = dir.Path.Count > 0 ? dir.Path.Last().Direction : -1;
+			int previousDir = currentDirection.Path.Count > 0 ? currentDirection.Path.Last().Direction : -1;
 
-			if (previousDir == newDir && GroupPath(dir.Path.Last().Status) == pathMode && dir.Path.Last().Steps < (256 - gridSnap))
+			if (previousDir == newDir && GroupPath(currentDirection.Path.Last().Status) == pathMode && currentDirection.Path.Last().Steps < (256 - gridSnap))
 			{							
-				dir.Path.Last().Steps += gridSnap;
+				currentDirection.Path.Last().Steps += gridSnap;
 			}						
 			else if ((previousDir == 0 && newDir == 1) || (previousDir == 1 && newDir == 0) || //opposite direction
 			         (previousDir == 2 && newDir == 3) || (previousDir == 3 && newDir == 2)) 
 			{				
-				if (dir.Path.Last().Steps > gridSnap)
+				if (currentDirection.Path.Last().Steps > gridSnap)
 				{
-					dir.Path.Last().Steps -= gridSnap;
+					currentDirection.Path.Last().Steps -= gridSnap;
 				}
 				else
 				{
@@ -133,10 +135,10 @@ namespace WLEditor
 			}
 			else
 			{
-				dir.Path.Add(new WorldPathSegment 
+				currentDirection.Path.Add(new WorldPathSegment 
              	{
 	             	Direction = newDir, 
-	             	Status = GetStatus(newDir),
+	             	Status = GetStatus(newDir, new [] { 0, 14, 12 }[pathMode]),
 	             	Steps = gridSnap 
 				});
 			}
@@ -144,77 +146,71 @@ namespace WLEditor
 		
 		void RemovePath()
 		{
-			int level = levels[currentWorld][currentPath];
-			var dir = pathData[level].Directions[currentDirection];
-						
-			dir.Path.RemoveAt(dir.Path.Count - 1);
-			UnbindPath(dir);
+			currentDirection.Path.RemoveAt(currentDirection.Path.Count - 1);
+			UnbindPath(currentDirection);
 			
-			if (dir.Path.Count == 0)
+			if (currentDirection.Path.Count == 0)
 			{
-				currentDirection = -1;
-				dir.Progress = 0xFD;
+				currentDirection.Progress = 0xFD;
+				currentDirection = null;				
 				pathMode = 0;
 			}					
 			else 
 			{
-				pathMode = GroupPath(dir.Path.Last().Status);
+				pathMode = GroupPath(currentDirection.Path.Last().Status);
 			}
 		}
 		
 		void RemoveAllPaths()
 		{
-			int level = levels[currentWorld][currentPath];
-			foreach(var dir in pathData[level].Directions)
+			foreach(var dir in currentPath.Directions)
 			{
 				dir.Path.Clear();
 				UnbindPath(dir);
 				dir.Progress = 0xFD;
 			}
 			
-			currentDirection = -1;
+			currentDirection = null;
 			pathMode = 0;
 		}
 		
 		void MoveLevel(Keys key)
 		{
-			//align on grid
-			int currentLevel = levels[currentWorld][currentPath];
-			var item = pathData[currentLevel];
-			int posX = item.X / gridSnap * gridSnap;
-			int posY = item.Y / gridSnap * gridSnap;
+			//align on grid		
+			int posX = currentPath.X / gridSnap * gridSnap;
+			int posY = currentPath.Y / gridSnap * gridSnap;
 			
 			switch(key)
 			{
 				case Keys.Up:
-					item.Y = Math.Max(posY - gridSnap, 0);
+					currentPath.Y = Math.Max(posY - gridSnap, 0);
 					break;
 					
 				case Keys.Down:
-					item.Y = Math.Min(posY + gridSnap, currentMapY - 8);
+					currentPath.Y = Math.Min(posY + gridSnap, currentMapY - 8);
 					break;
 					
 				case Keys.Left:
-					item.X = Math.Max(posX - gridSnap, 0);
+					currentPath.X = Math.Max(posX - gridSnap, 0);
 					break;
 					
 				case Keys.Right:
-					item.X = Math.Min(posX + gridSnap, currentMapX - 8);
+					currentPath.X = Math.Min(posX + gridSnap, currentMapX - 8);
 					break;
 			}
 			
 			if (currentWorld == 8)
 			{
-				item.FlagX = item.X + 20;
-				item.FlagY = item.Y;
+				currentPath.FlagX = currentPath.X + 20;
+				currentPath.FlagY = currentPath.Y;
 			}
 			else
 			{
-				item.TreasureX = item.X + 4;
-				item.TreasureY = item.Y + 4;
+				currentPath.TreasureX = currentPath.X + 4;
+				currentPath.TreasureY = currentPath.Y + 4;
 			}
 			
-			foreach (var dir in pathData[currentLevel].Directions)
+			foreach (var dir in currentPath.Directions)
 			{
 				UnbindPath(dir);
 			}
@@ -234,53 +230,50 @@ namespace WLEditor
 		
 		void SetExit()
 		{
-			int level = levels[currentWorld][currentPath];
-			var dir = pathData[level].Directions[currentDirection];	
 			if (currentWorld == 8)
 			{
-				dir.Next = 0xF8;
+				currentDirection.Next = 0xF8;
 			}
 			else
 			{
 				int[] exits = { 0xFD, 0xFA, 0xF9 };
-				int next = Array.IndexOf(exits, dir.Next);
-				dir.Next = exits[(next + 1) % exits.Length];
+				int next = Array.IndexOf(exits, currentDirection.Next);
+				currentDirection.Next = exits[(next + 1) % exits.Length];
 			}		
 		}
 		
 		void SetProgress()
-		{
-			int level = levels[currentWorld][currentPath];
-			var dir = pathData[level].Directions[currentDirection];
-				
+		{			
 			int[] flags = { 0xFD, 1, 2, 4, 8, 16, 32 };
-			int progress = Array.IndexOf(flags, dir.Progress);			
-			dir.Progress = flags[(progress + 1) % flags.Length];
+			int progress = Array.IndexOf(flags, currentDirection.Progress);			
+			currentDirection.Progress = flags[(progress + 1) % flags.Length];
 		}
 		
 		void ChangeDirection(Keys key)
 		{
-			int newDir = GetDirection(key);
-			int level = levels[currentWorld][currentPath];
-			var dir = pathData[level].Directions[newDir];
-			if (dir.Path.Count > 0)
+			var newDir = GetDirection(key);
+			currentDirection = currentPath.Directions[newDir];
+			
+			if (currentDirection.Path.Count > 0)
 			{
-				currentDirection = newDir;							
-				pathMode = GroupPath(dir.Path.Last().Status);
+				pathMode = GroupPath(currentDirection.Path.Last().Status);
 			}
 			else
 			{
-				currentDirection = -1;
+				currentDirection = null;
 				pathMode = 0;
 			}
 		}
 		
 		void NextLevel()
 		{
-			if (currentPath < levels[currentWorld].Length - 1)
-			{
-				currentPath++;
-				currentDirection = -1;
+			int level = Array.IndexOf(levels[currentWorld], currentLevel);
+			if (level < levels[currentWorld].Length - 1)
+			{		
+				currentDirection = null;				
+				currentLevel = levels[currentWorld][level + 1];
+				currentPath = pathData[currentLevel];
+				
 				pathMode = 0;
 				pictureBox.Invalidate();
 			}
@@ -288,10 +281,13 @@ namespace WLEditor
 		
 		void PreviousLevel()
 		{
-			if (currentPath > 0)
+			int level = Array.IndexOf(levels[currentWorld], currentLevel);
+			if (level > 0)
 			{
-				currentPath--;
-				currentDirection = -1;
+				currentDirection = null;
+				currentLevel = levels[currentWorld][level - 1];
+				currentPath = pathData[currentLevel];
+				
 				pathMode = 0;
 				pictureBox.Invalidate();
 			}
@@ -326,7 +322,7 @@ namespace WLEditor
 						pictureBox.Invalidate();
 						SetChanges();						
 					}
-					else if (currentDirection != -1)
+					else if (currentDirection != null)
 					{
 						RemovePath();
 						BindPaths();						
@@ -372,7 +368,7 @@ namespace WLEditor
 					return true;
 					
 				case Keys.X:
-					if (currentDirection != -1)
+					if (currentDirection != null)
 					{
 						SetExit();
 						
@@ -382,7 +378,7 @@ namespace WLEditor
 					return true;
 				
 				case Keys.F:
-					if (currentDirection != -1)
+					if (currentDirection != null)
 					{
 						SetProgress();
 						
@@ -415,14 +411,15 @@ namespace WLEditor
 			return -1;
 		}
 		
-		int GetStatus(int newDir)
+		int GetStatus(int newDir, int status)
 		{
-			switch (pathMode)
+			switch (status)
 			{
-				case 1: //invisible
+				case 14: //invisible
 					return 14;
 					
-				case 2: //water
+				case 12: //water
+				case 13: //water
 					if (newDir == 2) //up
 					{
 						return 13; //water back
@@ -455,23 +452,21 @@ namespace WLEditor
 				format.LineAlignment = StringAlignment.Center;
 				format.Alignment = StringAlignment.Center;
 
-				int currentLevel = levels[currentWorld][currentPath];
-				int next = currentDirection != -1 ? pathData[currentLevel].Directions[currentDirection].Next : -1;
+				int next = currentDirection == null ? -1 : currentDirection.Next;
 				
-				for (int i = 0 ; i < levels[currentWorld].Length ; i++)
+				foreach(var level in levels[currentWorld].OrderBy(x => x == currentLevel))
 				{
-					var level = levels[currentWorld][i];
 					var item = pathData[level];
 					int posX = item.X;
 					int posY = item.Y;
 							
-					bool selected = currentPath == i;
+					bool selected = currentPath == item;
 					bool connected = level == next;
 					
 					g.DrawEllipse(pen, posX * zoom, posY * zoom, 8 * zoom, 8 * zoom);
 					g.FillEllipse(selected || connected ? Brushes.Lime : Brushes.MediumSeaGreen, posX * zoom, posY * zoom, 8 * zoom, 8 * zoom);
 					
-					g.DrawString((i + 1).ToString(), font, Brushes.Black, (posX + 4) * zoom, (posY + 4) * zoom, format);
+					g.DrawString((Array.IndexOf(levels[currentWorld], level) + 1).ToString(), font, Brushes.Black, (posX + 4) * zoom, (posY + 4) * zoom, format);
 				}
 			}
 		}
@@ -485,20 +480,16 @@ namespace WLEditor
 				format.LineAlignment = StringAlignment.Center;
 				format.Alignment = StringAlignment.Center;
 				
-				int level = levels[currentWorld][currentPath];
-				var currentDir = currentDirection != -1 ? pathData[level].Directions[currentDirection] : null;
-				
-				var item = pathData[level];
-				foreach (var dir in item.Directions.Where(x => x.Path.Count > 0 && (x.Next == 0xFD || x.Next == 0xFA || x.Next == 0xF9 || x.Next == 0xF8)))
+				foreach (var dir in currentPath.Directions.Where(x => x.Path.Count > 0 && (x.Next == 0xFD || x.Next == 0xFA || x.Next == 0xF9 || x.Next == 0xF8)))
 				{			
 					int nextX, nextY;
-					GetPathPosition(item, dir, out nextX, out nextY);	
+					GetPathPosition(currentPath, dir, out nextX, out nextY);	
 					
 					int exitX = Math.Max(0, Math.Min(nextX, currentMapX - 8));
                  	int exitY = Math.Max(0, Math.Min(nextY, currentMapY - 8));
                  	int[] flags = { 0xFD, 0xFA, 0xF9, 0xF8 };
 					
-                 	bool selected = currentDir == dir;
+                 	bool selected = currentDirection == dir;
 					g.DrawEllipse(penBorder, exitX * zoom, exitY * zoom, 8 * zoom, 8 * zoom);
 					g.FillEllipse(selected ? Brushes.Lime : Brushes.MediumSeaGreen, exitX * zoom, exitY * zoom, 8 * zoom, 8 * zoom);
 					g.DrawString(new [] { "A", "B", "C", "C" } [Array.IndexOf(flags, dir.Next)], font, Brushes.Black, (exitX + 4) * zoom, (exitY + 4) * zoom, format);
@@ -507,16 +498,12 @@ namespace WLEditor
 		}
 				
 		void DrawPaths(Graphics g)
-		{						
-			int level = levels[currentWorld][currentPath];
-			var item = pathData[level];
-			var currentDir = currentDirection != -1 ? item.Directions[currentDirection] : null;
-			
-			foreach (var dirs in item.Directions.Where(x => x.Path.Count > 0).OrderBy(x => currentDir == x))
+		{							
+			foreach (var dirs in currentPath.Directions.Where(x => x.Path.Count > 0).OrderBy(x => currentDirection == x))
 			{					
-				int startX = item.X;
-				int startY = item.Y;								
-				bool selected = currentDir == dirs;
+				int startX = currentPath.X;
+				int startY = currentPath.Y;								
+				bool selected = currentDirection == dirs;
 				
 				List<Point> points = new List<Point>();
 				List<Color> colors = new List<Color>();
@@ -527,7 +514,7 @@ namespace WLEditor
 					GetPathPosition(path, ref startX, ref startY);
 					points.Add(new Point((startX + 4) * zoom, (startY + 4) * zoom));				
 					
-					Color color = new[] { Color.Lime, Color.Red, Color.Blue, Color.MediumSeaGreen, Color.Brown, Color.SteelBlue }[GroupPath(path.Status) + (selected ? 0 : 3)];
+					Color color = pathColors[GroupPath(path.Status) + (selected ? 0 : 3)];
 					colors.Add(color);
 				}	
 				
@@ -600,9 +587,6 @@ namespace WLEditor
 				format.LineAlignment = StringAlignment.Center;
 				format.Alignment = StringAlignment.Center;
 				
-				int level = levels[currentWorld][currentPath];
-				var item = pathData[level];
-				
 				int[][] offsets =
 				{
 					new int[] {  8,  0 },
@@ -613,15 +597,15 @@ namespace WLEditor
 								
 				for (int dir = 0 ; dir < 4; dir++)
 				{					
-					var dirs = item.Directions[dir];					
+					var dirs = currentPath.Directions[dir];					
 					if (dirs.Path.Count > 0 && dirs.Progress != 0xFD)
 					{
 						int[] progressFlags = { 0, 1, 2, 4, 8, 16, 32 };
 						int progress = Array.IndexOf(progressFlags, dirs.Progress);
 						
 						var offset = offsets[dir];
-						g.FillRectangle(Brushes.Gray, (item.X + offset[0]) * zoom, (item.Y + offset[1]) * zoom, 8 * zoom, 8 * zoom);
-						g.DrawString(progress.ToString(), font, Brushes.White, (item.X + 4 + offset[0]) * zoom, (item.Y + 4 + offset[1]) * zoom, format);
+						g.FillRectangle(Brushes.Gray, (currentPath.X + offset[0]) * zoom, (currentPath.Y + offset[1]) * zoom, 8 * zoom, 8 * zoom);
+						g.DrawString(progress.ToString(), font, Brushes.White, (currentPath.X + 4 + offset[0]) * zoom, (currentPath.Y + 4 + offset[1]) * zoom, format);
 					}
 				}
 			}
