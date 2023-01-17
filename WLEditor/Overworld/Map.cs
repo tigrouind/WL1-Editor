@@ -20,7 +20,7 @@ namespace WLEditor
 			new int[] { 0x57C3, 0x57B6 },
 		};
 		
-		#region World tiles
+		#region World 8x8 tiles
 		
 		static void RLEDecompressTiles(Rom rom, int tilesdata, byte[] decompressed)
 		{
@@ -88,7 +88,7 @@ namespace WLEditor
 					}
 					
 					yield return repeat;
-					yield return (byte)(data);					
+					yield return (byte)data;					
 				}
 				else
 				{
@@ -164,6 +164,10 @@ namespace WLEditor
 				return (sbyte)rom.ReadByte(0x4F13 + value % 16);
 			}			 
 		}
+		
+		#endregion
+		
+		#region World tiles
 		
 		public static void LoadTiles(Rom rom, int bank, int tileAddress, byte[] data)
 		{
@@ -312,7 +316,7 @@ namespace WLEditor
 					{
 						Progress = 0xFD, 
 						Path = new List<WorldPathSegment>(), 
-						Next = level 
+						Next = overWorld ? 0xF8 : 0xFD 
 					};
 					
 					if ((dirFlag & (1 << (dir + 4))) != 0)

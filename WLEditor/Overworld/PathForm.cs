@@ -314,10 +314,6 @@ namespace WLEditor
 				case Keys.PageDown:
 					PreviousLevel();
 					return true;
-					
-				case Keys.Home:
-				case Keys.End:
-					return true;
 						
 				case Keys.Delete:
 					if (shift)
