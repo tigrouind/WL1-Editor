@@ -32,6 +32,8 @@ namespace WLEditor
 		bool selectionMode;
 		
 		byte[] worldTiles = new byte[32 * 32];
+		int[] previousWorldTiles = new int[32 * 32];
+		bool[] invalidTiles = new bool[16 * 16];
 		
 		readonly PathForm pathForm;
 		readonly EventForm eventForm;
@@ -118,9 +120,21 @@ namespace WLEditor
 			selection.ClearUndo();
 			
 			UpdateTitle();			
+			ClearAllTiles();
 			RenderMap();
 		}
 			
+		void ClearAllTiles()
+		{			
+			for(int y = 0 ; y < currentMapY ; y++)
+			{
+				for(int x = 0 ; x < currentMapX ; x++)
+				{
+					previousWorldTiles[x + y * 32] = -1;
+				}
+			}
+		}
+		
 		void LoadWorldCombobox()
 		{
 			WorldComboBox.Items.Clear();
@@ -366,15 +380,19 @@ namespace WLEditor
 			{
 				for(int x = 0 ; x < currentMapX ; x++)
 				{
-					int tileIndex = worldTiles[x + y * 32];					
-					Dump8x8Tile(new Point(x * 8, y * 8), tileIndex ^ 0x80, tilesWorld);
+					byte tileIndex = (byte)(worldTiles[x + y * 32] ^ 0x80);
+					int previousTileIndex = previousWorldTiles[x + y * 32];
+					if (tileIndex != previousTileIndex || (currentWorld == 7 && y < 7))
+					{
+						previousWorldTiles[x + y * 32] = tileIndex;
+						Dump8x8Tile(new Point(x * 8, y * 8), tileIndex, tilesWorld);
+					}
 				}			
 			}
 		}	
 		
 		void RenderMap()
 		{
-			Array.Clear(tilesWorld.Bits, 0, tilesWorld.Bits.Length);
 			RenderTiles();	
 			ScrollLines();
 			
@@ -635,6 +653,11 @@ namespace WLEditor
 			0x518D, 54,
 		};
 				
+		readonly int[] animationOverworld = 
+		{
+			0x46F6, 42 
+		};
+		
 		public void TimerTick()
 		{	
 			timerTicks++;
@@ -651,6 +674,7 @@ namespace WLEditor
 						{
 							animationIndex++;
 							DumpAnimatedTiles();	
+							InvalidateAnimatedTiles();
 							RenderMap();			
 						}
 						break;
@@ -677,6 +701,8 @@ namespace WLEditor
 		
 		void DumpAnimatedTiles()
 		{
+			Array.Clear(invalidTiles, 0, invalidTiles.Length);
+			
 			switch (currentWorld)
 			{
 				case 0:
@@ -684,6 +710,7 @@ namespace WLEditor
 					for (int i = 0; i < 10; i++)
 					{
 						Map.DumpAnimatedTilesA(rom, animationSea[i * 2], animationSea[i * 2 + 1], tilesWorld8x8, animationIndex % 6, 6);					
+						invalidTiles[animationSea[i * 2 + 1]] = true;
 					}
 					break;
 					
@@ -692,6 +719,7 @@ namespace WLEditor
 					{
 						int index = i + (animationIndex % 2) * 4;
 						Map.DumpAnimatedTilesB(rom, animationLava[index * 2], animationLava[index * 2 + 1], tilesWorld8x8);
+						invalidTiles[animationLava[i * 2 + 1]] = true;
 					}
 					break;
 					
@@ -700,13 +728,30 @@ namespace WLEditor
 					{
 						int index = i + (animationIndex % 2) * 2;
 						Map.DumpAnimatedTilesB(rom, animationWater[index * 2], animationWater[index * 2 + 1], tilesWorld8x8);
+						invalidTiles[animationWater[i * 2 + 1]] = true;
 					}
 					break;
 										
 				case 8:
-					Map.DumpAnimatedTilesA(rom, 0x46F6, 42, tilesWorld8x8, animationIndex % 8, 8);
+					Map.DumpAnimatedTilesA(rom, animationOverworld[0], animationOverworld[1], tilesWorld8x8, animationIndex % 8, 8);
+					invalidTiles[animationOverworld[1]] = true;
 					break;					
 			}						
+		}
+		
+		void InvalidateAnimatedTiles()
+		{
+			for(int y = 0 ; y < currentMapY ; y++)
+			{
+				for(int x = 0 ; x < currentMapX ; x++)
+				{
+					var previousTile = previousWorldTiles[x + y * 32];
+					if (invalidTiles[previousTile])
+					{
+						previousWorldTiles[x + y * 32] = -1;
+					}
+				}
+			}
 		}
 		
 		void ScrollLines()
