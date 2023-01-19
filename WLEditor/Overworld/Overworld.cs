@@ -148,7 +148,7 @@ namespace WLEditor
 		{
 			if (!ignoreEvents)
 			{				
-				if (!SaveChanges())
+				if (!SaveChanges(~4))
 				{
 					ignoreEvents = true;
 					WorldComboBox.SelectedIndex = currentWorld;
@@ -165,52 +165,66 @@ namespace WLEditor
 		
 		public bool SaveChanges()
 		{
-			if (hasChanges != 0)
+			return SaveChanges(~0);
+		}
+		
+		bool SaveChanges(int flags)
+		{
+			string message;				
+			if (((hasChanges & flags) & 1) != 0)
 			{
-				string message;				
-				if ((hasChanges & 1) != 0)
+				//improve tile compression
+				if (currentWorld != 8)
 				{
-					//improve tile compression
-					if (currentWorld != 8)
-					{
-						for (int y =  0; y < 17; y++)	
-						{
-							var data = worldTiles[19 + y * 32];
-							for (int x = 20; x < 32; x++)
-							{
-								worldTiles[x + y * 32] = data;
-							}
-						}
-					}
-					
-					var worldInfo = worldData[currentWorld].Value;					
-					if (!Map.SaveTiles(rom, worldInfo[2], worldInfo[3],
-					                   currentWorld == 8 ? worldTiles : worldTiles.Take(564).ToArray(), worldInfo[4], out message))
-					{									
-						MessageBox.Show(message, Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
-						return false;
-					}					
+					CopyTilesOnTheRightSide();
 				}
 				
-				hasChanges &= ~1;
+				var worldInfo = worldData[currentWorld].Value;					
+				if (!Map.SaveTiles(rom, worldInfo[2], worldInfo[3],
+				                   currentWorld == 8 ? worldTiles : worldTiles.Take(564).ToArray(), worldInfo[4], out message))
+				{									
+					MessageBox.Show(message, Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
+					return false;
+				}					
 				
-				if ((hasChanges & 2) != 0 && !eventForm.SaveEvents(rom, out message))
+				hasChanges &= ~1;
+			}
+			
+			if (((hasChanges & flags) & 2) != 0)
+			{
+				if (!eventForm.SaveEvents(rom, out message))
 				{
 					MessageBox.Show(message, Text, MessageBoxButtons.OK, MessageBoxIcon.Error);										
 					return false;
 				}
 				
 				hasChanges &= ~2;
-				
-				if ((hasChanges & 4) != 0 && !pathForm.SavePaths(rom, out message))
+			}
+			
+			if (((hasChanges & flags) & 4) != 0)
+			{
+				if (!pathForm.SavePaths(rom, out message))
 				{
 					MessageBox.Show(message, Text, MessageBoxButtons.OK, MessageBoxIcon.Error);										
 					return false;
 				}					
-
+				
 				hasChanges &= ~4;				
 			}
+
 			return true;
+		}
+		
+		void CopyTilesOnTheRightSide()
+		{
+			for (int y =  0; y < 17; y++)	
+			{
+				var data = worldTiles[19 + y * 32];
+				for (int x = 20; x < 32; x++)
+				{
+					worldTiles[x + y * 32] = data;
+				}
+			}
 		}
 		
 		void PictureBox1Paint(object sender, PaintEventArgs e)

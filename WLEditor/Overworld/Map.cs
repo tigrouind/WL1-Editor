@@ -182,7 +182,7 @@ namespace WLEditor
 			
 			if (compressedData.Length > maxSize)
 			{
-				errorMessage = string.Format("World data is too big to fit in ROM.\r\n Please free at least {0} byte(s).", compressedData.Length - maxSize);
+				errorMessage = string.Format("Tile data is too big to fit in ROM.\r\n Please free at least {0} byte(s).", compressedData.Length - maxSize);
 				return false;
 			}
 			
@@ -400,7 +400,7 @@ namespace WLEditor
 			
 			if (bytesToFree > 0)
 			{
-				errorMessage = string.Format("Path data is too big to fit in ROM. Please free at least {0} byte(s).", bytesToFree);
+				errorMessage = string.Format("Path data is too big to fit in ROM. Please free at least {0} byte(s) in any world.", bytesToFree);
 				return false;
 			}			
 						
