@@ -28,12 +28,12 @@ namespace WLEditor
 			new int[] { 7, 15, 14, 12, 25, 41 },
 			new int[] { 7, 15, 14, 12, 25, 41 },
 			new int[] { 6, 16, 13, 5, 17, 9 },
+			new int[] { 33, 2, 4, 8, 32, 24 },
 			new int[] { 3, 21, 22, 39, 27, 28 },
 			new int[] { 0, 30, 31, 11, 20 },
 			new int[] { 38, 29, 1, 19, 18, 26 },
-			new int[] { 33, 2, 4, 8, 32, 24 },
 			new int[] { 37, 34, 35, 40 },
-			new int[] { 0, 1, 2, 4, 3, 5, 6, 7 }
+			new int[] { 0, 1, 5, 2, 4, 3, 6, 7 }
 		};
 		
 		readonly int[][][] startPositionData = new int[][][]
@@ -41,10 +41,10 @@ namespace WLEditor
 			new int[][] { new int[] { 0x5558, 0x6075, 0 } },
 			new int[][] { new int[] { 0x5558, 0x6075, 0 } },
 			new int[][] { new int[] { 0x554C, 0x0000, 0 }, new int[] { 0x5552, 0x6095, 1 } },
+			new int[][] { new int[] { 0x5527, 0x608D, 0 } },
 			new int[][] { new int[] { 0x553F, 0x607D, 0 } },
 			new int[][] { new int[] { 0x552D, 0x6089, 0 } },
 			new int[][] { new int[] { 0x5533, 0x6085, 0 } },
-			new int[][] { new int[] { 0x5527, 0x608D, 0 } },
 			new int[][] { new int[] { 0x5539, 0x6081, 0 } }
 		};
 		
