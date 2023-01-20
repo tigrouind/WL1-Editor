@@ -23,29 +23,29 @@ namespace WLEditor
 		int currentWorld;
 		readonly PictureBox pictureBox;
 				
-		readonly int[][] levels = new int[][]
+		readonly int[][] levels =
 		{
-			new int[] { 7, 15, 14, 12, 25, 41 },
-			new int[] { 7, 15, 14, 12, 25, 41 },
-			new int[] { 6, 16, 13, 5, 17, 9 },
-			new int[] { 33, 2, 4, 8, 32, 24 },
-			new int[] { 3, 21, 22, 39, 27, 28 },
-			new int[] { 0, 30, 31, 11, 20 },
-			new int[] { 38, 29, 1, 19, 18, 26 },
-			new int[] { 37, 34, 35, 40 },
-			new int[] { 0, 1, 5, 2, 4, 3, 6, 7 }
+			new [] { 7, 15, 14, 12, 25, 41 },
+			new [] { 7, 15, 14, 12, 25, 41 },
+			new [] { 6, 16, 13, 5, 17, 9 },
+			new [] { 33, 2, 4, 8, 32, 24 },
+			new [] { 3, 21, 22, 39, 27, 28 },
+			new [] { 0, 30, 31, 11, 20 },
+			new [] { 38, 29, 1, 19, 18, 26 },
+			new [] { 37, 34, 35, 40 },
+			new [] { 0, 1, 5, 2, 4, 3, 6, 7 }
 		};
 		
-		readonly int[][][] startPositionData = new int[][][]
+		readonly int[][][] startPositionData =
 		{
-			new int[][] { new int[] { 0x5558, 0x6075, 0 } },
-			new int[][] { new int[] { 0x5558, 0x6075, 0 } },
-			new int[][] { new int[] { 0x554C, 0x0000, 0 }, new int[] { 0x5552, 0x6095, 1 } },
-			new int[][] { new int[] { 0x5527, 0x608D, 0 } },
-			new int[][] { new int[] { 0x553F, 0x607D, 0 } },
-			new int[][] { new int[] { 0x552D, 0x6089, 0 } },
-			new int[][] { new int[] { 0x5533, 0x6085, 0 } },
-			new int[][] { new int[] { 0x5539, 0x6081, 0 } }
+			new [] { new [] { 0x5558, 0x6075, 0 } },
+			new [] { new [] { 0x5558, 0x6075, 0 } },
+			new [] { new [] { 0x554C, 0x0000, 0 }, new [] { 0x5552, 0x6095, 1 } },
+			new [] { new [] { 0x5527, 0x608D, 0 } },
+			new [] { new [] { 0x553F, 0x607D, 0 } },
+			new [] { new [] { 0x552D, 0x6089, 0 } },
+			new [] { new [] { 0x5533, 0x6085, 0 } },
+			new [] { new [] { 0x5539, 0x6081, 0 } }
 		};
 		
 		readonly Color[] pathColors = { Color.Lime, Color.Red, Color.Blue, Color.MediumSeaGreen, Color.Brown, Color.SteelBlue };
@@ -588,12 +588,12 @@ namespace WLEditor
 				format.LineAlignment = StringAlignment.Center;
 				format.Alignment = StringAlignment.Center;
 				
-				int[][] offsets =
+				int[,] offsets =
 				{
-					new int[] {  8,  0 },
-					new int[] { -8,  0 },
-					new int[] {  0, -8 },
-					new int[] {  0,  8 }
+					{  8,  0 },
+					{ -8,  0 },
+					{  0, -8 },
+					{  0,  8 }
 				};
 								
 				for (int dir = 0 ; dir < 4; dir++)
@@ -604,9 +604,8 @@ namespace WLEditor
 						int[] progressFlags = { 0, 1, 2, 4, 8, 16, 32 };
 						int progress = Array.IndexOf(progressFlags, dirs.Progress);
 						
-						var offset = offsets[dir];
-						g.FillRectangle(Brushes.Gray, (currentPath.X + offset[0]) * zoom, (currentPath.Y + offset[1]) * zoom, 8 * zoom, 8 * zoom);
-						g.DrawString(progress.ToString(), font, Brushes.White, (currentPath.X + 4 + offset[0]) * zoom, (currentPath.Y + 4 + offset[1]) * zoom, format);
+						g.FillRectangle(Brushes.Gray, (currentPath.X + offsets[dir, 0]) * zoom, (currentPath.Y + offsets[dir, 1]) * zoom, 8 * zoom, 8 * zoom);
+						g.DrawString(progress.ToString(), font, Brushes.White, (currentPath.X + 4 + offsets[dir, 0]) * zoom, (currentPath.Y + 4 + offsets[dir, 1]) * zoom, format);
 					}
 				}
 			}

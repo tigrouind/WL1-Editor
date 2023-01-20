@@ -21,46 +21,70 @@ namespace WLEditor
 		public event EventHandler EventChanged;
 		public event EventHandler EventIndexChanged;
 		
-		readonly int[][] eventPointersA = new int[][] //applied when map is show (ld bc, XXXX ld hl, XXXX)
+		readonly int[][][] eventPointers =  
 		{
-			new int[] { 0x68B9, 0x68C5, 0x68D1, 0x68DD, 0x68E9, 0x68F5 },
-			new int[] { 0x68DD },
-			new int[] { 0x69FB, 0x6A07, 0x6A13, 0x6A1F, 0x6A2B, 0x6A37, 0x6A43, 0x6A4F },
-			new int[] { 0x702F, 0x703B, 0x7047, 0x7053, 0x705F, 0x706B },
-			new int[] { 0x6BAB, 0x6BB7, 0x6BC3, 0x6BCF, 0x6BDB, 0x6BED },
-			new int[] { 0x6CE0, 0x6CEC, 0x6CF8, 0x6D04, 0x6D10 },
-			new int[] { 0x6DD3, 0x6DDF, 0x6DEB, 0x6DF7, 0x6E03, 0x6E0F, 0x6E27 },			
-			new int[] { 0x714B, 0x7157, 0x7163 },
-			new int[] { 0x66C6 },
+			new []
+			{
+				new [] { 0x68B9, 0x68C5, 0x68D1, 0x68DD, 0x68E9, 0x68F5 }, //applied when map is show    (ld bc, XXXX ld hl, XXXX)
+				new [] { 0x690F, 0x691B, 0x6927, 0x6933, 0x693F, 0x694B }, //applied after beating level (ld bc, XXXX ld hl, XXXX)
+				new [] { 0x770B, 0x770F, 0x7713, 0x7717, 0x771B },         //step by step animation for next path
+			},
+			new []
+			{
+				new [] { 0x68DD },
+				new [] { 0x6933 },
+				new [] { 0x7717 },
+			},
+			new []
+			{
+				new [] { 0x69FB, 0x6A07, 0x6A13, 0x6A1F, 0x6A2B, 0x6A37, 0x6A43, 0x6A4F },
+				new [] { 0x6A5C, 0x6A68, 0x6A74, 0x6A80, 0x6A8C, 0x6A98 },
+				new [] { 0x7743, 0x7747, 0x774B, 0x774F, 0x7753, 0x7757 },
+			},
+			new []
+			{
+				new [] { 0x702F, 0x703B, 0x7047, 0x7053, 0x705F, 0x706B },
+				new [] { 0x7084, 0x7090, 0x709C, 0x70A8, 0x70B4, 0x70C0 },
+				new [] { 0x77EB, 0x77EF, 0x77F3, 0x77F7, 0x77FB, 0x77FF },
+			},
+			new []
+			{
+				new [] { 0x6BAB, 0x6BB7, 0x6BC3, 0x6BCF, 0x6BDB, 0x6BED },
+				new [] { 0x6C00, 0x6C0C, 0x6C18, 0x6C24, 0x6C30 },
+				new [] { 0x777F, 0x7783, 0x7787, 0x778B, 0x778F },
+			},
+			new []
+			{
+				new [] { 0x6CE0, 0x6CEC, 0x6CF8, 0x6D04, 0x6D10 },
+				new [] { 0x6D2F, 0x6D3B, 0x6D47, 0x6D53 },
+				new [] { 0x77B7, 0x77BB, 0x77BF, 0x77C3 },
+			},
+			new []
+			{
+				new [] { 0x6DD3, 0x6DDF, 0x6DEB, 0x6DF7, 0x6E03, 0x6E0F, 0x6E27 },
+				new [] { 0x6E34, 0x6E40, 0x6E4C, 0x6E58, 0x6E64, 0x0000, 0x6E82 },
+				new [] { 0x7827, 0x782B, 0x782F, 0x7833, 0x7837 },
+			},
+			new []
+			{
+				new [] { 0x714B, 0x7157, 0x7163 },
+				new [] { 0x7173, 0x717F, 0x718B },
+				new [] { 0x785F },
+			},
+			new []
+			{
+				new [] { 0x66C6 }
+			},
 		};
 		
-		readonly int[][] eventPointersB = new int[][] //applied after beating level (ld bc, XXXX ld hl, XXXX)
+		readonly int[,] eventAddressOffset =
 		{
-			new int[] { 0x690F, 0x691B, 0x6927, 0x6933, 0x693F, 0x694B },
-			new int[] { 0x6933 },
-			new int[] { 0x6A5C, 0x6A68, 0x6A74, 0x6A80, 0x6A8C, 0x6A98 },
-			new int[] { 0x7084, 0x7090, 0x709C, 0x70A8, 0x70B4, 0x70C0 },			
-			new int[] { 0x6C00, 0x6C0C, 0x6C18, 0x6C24, 0x6C30 },
-			new int[] { 0x6D2F, 0x6D3B, 0x6D47, 0x6D53 },
-			new int[] { 0x6E34, 0x6E40, 0x6E4C, 0x6E58, 0x6E64, 0x0000, 0x6E82 },			
-			new int[] { 0x7173, 0x717F, 0x718B },
-			new int[] { },
+			{ 1, 4 }, 
+			{ 1, 4 }, 
+			{ 0, 2 } 
 		};
 		
-		readonly int[][] eventPointersC = new int[][] //step by step animation for next path
-		{
-			new int[] { 0x770B, 0x770F, 0x7713, 0x7717, 0x771B },
-			new int[] { 0x7717 },
-			new int[] { 0x7743, 0x7747, 0x774B, 0x774F, 0x7753, 0x7757 },
-			new int[] { 0x77EB, 0x77EF, 0x77F3, 0x77F7, 0x77FB, 0x77FF },
-			new int[] { 0x777F, 0x7783, 0x7787, 0x778B, 0x778F },
-			new int[] { 0x77B7, 0x77BB, 0x77BF, 0x77C3 },
-			new int[] { 0x7827, 0x782B, 0x782F, 0x7833, 0x7837 },			
-			new int[] { 0x785F },
-			new int[] { },
-		};	
-		
-		readonly int[] eventMaxSize = new int[]
+		readonly int[] eventMaxSize = 
 		{
 			150,
 			26,
@@ -94,17 +118,12 @@ namespace WLEditor
 			currentWorld = world;
 			eventId = 0;
 			eventStep = 0;
-			worldEvents = Map.LoadEvents(rom, eventPointersA[currentWorld]);				
+			worldEvents = Map.LoadEvents(rom, eventPointers[currentWorld][0]);
 		}
 		
 		public bool SaveEvents(Rom rom, out string message)
 		{
-			return Map.SaveEvents(rom, worldEvents,
-                new int[][][] {
-                   	new int[][] { eventPointersA[currentWorld], new [] { 1, 4 } },
-                   	new int[][] { eventPointersB[currentWorld], new [] { 1, 4 } },
-                   	new int[][] { eventPointersC[currentWorld], new [] { 0, 2 } }
-				},
+			return Map.SaveEvents(rom, worldEvents, eventPointers[currentWorld], eventAddressOffset,
 				eventMaxSize[currentWorld], out message);
 		}
 		

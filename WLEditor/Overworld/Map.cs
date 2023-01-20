@@ -9,15 +9,15 @@ namespace WLEditor
 		static uint[] paletteColors =  { 0xFFFFFFFF, 0xFFAAAAAA, 0xFF555555, 0xFF000000 };
 		static int[] directions = { 0xF0, 0xFE, 0xE0, 0xEE };
 		
-		static readonly int[][] flagsPosition = 
+		static readonly int[,] flagsPosition = 
 		{
-			new int[] { 0x56F5, 0x56E8 },
-			new int[] { 0x5719, 0x570C },
-			new int[] { 0x5738, 0x572B },
-			new int[] { 0x575C, 0x574F },
-			new int[] { 0x5780, 0x5773 },
-			new int[] { 0x57A4, 0x5797 },
-			new int[] { 0x57C3, 0x57B6 },
+			{ 0x56F5, 0x56E8 },
+			{ 0x5719, 0x570C },
+			{ 0x5738, 0x572B },
+			{ 0x575C, 0x574F },
+			{ 0x5780, 0x5773 },
+			{ 0x57A4, 0x5797 },
+			{ 0x57C3, 0x57B6 },
 		};
 		
 		#region World 8x8 tiles
@@ -229,7 +229,7 @@ namespace WLEditor
 		}
 		
 		public static bool SaveEvents(Rom rom, List<List<KeyValuePair<int, byte>>> events, 
-			int[][][] eventPointers, int maxSize, out string errorMessage)
+          	int[][] eventPointers, int[,] eventAddressOffset, int maxSize, out string errorMessage)
 		{			
 			int size = events.Sum(x => x.Sum(y => 3) + 2);
 			if (size > maxSize)
@@ -239,18 +239,19 @@ namespace WLEditor
 			}
 			
 			rom.SetBank(8);	
-			int position = rom.ReadWord(eventPointers[0][0][0] + eventPointers[0][1][0]);
+			int position = rom.ReadWord(eventPointers[0][0] + eventAddressOffset[0, 0]);
 			
 			for(int i = 0 ; i < events.Count; i++)
 			{				
 				var worldEvent = events[i];
 				
 				//fix pointers
-				foreach(var item in eventPointers)
+				for(int j = 0 ; j < eventPointers.GetLength(0) ; j++)
 				{
-					if (i < item[0].Length && item[0][i] != 0)
+					var item = eventPointers[j];
+					if (i < item.Length && item[i] != 0)
 					{
-						rom.WriteWord(item[0][i] + item[1][0], (ushort)position);
+						rom.WriteWord(item[i] + eventAddressOffset[j, 0], (ushort)position);
 					}	
 				}
 				
@@ -262,11 +263,12 @@ namespace WLEditor
 				rom.WriteByte(position++, 0xFF);
 
 				//fix pointers
-				foreach(var item in eventPointers)
+				for(int j = 0 ; j < eventPointers.GetLength(0) ; j++)
 				{
-					if (i < item[0].Length && item[0][i] != 0)
+					var item = eventPointers[j];
+					if (i < item.Length && item[i] != 0)
 					{
-						rom.WriteWord(item[0][i] + item[1][1], (ushort)position);
+						rom.WriteWord(item[i] + eventAddressOffset[j, 1], (ushort)position);
 					}	
 				}
 				
@@ -366,12 +368,12 @@ namespace WLEditor
 		
 		public static bool SavePaths(Rom rom, WorldPath[] pathData, bool overWorld, out string errorMessage)
 		{			
-			int[][] duplicates = new int[][]
+			int[][] duplicates = 
 			{
-				new int[] { 7, 23 },  // rice beach 1 / flooded
-				new int[] { 14, 36 }, // rice beach 3 / flooded
-				new int[] { 5, 10 },  // mt teapot 4 / crushed
-				new int[] { 38, 42 }, // parsley woods 1 / flooded				
+				new [] { 7, 23 },  // rice beach 1 / flooded
+				new [] { 14, 36 }, // rice beach 3 / flooded
+				new [] { 5, 10 },  // mt teapot 4 / crushed
+				new [] { 38, 42 }, // parsley woods 1 / flooded				
 			};
 			
 			if (!overWorld)
@@ -564,22 +566,22 @@ namespace WLEditor
 		public static void LoadFlags(Rom rom, WorldPath[] pathData)
 		{
 			rom.SetBank(0x14);
-			for (int level = 0 ; level < flagsPosition.Length ; level++)
+			for (int level = 0 ; level < flagsPosition.GetLength(0) ; level++)
 			{
 				var item = pathData[level];
-				item.FlagX = rom.ReadByte(flagsPosition[level][0] + 1) - 12;
-				item.FlagY = rom.ReadByte(flagsPosition[level][1] + 1) - 20;
+				item.FlagX = rom.ReadByte(flagsPosition[level, 0] + 1) - 12;
+				item.FlagY = rom.ReadByte(flagsPosition[level, 1] + 1) - 20;
 			}
 		}
 		
 		public static void SaveFlags(Rom rom, WorldPath[] pathData)
 		{
 			rom.SetBank(0x14);
-			for (int level = 0 ; level < flagsPosition.Length ; level++)
+			for (int level = 0 ; level < flagsPosition.GetLength(0) ; level++)
 			{
 				var item = pathData[level];
-				rom.WriteByte(flagsPosition[level][0] + 1, (byte)Math.Max(0, Math.Min(255, item.FlagX + 12)));
-				rom.WriteByte(flagsPosition[level][1] + 1, (byte)Math.Max(0, Math.Min(255, item.FlagY + 20)));
+				rom.WriteByte(flagsPosition[level, 0] + 1, (byte)Math.Max(0, Math.Min(255, item.FlagX + 12)));
+				rom.WriteByte(flagsPosition[level, 1] + 1, (byte)Math.Max(0, Math.Min(255, item.FlagY + 20)));
 			}
 		}					
 		
