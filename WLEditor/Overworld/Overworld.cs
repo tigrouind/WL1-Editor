@@ -768,18 +768,33 @@ namespace WLEditor
 		{
 			if (currentWorld == 7 && timerTicks != 0)
 			{
-				uint[] line = new uint[160];
-				
 				for(int y = 0 ; y < 54 ; y++)
 				{					
 					int scroll = Map.GetScroll(rom, animationIndex + y);
-					for(int x = 0 ; x < line.Length ; x++)
+					if (scroll > 0)
 					{
-						line[(x + scroll + line.Length) % line.Length] = tilesWorld.Bits[x + y * 256];
+						RotateRight(tilesWorld.Bits, scroll, y * 256, 160);
 					}
-					Array.Copy(line, 0, tilesWorld.Bits, y * 256, line.Length);
+					else if (scroll < 0)
+					{
+						RotateLeft(tilesWorld.Bits, -scroll, y * 256, 160);
+					}
 				}
 			}
+		}
+		
+		void RotateRight<T>(T[] array, int count, int offset, int length)
+		{
+			Array.Copy(array, offset + length - count, array, offset + length, count);
+			Array.Copy(array, offset, array, offset + count, length - count);
+			Array.Copy(array, offset + length, array, offset, count);
+		}
+		
+		void RotateLeft<T>(T[] array, int count, int offset, int length)
+		{
+			Array.Copy(array, offset, array, offset + length, count);
+			Array.Copy(array, offset + count, array, offset, length - count);
+			Array.Copy(array, offset + length, array, offset + length - count, count);
 		}
 		
 		#endregion		

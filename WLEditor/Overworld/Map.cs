@@ -52,15 +52,6 @@ namespace WLEditor
 			}
 		}
 				
-		static IEnumerable<byte> DecompressTilesHelper(byte[] data, int length)
-		{
-			for(int i = 0 ; i < length; i++)
-			{
-				yield return data[i];
-				yield return data[i+length];
-			}
-		}
-		
 		public static IEnumerable<byte> RLECompressTiles(byte[] tilesdata)
 		{
 			List<byte> result = new List<byte>();
@@ -126,14 +117,13 @@ namespace WLEditor
 			rom.SetBank(bank);		
 			byte[] data = new byte[384 * 8 * 2];
 			RLEDecompressTiles(rom, tileAddress, data);
-			Level.Dump8x8Tiles(DecompressTilesHelper(data, 384 * 8).Skip(128 * 16), bitmap, 256, 0, 0xE1, paletteColors, false);
+			Level.Dump8x8Tiles(Zip(Enumerable.Range(0, 384 * 8), x => data[x], x => data[x + 384 * 8]).Skip(128 * 16), bitmap, 256, 0, 0xE1, paletteColors, false);
 		}
 		
 		public static void DumpAnimatedTilesA(Rom rom, int tileAddress, int tilePosition, DirectBitmap bitmap, int index, int offset)
 		{
 			rom.SetBank(8);
-			Level.Dump8x8Tiles(Zip(Enumerable.Range(0, 8)
-				.Select(x => rom.ReadByte(tileAddress + x * offset + index)), Enumerable.Range(0, 8).Select(x => (byte)0)), bitmap, 1, tilePosition, 0xE1, paletteColors, false);
+			Level.Dump8x8Tiles(Zip(Enumerable.Range(0, 8), x => rom.ReadByte(tileAddress + x * offset + index), x => (byte)0), bitmap, 1, tilePosition, 0xE1, paletteColors, false);
 		}
 		
 		public static void DumpAnimatedTilesB(Rom rom, int tileAddress, int tilePosition, DirectBitmap bitmap)
@@ -143,16 +133,12 @@ namespace WLEditor
                .Select(x => rom.ReadByte(tileAddress + x)), bitmap, 1, tilePosition, 0xE1, paletteColors, false);
 		}
 		
-		static IEnumerable<byte> Zip(IEnumerable<byte> first, IEnumerable<byte> second)
+		static IEnumerable<TResult> Zip<T, TResult>(IEnumerable<T> source, Func<T, TResult> first, Func<T, TResult> second)
 		{
-			using (var e1 = first.GetEnumerator())
-            using (var e2 = second.GetEnumerator())
+			foreach(var item in source)
 			{
-                while (e1.MoveNext() && e2.MoveNext())
-                {
-                	yield return e1.Current;
-                	yield return e2.Current;
-                }
+				yield return first(item);
+				yield return second(item);
 			}
 		}
 		
@@ -563,7 +549,7 @@ namespace WLEditor
 		
 		#region Flags
 		
-		public static void LoadFlags(Rom rom, WorldPath[] pathData)
+		static void LoadFlags(Rom rom, WorldPath[] pathData)
 		{
 			rom.SetBank(0x14);
 			for (int level = 0 ; level < flagsPosition.GetLength(0) ; level++)
@@ -574,7 +560,7 @@ namespace WLEditor
 			}
 		}
 		
-		public static void SaveFlags(Rom rom, WorldPath[] pathData)
+		static void SaveFlags(Rom rom, WorldPath[] pathData)
 		{
 			rom.SetBank(0x14);
 			for (int level = 0 ; level < flagsPosition.GetLength(0) ; level++)
