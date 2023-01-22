@@ -14,7 +14,6 @@ namespace WLEditor
 		int zoom;
 						
 		public bool ShowSectors = true;
-		public bool ShowScrollInfo = true;
 		public bool ShowObjects = true;		
 		public bool ShowColliders = true;
 		public bool ShowTileNumbers;
@@ -50,8 +49,6 @@ namespace WLEditor
 		{			
 			if(Level.LevelData != null && !DesignMode)
 			{
-				var sectorsToDraw = GetVisibleSectors(e.ClipRectangle);
-				
 				using (StringFormat format = new StringFormat())
 				using (Font font = new Font("Arial", 8 * zoom))		
 				using (Font smallFont = new Font("Verdana", 7))		
@@ -84,19 +81,12 @@ namespace WLEditor
 						}
 					}
 
-					//scroll
-					if(ShowScrollInfo)
-					{
-						foreach (Point point in sectorsToDraw)
-						{
-							DrawScrollInfo(point.X, point.Y, e.Graphics);
-						}
-					}
-
 					//sectors
 					if(ShowSectors)
 					{			
-						DrawSectors(e.Graphics, e.ClipRectangle, font, format, sectorsToDraw);
+						DrawSectors(e.Graphics, e.ClipRectangle, font, format);
+						DrawCamera(e.Graphics, e.ClipRectangle);
+						DrawSelectedSector(e.Graphics, e.ClipRectangle);
 					}
 					
 					selection.DrawSelection(e.Graphics);
@@ -104,16 +94,19 @@ namespace WLEditor
 			}
 		}
 		
-		void DrawSectors(Graphics g, Rectangle clipRectangle, Font font, StringFormat format, List<Point> sectorsToDraw)
+		void DrawSectors(Graphics g, Rectangle clipRectangle, Font font, StringFormat format)
 		{
-			foreach (Point point in sectorsToDraw)
+			foreach (Point point in GetVisibleSectors(clipRectangle))
 			{						
+				DrawScrollInfo(point.X, point.Y, g);
 				DrawSectorInfo(point.X, point.Y, g, font, format);
 			}
 			
 			DrawSectorBorders(g, clipRectangle);
-			
-			//camera
+		}
+		
+		void DrawCamera(Graphics g, Rectangle clipRectangle)
+		{
 			if (Level.CameraPosition != -1)
 			{
 				Rectangle camera = new Rectangle((Level.CameraPosition % 4096) * zoom, (Level.CameraPosition / 4096) * zoom, 10 * 16 * zoom, 9 * 16 * zoom);
@@ -125,7 +118,10 @@ namespace WLEditor
 					}
 				}
 			}
-			
+		}
+		
+		void DrawSelectedSector(Graphics g, Rectangle clipRectangle)
+		{
 			if (CurrentSector != -1)
 			{
 				Rectangle sectorRect = new Rectangle((CurrentSector % 16) * 256 * zoom, (CurrentSector / 16) * 256 * zoom, 256 * zoom, 256 * zoom);
@@ -286,19 +282,16 @@ namespace WLEditor
 			}			
 		}
 				
-		List<Point> GetVisibleSectors(Rectangle clipRectangle)
+		IEnumerable<Point> GetVisibleSectors(Rectangle clipRectangle)
 		{					
 			clipRectangle = GetClipRectangle(clipRectangle, 256 * zoom);
-			List<Point> sectors = new List<Point>(clipRectangle.Width * clipRectangle.Height);
 			for(int y = clipRectangle.Top ; y < clipRectangle.Bottom ; y++)
 			{
 				for(int x = clipRectangle.Left ; x < clipRectangle.Right ; x++)
 				{
-					sectors.Add(new Point(x, y));
+					yield return new Point(x, y);
 				}
 			}
-			
-			return sectors;
 		}
 		
 		Rectangle GetClipRectangle(Rectangle clipRectangle, int size)

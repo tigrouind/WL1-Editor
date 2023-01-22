@@ -192,12 +192,6 @@ namespace WLEditor
 			levelPictureBox.Invalidate();
 		}
 
-		void ScrollRegionToolStripMenuItemClick(object sender, EventArgs e)
-		{
-			levelPictureBox.ShowScrollInfo = scrollRegionToolStripMenuItem.Checked;
-			levelPictureBox.Invalidate();
-		}
-
 		void ToolBoxSectorChanged(object sender, EventArgs e)
 		{
 			currentWarp = Sector.SearchWarp(rom, currentCourseId, levelPictureBox.CurrentSector);

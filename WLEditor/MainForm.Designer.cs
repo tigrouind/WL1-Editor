@@ -1,12 +1,4 @@
-﻿/*
- * Created by SharpDevelop.
- * User: Tigrou
- * Date: 1/11/2015
- * Time: 15:08
- * 
- * To change this template use Tools | Options | Coding | Edit Standard Headers.
- */
-namespace WLEditor
+﻿namespace WLEditor
 {
 	partial class MainForm
 	{
@@ -49,7 +41,6 @@ namespace WLEditor
 			this.toolboxToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.regionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.objectsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.scrollRegionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.collidersToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.tileNumbersToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.overworldToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -155,7 +146,6 @@ namespace WLEditor
 			this.toolboxToolStripMenuItem,
 			this.regionsToolStripMenuItem,
 			this.objectsToolStripMenuItem,
-			this.scrollRegionToolStripMenuItem,
 			this.collidersToolStripMenuItem,
 			this.tileNumbersToolStripMenuItem,
 			this.overworldToolStripMenuItem,
@@ -172,7 +162,7 @@ namespace WLEditor
 			this.toolboxToolStripMenuItem.Enabled = false;
 			this.toolboxToolStripMenuItem.Name = "toolboxToolStripMenuItem";
 			this.toolboxToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
-			this.toolboxToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F1;
+			this.toolboxToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F2;
 			this.toolboxToolStripMenuItem.Text = "Toolbox";
 			this.toolboxToolStripMenuItem.CheckedChanged += new System.EventHandler(this.ToolboxToolStripMenuItemCheckedChanged);
 			// 
@@ -183,7 +173,7 @@ namespace WLEditor
 			this.regionsToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.regionsToolStripMenuItem.Name = "regionsToolStripMenuItem";
 			this.regionsToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
-			this.regionsToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F2;
+			this.regionsToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F3;
 			this.regionsToolStripMenuItem.Text = "Sectors";
 			this.regionsToolStripMenuItem.Click += new System.EventHandler(this.RegionsToolStripMenuItemClick);
 			// 
@@ -194,21 +184,10 @@ namespace WLEditor
 			this.objectsToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.objectsToolStripMenuItem.Name = "objectsToolStripMenuItem";
 			this.objectsToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
-			this.objectsToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F3;
+			this.objectsToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F4;
 			this.objectsToolStripMenuItem.Text = "Objects";
 			this.objectsToolStripMenuItem.Click += new System.EventHandler(this.ObjectsToolStripMenuItemClick);
-			// 
-			// scrollRegionToolStripMenuItem
-			// 
-			this.scrollRegionToolStripMenuItem.Checked = true;
-			this.scrollRegionToolStripMenuItem.CheckOnClick = true;
-			this.scrollRegionToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
-			this.scrollRegionToolStripMenuItem.Name = "scrollRegionToolStripMenuItem";
-			this.scrollRegionToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
-			this.scrollRegionToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F4;
-			this.scrollRegionToolStripMenuItem.Text = "Scroll boundaries";
-			this.scrollRegionToolStripMenuItem.Click += new System.EventHandler(this.ScrollRegionToolStripMenuItemClick);
-			// 
+			//
 			// collidersToolStripMenuItem
 			//
 			this.collidersToolStripMenuItem.Checked = true;
@@ -425,7 +404,6 @@ namespace WLEditor
 		private System.Windows.Forms.ToolStripMenuItem noneToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem switchToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem collidersToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem scrollRegionToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem objectsToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem overworldToolStripMenuItem;
