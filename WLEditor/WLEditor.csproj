@@ -68,6 +68,7 @@
     <Compile Include="Selection\Selection.cs" />
     <Compile Include="Selection\SelectionChange.cs" />
     <Compile Include="Selection\SelectionEventArgs.cs" />
+    <Compile Include="Sprite.cs" />
     <Compile Include="TileEventArgs.cs" />
     <Compile Include="Toolbox\ObjectsPictureBox.cs" />
     <Compile Include="Toolbox\Sector.cs" />

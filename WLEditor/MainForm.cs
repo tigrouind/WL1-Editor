@@ -139,8 +139,8 @@ namespace WLEditor
 					
 					rom = newRom;
 					LoadLevelCombobox();
-					Level.DumpBonusSprites(rom);
-					Level.DumpPlayerSprite(rom);
+					Sprite.DumpBonusSprites(rom);
+					Sprite.DumpPlayerSprite(rom);
 					toolboxForm.LoadRom(rom);
 					overworldForm.LoadRom(rom);
 					romFilePath = openFileDialog1.FileName;

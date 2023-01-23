@@ -390,7 +390,7 @@ namespace WLEditor
 			int enemiesIdsPointer, tilesPointer, treasureId;
 			bool exitOpen, treasureCheck, bonus;
 			
-			Level.FindEnemiesData(rom, enemyPointer, out enemiesIdsPointer, out tilesPointer, out treasureId, out treasureCheck, out exitOpen, out bonus);
+			Sprite.FindEnemiesData(rom, enemyPointer, out enemiesIdsPointer, out tilesPointer, out treasureId, out treasureCheck, out exitOpen, out bonus);
 			
 			
 			char[] treasureNames = { 'C', 'I', 'F', 'O', 'A', 'N', 'H', 'M', 'L', 'K', 'B', 'D', 'G', 'J', 'E' };			
@@ -405,7 +405,7 @@ namespace WLEditor
 			}
 					
 			//enemy ids
-			List<int> enemies = Level.GetEnemyIds(rom, enemiesIdsPointer);				
+			List<int> enemies = Sprite.GetEnemyIds(rom, enemiesIdsPointer);				
 			return prefix + string.Join(" / ", enemies.Select(x => EnemyToString(x, exitOpen)).ToArray());
 		}
 		

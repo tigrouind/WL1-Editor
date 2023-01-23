@@ -73,11 +73,11 @@ namespace WLEditor
 						
 						//wario position
 						int index = Level.WarioRightFacing ? 0 : 1;
-						Rectangle playerRectangle = Level.PlayerRectangles[index];
+						Rectangle playerRectangle = Sprite.PlayerRectangles[index];
 						Rectangle destRect = new Rectangle((Level.WarioPosition % 4096 + playerRectangle.X - 32) * zoom, (Level.WarioPosition / 4096 + playerRectangle.Y - 56 - index * 64) * zoom, playerRectangle.Width * zoom, playerRectangle.Height * zoom);
 						if (destRect.IntersectsWith(e.ClipRectangle))
 						{
-							e.Graphics.DrawImage(Level.PlayerSprite.Bitmap, destRect, playerRectangle, GraphicsUnit.Pixel);
+							e.Graphics.DrawImage(Sprite.PlayerSprite.Bitmap, destRect, playerRectangle, GraphicsUnit.Pixel);
 						}
 					}
 
@@ -204,20 +204,20 @@ namespace WLEditor
 							//power up
 							if (data > 6)
 							{
-								e.Graphics.DrawImage(Level.TilesObjects.Bitmap, destRect, new Rectangle((data - 7) * 16, 0, 16, 16), GraphicsUnit.Pixel);		
+								e.Graphics.DrawImage(Sprite.TilesObjects.Bitmap, destRect, new Rectangle((data - 7) * 16, 0, 16, 16), GraphicsUnit.Pixel);		
 							}
 						}
 						
 						//enemy																	
 						if(data <= 6)
 						{
-							if (Level.LoadedSprites[data - 1] != Rectangle.Empty)
+							if (Sprite.LoadedSprites[data - 1] != Rectangle.Empty)
 							{
-								Rectangle enemyRect = Level.LoadedSprites[data - 1];
+								Rectangle enemyRect = Sprite.LoadedSprites[data - 1];
 								destRect = new Rectangle((i * 16 + enemyRect.X - 32 + 8) * zoom, (j * 16 + enemyRect.Y - (data - 1) * 128 - 104) * zoom, enemyRect.Width * zoom, enemyRect.Height * zoom);							
 								if(destRect.IntersectsWith(e.ClipRectangle))
 								{																												
-									e.Graphics.DrawImage(Level.TilesEnemies.Bitmap, destRect, enemyRect, GraphicsUnit.Pixel);
+									e.Graphics.DrawImage(Sprite.TilesEnemies.Bitmap, destRect, enemyRect, GraphicsUnit.Pixel);
 								}							
 							}
 							else
@@ -354,7 +354,7 @@ namespace WLEditor
 		{
 			if(enemyIndex >= 1 && enemyIndex <= 6)
 			{
-				Rectangle enemyRect = Level.LoadedSprites[enemyIndex - 1];
+				Rectangle enemyRect = Sprite.LoadedSprites[enemyIndex - 1];
 				if(enemyRect != Rectangle.Empty)
 				{						
 					region.Union(new Rectangle(((tileIndex % 256) * 16 + enemyRect.X - 32 + 8) * zoom, ((tileIndex / 256) * 16 + enemyRect.Y - (enemyIndex - 1) * 128 - 104) * zoom, enemyRect.Width * zoom, enemyRect.Height * zoom));
