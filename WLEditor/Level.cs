@@ -68,7 +68,7 @@ namespace WLEditor
 		public static bool WarioRightFacing;
 		public static Rectangle[] PlayerRectangles = new Rectangle[2];
 		
-		public static DirectBitmap Tiles8x8 = new DirectBitmap(16 * 8, 16 * 8); 
+		public static DirectBitmap Tiles8x8 = new DirectBitmap(16 * 8, 8 * 8); 
 		public static DirectBitmap Tiles16x16 = new DirectBitmap(16 * 8, 16 * 16); 
 		public static DirectBitmap TilesObjects = new DirectBitmap(16 * 9, 16);
 		public static DirectBitmap TilesEnemies = new DirectBitmap(64, 128 * 6); 		
