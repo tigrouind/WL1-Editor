@@ -117,6 +117,7 @@ namespace WLEditor
 		public void LoadSector(int course, int sector)
 		{									
 			sectorForm.LoadSector(course, sector);
+			comboBox1.Items[3] = sector == -1 ? "Level" : string.Format("Sector {0:D2}", sector);
 		}
 		
 		public bool ShowColliders
