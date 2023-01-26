@@ -538,53 +538,56 @@ namespace WLEditor
 		{				
 			if(toolboxForm.Visible)
 			{
-				int tileIndex = levelPictureBox.CurrentTileIndex;
-				int selectedPanelIndex = toolboxForm.SelectedPanelIndex;
-				int currentTile = toolboxForm.CurrentTile;
-				int currentObject = toolboxForm.CurrentObject;
-				
 				if (e.Status == 0) //down
 				{
 					levelPictureBox.StartChanges();
 				}
 				
-				if (e.Button == MouseButtons.Left)
+				if (e.Status == 0 || e.Status == 1)
 				{
-					if(currentTile != -1 && selectedPanelIndex == 0)
+					int tileIndex = levelPictureBox.CurrentTileIndex;
+					int selectedPanelIndex = toolboxForm.SelectedPanelIndex;
+					int currentTile = toolboxForm.CurrentTile;
+					int currentObject = toolboxForm.CurrentObject;
+				
+					if (e.Button == MouseButtons.Left)
 					{
-						int previousTile = Level.LevelData[tileIndex + 0x1000];
-						if(previousTile != currentTile)
+						if(currentTile != -1 && selectedPanelIndex == 0)
 						{
-							levelPictureBox.AddChange(tileIndex % 256, tileIndex / 256);
-							Level.LevelData[tileIndex + 0x1000] = (byte)currentTile;
-							levelPictureBox.InvalidateTile(tileIndex);
-							SetChanges(true);
+							int previousTile = Level.LevelData[tileIndex + 0x1000];
+							if(previousTile != currentTile)
+							{
+								levelPictureBox.AddChange(tileIndex % 256, tileIndex / 256);
+								Level.LevelData[tileIndex + 0x1000] = (byte)currentTile;
+								levelPictureBox.InvalidateTile(tileIndex);
+								SetChanges(true);
+							}
+						}					
+						else if(currentObject != -1 && levelPictureBox.ShowObjects && selectedPanelIndex == 2)
+						{	
+							int previousObject = Level.ObjectsData[tileIndex];
+							if(previousObject != currentObject)
+							{
+								levelPictureBox.AddChange(tileIndex % 256, tileIndex / 256);
+								Level.ObjectsData[tileIndex] = (byte)currentObject;
+								levelPictureBox.InvalidateObject(tileIndex, currentObject, previousObject);
+								SetChanges(true);
+							}				
+						}						
+					}
+					else if (e.Button == MouseButtons.Right)
+					{
+						if (levelPictureBox.ShowObjects && selectedPanelIndex == 2)
+						{	
+							int previousObject = Level.ObjectsData[tileIndex];
+							if(previousObject != 0)
+							{
+								levelPictureBox.AddChange(tileIndex % 256, tileIndex / 256);
+								Level.ObjectsData[tileIndex] = 0;
+								levelPictureBox.InvalidateObject(tileIndex, 0, previousObject);
+								SetChanges(true);
+							}			
 						}
-					}					
-					else if(currentObject != -1 && levelPictureBox.ShowObjects && selectedPanelIndex == 2)
-					{	
-						int previousObject = Level.ObjectsData[tileIndex];
-						if(previousObject != currentObject)
-						{
-							levelPictureBox.AddChange(tileIndex % 256, tileIndex / 256);
-							Level.ObjectsData[tileIndex] = (byte)currentObject;
-							levelPictureBox.InvalidateObject(tileIndex, currentObject, previousObject);
-							SetChanges(true);
-						}				
-					}						
-				}
-				else if (e.Button == MouseButtons.Right)
-				{
-					if (levelPictureBox.ShowObjects && selectedPanelIndex == 2)
-					{	
-						int previousObject = Level.ObjectsData[tileIndex];
-						if(previousObject != 0)
-						{
-							levelPictureBox.AddChange(tileIndex % 256, tileIndex / 256);
-							Level.ObjectsData[tileIndex] = 0;
-							levelPictureBox.InvalidateObject(tileIndex, 0, previousObject);
-							SetChanges(true);
-						}			
 					}
 				}
 
@@ -599,7 +602,7 @@ namespace WLEditor
 				{
 					levelPictureBox.StartSelection(levelPictureBox.CurrentTileIndex % 256, levelPictureBox.CurrentTileIndex / 256);
 				}
-				else
+				else if (e.Status == 1) //move
 				{
 					levelPictureBox.SetSelection(levelPictureBox.CurrentTileIndex % 256, levelPictureBox.CurrentTileIndex / 256);
 				}
