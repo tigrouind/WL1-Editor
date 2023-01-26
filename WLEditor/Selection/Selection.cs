@@ -52,7 +52,7 @@ namespace WLEditor
 			end = new Point(endX, endY);
 		}
 		
-		void InvalidatePicture()
+		void Invalidate()
 		{
 			InvalidatePictureBox(this, new SelectionEventArgs(GetSelectionRectangle()));
 		}
@@ -131,7 +131,7 @@ namespace WLEditor
 		{
 			if (selection)
 			{
-				InvalidatePicture();
+				Invalidate();
 			}
 			
 			selectionStart = new Point(x, y);				
@@ -140,7 +140,7 @@ namespace WLEditor
 			
 			if (selection)
 			{
-				InvalidatePicture();
+				Invalidate();
 			}
 		}
 		
@@ -148,14 +148,14 @@ namespace WLEditor
 		{
 			if (selection)
 			{
-				InvalidatePicture();
+				Invalidate();
 			}
 			
 			selectionEnd = new Point(x, y);	
 			
 			if (selection)
 			{
-				InvalidatePicture();
+				Invalidate();
 			}
 		}
 		
@@ -164,7 +164,7 @@ namespace WLEditor
 			if (selection)
 			{
 				selection = false;
-				InvalidatePicture();
+				Invalidate();
 			}
 		}
 		
