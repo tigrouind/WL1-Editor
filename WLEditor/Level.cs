@@ -492,7 +492,29 @@ namespace WLEditor
 			
 			return 0;
 		}
-
+		
+		public static int GetEmptyTile(uint[] bitmap, int tileSize, int tileWidth)
+		{
+			int emptyTile = 0;
+			var tilesOccurence = new int[256];
+			
+			for(int i = 0 ; i < bitmap.Length ; i++)
+			{
+				uint color = bitmap[i];
+				if (color == 0xFFFFFFFF)
+				{
+					int tile = (i % 128) / tileSize + (i / 128) / tileSize * tileWidth;
+					tilesOccurence[tile]++;
+					if (tilesOccurence[tile] >= tilesOccurence[emptyTile])
+					{
+						emptyTile = tile;
+					}
+				}
+			}
+			
+			return emptyTile;
+		}
+		
 		public static bool SaveChanges(Rom rom, int course, out string errorMessage)
 		{
 			//rom expansion give new banks for level data

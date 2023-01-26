@@ -52,7 +52,7 @@ namespace WLEditor
 			end = new Point(endX, endY);
 		}
 		
-		void Invalidate()
+		public void Invalidate()
 		{
 			InvalidatePictureBox(this, new SelectionEventArgs(GetSelectionRectangle()));
 		}
@@ -87,7 +87,28 @@ namespace WLEditor
 				
 				selectionWidth = end.X - start.X + 1;
 				selectionHeight = end.Y - start.Y + 1;
-				ClearSelection();
+			}
+		}
+		
+		public void DeleteSelection(Func<int, int, int> getTileAt, Action<int, int> clearTileAt)
+		{
+			if (selection)
+			{
+				var changes = new List<SelectionChange>();
+				
+				Point start, end;
+				GetSelection(out start, out end);
+								
+				for(int y = start.Y ; y <= end.Y ; y++)
+				{
+					for(int x = start.X ; x <= end.X ; x++)	
+					{
+						changes.Add(new SelectionChange { X = x, Y =  y, Data = getTileAt(x, y) });
+						clearTileAt(x, y);
+					}
+				}
+				
+				AddChanges(changes);
 			}
 		}
 		
@@ -122,8 +143,6 @@ namespace WLEditor
 
 					AddChanges(changes);
 				}
-								
-				ClearSelection();
 			}		
 		}
 		

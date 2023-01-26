@@ -433,6 +433,20 @@ namespace WLEditor
 				return true;
 			}
 			
+			if (keyData == (Keys.Control | Keys.X))
+			{
+				levelPictureBox.CutSelection(GetEmptyTile());
+				SetChanges(true);
+				return true;
+			}
+			
+			if (keyData == (Keys.Delete))
+			{
+				levelPictureBox.DeleteSelection(GetEmptyTile());
+				SetChanges(true);
+				return true;
+			}
+			
 			if (keyData == (Keys.Control | Keys.Z))
 			{
 				levelPictureBox.Undo();
@@ -613,6 +627,11 @@ namespace WLEditor
 			}
 		}
 		
+		int GetEmptyTile()
+		{
+			return Level.GetEmptyTile(Level.Tiles16x16.Bits, 16, 8);
+		}
+				
 		void LevelPictureBoxSectorChanged(object sender, EventArgs e)
 		{
 			int warpTarget = Sector.SearchWarp(rom, currentCourseId, levelPictureBox.CurrentSector);

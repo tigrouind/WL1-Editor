@@ -316,6 +316,16 @@ namespace WLEditor
 		
 		bool DispatchCommandKey(Keys keyData)
 		{
+			if (eventMode && eventForm.ProcessEventKey(keyData))
+			{
+				return true;
+			}
+			
+			if (pathMode && pathForm.ProcessPathKey(keyData))
+			{
+				return true;
+			}
+			
 			if (keyData == Keys.E)
 			{
 				pathMode = false;						
@@ -352,6 +362,18 @@ namespace WLEditor
 				return true;
 			}
 			
+			if (keyData == (Keys.Control | Keys.X))
+			{
+				CutSelection();
+				return true;
+			}
+			
+			if (keyData == (Keys.Delete))
+			{
+				DeleteSelection();
+				return true;
+			}
+			
 			if (keyData == (Keys.Control | Keys.Z))
 			{
 				Undo();
@@ -361,21 +383,6 @@ namespace WLEditor
 			if (keyData == (Keys.Control | Keys.Y))
 			{				
 				Redo();
-				return true;
-			}
-			
-			if (eventMode && eventForm.ProcessEventKey(keyData))
-			{
-				return true;
-			}
-			
-			if (pathMode && pathForm.ProcessPathKey(keyData))
-			{
-				return true;
-			}
-			
-			if (keyData >= Keys.A && keyData <= Keys.Z)
-			{
 				return true;
 			}
 			
@@ -540,15 +547,8 @@ namespace WLEditor
 		{
 			if (!pathMode)
 			{
-				selection.CopySelection((x, y) =>
-				{
-	            	if (selectionMode)
-					{
-	            		return GetTileAt(x, y);
-					}
-	            	
-					return (byte)((x + y * 16) ^ 0x80);
-	        	});
+				selection.CopySelection(CopyTileAt);
+				selection.ClearSelection();
 			}
 		}
 		
@@ -577,10 +577,48 @@ namespace WLEditor
 	             	
 	             	return -1;
 				});
+				selection.ClearSelection();
 				
 				RenderMap();
 				SetChanges(1);
 			}
+		}
+		
+		void CutSelection()
+		{
+			if (!pathMode && selectionMode)
+			{
+				int tile = GetEmptyTile();
+				selection.CopySelection(CopyTileAt);
+				selection.DeleteSelection(GetTileAt, (x, y) => SetTileAt(x, y, tile ^ 0x80));
+				selection.ClearSelection();
+				
+				RenderMap();
+				SetChanges(1);
+			}
+		}
+		
+		void DeleteSelection()
+		{
+			if (!pathMode && selectionMode)
+			{
+				int tile = GetEmptyTile();
+				selection.DeleteSelection(GetTileAt, (x, y) => SetTileAt(x, y, tile ^ 0x80));
+				selection.ClearSelection();
+				
+				RenderMap();
+				SetChanges(1);
+			}
+		}
+		
+		int CopyTileAt(int x, int y)
+		{
+			if (selectionMode)
+			{
+				return GetTileAt(x, y);
+			}
+			
+			return (byte)((x + y * 16) ^ 0x80);
 		}
 		
 		int GetTileAt(int x, int y)
@@ -591,6 +629,11 @@ namespace WLEditor
 		void SetTileAt(int x, int y, int data)
 		{
 			worldTiles[x + y * 32] = (byte)data;
+		}
+		
+		int GetEmptyTile()
+		{
+			return Level.GetEmptyTile(tilesWorld8x8.Bits, 8, 16);
 		}
 		
 		void InvalidatePictureBox(object sender, SelectionEventArgs e)

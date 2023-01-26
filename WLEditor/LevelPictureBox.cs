@@ -459,6 +459,7 @@ namespace WLEditor
 		public void CopySelection()
 		{
 			selection.CopySelection(GetTileAt);
+			selection.ClearSelection();
 		}
 		
 		public void PasteSelection()
@@ -474,7 +475,22 @@ namespace WLEditor
              	
              	return -1;
 			});
-			
+			selection.ClearSelection();
+			Invalidate();
+		}
+		
+		public void CutSelection(int emptyTile)
+		{
+			selection.CopySelection(GetTileAt);
+			selection.DeleteSelection(GetTileAt, (x, y) => SetTileAt(x, y, emptyTile));
+			selection.ClearSelection();
+			Invalidate();
+		}
+		
+		public void DeleteSelection(int emptyTile)
+		{
+			selection.DeleteSelection(GetTileAt, (x, y) => SetTileAt(x, y, emptyTile));
+			selection.ClearSelection();
 			Invalidate();
 		}
 		
