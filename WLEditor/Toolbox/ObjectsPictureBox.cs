@@ -8,7 +8,7 @@ namespace WLEditor
 {
 	public class ObjectsPictureBox : PictureBox
 	{
-		public int CurrentObject = -1;	
+		public int CurrentObject;	
 		int zoom;
 		
 		protected override void OnPaint(PaintEventArgs e)
@@ -32,11 +32,7 @@ namespace WLEditor
 						DrawTile(e.Graphics, e.ClipRectangle, font, format, index);
 					}
 					
-					if(CurrentObject != -1)
-					{
-						int index = CurrentObject - 1;
-						e.Graphics.FillRectangle(brush, (index % 4) * 32 * zoom, (index / 4) * 32 * zoom, 32 * zoom, 32 * zoom);
-					}
+					e.Graphics.FillRectangle(brush, (CurrentObject % 4) * 32 * zoom, (CurrentObject / 4) * 32 * zoom, 32 * zoom, 32 * zoom);
 				}
 			}		
 		}
@@ -73,7 +69,7 @@ namespace WLEditor
 			int index = e.Location.X / 32 / zoom + (e.Location.Y / 32 / zoom) * 4;
 			if (index < 15)
 			{
-				CurrentObject = index + 1;
+				CurrentObject = index;
 				Invalidate();
 			}
 		}

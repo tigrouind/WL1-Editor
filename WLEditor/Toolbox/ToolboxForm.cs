@@ -86,11 +86,6 @@ namespace WLEditor
 			{
 				return objectsPictureBox.CurrentObject;
 			}
-			
-			set
-			{
-				objectsPictureBox.CurrentObject = value;
-			}
 		}
 		
 		public int CurrentTile

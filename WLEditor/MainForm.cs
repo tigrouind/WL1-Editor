@@ -566,41 +566,24 @@ namespace WLEditor
 				
 					if (e.Button == MouseButtons.Left)
 					{
-						if(currentTile != -1 && selectedPanelIndex == 0)
+						if(selectedPanelIndex == 0)
 						{
-							int previousTile = Level.LevelData[tileIndex + 0x1000];
-							if(previousTile != currentTile)
-							{
-								levelPictureBox.AddChange(tileIndex % 256, tileIndex / 256);
-								Level.LevelData[tileIndex + 0x1000] = (byte)currentTile;
-								levelPictureBox.InvalidateTile(tileIndex);
-								SetChanges(true);
-							}
+							UpdateTile(tileIndex, currentTile);
 						}					
-						else if(currentObject != -1 && levelPictureBox.ShowObjects && selectedPanelIndex == 2)
+						else if(levelPictureBox.ShowObjects && selectedPanelIndex == 2)
 						{	
-							int previousObject = Level.ObjectsData[tileIndex];
-							if(previousObject != currentObject)
-							{
-								levelPictureBox.AddChange(tileIndex % 256, tileIndex / 256);
-								Level.ObjectsData[tileIndex] = (byte)currentObject;
-								levelPictureBox.InvalidateObject(tileIndex, currentObject, previousObject);
-								SetChanges(true);
-							}				
+							UpdateObject(tileIndex, currentObject + 1);
 						}						
 					}
 					else if (e.Button == MouseButtons.Right)
 					{
-						if (levelPictureBox.ShowObjects && selectedPanelIndex == 2)
+						if (selectedPanelIndex == 0)
 						{	
-							int previousObject = Level.ObjectsData[tileIndex];
-							if(previousObject != 0)
-							{
-								levelPictureBox.AddChange(tileIndex % 256, tileIndex / 256);
-								Level.ObjectsData[tileIndex] = 0;
-								levelPictureBox.InvalidateObject(tileIndex, 0, previousObject);
-								SetChanges(true);
-							}			
+							UpdateTile(tileIndex, GetEmptyTile());
+						}
+						else if(levelPictureBox.ShowObjects && selectedPanelIndex == 2)
+						{	
+							UpdateObject(tileIndex, 0);			
 						}
 					}
 				}
@@ -624,6 +607,30 @@ namespace WLEditor
 			else
 			{
 				levelPictureBox.ClearSelection();
+			}
+		}
+		
+		void UpdateTile(int tileIndex, int currentTile)
+		{
+			int previousTile = Level.LevelData[tileIndex + 0x1000];
+			if(previousTile != currentTile)
+			{
+				levelPictureBox.AddChange(tileIndex % 256, tileIndex / 256);
+				Level.LevelData[tileIndex + 0x1000] = (byte)currentTile;
+				levelPictureBox.InvalidateTile(tileIndex);
+				SetChanges(true);
+			}
+		}
+		
+		void UpdateObject(int tileIndex, int currentObject)
+		{
+			int previousObject = Level.ObjectsData[tileIndex];
+			if(previousObject != currentObject)
+			{
+				levelPictureBox.AddChange(tileIndex % 256, tileIndex / 256);
+				Level.ObjectsData[tileIndex] = (byte)currentObject;
+				levelPictureBox.InvalidateObject(tileIndex, currentObject, previousObject);
+				SetChanges(true);
 			}
 		}
 		

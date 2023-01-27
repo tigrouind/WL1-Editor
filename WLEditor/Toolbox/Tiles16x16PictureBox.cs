@@ -8,7 +8,7 @@ namespace WLEditor
 {
 	public class Tiles16x16PictureBox : PictureBox
 	{
-		public int CurrentTile = -1;
+		public int CurrentTile;
 		public bool ShowColliders = true;
 		public bool ShowTileNumbers;
 		public int SwitchMode;		
@@ -33,12 +33,9 @@ namespace WLEditor
 					e.Graphics.DrawImage(tiles.Bitmap, 0, 0, 128 * zoom, 256 * zoom);	
 				}
 	
-				if(CurrentTile != -1)
+				using (Brush brush = new SolidBrush(Color.FromArgb(128, 255, 0, 0)))
 				{
-					using (Brush brush = new SolidBrush(Color.FromArgb(128, 255, 0, 0)))
-					{
-						e.Graphics.FillRectangle(brush, (CurrentTile % 8) * 16 * zoom, (CurrentTile / 8) * 16 * zoom, 16 * zoom, 16 * zoom);
-					}
+					e.Graphics.FillRectangle(brush, (CurrentTile % 8) * 16 * zoom, (CurrentTile / 8) * 16 * zoom, 16 * zoom, 16 * zoom);
 				}
 			}
 		}		
