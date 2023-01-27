@@ -15,6 +15,7 @@ namespace WLEditor
 		int zoom;		
 		DirectBitmap tilesWorld8x8 = new DirectBitmap(16 * 8, 16 * 8);
 		DirectBitmap tilesWorld = new DirectBitmap(32 * 8, 32 * 8);
+		DirectBitmap tilesWorldScroll = new DirectBitmap(32 * 8, 32 * 8);
 		int currentWorld;
 		
 		bool eventMode;
@@ -121,7 +122,8 @@ namespace WLEditor
 			
 			UpdateTitle();			
 			ClearAllTiles();
-			RenderMap();
+			pictureBox1.Invalidate();
+			pictureBox2.Invalidate();
 		}
 			
 		void ClearAllTiles()
@@ -231,10 +233,12 @@ namespace WLEditor
 		{
 			if(!DesignMode)
 			{
+				RenderTiles();
+				
 				e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
 				e.Graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
 				e.Graphics.PixelOffsetMode = PixelOffsetMode.Half;
-				e.Graphics.DrawImage(tilesWorld.Bitmap, 
+				e.Graphics.DrawImage(GetTilesWorldBitmap(), 
 				                     new Rectangle(0, 0, currentMapX * 8 * zoom, currentMapY * 8 * zoom),
 				                     new Rectangle(0, 0, currentMapX * 8, currentMapY * 8), 
 				                     GraphicsUnit.Pixel);
@@ -403,7 +407,7 @@ namespace WLEditor
 				{
 					byte tileIndex = (byte)(worldTiles[x + y * 32] ^ 0x80);
 					int previousTileIndex = previousWorldTiles[x + y * 32];
-					if (tileIndex != previousTileIndex || (currentWorld == 7 && y < 7))
+					if (tileIndex != previousTileIndex)
 					{
 						previousWorldTiles[x + y * 32] = tileIndex;
 						Dump8x8Tile(new Point(x * 8, y * 8), tileIndex, tilesWorld);
@@ -412,15 +416,6 @@ namespace WLEditor
 			}
 		}	
 		
-		void RenderMap()
-		{
-			RenderTiles();	
-			ScrollLines();
-			
-			pictureBox1.Invalidate();
-			pictureBox2.Invalidate();
-		}
-				
 		void Dump8x8Tile(Point dest, int tileIndex, DirectBitmap bitmap)
 		{
 			Point source = new Point((tileIndex % 16) * 8, (tileIndex / 16) * 8);										
@@ -579,7 +574,7 @@ namespace WLEditor
 				});
 				selection.ClearSelection();
 				
-				RenderMap();
+				pictureBox1.Invalidate();
 				SetChanges(1);
 			}
 		}
@@ -593,7 +588,7 @@ namespace WLEditor
 				selection.DeleteSelection(GetTileAt, (x, y) => SetTileAt(x, y, tile ^ 0x80));
 				selection.ClearSelection();
 				
-				RenderMap();
+				pictureBox1.Invalidate();
 				SetChanges(1);
 			}
 		}
@@ -606,7 +601,7 @@ namespace WLEditor
 				selection.DeleteSelection(GetTileAt, (x, y) => SetTileAt(x, y, tile ^ 0x80));
 				selection.ClearSelection();
 				
-				RenderMap();
+				pictureBox1.Invalidate();
 				SetChanges(1);
 			}
 		}
@@ -657,7 +652,7 @@ namespace WLEditor
 			if (!eventMode && !pathMode)
 			{
 				selection.Undo(SetTileAt, GetTileAt);
-				RenderMap();	
+				pictureBox1.Invalidate();
 				SetChanges(1);
 			}
 		}
@@ -667,7 +662,7 @@ namespace WLEditor
 			if (!eventMode && !pathMode)
 			{
 				selection.Redo(SetTileAt, GetTileAt);
-				RenderMap();	
+				pictureBox1.Invalidate();
 				SetChanges(1);
 			}
 		}
@@ -724,7 +719,8 @@ namespace WLEditor
 							animationIndex++;
 							DumpAnimatedTiles();	
 							InvalidateAnimatedTiles();
-							RenderMap();			
+							pictureBox1.Invalidate();
+							pictureBox2.Invalidate();
 						}
 						break;
 						
@@ -732,7 +728,7 @@ namespace WLEditor
 						if ((timerTicks % 2) == 0)
 						{
 							animationIndex++;	
-							RenderMap();			
+							pictureBox1.Invalidate();
 						}
 						break;
 				}				
@@ -744,7 +740,8 @@ namespace WLEditor
 			timerTicks = 0;
 			if (Visible)
 			{				
-				RenderMap();		
+				pictureBox1.Invalidate();
+				pictureBox2.Invalidate();
 			}
 		}
 		
@@ -807,37 +804,34 @@ namespace WLEditor
 			}
 		}
 		
-		void ScrollLines()
+		Bitmap GetTilesWorldBitmap()
 		{
 			if (currentWorld == 7 && timerTicks != 0)
 			{
-				for(int y = 0 ; y < 54 ; y++)
+				for(int y = 0 ; y < 144 ; y++)
 				{					
-					int scroll = Map.GetScroll(rom, animationIndex + y);
+					int offset = y * 256;
+					int scroll = y < 54 ? Map.GetScroll(rom, animationIndex + y) : 0;
 					if (scroll > 0)
 					{
-						RotateRight(tilesWorld.Bits, scroll, y * 256, 160);
+						Array.Copy(tilesWorld.Bits, offset, tilesWorldScroll.Bits, offset + scroll, 160 - scroll);
+						Array.Copy(tilesWorld.Bits, offset + 160 - scroll, tilesWorldScroll.Bits, offset, scroll);
 					}
 					else if (scroll < 0)
 					{
-						RotateLeft(tilesWorld.Bits, -scroll, y * 256, 160);
+						Array.Copy(tilesWorld.Bits, offset - scroll, tilesWorldScroll.Bits, offset, 160 + scroll);
+						Array.Copy(tilesWorld.Bits, offset, tilesWorldScroll.Bits, offset + 160 + scroll, -scroll);
+					}
+					else
+					{
+						Array.Copy(tilesWorld.Bits, offset, tilesWorldScroll.Bits, offset, 160);			
 					}
 				}
+				
+				return tilesWorldScroll.Bitmap;
 			}
-		}
-		
-		void RotateRight<T>(T[] array, int count, int offset, int length)
-		{
-			Array.Copy(array, offset + length - count, array, offset + length, count);
-			Array.Copy(array, offset, array, offset + count, length - count);
-			Array.Copy(array, offset + length, array, offset, count);
-		}
-		
-		void RotateLeft<T>(T[] array, int count, int offset, int length)
-		{
-			Array.Copy(array, offset, array, offset + length, count);
-			Array.Copy(array, offset + count, array, offset, length - count);
-			Array.Copy(array, offset + length, array, offset + length - count, count);
+			
+			return tilesWorld.Bitmap;
 		}
 		
 		#endregion		
