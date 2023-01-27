@@ -114,35 +114,37 @@ namespace WLEditor
 		
 		public void PasteSelection(Func<int, int, int, int> setTileAt)
 		{
-			if (selection)
+			if (selection && selectionWidth > 0 && selectionHeight > 0)
 			{
-				if (selectionHeight > 0 && selectionWidth > 0)
+				var changes = new List<SelectionChange>();
+				
+				Point start, end;
+				GetSelection(out start, out end);
+				
+				var sortedData = selectionData.Select((x, i) => new { tile = x, index = i })
+					.OrderBy(x => x.tile >> 16) //used for events
+					.Select(x => x.index)
+					.ToArray();
+				
+				for (int ty = start.Y ; ty <= end.Y ; ty += selectionHeight)
+				for (int tx = start.X ; tx <= end.X ; tx += selectionWidth)
+				foreach (int pos in sortedData)
 				{
-					var changes = new List<SelectionChange>();
+					int destX = tx + (pos % selectionWidth);
+					int destY = ty + (pos / selectionWidth);
 					
-					Point start, end;
-					GetSelection(out start, out end);
-					
-					for (int ty = start.Y ; ty <= end.Y ; ty += selectionHeight)
-					for (int tx = start.X ; tx <= end.X ; tx += selectionWidth)
-					for (int y = 0 ; y < selectionHeight ; y++)
-					for (int x = 0 ; x < selectionWidth ; x++)	
-					{						
-						int destX = tx + x;
-						int destY = ty + y;
-						if ((destX <= end.X && destY <= end.Y) || (start.X == end.X && start.Y == end.Y))
+					if ((destX <= end.X && destY <= end.Y) || (start.X == end.X && start.Y == end.Y))
+					{
+						int data = selectionData[pos];
+						int track = setTileAt(destX, destY, data & 0xFFFF);
+						if (track != -1)
 						{
-							int data = selectionData[x + y * selectionWidth];
-							int track = setTileAt(destX, destY, data);
-							if (track != -1)
-							{
-								changes.Add(new SelectionChange { X = destX, Y =  destY, Data = track });
-							}
+							changes.Add(new SelectionChange { X = destX, Y = destY, Data = track });
 						}
-					}			
+					}
+				}			
 
-					AddChanges(changes);
-				}
+				AddChanges(changes);
 			}		
 		}
 		

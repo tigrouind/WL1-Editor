@@ -226,6 +226,18 @@ namespace WLEditor
 			return false;
 		}
 		
+		public int GetEvent(int tilePos)
+		{
+			var worldEvent = worldEvents[eventId];
+			int index = worldEvent.FindIndex(x => x.Key == tilePos);
+			if (index != -1)
+			{
+				return index << 16 | worldEvent[index].Value;
+			}
+			
+			return -1;
+		}
+		
 		public void AddEvent(byte tileData, int tilePos)
 		{
 			var worldEvent = worldEvents[eventId];

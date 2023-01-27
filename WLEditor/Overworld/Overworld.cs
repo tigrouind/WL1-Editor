@@ -585,7 +585,7 @@ namespace WLEditor
 			{
 				int tile = GetEmptyTile();
 				selection.CopySelection(CopyTileAt);
-				selection.DeleteSelection(GetTileAt, (x, y) => SetTileAt(x, y, tile ^ 0x80));
+				selection.DeleteSelection(GetTileAt, (x, y) => ClearTileAt(x, y, tile));
 				selection.ClearSelection();
 				
 				pictureBox1.Invalidate();
@@ -598,7 +598,7 @@ namespace WLEditor
 			if (!pathMode && selectionMode)
 			{
 				int tile = GetEmptyTile();
-				selection.DeleteSelection(GetTileAt, (x, y) => SetTileAt(x, y, tile ^ 0x80));
+				selection.DeleteSelection(GetTileAt, (x, y) => ClearTileAt(x, y, tile));
 				selection.ClearSelection();
 				
 				pictureBox1.Invalidate();
@@ -610,10 +610,31 @@ namespace WLEditor
 		{
 			if (selectionMode)
 			{
+				if (eventMode)
+				{
+					int tile = eventForm.GetEvent(x + y * 32);
+					if (tile != -1)
+					{
+						return tile;
+					}
+				}
+				
 				return GetTileAt(x, y);
 			}
 			
 			return (byte)((x + y * 16) ^ 0x80);
+		}
+		
+		void ClearTileAt(int x, int y, int tile)
+		{
+			if (eventMode)
+			{
+				eventForm.RemoveEvent(x + y * 32);
+			}
+			else
+			{
+				SetTileAt(x, y, tile ^ 0x80);
+			}
 		}
 		
 		int GetTileAt(int x, int y)
