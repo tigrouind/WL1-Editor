@@ -300,11 +300,6 @@ namespace WLEditor
 					
 		public bool ProcessPathKey(Keys key)
 		{	
-			bool shift = (key & Keys.Shift) != 0;
-			bool control = (key & Keys.Control) != 0;
-			
-			key = key & Keys.KeyCode;
-						
 			switch(key)
 			{
 				case Keys.PageUp:
@@ -315,49 +310,52 @@ namespace WLEditor
 					PreviousLevel();
 					return true;
 						
+				case Keys.Shift | Keys.Delete:
+					RemoveAllPaths();
+					
+					pictureBox.Invalidate();
+					SetChanges();						
+					return true;
+					
 				case Keys.Delete:
-					if (shift)
-					{
-						RemoveAllPaths();
-						
-						pictureBox.Invalidate();
-						SetChanges();						
-					}
-					else if (currentDirection != null)
+					if (currentDirection != null)
 					{
 						RemovePath();
 						BindPaths();						
 												
 						pictureBox.Invalidate();
-						SetChanges();						
-					}				
+						SetChanges();
+					}
 					return true;
 										
 				case Keys.Up:
 				case Keys.Down:
 				case Keys.Left:
 				case Keys.Right:
-					if (control)
-					{
-						MoveLevel(key);
-						BindPaths();
-						
-						pictureBox.Invalidate();
-						SetChanges();
-					}
-					else if (shift)
-					{		
-						AddPath(key);
-						BindPaths();						
-						
-						pictureBox.Invalidate();
-						SetChanges();
-					}
-					else
-					{	
-						ChangeDirection(key);						
-						pictureBox.Invalidate();
-					}					
+					ChangeDirection(key & Keys.KeyCode);
+					pictureBox.Invalidate();
+					return true;
+					
+				case Keys.Up | Keys.Control:
+				case Keys.Down | Keys.Control:
+				case Keys.Left | Keys.Control:
+				case Keys.Right | Keys.Control:
+					MoveLevel(key & Keys.KeyCode);
+					BindPaths();
+					
+					pictureBox.Invalidate();
+					SetChanges();
+					return true;
+					
+				case Keys.Up | Keys.Shift:
+				case Keys.Down | Keys.Shift:
+				case Keys.Left | Keys.Shift:
+				case Keys.Right | Keys.Shift:
+					AddPath(key & Keys.KeyCode);
+					BindPaths();						
+					
+					pictureBox.Invalidate();
+					SetChanges();
 					return true;
 					
 				case Keys.I:

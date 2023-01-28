@@ -388,77 +388,64 @@ namespace WLEditor
 		
 		bool DispatchCommandKey(Keys keyData)
 		{
-			if (keyData == (Keys.Control | Keys.Add) || keyData == (Keys.Control | Keys.Oemplus))
+			switch(keyData)
 			{
-				zoomInToolStripMenuItem.PerformClick();
-				return true;
-			}
-			if (keyData == (Keys.Control | Keys.Subtract) || keyData == (Keys.Control | Keys.OemMinus))
-			{
-				zoomOutToolStripMenuItem.PerformClick();
-				return true;
-			}
-						
-			if (keyData == Keys.B)
-			{				
-				int typeOfSwitch = Level.GetTypeOfSwitch();
-				switch(typeOfSwitch)
-				{
-					case 1:
-						SetSwitchMode(switchMode == 1 ? 0 : 1);
-						break;
-						
-					case 2:
-						SetSwitchMode(switchMode == 2 ? 0 : 2);
-						break;
-						
-					default:
-						SetSwitchMode((switchMode + 1) % 3);	
-						break;
-				}					
-			 	
-				return true;
-			}
-			
-			if (keyData == (Keys.Control | Keys.C))
-			{
-				levelPictureBox.CopySelection();
-				return true;
-			}
-			
-			if (keyData == (Keys.Control | Keys.V))
-			{
-				levelPictureBox.PasteSelection();
-				SetChanges(true);
-				return true;
-			}
-			
-			if (keyData == (Keys.Control | Keys.X))
-			{
-				levelPictureBox.CutSelection(GetEmptyTile());
-				SetChanges(true);
-				return true;
-			}
-			
-			if (keyData == (Keys.Delete))
-			{
-				levelPictureBox.DeleteSelection(GetEmptyTile());
-				SetChanges(true);
-				return true;
-			}
-			
-			if (keyData == (Keys.Control | Keys.Z))
-			{
-				levelPictureBox.Undo();
-				SetChanges(true);
-				return true;
-			}
-			
-			if (keyData == (Keys.Control | Keys.Y))
-			{
-				levelPictureBox.Redo();
-				SetChanges(true);
-				return true;
+				case Keys.Control | Keys.Add:
+				case Keys.Control | Keys.Oemplus:
+					zoomInToolStripMenuItem.PerformClick();
+					return true;
+					
+				case Keys.Control | Keys.Subtract:
+				case Keys.Control | Keys.OemMinus:
+					zoomOutToolStripMenuItem.PerformClick();
+					return true;
+					
+				case Keys.B:
+					int typeOfSwitch = Level.GetTypeOfSwitch();
+					switch(typeOfSwitch)
+					{
+						case 1:
+							SetSwitchMode(switchMode == 1 ? 0 : 1);
+							break;
+							
+						case 2:
+							SetSwitchMode(switchMode == 2 ? 0 : 2);
+							break;
+							
+						default:
+							SetSwitchMode((switchMode + 1) % 3);	
+							break;
+					}					
+					return true;
+					
+				case Keys.Control | Keys.C:
+					levelPictureBox.CopySelection();
+					return true;
+					
+				case Keys.Control | Keys.V:
+					levelPictureBox.PasteSelection();
+					SetChanges(true);
+					return true;
+					
+				case Keys.Control | Keys.X:
+					levelPictureBox.CutSelection(GetEmptyTile());
+					SetChanges(true);
+					return true;
+					
+				case Keys.Delete:
+					levelPictureBox.DeleteSelection(GetEmptyTile());
+					SetChanges(true);
+					return true;
+					
+				case Keys.Control | Keys.Z:
+					levelPictureBox.Undo();
+					SetChanges(true);
+					return true;
+					
+				case Keys.Control | Keys.Y:
+					levelPictureBox.Redo();
+					SetChanges(true);
+					return true;
 			}
 			
 			ToolStripMenuItem toolStrip = GetAllMenuItems(menuStrip1.Items)

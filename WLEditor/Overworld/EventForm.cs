@@ -136,8 +136,7 @@ namespace WLEditor
 		
 		public bool ProcessEventKey(Keys keyData)
 		{
-			bool shift = (keyData & Keys.Shift) != 0;
-			switch (keyData & Keys.KeyCode)
+			switch (keyData)
 			{
 				case Keys.PageUp:
 					if (eventId < worldEvents.Count - 1)
@@ -149,7 +148,7 @@ namespace WLEditor
 					{
 						eventStep = worldEvents[eventId].Count;
 					}
-					break;
+					return true;
 					
 				case Keys.PageDown:
 					if (eventId > 0) 
@@ -161,7 +160,7 @@ namespace WLEditor
 					{
 						eventStep = 0;
 					}
-					break;
+					return true;
 					
 				case Keys.Home:
 					if (eventStep < worldEvents[eventId].Count) 
@@ -173,7 +172,7 @@ namespace WLEditor
 						eventId++;
 						eventStep = 0;
 					}
-					break;
+					return true;
 					
 				case Keys.End:
 					if (eventStep > 0) 
@@ -185,31 +184,35 @@ namespace WLEditor
 						eventId--;
 						eventStep = worldEvents[eventId].Count;
 					}
-					break;
+					return true;
 					
 				case Keys.Delete:
-					var worldEvent = worldEvents[eventId];					
-					if (shift)
+					if (eventStep > 0)
+					{				
+						var worldEvent = worldEvents[eventId];					
+						worldEvent.RemoveAt(eventStep - 1);	
+						eventStep--;
+
+						pictureBox.Invalidate();
+						EventIndexChange();
+						SetChanges();
+					}
+					return true;
+					
+				case Keys.Delete | Keys.Shift:
 					{
+						var worldEvent = worldEvents[eventId];
 						if (worldEvent.Count > 0)
 						{
 							worldEvent.Clear();
 							eventStep = 0;
+							
+							pictureBox.Invalidate();
+							EventIndexChange();
+							SetChanges();
 						}
 					}
-					else
-					{						
-						if (eventStep > 0)
-						{							
-							worldEvent.RemoveAt(eventStep - 1);	
-							eventStep--;													
-						}
-					}
-					
-					pictureBox.Invalidate();
-					EventIndexChange();
-					SetChanges();
-					break;
+					return true;
 			}
 			
 			switch(keyData)

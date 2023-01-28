@@ -330,64 +330,50 @@ namespace WLEditor
 				return true;
 			}
 			
-			if (keyData == Keys.E)
+			switch(keyData)
 			{
-				pathMode = false;						
-				
-				eventMode = !eventMode;
-				UpdateTitle();
-				pictureBox1.Invalidate();
-				pictureBox2.Visible = true;
-				UpdateBounds();
-				return true;
-			}
-			
-			if (keyData == Keys.P)
-			{				
-				eventMode = false;
-				pathMode = !pathMode;
-				UpdateTitle();
-				pictureBox1.Invalidate();
-				pictureBox2.Visible = !pathMode;
-				UpdateBounds();
-				selection.ClearSelection();
-				return true;
-			}
-			
-			if (keyData == (Keys.Control | Keys.C))
-			{
-				CopySelection();
-				return true;
-			}
-			
-			if (keyData == (Keys.Control | Keys.V))
-			{					
-				PasteSelection();
-				return true;
-			}
-			
-			if (keyData == (Keys.Control | Keys.X))
-			{
-				CutSelection();
-				return true;
-			}
-			
-			if (keyData == (Keys.Delete))
-			{
-				DeleteSelection();
-				return true;
-			}
-			
-			if (keyData == (Keys.Control | Keys.Z))
-			{
-				Undo();
-				return true;
-			}
-			
-			if (keyData == (Keys.Control | Keys.Y))
-			{				
-				Redo();
-				return true;
+				case Keys.E:
+					pathMode = false;
+					eventMode = !eventMode;
+					UpdateTitle();
+					pictureBox1.Invalidate();
+					pictureBox2.Visible = true;
+					UpdateBounds();
+					return true;
+					
+				case Keys.P:
+					eventMode = false;
+					pathMode = !pathMode;
+					UpdateTitle();
+					pictureBox1.Invalidate();
+					pictureBox2.Visible = !pathMode;
+					UpdateBounds();
+					selection.ClearSelection();
+					return true;
+					
+				case Keys.Control | Keys.C:
+					CopySelection();
+					return true;
+					
+				case Keys.Control | Keys.V:
+					PasteSelection();
+					return true;
+					
+				case Keys.Control | Keys.X:
+					CutSelection();
+					return true;
+					
+				case Keys.Delete:
+					DeleteSelection();
+					return true;
+					
+				case Keys.Control | Keys.Z:
+					Undo();
+					return true;
+					
+				case Keys.Control | Keys.Y:
+					Redo();
+					return true;
 			}
 			
 			return false;
