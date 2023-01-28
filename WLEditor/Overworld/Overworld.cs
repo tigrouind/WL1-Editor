@@ -537,31 +537,12 @@ namespace WLEditor
 		{
 			if (!pathMode && selectionMode)
 			{
-				selection.PasteSelection((x, y, data) => 
-				{   	
-	             	if (x < currentMapX && y < currentMapY)
-	             	{	                     	
-						if (eventMode)
-						{
-							if (data != 0xFF) //not allowed because used as a marker
-							{
-								eventForm.AddEvent((byte)data, x + y * 32);
-							}
-						}
-						else
-						{							
-							int previous = GetTileAt(x, y);
-							worldTiles[x + y * 32] = (byte)data;							
-							return previous;
-						}					
-	             	}
-	             	
-	             	return -1;
-				});
-				selection.ClearSelection();
-				
-				pictureBox1.Invalidate();
-				SetChanges(1);
+				if (selection.PasteSelection(PasteTileAt))
+				{
+					selection.ClearSelection();
+					pictureBox1.Invalidate();
+					SetChanges(1);
+				}
 			}
 		}
 		
@@ -570,12 +551,12 @@ namespace WLEditor
 			if (!pathMode && selectionMode)
 			{
 				int tile = GetEmptyTile();
-				selection.CopySelection(CopyTileAt);
-				selection.DeleteSelection(GetTileAt, (x, y) => ClearTileAt(x, y, tile));
-				selection.ClearSelection();
-				
-				pictureBox1.Invalidate();
-				SetChanges(1);
+				if (selection.CutSelection(CopyTileAt, (x, y) => ClearTileAt(x, y, tile)))
+				{
+					selection.ClearSelection();
+					pictureBox1.Invalidate();
+					SetChanges(1);
+				}
 			}
 		}
 		
@@ -584,12 +565,35 @@ namespace WLEditor
 			if (!pathMode && selectionMode)
 			{
 				int tile = GetEmptyTile();
-				selection.DeleteSelection(GetTileAt, (x, y) => ClearTileAt(x, y, tile));
-				selection.ClearSelection();
-				
-				pictureBox1.Invalidate();
-				SetChanges(1);
+				if (selection.DeleteSelection(GetTileAt, (x, y) => ClearTileAt(x, y, tile)))
+				{
+					selection.ClearSelection();
+					pictureBox1.Invalidate();
+					SetChanges(1);
+				}
 			}
+		}
+		
+		int PasteTileAt(int x, int y, int data)
+		{
+			if (x < currentMapX && y < currentMapY)
+			{
+				if (eventMode)
+				{
+					if (data != 0xFF) //not allowed because used as a marker
+					{
+						eventForm.AddEvent((byte)data, x + y * 32);
+					}
+				}
+				else
+				{
+					int previous = GetTileAt(x, y);
+					worldTiles[x + y * 32] = (byte)data;
+					return previous;
+				}
+			}
+			
+			return -1;
 		}
 		
 		int CopyTileAt(int x, int y)
@@ -658,9 +662,11 @@ namespace WLEditor
 		{
 			if (!eventMode && !pathMode)
 			{
-				selection.Undo(SetTileAt, GetTileAt);
-				pictureBox1.Invalidate();
-				SetChanges(1);
+				if (selection.Undo(SetTileAt, GetTileAt))
+				{
+					pictureBox1.Invalidate();
+					SetChanges(1);
+				}
 			}
 		}
 		
@@ -668,9 +674,11 @@ namespace WLEditor
 		{
 			if (!eventMode && !pathMode)
 			{
-				selection.Redo(SetTileAt, GetTileAt);
-				pictureBox1.Invalidate();
-				SetChanges(1);
+				if (selection.Redo(SetTileAt, GetTileAt))
+				{
+					pictureBox1.Invalidate();
+					SetChanges(1);
+				}
 			}
 		}
 				

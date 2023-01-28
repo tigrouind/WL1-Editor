@@ -423,28 +423,38 @@ namespace WLEditor
 					return true;
 					
 				case Keys.Control | Keys.V:
-					levelPictureBox.PasteSelection();
-					SetChanges(true);
+					if (levelPictureBox.PasteSelection())
+					{
+						SetChanges(true);
+					}
 					return true;
 					
 				case Keys.Control | Keys.X:
-					levelPictureBox.CutSelection(GetEmptyTile());
-					SetChanges(true);
+					if (levelPictureBox.CutSelection(GetEmptyTile()))
+					{
+						SetChanges(true);
+					}
 					return true;
 					
 				case Keys.Delete:
-					levelPictureBox.DeleteSelection(GetEmptyTile());
-					SetChanges(true);
+					if (levelPictureBox.DeleteSelection(GetEmptyTile()))
+					{
+						SetChanges(true);
+					}
 					return true;
 					
 				case Keys.Control | Keys.Z:
-					levelPictureBox.Undo();
-					SetChanges(true);
+					if (levelPictureBox.Undo())
+					{
+						SetChanges(true);
+					}
 					return true;
 					
 				case Keys.Control | Keys.Y:
-					levelPictureBox.Redo();
-					SetChanges(true);
+					if (levelPictureBox.Redo())
+					{
+						SetChanges(true);
+					}
 					return true;
 			}
 			

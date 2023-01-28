@@ -462,36 +462,40 @@ namespace WLEditor
 			selection.ClearSelection();
 		}
 		
-		public void PasteSelection()
+		public bool PasteSelection()
 		{
-			selection.PasteSelection((x, y, data) => 				                                         
+			if (selection.PasteSelection(PasteTileAt))
 			{
-             	if (x < 256 && y < 32)
-				{             	
-             		int previous = GetTileAt(x, y);
-             		SetTileAt(x, y, data);         
-             		return previous;
-				}
-             	
-             	return -1;
-			});
-			selection.ClearSelection();
-			Invalidate();
+				selection.ClearSelection();
+				Invalidate();
+				return true;
+			}
+			
+			return false;
 		}
 		
-		public void CutSelection(int emptyTile)
-		{
-			selection.CopySelection(GetTileAt);
-			selection.DeleteSelection(GetTileAt, (x, y) => SetTileAt(x, y, emptyTile));
-			selection.ClearSelection();
-			Invalidate();
+		public bool CutSelection(int emptyTile)
+		{			
+			if (selection.CutSelection(GetTileAt, (x, y) => SetTileAt(x, y, emptyTile)))
+			{
+				selection.ClearSelection();
+				Invalidate();
+				return true;
+			}
+			
+			return false;
 		}
 		
-		public void DeleteSelection(int emptyTile)
+		public bool DeleteSelection(int emptyTile)
 		{
-			selection.DeleteSelection(GetTileAt, (x, y) => SetTileAt(x, y, emptyTile));
-			selection.ClearSelection();
-			Invalidate();
+			if (selection.DeleteSelection(GetTileAt, (x, y) => SetTileAt(x, y, emptyTile)))
+			{
+				selection.ClearSelection();
+				Invalidate();
+				return true;
+			}
+			
+			return false;
 		}
 		
 		public void ClearSelection()
@@ -507,6 +511,18 @@ namespace WLEditor
 		public void SetSelection(int x, int y)
 		{
 			selection.SetSelection(x, y);
+		}
+		
+		int PasteTileAt(int x, int y, int data)
+		{
+			if (x < 256 && y < 32)
+			{
+				int previous = GetTileAt(x, y);
+				SetTileAt(x, y, data);
+				return previous;
+			}
+			
+			return -1;
 		}
 		
 		int GetTileAt(int x, int y)
@@ -542,16 +558,26 @@ namespace WLEditor
 			selection.AddChanges(changes);
 		}
 		
-		public void Undo()
+		public bool Undo()
 		{
-			selection.Undo(SetTileAt, GetTileAt);			
-			Invalidate();
+			if (selection.Undo(SetTileAt, GetTileAt))
+			{
+				Invalidate();
+				return true;
+			}
+			
+			return false;
 		}
 		
-		public void Redo()
+		public bool Redo()
 		{
-			selection.Redo(SetTileAt, GetTileAt);			
-			Invalidate();
+			if (selection.Redo(SetTileAt, GetTileAt))
+			{
+				Invalidate();
+				return true;
+			}
+			
+			return false;
 		}
 		
 		public void ClearUndo()

@@ -90,7 +90,19 @@ namespace WLEditor
 			}
 		}
 		
-		public void DeleteSelection(Func<int, int, int> getTileAt, Action<int, int> clearTileAt)
+		public bool CutSelection(Func<int, int, int> getTileAt, Action<int, int> clearTileAt)
+		{
+			if (selection)
+			{
+				CopySelection(getTileAt);
+				DeleteSelection(getTileAt, clearTileAt);
+				return true;
+			}
+			
+			return false;
+		}
+		
+		public bool DeleteSelection(Func<int, int, int> getTileAt, Action<int, int> clearTileAt)
 		{
 			if (selection)
 			{
@@ -109,10 +121,13 @@ namespace WLEditor
 				}
 				
 				AddChanges(changes);
+				return true;
 			}
+			
+			return false;
 		}
 		
-		public void PasteSelection(Func<int, int, int, int> setTileAt)
+		public bool PasteSelection(Func<int, int, int, int> setTileAt)
 		{
 			if (selection && selectionWidth > 0 && selectionHeight > 0)
 			{
@@ -145,7 +160,10 @@ namespace WLEditor
 				}			
 
 				AddChanges(changes);
+				return true;
 			}		
+			
+			return false;
 		}
 		
 		public void StartSelection(int x, int y)
@@ -206,17 +224,17 @@ namespace WLEditor
 			}
 		}
 				
-		public void Undo(Action<int, int, int> setTileAt, Func<int, int, int> getTileAt)
+		public bool Undo(Action<int, int, int> setTileAt, Func<int, int, int> getTileAt)
 		{
-			ApplyChanges(setTileAt, getTileAt, undo, redo);
+			return ApplyChanges(setTileAt, getTileAt, undo, redo);
 		}
 		
-		public void Redo(Action<int, int, int> setTileAt, Func<int, int, int> getTileAt)
+		public bool Redo(Action<int, int, int> setTileAt, Func<int, int, int> getTileAt)
 		{
-			ApplyChanges(setTileAt, getTileAt, redo, undo);
+			return ApplyChanges(setTileAt, getTileAt, redo, undo);
 		}
 				
-		void ApplyChanges(Action<int, int, int> setTileAt, Func<int, int, int> getTileAt, List<List<SelectionChange>> source, List<List<SelectionChange>> dest)
+		bool ApplyChanges(Action<int, int, int> setTileAt, Func<int, int, int> getTileAt, List<List<SelectionChange>> source, List<List<SelectionChange>> dest)
 		{
 			if (source.Count > 0)
 			{
@@ -228,8 +246,11 @@ namespace WLEditor
 				}
 									
 				source.RemoveAt(source.Count - 1);	
-				dest.Add(changes);				
+				dest.Add(changes);
+				return true;
 			}
+			
+			return false;
 		}
 		
 		#endregion
