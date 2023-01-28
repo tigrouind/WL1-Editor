@@ -182,7 +182,7 @@ namespace WLEditor
 		
 		#region Events
 		
-		public static List<List<KeyValuePair<int, byte>>> LoadEvents(Rom rom, int[] events)
+		public static List<KeyValuePair<int, byte>>[] LoadEvents(Rom rom, int[] events)
 		{
 			rom.SetBank(8);			
 			
@@ -211,10 +211,10 @@ namespace WLEditor
 				result.Add(eventItem);
 			}		
 			
-			return result;
+			return result.ToArray();
 		}
 		
-		public static bool SaveEvents(Rom rom, List<List<KeyValuePair<int, byte>>> events, 
+		public static bool SaveEvents(Rom rom, List<KeyValuePair<int, byte>>[] events,
           	int[][] eventPointers, int[,] eventAddressOffset, int maxSize, out string errorMessage)
 		{			
 			int size = events.Sum(x => x.Sum(y => 3) + 2);
@@ -227,7 +227,7 @@ namespace WLEditor
 			rom.SetBank(8);	
 			int position = rom.ReadWord(eventPointers[0][0] + eventAddressOffset[0, 0]);
 			
-			for(int i = 0 ; i < events.Count; i++)
+			for(int i = 0 ; i < events.Length; i++)
 			{				
 				var worldEvent = events[i];
 				

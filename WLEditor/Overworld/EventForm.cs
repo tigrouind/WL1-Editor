@@ -7,9 +7,8 @@ namespace WLEditor
 {
 	public class EventForm
 	{	
-		List<List<KeyValuePair<int, byte>>> worldEvents;
-		
-		int eventId;
+		List<KeyValuePair<int, byte>>[] worldEvents;
+		List<KeyValuePair<int, byte>> worldEvent;
 		int eventStep;
 				
 		int zoom;
@@ -116,9 +115,9 @@ namespace WLEditor
 		public void LoadWorld(Rom rom, int world)
 		{
 			currentWorld = world;
-			eventId = 0;
-			eventStep = 0;
 			worldEvents = Map.LoadEvents(rom, eventPointers[currentWorld][0]);
+			eventStep = 0;
+			worldEvent = worldEvents[0];
 		}
 		
 		public bool SaveEvents(Rom rom, out string message)
@@ -129,6 +128,7 @@ namespace WLEditor
 		
 		public string GetTitle()
 		{
+			int eventId = Array.IndexOf(worldEvents, worldEvent);
 			return string.Format(eventStep == 0 ? "Event {0}" : "Event {0} / {1}", eventId + 1, eventStep);
 		}
 		
@@ -139,39 +139,51 @@ namespace WLEditor
 			switch (keyData)
 			{
 				case Keys.PageUp:
-					if (eventId < worldEvents.Count - 1)
+					if (worldEvent != worldEvents[worldEvents.Length - 1])
 					{
-						eventId++;
+						int eventId = Array.IndexOf(worldEvents, worldEvent);
+						worldEvent = worldEvents[eventId + 1];
 						eventStep = 0;
 					}		
 					else 
 					{
-						eventStep = worldEvents[eventId].Count;
+						eventStep = worldEvent.Count;
 					}
+					
+					EventIndexChange();
+					pictureBox.Invalidate();
 					return true;
 					
 				case Keys.PageDown:
-					if (eventId > 0) 
+					if (worldEvent != worldEvents[0])
 					{
-						eventId--;
+						int eventId = Array.IndexOf(worldEvents, worldEvent);
+						worldEvent = worldEvents[eventId - 1];
 						eventStep = 0;
 					}		
 					else 
 					{
 						eventStep = 0;
 					}
+					
+					EventIndexChange();
+					pictureBox.Invalidate();
 					return true;
 					
 				case Keys.Home:
-					if (eventStep < worldEvents[eventId].Count) 
+					if (eventStep < worldEvent.Count) 
 					{
 						eventStep++;
 					}			
-					else if (eventId < worldEvents.Count - 1)
+					else if (worldEvent != worldEvents[worldEvents.Length - 1])
 					{
-						eventId++;
+						int eventId = Array.IndexOf(worldEvents, worldEvent);
+						worldEvent = worldEvents[eventId + 1];
 						eventStep = 0;
 					}
+					
+					EventIndexChange();
+					pictureBox.Invalidate();
 					return true;
 					
 				case Keys.End:
@@ -179,17 +191,20 @@ namespace WLEditor
 					{
 						eventStep--;
 					}		
-					else if (eventId > 0) 
+					else if (worldEvent != worldEvents[0])
 					{
-						eventId--;
-						eventStep = worldEvents[eventId].Count;
+						int eventId = Array.IndexOf(worldEvents, worldEvent);
+						worldEvent = worldEvents[eventId - 1];
+						eventStep = worldEvent.Count;
 					}
+					
+					EventIndexChange();
+					pictureBox.Invalidate();
 					return true;
 					
 				case Keys.Delete:
 					if (eventStep > 0)
-					{				
-						var worldEvent = worldEvents[eventId];					
+					{
 						worldEvent.RemoveAt(eventStep - 1);	
 						eventStep--;
 
@@ -200,29 +215,15 @@ namespace WLEditor
 					return true;
 					
 				case Keys.Delete | Keys.Shift:
+					if (worldEvent.Count > 0)
 					{
-						var worldEvent = worldEvents[eventId];
-						if (worldEvent.Count > 0)
-						{
-							worldEvent.Clear();
-							eventStep = 0;
-							
-							pictureBox.Invalidate();
-							EventIndexChange();
-							SetChanges();
-						}
+						worldEvent.Clear();
+						eventStep = 0;
+						
+						pictureBox.Invalidate();
+						EventIndexChange();
+						SetChanges();
 					}
-					return true;
-			}
-			
-			switch(keyData)
-			{
-				case Keys.PageUp:
-				case Keys.PageDown:
-				case Keys.Home:
-				case Keys.End:	
-					EventIndexChange();
-					pictureBox.Invalidate();
 					return true;
 			}
 			
@@ -231,7 +232,6 @@ namespace WLEditor
 		
 		public int GetEvent(int tilePos)
 		{
-			var worldEvent = worldEvents[eventId];
 			int index = worldEvent.FindIndex(x => x.Key == tilePos);
 			if (index != -1)
 			{
@@ -243,7 +243,6 @@ namespace WLEditor
 		
 		public void AddEvent(byte tileData, int tilePos)
 		{
-			var worldEvent = worldEvents[eventId];
 			int index = worldEvent.FindIndex(x => x.Key == tilePos);
 			if (index == -1)
 			{
@@ -261,8 +260,7 @@ namespace WLEditor
 		}
 				
 		public void RemoveEvent(int tilePos)
-		{			
-			var worldEvent = worldEvents[eventId];
+		{
 			int index = worldEvent.FindIndex(x => x.Key == tilePos);
 			if (index >= 0)
 			{
@@ -290,18 +288,18 @@ namespace WLEditor
 			using (var brushEvent = new SolidBrush(Color.FromArgb(128, 255, 128, 0)))
 			using (var brushStep = new SolidBrush(Color.FromArgb(128, 64, 192, 192)))
 			{
-				for(int j = 0 ; j < Math.Min(worldEvents.Count, eventId + 1) ; j++)
+				foreach(var worldEv in worldEvents)
 				{
-					var worldEvent = worldEvents[j];
-					for(int i = 0 ; i < worldEvent.Count ; i++)
+					for(int i = 0 ; i < worldEv.Count ; i++)
 					{
-						var item = worldEvent[i];						
+						var item = worldEv[i];						
 						int position = item.Key;
 						int x = position % 32;
 						int y = position / 32;
 						byte tileIndex = item.Value;
 						
-						if (i >= eventStep && j == eventId)
+						bool selected = worldEv == worldEvent;
+						if (i >= eventStep && selected)
 						{
 							graphics.FillRectangle(brushEvent, new Rectangle(x * 8 * zoom, y * 8 * zoom, 8 * zoom, 8 * zoom));
 						}
@@ -314,12 +312,16 @@ namespace WLEditor
 							                   new Rectangle(x * 8 * zoom, y * 8 * zoom, 8 * zoom, 8 * zoom), 
 							                   new Rectangle(srcx * 8, srcy * 8, 8, 8), GraphicsUnit.Pixel);
 							
-							if (j == eventId) 
+							if (selected) 
 							{
 								graphics.FillRectangle(brushStep, new Rectangle(x * 8 * zoom, y * 8 * zoom, 8 * zoom, 8 * zoom));
 							}
 						}
-						
+					}
+					
+					if (worldEv == worldEvent)
+					{
+						break;
 					}
 				}
 			}
