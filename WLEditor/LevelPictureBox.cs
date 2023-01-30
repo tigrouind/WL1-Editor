@@ -42,7 +42,7 @@ namespace WLEditor
 		
 		public LevelPictureBox()
 		{
-			selection.InvalidatePictureBox += (s, e) => Invalidate(e.ClipRectangle);
+			selection.InvalidateSelection += (s, e) => Invalidate(e.ClipRectangle);
 		}
 				
 		protected override void OnPaint(PaintEventArgs e)

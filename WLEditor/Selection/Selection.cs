@@ -14,7 +14,7 @@ namespace WLEditor
 		Point selectionStart, selectionEnd;
 		int selectionWidth, selectionHeight;
 		readonly List<int> selectionData = new List<int>();
-		public event EventHandler<SelectionEventArgs> InvalidatePictureBox;
+		public event EventHandler<SelectionEventArgs> InvalidateSelection;
 		
 		readonly List<List<SelectionChange>> undo = new List<List<SelectionChange>>();
 		readonly List<List<SelectionChange>> redo = new List<List<SelectionChange>>();
@@ -52,9 +52,9 @@ namespace WLEditor
 			end = new Point(endX, endY);
 		}
 		
-		public void Invalidate()
+		void Invalidate()
 		{
-			InvalidatePictureBox(this, new SelectionEventArgs(GetSelectionRectangle()));
+			InvalidateSelection(this, new SelectionEventArgs(GetSelectionRectangle()));
 		}
 		
 		Rectangle GetSelectionRectangle()

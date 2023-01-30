@@ -49,7 +49,7 @@ namespace WLEditor
 			pathForm = new PathForm(pictureBox1);
 			pathForm.PathChanged += (s, e) => SetChanges(4);			
 			
-			selection.InvalidatePictureBox += InvalidatePictureBox;
+			selection.InvalidateSelection += InvalidateSelection;
 		}
 		
 		readonly ComboboxItem<int[]>[] worldData = 
@@ -639,7 +639,7 @@ namespace WLEditor
 			return Level.GetEmptyTile(tilesWorld8x8.Bits, 8, 16);
 		}
 		
-		void InvalidatePictureBox(object sender, SelectionEventArgs e)
+		void InvalidateSelection(object sender, SelectionEventArgs e)
 		{	
 			if (selectionMode)
 			{
