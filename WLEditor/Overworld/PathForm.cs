@@ -479,7 +479,8 @@ namespace WLEditor
 				format.LineAlignment = StringAlignment.Center;
 				format.Alignment = StringAlignment.Center;
 				
-				foreach (var dir in currentPath.Directions.Where(x => x.Path.Count > 0 && (x.Next == 0xFD || x.Next == 0xFA || x.Next == 0xF9 || x.Next == 0xF8)))
+				foreach (var dir in currentPath.Directions.Where(x => x.Path.Count > 0 && (x.Next == 0xFD || x.Next == 0xFA || x.Next == 0xF9 || x.Next == 0xF8))
+				         .OrderBy(x => x == currentDirection))
 				{			
 					int nextX, nextY;
 					GetPathPosition(currentPath, dir, out nextX, out nextY);	
