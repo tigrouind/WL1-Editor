@@ -281,9 +281,6 @@ namespace WLEditor
 			pictureBox2.Width = 128 * zoomlevel;
 			pictureBox2.Height = 128 * zoomlevel;				
 			
-			pictureBox1.Invalidate();
-			pictureBox2.Invalidate();
-			
 			eventForm.SetZoom(zoomlevel);
 			pathForm.SetZoom(zoomlevel);			
 			selection.SetZoom(zoomlevel);

@@ -79,7 +79,6 @@ namespace WLEditor
 			Height = 128 * zoomlevel;
 			Width = 128 * zoomlevel;
 			zoom = zoomlevel;
-			Invalidate();			
 		}						
 	}
 }
