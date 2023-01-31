@@ -207,6 +207,14 @@ namespace WLEditor
 			}
 		}
 		
+		public bool HasSelection
+		{
+			get
+			{
+				return selection;
+			}
+		}
+
 		#region Undo
 		
 		public void ClearUndo()

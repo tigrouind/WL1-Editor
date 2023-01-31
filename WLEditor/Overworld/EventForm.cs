@@ -96,10 +96,10 @@ namespace WLEditor
 			71			
 		};
 		
-		public EventForm(PictureBox box, DirectBitmap tiles)
+		public EventForm(PictureBox pictureBox, DirectBitmap tilesWorld8x8)
 		{	
-			tilesWorld8x8 = tiles;			
-			pictureBox = box;
+			this.tilesWorld8x8 = tilesWorld8x8;
+			this.pictureBox = pictureBox;
 		}
 		
 		public void SetZoom(int zoomLevel)

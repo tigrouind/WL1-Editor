@@ -320,7 +320,7 @@ namespace WLEditor
 		
 		bool DispatchCommandKey(Keys keyData)
 		{
-			if (eventMode && eventForm.ProcessEventKey(keyData))
+			if (eventMode && !(keyData == Keys.Delete && selection.HasSelection) && eventForm.ProcessEventKey(keyData))
 			{
 				return true;
 			}
