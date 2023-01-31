@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -7,29 +7,29 @@ namespace WLEditor
 {
 	public static class Extensions
 	{
-		public static int FindIndex<T>(this IEnumerable<T> items, Func<T, bool> predicate) 
-		{		
-		    int index = 0;
-		    foreach (var item in items) 
-		    {
-		        if (predicate(item))
-		        {
-		        	return index;
-		        }
-		        
-		        index++;
-		    }
-		    return -1;
+		public static int FindIndex<T>(this IEnumerable<T> items, Func<T, bool> predicate)
+		{
+			int index = 0;
+			foreach (var item in items)
+			{
+				if (predicate(item))
+				{
+					return index;
+				}
+
+				index++;
+			}
+			return -1;
 		}
-		
+
 		public static PointF Normalized(this PointF point)
 		{
 			float length = (float)Math.Sqrt(point.X * point.X + point.Y * point.Y);
 			return new PointF(point.X / length, point.Y / length);
 		}
-		
-		public static IEnumerable<TResult> GroupByAdjacent<TSource, TKey, TResult>(this IEnumerable<TSource> source, 
-				Func<TSource, TKey> selector, 
+
+		public static IEnumerable<TResult> GroupByAdjacent<TSource, TKey, TResult>(this IEnumerable<TSource> source,
+				Func<TSource, TKey> selector,
 				Func<TKey, IEnumerable<TSource>, TResult> resultSelector)
 		{
 			var comparer = EqualityComparer<TKey>.Default;
@@ -59,6 +59,6 @@ namespace WLEditor
 					yield return resultSelector(lastKey, buffer);
 				}
 			}
-        }
+		}
 	}
 }

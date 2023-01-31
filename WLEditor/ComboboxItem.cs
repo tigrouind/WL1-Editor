@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace WLEditor
 {
@@ -6,7 +6,7 @@ namespace WLEditor
 	{
 		public string Text { get; set; }
 		public T Value { get; set; }
-		
+
 		public ComboboxItem(T value)
 		{
 			Value = value;

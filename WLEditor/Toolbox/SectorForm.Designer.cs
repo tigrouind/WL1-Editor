@@ -1,4 +1,4 @@
-﻿namespace WLEditor
+namespace WLEditor
 {
 	partial class SectorForm
 	{
@@ -33,7 +33,7 @@
 		private System.Windows.Forms.Panel panel1;
 		private System.Windows.Forms.Panel panel2;
 		private System.Windows.Forms.Panel panel3;
-		
+
 		/// <summary>
 		/// Disposes resources used by the control.
 		/// </summary>
@@ -47,7 +47,7 @@
 			}
 			base.Dispose(disposing);
 		}
-		
+
 		/// <summary>
 		/// This method is required for Windows Forms designer support.
 		/// Do not change the method contents inside the source code editor. The Forms designer might

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -7,113 +7,113 @@ namespace WLEditor
 {
 	public static class Level
 	{
-		readonly static uint[] paletteColors =  { 0xFFFFFFFF, 0xFFAAAAAA, 0xFF555555, 0xFF000000 };				
-		
+		readonly static uint[] paletteColors =  { 0xFFFFFFFF, 0xFFAAAAAA, 0xFF555555, 0xFF000000 };
+
 		public static byte[] LevelData = new byte[0x3000];
 		public static byte[] ObjectsData = new byte[0x2000];
 		public static byte[] ScrollData = new byte[32];
 		public static byte[] Warps = new byte[32];
 		public static int WarioPosition;
-		public static int CameraPosition;		
+		public static int CameraPosition;
 		public static bool[] Animated16x16Tiles = new bool[16 * 8];
 		private static int[] animated8x8Tiles = new int[16 * 8 * 2 * 2];
 		public static int AnimatedTilesMask;
-		public static bool WarioRightFacing;		
-		
-		public static DirectBitmap Tiles8x8 = new DirectBitmap(16 * 8, 8 * 8); 
-		public static DirectBitmap Tiles16x16 = new DirectBitmap(16 * 8, 16 * 16); 
-				
+		public static bool WarioRightFacing;
+
+		public static DirectBitmap Tiles8x8 = new DirectBitmap(16 * 8, 8 * 8);
+		public static DirectBitmap Tiles16x16 = new DirectBitmap(16 * 8, 16 * 16);
+
 		public static void DumpLevel(Rom rom, int course, int warp, bool reloadAll, int switchMode, int animatedTileIndex, bool reloadAnimatedTilesOnly)
-		{			
+		{
 			int tilebank;
 			int tileaddressB;
 			int tileaddressA;
-			int tileanimated;			
-			int blockindex;			
+			int tileanimated;
+			int blockindex;
 			byte palette;
 			int enemiesData;
-			
+
 			rom.SetBank(0xC);
 			int header = rom.ReadWord(0x4560 + course * 2);
-						
+
 			if(warp != -1)
-			{				
+			{
 				tilebank = rom.ReadByte(warp + 11);
 				tileaddressB = rom.ReadWord(warp + 12);
 				tileaddressA = rom.ReadWord(warp + 14);
 				tileanimated = rom.ReadWord(warp + 18);
 				blockindex = rom.ReadWord(warp + 20);
 				palette = rom.ReadByte(warp + 10);
-				enemiesData = rom.ReadWord(warp + 22);				
+				enemiesData = rom.ReadWord(warp + 22);
 			}
 			else
 			{
 				tilebank = rom.ReadByte(header + 0);
 				tileaddressB = rom.ReadWord(header + 1);
 				tileaddressA = rom.ReadWord(header + 3);
-				tileanimated = rom.ReadWord(header + 7);							
+				tileanimated = rom.ReadWord(header + 7);
 				blockindex = rom.ReadWord(header + 11);
-				palette = rom.ReadByte(header + 27);			
+				palette = rom.ReadByte(header + 27);
 				enemiesData = rom.ReadWord(header + 28);
 			}
-							
+
 			if(!reloadAnimatedTilesOnly)
 			{
 				int enemiesIdsPointer, enemiesTiles, treasureID;
 				bool exitOpen, treasureCheck, bonus;
-				
+
 				Sprite.FindEnemiesData(rom, enemiesData, out enemiesIdsPointer, out enemiesTiles, out treasureID, out treasureCheck, out exitOpen, out bonus);
-				Sprite.DumpEnemiesSprites(rom, enemiesIdsPointer, enemiesTiles);	
+				Sprite.DumpEnemiesSprites(rom, enemiesIdsPointer, enemiesTiles);
 
 				//dump 8x8 tiles
 				Array.Clear(Tiles8x8.Bits, 0, Tiles8x8.Width * Tiles8x8.Height);
 				rom.SetBank(0x11);
 				Dump8x8Tiles(rom, Tiles8x8, tileaddressA, 2*16, 0*16, palette, paletteColors, false);
 				rom.SetBank(tilebank);
-				Dump8x8Tiles(rom, Tiles8x8, tileaddressB, 6*16, 2*16, palette, paletteColors, false);				
+				Dump8x8Tiles(rom, Tiles8x8, tileaddressB, 6*16, 2*16, palette, paletteColors, false);
 
 				//dump scroll
 				rom.SetBank(0xC);
 				rom.ReadBytes(0x4000 + course * 32, 32, ScrollData);
-				
+
 				//dump warps
-				rom.SetBank(0xC);				
+				rom.SetBank(0xC);
 				for(int i = 0 ; i < 32 ; i++)
 				{
 					int warpdata = rom.ReadWord(0x4F30 + course * 64 + i * 2);
 					Warps[i] = rom.ReadByte(warpdata);
 				}
-				
+
 				rom.SetBank(0xC);
 				if (warp != -1)
 				{
-					int targetSector = rom.ReadByte(warp);					
-					WarioPosition = (targetSector % 16) * 256 + rom.ReadByte(warp + 2) 
-						         + ((targetSector / 16) * 256 + rom.ReadByte(warp + 1)) * 4096;
+					int targetSector = rom.ReadByte(warp);
+					WarioPosition = (targetSector % 16) * 256 + rom.ReadByte(warp + 2)
+								+ ((targetSector / 16) * 256 + rom.ReadByte(warp + 1)) * 4096;
 					WarioRightFacing = false;
-					
-					int cameraSector = rom.ReadByte(warp + 4);			
-					CameraPosition = rom.ReadByte(warp + 6) + (cameraSector % 16) * 256 + 16 
-						          + (rom.ReadByte(warp + 5) + (cameraSector / 16) * 256 + 16) * 4096;
+
+					int cameraSector = rom.ReadByte(warp + 4);
+					CameraPosition = rom.ReadByte(warp + 6) + (cameraSector % 16) * 256 + 16
+								+ (rom.ReadByte(warp + 5) + (cameraSector / 16) * 256 + 16) * 4096;
 					AnimatedTilesMask = rom.ReadByte(warp + 9);
 				}
-				else 
+				else
 				{
-					WarioPosition = rom.ReadWordSwap(header + 15) + rom.ReadWordSwap(header + 13) * 4096;								
-					WarioRightFacing = (rom.ReadByte(header + 18) & 0x20) == 0;					
+					WarioPosition = rom.ReadWordSwap(header + 15) + rom.ReadWordSwap(header + 13) * 4096;
+					WarioRightFacing = (rom.ReadByte(header + 18) & 0x20) == 0;
 					CameraPosition = rom.ReadWordSwap(header + 21) + 16
-						          + (rom.ReadWordSwap(header + 19) + 16) * 4096;
-					AnimatedTilesMask = rom.ReadByte(header + 26);					
+								+ (rom.ReadWordSwap(header + 19) + 16) * 4096;
+					AnimatedTilesMask = rom.ReadByte(header + 26);
 				}
 			}
-						
+
 			if(AnimatedTilesMask != 0)
 			{
 				rom.SetBank(0x11);
-				Dump8x8Tiles(rom, Tiles8x8, tileanimated + animatedTileIndex * 16 * 4, 4, 2*16, palette, paletteColors, false);			
-			}				
+				Dump8x8Tiles(rom, Tiles8x8, tileanimated + animatedTileIndex * 16 * 4, 4, 2*16, palette, paletteColors, false);
+			}
 
-			//dump 16x16 tiles			
+			//dump 16x16 tiles
 			if(reloadAnimatedTilesOnly)
 			{
 				rom.SetBank(0x11);
@@ -126,27 +126,27 @@ namespace WLEditor
 			}
 
 			if(reloadAll)
-			{						
+			{
 				//dump 16x16 blocks
 				rom.SetBank(0xC);
 				int blockbank = rom.ReadByte(header + 9);
 				int blockubbank = rom.ReadByte(header + 10);
-				
+
 				rom.SetBank(blockbank);
 				int tilesdata = rom.ReadWord(0x4000 + blockubbank * 2);
 				RLEDecompressTiles(rom, tilesdata, LevelData);
-				
+
 				//dump objects
 				rom.SetBank(0x7);
 				int objectsPosition = rom.ReadWord(0x4199 + course * 2);
 				RLEDecompressObjects(rom, objectsPosition, ObjectsData);
 			}
-		}		
-		
+		}
+
 		static void RLEDecompressTiles(Rom rom, int tilesdata, byte[] decompressed)
 		{
 			int position = 0;
-			
+
 			while(position < decompressed.Length)
 			{
 				byte data = rom.ReadByte(tilesdata++);
@@ -194,7 +194,7 @@ namespace WLEditor
 		static void RLEDecompressObjects(Rom rom, int enemiesData, byte[] decompressed)
 		{
 			int position = 0;
-			
+
 			while(position < decompressed.Length)
 			{
 				byte data = rom.ReadByte(enemiesData++);
@@ -237,24 +237,24 @@ namespace WLEditor
 				yield return count;
 			}
 		}
-		
+
 		static void DumpAnimated16x16Tiles(uint defaultColor)
 		{
 			int m = 0;
 			for(int n = 0 ; n < 16 ; n++)
 			{
 				for(int i = 0 ; i < 8 ; i++)
-				{				
+				{
 					for(int k = 0 ; k < 2 ; k++)
 					{
 						for(int j = 0 ; j < 2 ; j++)
-						{							
+						{
 							int subTileIndex = animated8x8Tiles[m++];
 							if(subTileIndex != -1)
 							{
 								Point dest = new Point(j * 8 + i * 16, k * 8 + n * 16);
-								Dump8x8Tile(dest, subTileIndex, defaultColor);	
-							}							
+								Dump8x8Tile(dest, subTileIndex, defaultColor);
+							}
 						}
 					}
 				}
@@ -262,7 +262,7 @@ namespace WLEditor
 		}
 
 		static void Dump16x16Tiles(Rom rom, int tileindexaddress, int switchMode, uint defaultColor)
-		{						
+		{
 			int m = 0;
 			for(int n = 0 ; n < 16 ; n++)
 			{
@@ -280,22 +280,22 @@ namespace WLEditor
 							bool isAnimated = subTileIndex >= (2 * 16) && subTileIndex < (2 * 16 + 4);
 							isAnimatedTile |= isAnimated;
 							animated8x8Tiles[m++] = isAnimated ? subTileIndex : -1;
-														
+
 							Point dest = new Point(j * 8 + i * 16, k * 8 + n * 16);
 							Dump8x8Tile(dest, subTileIndex, defaultColor);
 						}
 					}
-					
+
 					Animated16x16Tiles[tileIndex] = isAnimatedTile;
 				}
 			}
 		}
-		
+
 		static void Dump8x8Tile(Point dest, int subTileIndex, uint defaultColor)
 		{
 			if(subTileIndex < 128)
 			{
-				Point source = new Point((subTileIndex % 16) * 8, (subTileIndex / 16) * 8);										
+				Point source = new Point((subTileIndex % 16) * 8, (subTileIndex / 16) * 8);
 				for(int y = 0 ; y < 8 ; y++)
 				{
 					Array.Copy(Tiles8x8.Bits, source.X + (source.Y + y) * Tiles8x8.Width, Tiles16x16.Bits, dest.X + (dest.Y + y) * Tiles16x16.Width, 8);
@@ -303,18 +303,18 @@ namespace WLEditor
 			}
 			else
 			{
-				//fill 8x8 block with default color							
+				//fill 8x8 block with default color
 				for(int y = 0 ; y < 8 ; y++)
 				{
-					int destIndex = dest.X + (dest.Y + y) * Tiles16x16.Width;									
+					int destIndex = dest.X + (dest.Y + y) * Tiles16x16.Width;
 					for(int x = 0 ; x < 8 ; x++)
 					{
 						Tiles16x16.Bits[destIndex + x] = defaultColor;
 					}
 				}
 			}
-		}		
-		
+		}
+
 		public static void Dump8x8Tiles(Rom rom, DirectBitmap bitmap, int gfxAddress, int tiles, int pos, byte palette, uint[] customPalette, bool transparency)
 		{
 			Dump8x8Tiles(Enumerable.Range(0, tiles * 16).Select(x => rom.ReadByte(gfxAddress + x)), bitmap, tiles, pos, palette, customPalette, transparency);
@@ -328,7 +328,7 @@ namespace WLEditor
 				{
 					int tilePosX = ((n + pos) % 16) * 8;
 					int tilePosY = ((n + pos) / 16) * 8;
-								
+
 					for(int y = 0 ; y < 8 ; y++)
 					{
 						enumerator.MoveNext();
@@ -336,13 +336,13 @@ namespace WLEditor
 						enumerator.MoveNext();
 						byte data1 = enumerator.Current;
 						int destIndex = tilePosX + (y + tilePosY) * Tiles8x8.Width;
-	
+
 						for(int x = 0 ; x < 8 ; x++)
 						{
 							int pixelA = (data0 >> (7 - x)) & 0x1;
 							int pixelB = (data1 >> (7 - x)) & 0x1;
 							int pixel = pixelA + pixelB * 2;
-							
+
 							if(!transparency || pixel != 0)
 							{
 								int palindex = (palette >> pixel * 2) & 0x3;
@@ -353,7 +353,7 @@ namespace WLEditor
 				}
 			}
 		}
-		
+
 		public static List<KeyValuePair<int, int>> GetCourseIds(Rom rom)
 		{
 			//convert course id => course no using data in ROM
@@ -365,65 +365,65 @@ namespace WLEditor
 				int courseNo = (levelpointer - 0x0587) / 3;
 				courseIdToNo.Add(new KeyValuePair<int, int>(i, courseNo));
 			}
-			
+
 			return courseIdToNo;
 		}
-		
+
 		public static int IsSpecialTile(int tileIndex)
 		{
 			switch(tileIndex)
 			{
-				case 0x2E: 
+				case 0x2E:
 				case 0x48:
 				case 0x4B:
-				case 0x54:					
+				case 0x54:
 					return 6; //door
-					
-				case 0x44: 
-				case 0x45:					
-					return 4; //ladder		
 
-				case 0x47: 
+				case 0x44:
+				case 0x45:
+					return 4; //ladder
+
+				case 0x47:
 				case 0x46:
-				case 0x53:	
-				case 0x3E: 							
+				case 0x53:
+				case 0x3E:
 					return 3; //coins or sand
-									
-				case 0x59: 
+
+				case 0x59:
 				case 0x5A:
-				case 0x5C: 	
+				case 0x5C:
 				case 0x5D:
-				case 0x5E:	
-				case 0x5F:							
+				case 0x5E:
+				case 0x5F:
 					return 5; //damage
-					
-				case 0x3A: 
+
+				case 0x3A:
 				case 0x3B:
 				case 0x40:
 				case 0x41:
 				case 0x42:
-				case 0x43:					
-					return 1; //plateform	 
+				case 0x43:
+					return 1; //plateform
 
 				case 0x4A:
 				case 0x4C:
 				case 0x4D:
 				case 0x4E:
 				case 0x4F:
-				case 0x50: 	
-				case 0x51: 	
-				case 0x52: 	
-				case 0x55: 	
-				case 0x56: 		
-				case 0x57: 	
-				case 0x58: 
-				case 0x5B: 					
-					return 2; //water		 					
-			}	
+				case 0x50:
+				case 0x51:
+				case 0x52:
+				case 0x55:
+				case 0x56:
+				case 0x57:
+				case 0x58:
+				case 0x5B:
+					return 2; //water
+			}
 
 			if((tileIndex & 64) != 64)
 				return 0;
-			
+
 			return -1;
 		}
 
@@ -462,7 +462,7 @@ namespace WLEditor
 
 					case 0x7B:
 						return 0x7A;
-						
+
 					case 0x59:
 						return 0x5D;
 
@@ -473,7 +473,7 @@ namespace WLEditor
 
 			return tileData;
 		}
-		
+
 		public static int GetTypeOfSwitch()
 		{
 			for (int tileIndex = 0 ; tileIndex < 8192 ; tileIndex++)
@@ -483,21 +483,21 @@ namespace WLEditor
 				{
 					return 1;
 				}
-				
+
 				if(data == 0x32)
 				{
 					return 2;
 				}
 			}
-			
+
 			return 0;
 		}
-		
+
 		public static int GetEmptyTile(uint[] bitmap, int tileSize, int tileWidth)
 		{
 			int emptyTile = 0;
 			var tilesOccurence = new int[256];
-			
+
 			for(int i = 0 ; i < bitmap.Length ; i++)
 			{
 				uint color = bitmap[i];
@@ -511,10 +511,10 @@ namespace WLEditor
 					}
 				}
 			}
-			
+
 			return emptyTile;
 		}
-		
+
 		public static bool SaveChanges(Rom rom, int course, out string errorMessage)
 		{
 			//rom expansion give new banks for level data

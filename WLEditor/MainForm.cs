@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
@@ -7,7 +7,7 @@ namespace WLEditor
 {
 	public partial class MainForm : Form
 	{
-		Rom rom = new Rom();		 		
+		Rom rom = new Rom();
 		ToolboxForm toolboxForm = new ToolboxForm();
 		Overworld overworldForm = new Overworld();
 
@@ -57,7 +57,7 @@ namespace WLEditor
 			"Rice Beach 6",
 			"Parsley Woods 1 - DRAINED"
 		};
-			
+
 		int currentCourseId = -1;
 		int currentWarp = -1;
 		int switchMode;
@@ -67,13 +67,13 @@ namespace WLEditor
 		bool hasChanges;
 		int zoom;
 		bool ignoreEvents;
-				
+
 		public MainForm()
 		{
-			InitializeComponent();									
+			InitializeComponent();
 			LevelPanel.MouseWheel += LevelPanelMouseWheel;
 			toolboxForm.MouseWheel += LevelPanelMouseWheel;
-			toolboxForm.FormClosing += ToolBoxFormClosing;	
+			toolboxForm.FormClosing += ToolBoxFormClosing;
 			toolboxForm.ProcessCommandKey += ToolBoxProcessCommandKey;
 			toolboxForm.SectorChanged += ToolBoxSectorChanged;
 			overworldForm.FormClosing += OverworldClosing;
@@ -86,15 +86,15 @@ namespace WLEditor
 		void LoadLevel(bool reloadAll)
 		{
 			if(rom.IsLoaded && levelComboBox.SelectedItem != null)
-			{				
+			{
 				Level.DumpLevel(rom, currentCourseId, currentWarp, reloadAll, switchMode, animatedTileIndex, false);
-				
+
 				levelPictureBox.ClearTileCache();
-				levelPictureBox.Invalidate();	
-												
-				toolboxForm.Invalidate(true);		
+				levelPictureBox.Invalidate();
+
+				toolboxForm.Invalidate(true);
 			}
-		}			
+		}
 
 		void LevelComboBoxSelectedIndexChanged(object sender, EventArgs e)
 		{
@@ -134,9 +134,9 @@ namespace WLEditor
 				{
 					if (!newRom.CheckCRC())
 					{
-						MessageBox.Show("ROM checksum failed", Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);						
+						MessageBox.Show("ROM checksum failed", Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
 					}
-					
+
 					rom = newRom;
 					LoadLevelCombobox();
 					Sprite.DumpBonusSprites(rom);
@@ -149,32 +149,32 @@ namespace WLEditor
 					ignoreEvents = true;
 					levelComboBox.SelectedIndex = 0;
 					ignoreEvents = false;
-					LevelComboBoxSelectedIndexChanged(sender, e);						
-					
+					LevelComboBoxSelectedIndexChanged(sender, e);
+
 					toolboxToolStripMenuItem.Enabled = true;
 					overworldToolStripMenuItem.Enabled = true;
 					saveAsToolStripMenuItem.Enabled = true;
 					levelComboBox.Visible = true;
-					LevelPanel.Visible = true;					
+					LevelPanel.Visible = true;
 				}
 				else
 				{
 					MessageBox.Show("Please select a valid WarioLand 1 rom", Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
 				}
 			}
-		}			
+		}
 
 		void LoadLevelCombobox()
 		{
 			//init combobox
 			levelComboBox.SelectedItem = null;
 			levelComboBox.Items.Clear();
-			
-			var items = new List<ComboboxItem<int>>();			
+
+			var items = new List<ComboboxItem<int>>();
 			foreach(var levelInfo in Level.GetCourseIds(rom).OrderBy(x => x.Value))
 			{
 				var item = new ComboboxItem<int>(levelInfo.Key, string.Format("{0:D2} {1}", levelInfo.Value, LevelNames[levelInfo.Key]));
-				items.Add(item);				
+				items.Add(item);
 			}
 
 			levelComboBox.Items.AddRange(items.ToArray());
@@ -198,12 +198,12 @@ namespace WLEditor
 			LoadLevel(false);
 			SetChanges(true);
 		}
-		
+
 		void WorldMapChanged(object sender, EventArgs e)
 		{
 			SetChanges(true);
 		}
-		
+
 		void ExitToolStripMenuItemClick(object sender, EventArgs e)
 		{
 			Application.Exit();
@@ -216,7 +216,7 @@ namespace WLEditor
 			levelPictureBox.ClearTileCache();
 			levelPictureBox.Invalidate();
 			toolboxForm.ShowColliders = showColliders;
-			toolboxForm.Invalidate(true);	
+			toolboxForm.Invalidate(true);
 		}
 
 		void NoneToolStripMenuItemClick(object sender, EventArgs e)
@@ -226,11 +226,11 @@ namespace WLEditor
 
 		void AToolStripMenuItemClick(object sender, EventArgs e)
 		{
-			SetSwitchMode(1);			
+			SetSwitchMode(1);
 		}
 
 		void BToolStripMenuItemClick(object sender, EventArgs e)
-		{			
+		{
 			SetSwitchMode(2);
 		}
 
@@ -239,11 +239,11 @@ namespace WLEditor
 			switchMode = value;
 			noneToolStripMenuItem.Checked = value == 0;
 			aToolStripMenuItem.Checked = value == 1;
-			bToolStripMenuItem.Checked = value == 2;			
+			bToolStripMenuItem.Checked = value == 2;
 			levelPictureBox.SwitchMode = value;
 			toolboxForm.SwitchMode = value;
-			toolboxForm.Invalidate(true);		
-			
+			toolboxForm.Invalidate(true);
+
 			LoadLevel(false);
 		}
 
@@ -260,12 +260,12 @@ namespace WLEditor
 						return false;
 					}
 				}
-				
+
 				if (saveFile && !overworldForm.SaveChanges())
 				{
 					return false;
 				}
-				
+
 				if(saveFile)
 				{
 					rom.FixCRC();
@@ -273,7 +273,7 @@ namespace WLEditor
 					SetChanges(false);
 				}
 			}
-			
+
 			return true;
 		}
 
@@ -297,12 +297,12 @@ namespace WLEditor
 						throw new NotImplementedException();
 				}
 			}
-			
+
 			return true;
 		}
-		
+
 		void SetChanges(bool hasChanges)
-		{			
+		{
 			this.hasChanges = hasChanges;
 			saveToolStripMenuItem.Enabled = hasChanges;
 		}
@@ -311,7 +311,7 @@ namespace WLEditor
 		{
 			SaveChanges(true);
 		}
-		
+
 		void MainFormFormClosing(object sender, FormClosingEventArgs e)
 		{
 			e.Cancel = !AskForSavingChanges();
@@ -332,60 +332,60 @@ namespace WLEditor
 				}
 			}
 		}
-		
+
 		void SetZoomLevel(int zoomLevel)
 		{
 			zoom = zoomLevel;
 			zoom100ToolStripMenuItem.Checked = zoomLevel == 1;
-			zoom200ToolStripMenuItem.Checked = zoomLevel == 2;	
-			zoom300ToolStripMenuItem.Checked = zoomLevel == 3;	
-			zoom400ToolStripMenuItem.Checked = zoomLevel == 4;	
+			zoom200ToolStripMenuItem.Checked = zoomLevel == 2;
+			zoom300ToolStripMenuItem.Checked = zoomLevel == 3;
+			zoom400ToolStripMenuItem.Checked = zoomLevel == 4;
 			zoomOutToolStripMenuItem.Enabled = zoomLevel > 1;
 			zoomInToolStripMenuItem.Enabled = zoomLevel < 4;
-									
+
 			levelPictureBox.SetZoom(zoomLevel);
-			toolboxForm.SetZoom(zoomLevel);			
+			toolboxForm.SetZoom(zoomLevel);
 			overworldForm.SetZoom(zoomLevel);
 		}
-						
+
 		void Zoom100ToolStripMenuItemClick(object sender, EventArgs e)
 		{
-			SetZoomLevel(1);			
+			SetZoomLevel(1);
 		}
-		
+
 		void Zoom200ToolStripMenuItemClick(object sender, EventArgs e)
-		{			
+		{
 			SetZoomLevel(2);
 		}
-		
+
 		void Zoom300ToolStripMenuItemClick(object sender, EventArgs e)
 		{
 			SetZoomLevel(3);
 		}
-		
+
 		void Zoom400ToolStripMenuItemClick(object sender, EventArgs e)
 		{
 			SetZoomLevel(4);
 		}
-		
+
 		void ToolBoxProcessCommandKey(object sender, KeyEventArgs e)
 		{
 			if(DispatchCommandKey(e.KeyData))
 			{
 				e.Handled = true;
-			}	
+			}
 		}
-			
+
 		protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
 		{
 			if(DispatchCommandKey(keyData))
 			{
 				return true;
 			}
-			
+
 			return base.ProcessCmdKey(ref msg, keyData);
 		}
-		
+
 		bool DispatchCommandKey(Keys keyData)
 		{
 			switch(keyData)
@@ -394,12 +394,12 @@ namespace WLEditor
 				case Keys.Control | Keys.Oemplus:
 					zoomInToolStripMenuItem.PerformClick();
 					return true;
-					
+
 				case Keys.Control | Keys.Subtract:
 				case Keys.Control | Keys.OemMinus:
 					zoomOutToolStripMenuItem.PerformClick();
 					return true;
-					
+
 				case Keys.B:
 					int typeOfSwitch = Level.GetTypeOfSwitch();
 					switch(typeOfSwitch)
@@ -407,49 +407,49 @@ namespace WLEditor
 						case 1:
 							SetSwitchMode(switchMode == 1 ? 0 : 1);
 							break;
-							
+
 						case 2:
 							SetSwitchMode(switchMode == 2 ? 0 : 2);
 							break;
-							
+
 						default:
-							SetSwitchMode((switchMode + 1) % 3);	
+							SetSwitchMode((switchMode + 1) % 3);
 							break;
-					}					
+					}
 					return true;
-					
+
 				case Keys.Control | Keys.C:
 					levelPictureBox.CopySelection();
 					return true;
-					
+
 				case Keys.Control | Keys.V:
 					if (levelPictureBox.PasteSelection())
 					{
 						SetChanges(true);
 					}
 					return true;
-					
+
 				case Keys.Control | Keys.X:
 					if (levelPictureBox.CutSelection(GetEmptyTile()))
 					{
 						SetChanges(true);
 					}
 					return true;
-					
+
 				case Keys.Delete:
 					if (levelPictureBox.DeleteSelection(GetEmptyTile()))
 					{
 						SetChanges(true);
 					}
 					return true;
-					
+
 				case Keys.Control | Keys.Z:
 					if (levelPictureBox.Undo())
 					{
 						SetChanges(true);
 					}
 					return true;
-					
+
 				case Keys.Control | Keys.Y:
 					if (levelPictureBox.Redo())
 					{
@@ -457,10 +457,10 @@ namespace WLEditor
 					}
 					return true;
 			}
-			
+
 			ToolStripMenuItem toolStrip = GetAllMenuItems(menuStrip1.Items)
 				.FirstOrDefault(x => x.ShortcutKeys == keyData);
-			
+
 			if(toolStrip != null)
 			{
 				toolStrip.PerformClick();
@@ -469,18 +469,18 @@ namespace WLEditor
 
 			return false;
 		}
-				
+
 		IEnumerable<ToolStripMenuItem> GetAllMenuItems(ToolStripItemCollection items)
 		{
 			foreach(ToolStripItem item in items)
 			{
-				ToolStripMenuItem toolStrip = item as ToolStripMenuItem;		
+				ToolStripMenuItem toolStrip = item as ToolStripMenuItem;
 				if(toolStrip != null)
 				{
 					yield return toolStrip;
 				}
-				
-				ToolStripDropDownItem toolStripDropDown = item as ToolStripDropDownItem;	
+
+				ToolStripDropDownItem toolStripDropDown = item as ToolStripDropDownItem;
 				if(toolStripDropDown != null)
 				{
 					foreach(var child in GetAllMenuItems(toolStripDropDown.DropDownItems))
@@ -490,17 +490,17 @@ namespace WLEditor
 				}
 			}
 		}
-		
+
 		void ZoomOutToolStripMenuItemClick(object sender, EventArgs e)
 		{
 			SetZoomLevel(zoom - 1);
 		}
-		
+
 		void ZoomInToolStripMenuItemClick(object sender, EventArgs e)
 		{
 			SetZoomLevel(zoom + 1);
-		}		
-		
+		}
+
 		void LevelPanelMouseWheel(object sender, MouseEventArgs e)
 		{
 			if (Control.ModifierKeys == Keys.Control)
@@ -515,72 +515,72 @@ namespace WLEditor
 				}
 			}
 		}
-		
+
 		void ToolboxToolStripMenuItemCheckedChanged(object sender, EventArgs e)
 		{
 			if(toolboxToolStripMenuItem.Checked)
 			{
 				if(!toolboxForm.Visible)
 				{
-					toolboxForm.Show(this);	
+					toolboxForm.Show(this);
 					levelPictureBox.ClearSelection();
-				}	
+				}
 			}
 			else
 			{
 				if(toolboxForm.Visible)
 				{
-					toolboxForm.Hide();	
+					toolboxForm.Hide();
 				}
-			}		
-		}		
-		
+			}
+		}
+
 		void ToolBoxFormClosing(object sender, EventArgs e)
 		{
 			toolboxToolStripMenuItem.Checked = false;
 		}
-		
+
 		void OverworldClosing(object sender, EventArgs e)
 		{
 			overworldToolStripMenuItem.Checked = false;
 		}
-		
+
 		void LevelPictureBoxTileMouseDown(object sender, TileEventArgs e)
-		{				
+		{
 			if(toolboxForm.Visible)
 			{
 				if (e.Status == 0) //down
 				{
 					levelPictureBox.StartChanges();
 				}
-				
+
 				if (e.Status == 0 || e.Status == 1)
 				{
 					int tileIndex = levelPictureBox.CurrentTileIndex;
 					int selectedPanelIndex = toolboxForm.SelectedPanelIndex;
 					int currentTile = toolboxForm.CurrentTile;
 					int currentObject = toolboxForm.CurrentObject;
-				
+
 					if (e.Button == MouseButtons.Left)
 					{
 						if(selectedPanelIndex == 0)
 						{
 							UpdateTile(tileIndex, currentTile);
-						}					
+						}
 						else if(levelPictureBox.ShowObjects && selectedPanelIndex == 2)
-						{	
+						{
 							UpdateObject(tileIndex, currentObject + 1);
-						}						
+						}
 					}
 					else if (e.Button == MouseButtons.Right)
 					{
 						if (selectedPanelIndex == 0)
-						{	
+						{
 							UpdateTile(tileIndex, GetEmptyTile());
 						}
 						else if(levelPictureBox.ShowObjects && selectedPanelIndex == 2)
-						{	
-							UpdateObject(tileIndex, 0);			
+						{
+							UpdateObject(tileIndex, 0);
 						}
 					}
 				}
@@ -588,8 +588,8 @@ namespace WLEditor
 				if (e.Status == 2) //up
 				{
 					levelPictureBox.CommitChanges();
-				}				
-			}			
+				}
+			}
 			else if (e.Button == MouseButtons.Left)
 			{
 				if (e.Status == 0) //down
@@ -606,7 +606,7 @@ namespace WLEditor
 				levelPictureBox.ClearSelection();
 			}
 		}
-		
+
 		void UpdateTile(int tileIndex, int currentTile)
 		{
 			int previousTile = Level.LevelData[tileIndex + 0x1000];
@@ -618,7 +618,7 @@ namespace WLEditor
 				SetChanges(true);
 			}
 		}
-		
+
 		void UpdateObject(int tileIndex, int currentObject)
 		{
 			int previousObject = Level.ObjectsData[tileIndex];
@@ -630,12 +630,12 @@ namespace WLEditor
 				SetChanges(true);
 			}
 		}
-		
+
 		int GetEmptyTile()
 		{
 			return Level.GetEmptyTile(Level.Tiles16x16.Bits, 16, 8);
 		}
-				
+
 		void LevelPictureBoxSectorChanged(object sender, EventArgs e)
 		{
 			int warpTarget = Sector.SearchWarp(rom, currentCourseId, levelPictureBox.CurrentSector);
@@ -651,7 +651,7 @@ namespace WLEditor
 			toolboxForm.LoadSector(currentCourseId, levelPictureBox.CurrentSector);
 			levelPictureBox.ClearSelection();
 		}
-				
+
 		void TimerTick(object sender, EventArgs e)
 		{
 			if(rom.IsLoaded)
@@ -665,15 +665,15 @@ namespace WLEditor
 						RefreshAnimatedTiles();
 					}
 				}
-				
+
 				overworldForm.TimerTick();
 			}
 		}
-		
+
 		void RefreshAnimatedTiles()
 		{
 			Level.DumpLevel(rom, currentCourseId, currentWarp, false, switchMode, animatedTileIndex, true);
-				
+
 			//redraw
 			levelPictureBox.InvalidateAnimatedTiles();
 			if(toolboxForm.Visible)
@@ -682,7 +682,7 @@ namespace WLEditor
 				{
 					case 0: //16x16 tiles
 					case 1: //8x8 tiles
-						toolboxForm.Invalidate(true);		
+						toolboxForm.Invalidate(true);
 						break;
 				}
 			}
@@ -692,13 +692,13 @@ namespace WLEditor
 		{
 			MessageBox.Show(Text + " v0.77\r\nDate : 15.01.2023\r\nContact me : tigrou.ind@gmail.com");
 		}
-		
+
 		void AnimationToolStripMenuItemClick(object sender, EventArgs e)
 		{
 			timer.Enabled = animationToolStripMenuItem.Checked;
 			overworldForm.ResetTimer();
 		}
-		
+
 		void TileNumbersToolStripMenuItemClick(object sender, EventArgs e)
 		{
 			bool showTileNumbers = tileNumbersToolStripMenuItem.Checked;
@@ -708,23 +708,23 @@ namespace WLEditor
 			toolboxForm.ShowTileNumbers = showTileNumbers;
 			toolboxForm.Invalidate(true);
 		}
-		
+
 		void OverworldToolStripMenuItemCheckedChanged(object sender, EventArgs e)
 		{
 			if (overworldToolStripMenuItem.Checked)
 			{
 				if (!overworldForm.Visible)
 				{
-					overworldForm.Show(this);	
-				}	
+					overworldForm.Show(this);
+				}
 			}
 			else
 			{
 				if (overworldForm.Visible)
 				{
-					overworldForm.Hide();	
+					overworldForm.Hide();
 				}
 			}
-		}		
+		}
 	}
 }

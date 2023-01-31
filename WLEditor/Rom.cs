@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Text;
 
@@ -19,7 +19,7 @@ namespace WLEditor
 		{
 			File.WriteAllBytes(filePath, data);
 		}
-		
+
 		#region Read/Write
 
 		public byte ReadByte(int position)
@@ -28,7 +28,7 @@ namespace WLEditor
 			{
 				return data[position];
 			}
-			
+
 			return data[position + (bank - 1) * 0x4000];
 		}
 
@@ -61,17 +61,17 @@ namespace WLEditor
 		{
 			return (ushort)(ReadByte(position) << 8 | ReadByte(position + 1));
 		}
-		
+
 		public void WriteWord(int position, ushort value)
 		{
 			WriteByte(position, (byte)(value & 0xFF));
 			WriteByte(position + 1, (byte)((value >> 8) & 0xFF));
 		}
-		
+
 		public void WriteWordSwap(int position, ushort value)
 		{
 			WriteByte(position, (byte)((value >> 8) & 0xFF));
-			WriteByte(position + 1, (byte)(value & 0xFF));			
+			WriteByte(position + 1, (byte)(value & 0xFF));
 		}
 
 		public void ReadBytes(int position, int size, byte[] result)
@@ -81,11 +81,11 @@ namespace WLEditor
 				result[i] = ReadByte(position + i);
 			}
 		}
-		
+
 		#endregion
 
 		#region CRC
-		
+
 		public bool CheckCRC()
 		{
 			return GetHeaderCRC() == ReadByte(0x14d) && GetGlobalCRC() == ReadWordSwap(0x14e);
@@ -96,7 +96,7 @@ namespace WLEditor
 			WriteByte(0x14d, GetHeaderCRC());
 			WriteWordSwap(0x14e, GetGlobalCRC());
 		}
-		
+
 		byte GetHeaderCRC()
 		{
 			ushort headerCRC = 0;
@@ -107,10 +107,10 @@ namespace WLEditor
 					headerCRC = (ushort)(headerCRC - data[i] - 1);
 				}
 			}
-			
+
 			return (byte)(headerCRC & 0xFF);
 		}
-		
+
 		ushort GetGlobalCRC()
 		{
 			ushort globalCRC = 0;
@@ -124,17 +124,17 @@ namespace WLEditor
 					}
 				}
 			}
-			
+
 			return globalCRC;
 		}
-		
+
 		#endregion
-		
+
 		public void ExpandTo1MB()
 		{
 			WriteByte(0x0147, 0x13); //MBC3+RAM+BATTERY
 			WriteByte(0x0148, 0x05); //1MB
-			
+
 			if (data.Length == 512*1024)
 			{
 				Array.Resize(ref data, 1024*1024);
@@ -149,7 +149,7 @@ namespace WLEditor
 				{
 					return Encoding.ASCII.GetString(data, 0x134, 16).TrimEnd('\0');
 				}
-				
+
 				return string.Empty;
 			}
 		}

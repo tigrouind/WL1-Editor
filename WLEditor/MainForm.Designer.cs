@@ -1,4 +1,4 @@
-﻿namespace WLEditor
+namespace WLEditor
 {
 	partial class MainForm
 	{
@@ -6,7 +6,7 @@
 		/// Designer variable used to keep track of non-visual components.
 		/// </summary>
 		private System.ComponentModel.IContainer components = null;
-		
+
 		/// <summary>
 		/// Disposes resources used by the form.
 		/// </summary>
@@ -20,7 +20,7 @@
 			}
 			base.Dispose(disposing);
 		}
-		
+
 		/// <summary>
 		/// This method is required for Windows Forms designer support.
 		/// Do not change the method contents inside the source code editor. The Forms designer might
@@ -187,11 +187,11 @@
 			this.objectsToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F4;
 			this.objectsToolStripMenuItem.Text = "Objects";
 			this.objectsToolStripMenuItem.Click += new System.EventHandler(this.ObjectsToolStripMenuItemClick);
-			//
+			// 
 			// collidersToolStripMenuItem
-			//
+			// 
 			this.collidersToolStripMenuItem.Checked = true;
-			this.collidersToolStripMenuItem.CheckOnClick = true;			
+			this.collidersToolStripMenuItem.CheckOnClick = true;
 			this.collidersToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.collidersToolStripMenuItem.Name = "collidersToolStripMenuItem";
 			this.collidersToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
@@ -434,8 +434,8 @@
 		private System.Windows.Forms.ToolStripMenuItem animationToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem tileNumbersToolStripMenuItem;
 
-			
-	
-		
+
+
+
 	}
 }

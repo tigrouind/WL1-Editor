@@ -1,4 +1,4 @@
-﻿
+
 using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -8,11 +8,11 @@ namespace WLEditor
 {
 	public class ObjectsPictureBox : PictureBox
 	{
-		public int CurrentObject;	
+		public int CurrentObject;
 		int zoom;
-		
+
 		protected override void OnPaint(PaintEventArgs e)
-		{			
+		{
 			if(Level.LevelData != null && !DesignMode)
 			{
 				StringFormat format = new StringFormat();
@@ -23,36 +23,36 @@ namespace WLEditor
 				using (Font font = new Font("Arial", 8 * zoom))
 				{
 					e.Graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
-					e.Graphics.PixelOffsetMode = PixelOffsetMode.Half;					
+					e.Graphics.PixelOffsetMode = PixelOffsetMode.Half;
 					e.Graphics.FillRectangle(LevelPictureBox.EnemyBrush, 0, 0, Width, Height);
 					e.Graphics.FillRectangle(Brushes.Black, new Rectangle(32 * 3 * zoom, 32 * 3 * zoom, 32 * zoom, 32 * zoom));
-					
+
 					for(int index = 0 ; index < 15 ; index++)
 					{
 						DrawTile(e.Graphics, e.ClipRectangle, font, format, index);
 					}
-					
+
 					e.Graphics.FillRectangle(brush, (CurrentObject % 4) * 32 * zoom, (CurrentObject / 4) * 32 * zoom, 32 * zoom, 32 * zoom);
 				}
-			}		
+			}
 		}
-		
+
 		void DrawTile(Graphics g, Rectangle clipRectangle, Font font, StringFormat format, int index)
-		{			
+		{
 			int x = (index % 4) * 32;
 			int y = (index / 4) * 32;
-			
-			Rectangle destRect = new Rectangle(x * zoom, y * zoom, 32 * zoom, 32 * zoom);							
+
+			Rectangle destRect = new Rectangle(x * zoom, y * zoom, 32 * zoom, 32 * zoom);
 			if (destRect.IntersectsWith(clipRectangle))
 			{
 				if(index < 6) //enemy
-				{																	
+				{
 					if(Sprite.LoadedSprites[index] != Rectangle.Empty)
 					{
 						Rectangle enemyRect = Sprite.LoadedSprites[index];
 						g.DrawImage(Sprite.TilesEnemies.Bitmap, destRect, new Rectangle(enemyRect.X - 16 + enemyRect.Width / 2, enemyRect.Y - 16 + enemyRect.Height / 2, 32, 32), GraphicsUnit.Pixel);
 					}
-					else 
+					else
 					{
 						g.DrawString((index + 1).ToString(), font, Brushes.White, (x + 16) * zoom, (y + 16) * zoom, format);
 					}
@@ -63,7 +63,7 @@ namespace WLEditor
 				}
 			}
 		}
-		
+
 		protected override void OnMouseDown(MouseEventArgs e)
 		{
 			int index = e.Location.X / 32 / zoom + (e.Location.Y / 32 / zoom) * 4;
@@ -73,12 +73,12 @@ namespace WLEditor
 				Invalidate();
 			}
 		}
-		
+
 		public void SetZoom(int zoomlevel)
 		{
 			Height = 128 * zoomlevel;
 			Width = 128 * zoomlevel;
 			zoom = zoomlevel;
-		}						
+		}
 	}
 }

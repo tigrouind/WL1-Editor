@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace WLEditor
@@ -8,5 +8,5 @@ namespace WLEditor
 		public List<WorldPathSegment> Path;
 		public int Progress;
 		public int Next;
-	}		
+	}
 }

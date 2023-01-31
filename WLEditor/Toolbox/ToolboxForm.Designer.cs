@@ -1,4 +1,4 @@
-﻿namespace WLEditor
+namespace WLEditor
 {
 	partial class ToolboxForm
 	{
@@ -13,7 +13,7 @@
 		private WLEditor.Tiles16x16PictureBox tiles16x16PictureBox;
 		private WLEditor.Tiles8x8PictureBox tiles8x8PictureBox;
 		private WLEditor.SectorForm sectorForm;
-		
+
 		/// <summary>
 		/// Disposes resources used by the form.
 		/// </summary>
@@ -27,7 +27,7 @@
 			}
 			base.Dispose(disposing);
 		}
-		
+
 		/// <summary>
 		/// This method is required for Windows Forms designer support.
 		/// Do not change the method contents inside the source code editor. The Forms designer might
@@ -76,7 +76,7 @@
 			this.comboBox1.Items.AddRange(new object[] {
 			"16x16 Tiles ",
 			"8x8 Tiles",
-			"Objects",			
+			"Objects",
 			"Level / Sector"});
 			this.comboBox1.Location = new System.Drawing.Point(3, 3);
 			this.comboBox1.Name = "comboBox1";
@@ -120,7 +120,7 @@
 			this.tiles8x8PictureBox.Name = "tiles8x8PictureBox";
 			this.tiles8x8PictureBox.Size = new System.Drawing.Size(47, 50);
 			this.tiles8x8PictureBox.TabIndex = 0;
-			this.tiles8x8PictureBox.TabStop = false;	
+			this.tiles8x8PictureBox.TabStop = false;
 			// 
 			// sector
 			// 

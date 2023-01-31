@@ -1,7 +1,7 @@
-﻿using System;
+using System;
 
 namespace WLEditor
-{	
+{
 	public class SelectionChange
 	{
 		public int X;
