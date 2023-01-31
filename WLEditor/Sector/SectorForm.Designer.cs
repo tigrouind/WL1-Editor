@@ -95,7 +95,7 @@ namespace WLEditor
 			// labWarp
 			// 
 			this.labWarp.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.labWarp.Location = new System.Drawing.Point(35, 30);
+			this.labWarp.Location = new System.Drawing.Point(35, 27);
 			this.labWarp.Name = "labWarp";
 			this.labWarp.Size = new System.Drawing.Size(48, 20);
 			this.labWarp.TabIndex = 4;
@@ -109,15 +109,15 @@ namespace WLEditor
 			this.ddlWarp.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.ddlWarp.DropDownWidth = 300;
 			this.ddlWarp.FormattingEnabled = true;
-			this.ddlWarp.Location = new System.Drawing.Point(88, 30);
+			this.ddlWarp.Location = new System.Drawing.Point(88, 27);
 			this.ddlWarp.Name = "ddlWarp";
-			this.ddlWarp.Size = new System.Drawing.Size(238, 21);
+			this.ddlWarp.Size = new System.Drawing.Size(223, 21);
 			this.ddlWarp.TabIndex = 5;
 			this.ddlWarp.SelectedIndexChanged += new System.EventHandler(this.DdlWarpSelectedIndexChanged);
 			// 
 			// checkBoxRight
 			// 
-			this.checkBoxRight.Location = new System.Drawing.Point(108, 4);
+			this.checkBoxRight.Location = new System.Drawing.Point(108, 1);
 			this.checkBoxRight.Name = "checkBoxRight";
 			this.checkBoxRight.Size = new System.Drawing.Size(18, 24);
 			this.checkBoxRight.TabIndex = 6;
@@ -126,7 +126,7 @@ namespace WLEditor
 			// 
 			// checkBoxLeft
 			// 
-			this.checkBoxLeft.Location = new System.Drawing.Point(88, 4);
+			this.checkBoxLeft.Location = new System.Drawing.Point(88, 1);
 			this.checkBoxLeft.Name = "checkBoxLeft";
 			this.checkBoxLeft.Size = new System.Drawing.Size(18, 24);
 			this.checkBoxLeft.TabIndex = 7;
@@ -136,7 +136,7 @@ namespace WLEditor
 			// labScroll
 			// 
 			this.labScroll.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.labScroll.Location = new System.Drawing.Point(8, 4);
+			this.labScroll.Location = new System.Drawing.Point(8, 1);
 			this.labScroll.Name = "labScroll";
 			this.labScroll.Size = new System.Drawing.Size(74, 20);
 			this.labScroll.TabIndex = 10;
@@ -164,18 +164,20 @@ namespace WLEditor
 			this.panel3.Controls.Add(this.txbWarioX);
 			this.panel3.Controls.Add(this.ddlAnimationSpeed);
 			this.panel3.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.panel3.Location = new System.Drawing.Point(3, 123);
+			this.panel3.Location = new System.Drawing.Point(3, 94);
 			this.panel3.Name = "panel3";
-			this.panel3.Size = new System.Drawing.Size(333, 193);
+			this.panel3.Padding = new System.Windows.Forms.Padding(0, 0, 0, 4);
+			this.panel3.Size = new System.Drawing.Size(320, 202);
 			this.panel3.TabIndex = 42;
+			this.panel3.Paint += new System.Windows.Forms.PaintEventHandler(this.Panel3Paint);
 			// 
 			// cmdCalculatePos
 			// 
 			this.cmdCalculatePos.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
 			| System.Windows.Forms.AnchorStyles.Right)));
-			this.cmdCalculatePos.Location = new System.Drawing.Point(201, 136);
+			this.cmdCalculatePos.Location = new System.Drawing.Point(201, 133);
 			this.cmdCalculatePos.Name = "cmdCalculatePos";
-			this.cmdCalculatePos.Size = new System.Drawing.Size(125, 47);
+			this.cmdCalculatePos.Size = new System.Drawing.Size(111, 47);
 			this.cmdCalculatePos.TabIndex = 30;
 			this.cmdCalculatePos.Text = "Recalculate";
 			this.cmdCalculatePos.UseVisualStyleBackColor = true;
@@ -187,15 +189,15 @@ namespace WLEditor
 			| System.Windows.Forms.AnchorStyles.Right)));
 			this.ddlTileSet.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.ddlTileSet.FormattingEnabled = true;
-			this.ddlTileSet.Location = new System.Drawing.Point(88, 11);
+			this.ddlTileSet.Location = new System.Drawing.Point(88, 8);
 			this.ddlTileSet.Name = "ddlTileSet";
-			this.ddlTileSet.Size = new System.Drawing.Size(238, 21);
+			this.ddlTileSet.Size = new System.Drawing.Size(223, 21);
 			this.ddlTileSet.TabIndex = 13;
 			this.ddlTileSet.SelectedIndexChanged += new System.EventHandler(this.DdlTileSetSelectedIndexChanged);
 			// 
 			// labAnimation
 			// 
-			this.labAnimation.Location = new System.Drawing.Point(9, 41);
+			this.labAnimation.Location = new System.Drawing.Point(9, 38);
 			this.labAnimation.Name = "labAnimation";
 			this.labAnimation.Size = new System.Drawing.Size(72, 18);
 			this.labAnimation.TabIndex = 41;
@@ -204,7 +206,7 @@ namespace WLEditor
 			// 
 			// txbCameraX
 			// 
-			this.txbCameraX.Location = new System.Drawing.Point(88, 163);
+			this.txbCameraX.Location = new System.Drawing.Point(88, 160);
 			this.txbCameraX.Maximum = new decimal(new int[] {
 			511,
 			0,
@@ -217,7 +219,7 @@ namespace WLEditor
 			// 
 			// labEnemies
 			// 
-			this.labEnemies.Location = new System.Drawing.Point(11, 68);
+			this.labEnemies.Location = new System.Drawing.Point(11, 65);
 			this.labEnemies.Name = "labEnemies";
 			this.labEnemies.Size = new System.Drawing.Size(71, 18);
 			this.labEnemies.TabIndex = 16;
@@ -226,7 +228,7 @@ namespace WLEditor
 			// 
 			// labWario
 			// 
-			this.labWario.Location = new System.Drawing.Point(13, 137);
+			this.labWario.Location = new System.Drawing.Point(13, 134);
 			this.labWario.Name = "labWario";
 			this.labWario.Size = new System.Drawing.Size(66, 18);
 			this.labWario.TabIndex = 19;
@@ -237,7 +239,7 @@ namespace WLEditor
 			// 
 			this.ddlAnimation.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.ddlAnimation.FormattingEnabled = true;
-			this.ddlAnimation.Location = new System.Drawing.Point(88, 40);
+			this.ddlAnimation.Location = new System.Drawing.Point(88, 37);
 			this.ddlAnimation.Name = "ddlAnimation";
 			this.ddlAnimation.Size = new System.Drawing.Size(144, 21);
 			this.ddlAnimation.TabIndex = 31;
@@ -245,7 +247,7 @@ namespace WLEditor
 			// 
 			// txbCameraY
 			// 
-			this.txbCameraY.Location = new System.Drawing.Point(145, 163);
+			this.txbCameraY.Location = new System.Drawing.Point(145, 160);
 			this.txbCameraY.Maximum = new decimal(new int[] {
 			63,
 			0,
@@ -262,15 +264,15 @@ namespace WLEditor
 			| System.Windows.Forms.AnchorStyles.Right)));
 			this.ddlCameraType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.ddlCameraType.FormattingEnabled = true;
-			this.ddlCameraType.Location = new System.Drawing.Point(88, 108);
+			this.ddlCameraType.Location = new System.Drawing.Point(88, 105);
 			this.ddlCameraType.Name = "ddlCameraType";
-			this.ddlCameraType.Size = new System.Drawing.Size(238, 21);
+			this.ddlCameraType.Size = new System.Drawing.Size(223, 21);
 			this.ddlCameraType.TabIndex = 40;
 			this.ddlCameraType.SelectedIndexChanged += new System.EventHandler(this.DdlCameraTypeSelectedIndexChanged);
 			// 
 			// txbWarioY
 			// 
-			this.txbWarioY.Location = new System.Drawing.Point(145, 136);
+			this.txbWarioY.Location = new System.Drawing.Point(145, 133);
 			this.txbWarioY.Maximum = new decimal(new int[] {
 			63,
 			0,
@@ -283,7 +285,7 @@ namespace WLEditor
 			// 
 			// labCameraType
 			// 
-			this.labCameraType.Location = new System.Drawing.Point(17, 109);
+			this.labCameraType.Location = new System.Drawing.Point(17, 106);
 			this.labCameraType.Name = "labCameraType";
 			this.labCameraType.Size = new System.Drawing.Size(66, 18);
 			this.labCameraType.TabIndex = 28;
@@ -297,15 +299,15 @@ namespace WLEditor
 			this.ddlEnemies.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.ddlEnemies.DropDownWidth = 380;
 			this.ddlEnemies.FormattingEnabled = true;
-			this.ddlEnemies.Location = new System.Drawing.Point(88, 68);
+			this.ddlEnemies.Location = new System.Drawing.Point(88, 65);
 			this.ddlEnemies.Name = "ddlEnemies";
-			this.ddlEnemies.Size = new System.Drawing.Size(238, 21);
+			this.ddlEnemies.Size = new System.Drawing.Size(223, 21);
 			this.ddlEnemies.TabIndex = 15;
 			this.ddlEnemies.SelectedIndexChanged += new System.EventHandler(this.DdlEnemiesSelectedIndexChanged);
 			// 
 			// labTileSet
 			// 
-			this.labTileSet.Location = new System.Drawing.Point(35, 12);
+			this.labTileSet.Location = new System.Drawing.Point(35, 9);
 			this.labTileSet.Name = "labTileSet";
 			this.labTileSet.Size = new System.Drawing.Size(46, 18);
 			this.labTileSet.TabIndex = 14;
@@ -314,7 +316,7 @@ namespace WLEditor
 			// 
 			// labCamera
 			// 
-			this.labCamera.Location = new System.Drawing.Point(8, 163);
+			this.labCamera.Location = new System.Drawing.Point(8, 160);
 			this.labCamera.Name = "labCamera";
 			this.labCamera.Size = new System.Drawing.Size(71, 18);
 			this.labCamera.TabIndex = 20;
@@ -323,7 +325,7 @@ namespace WLEditor
 			// 
 			// txbWarioX
 			// 
-			this.txbWarioX.Location = new System.Drawing.Point(88, 136);
+			this.txbWarioX.Location = new System.Drawing.Point(88, 133);
 			this.txbWarioX.Maximum = new decimal(new int[] {
 			511,
 			0,
@@ -340,16 +342,16 @@ namespace WLEditor
 			| System.Windows.Forms.AnchorStyles.Right)));
 			this.ddlAnimationSpeed.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.ddlAnimationSpeed.FormattingEnabled = true;
-			this.ddlAnimationSpeed.Location = new System.Drawing.Point(238, 40);
+			this.ddlAnimationSpeed.Location = new System.Drawing.Point(238, 37);
 			this.ddlAnimationSpeed.Name = "ddlAnimationSpeed";
-			this.ddlAnimationSpeed.Size = new System.Drawing.Size(88, 21);
+			this.ddlAnimationSpeed.Size = new System.Drawing.Size(73, 21);
 			this.ddlAnimationSpeed.TabIndex = 39;
 			this.ddlAnimationSpeed.SelectedIndexChanged += new System.EventHandler(this.DdlAnimationSpeedSelectedIndexChanged);
 			// 
 			// labMusic
 			// 
 			this.labMusic.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.labMusic.Location = new System.Drawing.Point(37, 30);
+			this.labMusic.Location = new System.Drawing.Point(37, 4);
 			this.labMusic.Name = "labMusic";
 			this.labMusic.Size = new System.Drawing.Size(47, 20);
 			this.labMusic.TabIndex = 14;
@@ -363,27 +365,29 @@ namespace WLEditor
 			this.ddlMusic.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.ddlMusic.DropDownWidth = 300;
 			this.ddlMusic.FormattingEnabled = true;
-			this.ddlMusic.Location = new System.Drawing.Point(88, 30);
+			this.ddlMusic.Location = new System.Drawing.Point(88, 4);
 			this.ddlMusic.Name = "ddlMusic";
-			this.ddlMusic.Size = new System.Drawing.Size(238, 21);
+			this.ddlMusic.Size = new System.Drawing.Size(223, 21);
 			this.ddlMusic.TabIndex = 15;
 			this.ddlMusic.SelectedIndexChanged += new System.EventHandler(this.DdlMusicSelectedIndexChanged);
 			// 
 			// tableLayoutPanel1
 			// 
+			this.tableLayoutPanel1.AutoSize = true;
+			this.tableLayoutPanel1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.tableLayoutPanel1.ColumnCount = 1;
 			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
 			this.tableLayoutPanel1.Controls.Add(this.panel1, 0, 0);
 			this.tableLayoutPanel1.Controls.Add(this.panel2, 0, 1);
 			this.tableLayoutPanel1.Controls.Add(this.panel3, 0, 2);
 			this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
+			this.tableLayoutPanel1.Location = new System.Drawing.Point(5, 5);
 			this.tableLayoutPanel1.Name = "tableLayoutPanel1";
 			this.tableLayoutPanel1.RowCount = 3;
 			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.tableLayoutPanel1.Size = new System.Drawing.Size(339, 319);
+			this.tableLayoutPanel1.Size = new System.Drawing.Size(326, 299);
 			this.tableLayoutPanel1.TabIndex = 42;
 			// 
 			// panel1
@@ -398,7 +402,7 @@ namespace WLEditor
 			this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.panel1.Location = new System.Drawing.Point(3, 3);
 			this.panel1.Name = "panel1";
-			this.panel1.Size = new System.Drawing.Size(333, 54);
+			this.panel1.Size = new System.Drawing.Size(320, 51);
 			this.panel1.TabIndex = 43;
 			// 
 			// panel2
@@ -408,18 +412,28 @@ namespace WLEditor
 			this.panel2.Controls.Add(this.labMusic);
 			this.panel2.Controls.Add(this.ddlMusic);
 			this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.panel2.Location = new System.Drawing.Point(3, 63);
+			this.panel2.Location = new System.Drawing.Point(3, 60);
 			this.panel2.Name = "panel2";
-			this.panel2.Size = new System.Drawing.Size(333, 54);
+			this.panel2.Size = new System.Drawing.Size(320, 28);
 			this.panel2.TabIndex = 44;
 			// 
 			// SectorForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+			this.AutoSize = true;
+			this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			this.ClientSize = new System.Drawing.Size(336, 309);
 			this.Controls.Add(this.tableLayoutPanel1);
+			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
+			this.MaximizeBox = false;
+			this.MinimizeBox = false;
 			this.Name = "SectorForm";
-			this.Size = new System.Drawing.Size(339, 319);
+			this.Padding = new System.Windows.Forms.Padding(5);
+			this.ShowIcon = false;
+			this.ShowInTaskbar = false;
+			this.Text = "Warp / Level header";
+			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.SectorFormFormClosing);
 			this.VisibleChanged += new System.EventHandler(this.SectorFormVisibleChanged);
 			this.panel3.ResumeLayout(false);
 			((System.ComponentModel.ISupportInitialize)(this.txbCameraX)).EndInit();
@@ -431,6 +445,7 @@ namespace WLEditor
 			this.panel1.ResumeLayout(false);
 			this.panel2.ResumeLayout(false);
 			this.ResumeLayout(false);
+			this.PerformLayout();
 
 		}
 	}

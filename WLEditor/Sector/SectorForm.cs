@@ -1,13 +1,15 @@
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using Microsoft.VisualBasic;
 
 namespace WLEditor
 {
-	public partial class SectorForm : UserControl
+	public partial class SectorForm : Form
 	{
+		public event EventHandler<KeyEventArgs> ProcessCommandKey;
 		public event EventHandler SectorChanged;
 
 		Rom rom;
@@ -448,12 +450,6 @@ namespace WLEditor
 
 		#endregion
 
-		public void SetSize()
-		{
-			Width = 339;
-			Height = 270;
-		}
-
 		void SetControlsVisibility()
 		{
 			tableLayoutPanel1.SuspendLayout();
@@ -479,6 +475,28 @@ namespace WLEditor
 			{
 				InitForm();
 				LoadSector();
+			}
+		}
+
+		protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+		{
+			KeyEventArgs args = new KeyEventArgs(keyData);
+
+			ProcessCommandKey(this, args);
+			if(args.Handled)
+			{
+				return true;
+			}
+
+			return base.ProcessCmdKey(ref msg, keyData);
+		}
+
+		void SectorFormFormClosing(object sender, FormClosingEventArgs e)
+		{
+			if (e.CloseReason == CloseReason.UserClosing)
+			{
+				e.Cancel = true;
+				Hide();
 			}
 		}
 
@@ -892,6 +910,15 @@ namespace WLEditor
 				{
 					cameraY = 44;
 				}
+			}
+		}
+
+		void Panel3Paint(object sender, PaintEventArgs e)
+		{
+			//draw border
+			using (var pen = new Pen(SystemColors.ControlLight))
+			{
+				e.Graphics.DrawRectangle(pen, new Rectangle(0, 0, panel3.Width - 1, panel3.Height - 1));
 			}
 		}
 

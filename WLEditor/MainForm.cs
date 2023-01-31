@@ -10,6 +10,7 @@ namespace WLEditor
 		Rom rom = new Rom();
 		ToolboxForm toolboxForm = new ToolboxForm();
 		OverworldForm overworldForm = new OverworldForm();
+		SectorForm sectorForm = new SectorForm();
 
 		public readonly static string[] LevelNames =
 		{
@@ -72,14 +73,22 @@ namespace WLEditor
 		{
 			InitializeComponent();
 			LevelPanel.MouseWheel += LevelPanelMouseWheel;
+			levelPictureBox.TileMouseDown += LevelPictureBoxTileMouseDown;
+			levelPictureBox.SectorChanged += LevelPictureBoxSectorChanged;
+
 			toolboxForm.MouseWheel += LevelPanelMouseWheel;
 			toolboxForm.FormClosing += ToolBoxFormClosing;
 			toolboxForm.ProcessCommandKey += ToolBoxProcessCommandKey;
-			toolboxForm.SectorChanged += ToolBoxSectorChanged;
-			overworldForm.FormClosing += OverworldClosing;
+
+			overworldForm.FormClosing += OverworldFormClosing;
 			overworldForm.ProcessCommandKey += ToolBoxProcessCommandKey;
 			overworldForm.MouseWheel += LevelPanelMouseWheel;
 			overworldForm.WorldMapChanged += WorldMapChanged;
+
+			sectorForm.FormClosing += SectorFormClosing;
+			sectorForm.ProcessCommandKey += ToolBoxProcessCommandKey;
+			sectorForm.SectorChanged += SectorChanged;
+
 			SetZoomLevel(2);
 		}
 
@@ -107,7 +116,7 @@ namespace WLEditor
 					var item = (ComboboxItem<int>)levelComboBox.SelectedItem;
 					currentCourseId = item.Value;
 					LoadLevel(true);
-					toolboxForm.LoadSector(currentCourseId, -1);
+					sectorForm.LoadSector(currentCourseId, -1);
 					levelPictureBox.ClearSelection();
 					levelPictureBox.ClearUndo();
 				}
@@ -141,7 +150,7 @@ namespace WLEditor
 					LoadLevelCombobox();
 					Sprite.DumpBonusSprites(rom);
 					Sprite.DumpPlayerSprite(rom);
-					toolboxForm.LoadRom(rom);
+					sectorForm.LoadRom(rom);
 					overworldForm.LoadRom(rom);
 					romFilePath = openFileDialog1.FileName;
 
@@ -153,6 +162,7 @@ namespace WLEditor
 
 					toolboxToolStripMenuItem.Enabled = true;
 					overworldToolStripMenuItem.Enabled = true;
+					sectorsToolStripMenuItem.Enabled = true;
 					saveAsToolStripMenuItem.Enabled = true;
 					levelComboBox.Visible = true;
 					LevelPanel.Visible = true;
@@ -192,7 +202,7 @@ namespace WLEditor
 			levelPictureBox.Invalidate();
 		}
 
-		void ToolBoxSectorChanged(object sender, EventArgs e)
+		void SectorChanged(object sender, EventArgs e)
 		{
 			currentWarp = Sector.SearchWarp(rom, currentCourseId, levelPictureBox.CurrentSector);
 			LoadLevel(false);
@@ -518,20 +528,9 @@ namespace WLEditor
 
 		void ToolboxToolStripMenuItemCheckedChanged(object sender, EventArgs e)
 		{
-			if(toolboxToolStripMenuItem.Checked)
+			if(ToggleForm(toolboxForm, toolboxToolStripMenuItem.Checked))
 			{
-				if(!toolboxForm.Visible)
-				{
-					toolboxForm.Show(this);
-					levelPictureBox.ClearSelection();
-				}
-			}
-			else
-			{
-				if(toolboxForm.Visible)
-				{
-					toolboxForm.Hide();
-				}
+				levelPictureBox.ClearSelection();
 			}
 		}
 
@@ -540,9 +539,14 @@ namespace WLEditor
 			toolboxToolStripMenuItem.Checked = false;
 		}
 
-		void OverworldClosing(object sender, EventArgs e)
+		void OverworldFormClosing(object sender, EventArgs e)
 		{
 			overworldToolStripMenuItem.Checked = false;
+		}
+
+		void SectorFormClosing(object sender, EventArgs e)
+		{
+			sectorsToolStripMenuItem.Checked = false;
 		}
 
 		void LevelPictureBoxTileMouseDown(object sender, TileEventArgs e)
@@ -648,7 +652,7 @@ namespace WLEditor
 			{
 				levelPictureBox.Invalidate();
 			}
-			toolboxForm.LoadSector(currentCourseId, levelPictureBox.CurrentSector);
+			sectorForm.LoadSector(currentCourseId, levelPictureBox.CurrentSector);
 			levelPictureBox.ClearSelection();
 		}
 
@@ -709,22 +713,35 @@ namespace WLEditor
 			toolboxForm.Invalidate(true);
 		}
 
-		void OverworldToolStripMenuItemCheckedChanged(object sender, EventArgs e)
+		bool ToggleForm(Form form, bool visible)
 		{
-			if (overworldToolStripMenuItem.Checked)
+			if (visible)
 			{
-				if (!overworldForm.Visible)
+				if (!form.Visible)
 				{
-					overworldForm.Show(this);
+					form.Show(this);
+					return true;
 				}
 			}
 			else
 			{
-				if (overworldForm.Visible)
+				if (form.Visible)
 				{
-					overworldForm.Hide();
+					form.Hide();
 				}
 			}
+
+			return false;
+		}
+
+		void OverworldToolStripMenuItemCheckedChanged(object sender, EventArgs e)
+		{
+			ToggleForm(overworldForm, overworldToolStripMenuItem.Checked);
+		}
+
+		void SectorsToolStripMenuItemCheckedChanged(object sender, EventArgs e)
+		{
+			ToggleForm(sectorForm, sectorsToolStripMenuItem.Checked);
 		}
 	}
 }
