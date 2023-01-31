@@ -51,9 +51,6 @@ namespace WLEditor
 			this.zoom400ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.zoomInToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.zoomOutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.classicToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.blackWhiteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.autumnToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.switchToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.noneToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.aToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -416,9 +413,6 @@ namespace WLEditor
 		PanelUnScrollable LevelPanel;
 		LevelPictureBox levelPictureBox;
 		private System.Windows.Forms.ToolStripMenuItem saveAsToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem classicToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem blackWhiteToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem autumnToolStripMenuItem;
 		private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
 		private System.Windows.Forms.ToolStripMenuItem zoomToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem zoom100ToolStripMenuItem;
