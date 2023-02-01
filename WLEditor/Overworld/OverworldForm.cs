@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
@@ -17,6 +18,9 @@ namespace WLEditor
 		DirectBitmap tilesWorld = new DirectBitmap(32 * 8, 32 * 8);
 		DirectBitmap tilesWorldScroll = new DirectBitmap(32 * 8, 32 * 8);
 		int currentWorld;
+
+		List<SelectionChange> changes = new List<SelectionChange>();
+		int currentTile;
 
 		bool eventMode;
 		bool pathMode;
@@ -42,7 +46,7 @@ namespace WLEditor
 		public OverworldForm()
 		{
 			InitializeComponent();
-			eventForm = new EventForm(pictureBox1, tilesWorld8x8);
+			eventForm = new EventForm(pictureBox1, tilesWorld8x8, selection);
 			eventForm.EventIndexChanged += (s, e) => UpdateTitle();
 			eventForm.EventChanged += (s, e) => SetChanges(2);
 
@@ -270,6 +274,11 @@ namespace WLEditor
 				{
 					selection.DrawSelection(e.Graphics);
 				}
+
+				using (Brush brush = new SolidBrush(Color.FromArgb(128, 255, 0, 0)))
+				{
+					e.Graphics.FillRectangle(brush, (currentTile % 16) * 8 * zoom, (currentTile / 16) * 8 * zoom, 8 * zoom, 8 * zoom);
+				}
 			}
 		}
 
@@ -317,7 +326,7 @@ namespace WLEditor
 
 		bool DispatchCommandKey(Keys keyData)
 		{
-			if (eventMode && !(keyData == Keys.Delete && selection.HasSelection) && eventForm.ProcessEventKey(keyData))
+			if (eventMode && eventForm.ProcessEventKey(keyData))
 			{
 				return true;
 			}
@@ -330,21 +339,15 @@ namespace WLEditor
 			switch(keyData)
 			{
 				case Keys.E:
-					pathMode = false;
-					eventMode = !eventMode;
-					UpdateTitle();
-					pictureBox1.Invalidate();
-					pictureBox2.Visible = true;
-					UpdateBounds();
-					return true;
-
 				case Keys.P:
-					eventMode = false;
-					pathMode = !pathMode;
+					eventMode = keyData == Keys.E && !eventMode;
+					pathMode = keyData == Keys.P && !pathMode;
+
 					UpdateTitle();
 					pictureBox1.Invalidate();
 					pictureBox2.Visible = !pathMode;
 					UpdateBounds();
+					selection.ClearUndo();
 					selection.ClearSelection();
 					return true;
 
@@ -439,38 +442,71 @@ namespace WLEditor
 
 		#region Mouse
 
-		void MouseEvent(MouseEventArgs e, bool down)
+		void UpdateTile(int x, int y, int newTile)
 		{
-			int tilePosX = e.Location.X / 8 / zoom;
-			int tilePosY = e.Location.Y / 8 / zoom;
-
-			int tilePos = tilePosX + tilePosY * 32;
-			if (tilePos != lastTilePos)
+			int previousTile = SetTileAt(x, y, newTile);
+			if (previousTile != newTile)
 			{
-				lastTilePos = tilePos;
-				if (e.Button == MouseButtons.Left)
+				changes.Add(new SelectionChange { X = x, Y = y, Data = previousTile });
+				pictureBox1.Invalidate();
+			}
+		}
+
+		void MouseEvent(MouseEventArgs e, int mode)
+		{
+			if ((e.Button == MouseButtons.Left || e.Button == MouseButtons.Right) && !pathMode)
+			{
+				int tilePosX = e.Location.X / 8 / zoom;
+				int tilePosY = e.Location.Y / 8 / zoom;
+
+				int tilePos = tilePosX + tilePosY * 32;
+				if (tilePos != lastTilePos)
 				{
-					if (!pathMode)
+					lastTilePos = tilePos;
+
+					if (e.Button == MouseButtons.Right)
 					{
-						if (down)
+						if (!selectionMode)
+						{
+							if (mode == 0)
+							{
+								InvalidateCurrentTile();
+								currentTile = tilePosX + tilePosY * 16;
+								InvalidateCurrentTile();
+							}
+						}
+						else
+						{
+							if (mode == 0)
+							{
+								changes = new List<SelectionChange>();
+							}
+
+							if ((mode == 0 || mode == 1) && !selection.HasSelection)
+							{
+								UpdateTile(tilePosX, tilePosY, currentTile ^ 0x80);
+							}
+
+							if (mode == 2)
+							{
+								selection.AddChanges(changes);
+							}
+						}
+					}
+
+					if (e.Button == MouseButtons.Left)
+					{
+						if (mode == 0) //down
 						{
 							selection.StartSelection(tilePosX, tilePosY);
 						}
-						else
+						else if(mode == 1) //move
 						{
 							selection.SetSelection(tilePosX, tilePosY);
 						}
 					}
-				}
-				else if (e.Button == MouseButtons.Right)
-				{
-					if (!pathMode)
+					else
 					{
-						if (eventMode)
-						{
-							eventForm.RemoveEvent(tilePos);
-						}
-
 						selection.ClearSelection();
 					}
 				}
@@ -481,7 +517,7 @@ namespace WLEditor
 		{
 			if (pictureBox1.ClientRectangle.Contains(e.Location))
 			{
-				MouseEvent(e, false);
+				MouseEvent(e, 1);
 			}
 		}
 
@@ -494,14 +530,20 @@ namespace WLEditor
 				selectionMode = true;
 			}
 
-			MouseEvent(e, true);
+			MouseEvent(e, 0);
+		}
+
+		void PictureBox1MouseUp(object sender, MouseEventArgs e)
+		{
+			lastTilePos = -1;
+			MouseEvent(e, 2);
 		}
 
 		void PictureBox2MouseMove(object sender, MouseEventArgs e)
 		{
 			if (pictureBox2.ClientRectangle.Contains(e.Location))
 			{
-				MouseEvent(e, false);
+				MouseEvent(e, 1);
 			}
 		}
 
@@ -514,7 +556,7 @@ namespace WLEditor
 				selectionMode = false;
 			}
 
-			MouseEvent(e, true);
+			MouseEvent(e, 0);
 		}
 
 		#endregion
@@ -548,7 +590,7 @@ namespace WLEditor
 			if (!pathMode && selectionMode)
 			{
 				int tile = GetEmptyTile();
-				if (selection.CutSelection(CopyTileAt, (x, y) => ClearTileAt(x, y, tile)))
+				if (selection.CopySelection(CopyTileAt) && selection.DeleteSelection(SetTileAt, GetEmptyTile()))
 				{
 					selection.ClearSelection();
 					pictureBox1.Invalidate();
@@ -562,7 +604,7 @@ namespace WLEditor
 			if (!pathMode && selectionMode)
 			{
 				int tile = GetEmptyTile();
-				if (selection.DeleteSelection(GetTileAt, (x, y) => ClearTileAt(x, y, tile)))
+				if (selection.DeleteSelection(SetTileAt, GetEmptyTile()))
 				{
 					selection.ClearSelection();
 					pictureBox1.Invalidate();
@@ -573,70 +615,78 @@ namespace WLEditor
 
 		int PasteTileAt(int x, int y, int data)
 		{
-			if (x < currentMapX && y < currentMapY)
+			if (x < currentMapX && y < currentMapY && data != -1)
+			{
+				return SetTileAt(x, y, data);
+			}
+
+			return data; //no changes
+		}
+
+		ClipboardData CopyTileAt(int x, int y)
+		{
+			if (selectionMode)
 			{
 				if (eventMode)
 				{
-					if (data != 0xFF) //not allowed because used as a marker
+					int index = eventForm.FindEvent(x + y * 32);
+					return new ClipboardData { Index = index, Tile = eventForm.GetEvent(index) };
+				}
+
+				return new ClipboardData { Tile = GetTileAt(x, y) };
+			}
+
+			return new ClipboardData { Tile = (x + y * 16) ^ 0x80 };
+		}
+
+		int GetTileAt(int x, int y)
+		{
+			if (eventMode)
+			{
+				return eventForm.GetEvent(eventForm.FindEvent(x + y * 32));
+			}
+
+			return worldTiles[x + y * 32];
+		}
+
+		int SetTileAt(int x, int y, int data)
+		{
+			int previous = GetTileAt(x, y);
+			if (previous != data)
+			{
+				if (eventMode)
+				{
+					if (data == 0xFF) //not allowed because used as a marker
+					{
+						return data; //no changes
+					}
+
+					if (data == -1)
+					{
+						eventForm.RemoveEvent(x + y * 32);
+					}
+					else
 					{
 						eventForm.AddEvent((byte)data, x + y * 32);
 					}
 				}
 				else
 				{
-					int previous = GetTileAt(x, y);
 					worldTiles[x + y * 32] = (byte)data;
-					return previous;
 				}
 			}
 
-			return -1;
-		}
-
-		int CopyTileAt(int x, int y)
-		{
-			if (selectionMode)
-			{
-				if (eventMode)
-				{
-					int tile = eventForm.GetEvent(x + y * 32);
-					if (tile != -1)
-					{
-						return tile;
-					}
-				}
-
-				return GetTileAt(x, y);
-			}
-
-			return (byte)((x + y * 16) ^ 0x80);
-		}
-
-		void ClearTileAt(int x, int y, int tile)
-		{
-			if (eventMode)
-			{
-				eventForm.RemoveEvent(x + y * 32);
-			}
-			else
-			{
-				SetTileAt(x, y, tile ^ 0x80);
-			}
-		}
-
-		int GetTileAt(int x, int y)
-		{
-			return worldTiles[x + y * 32];
-		}
-
-		void SetTileAt(int x, int y, int data)
-		{
-			worldTiles[x + y * 32] = (byte)data;
+			return previous;
 		}
 
 		int GetEmptyTile()
 		{
-			return Level.GetEmptyTile(tilesWorld8x8.Bits, 8, 16);
+			if (eventMode)
+			{
+				return -1;
+			}
+
+			return Level.GetEmptyTile(tilesWorld8x8.Bits, 8, 16) ^ 0x80;
 		}
 
 		void InvalidateSelection(object sender, SelectionEventArgs e)
@@ -651,13 +701,21 @@ namespace WLEditor
 			}
 		}
 
+		void InvalidateCurrentTile()
+		{
+			if (currentTile != -1)
+			{
+				pictureBox2.Invalidate(new Rectangle((currentTile % 16) * 8 * zoom, (currentTile / 16) * 8 * zoom, 8 * zoom, 8 * zoom));
+			}
+		}
+
 		#endregion
 
 		#region Undo
 
 		void Undo()
 		{
-			if (!eventMode && !pathMode)
+			if (!pathMode)
 			{
 				if (selection.Undo(SetTileAt, GetTileAt))
 				{
@@ -669,7 +727,7 @@ namespace WLEditor
 
 		void Redo()
 		{
-			if (!eventMode && !pathMode)
+			if (!pathMode)
 			{
 				if (selection.Redo(SetTileAt, GetTileAt))
 				{

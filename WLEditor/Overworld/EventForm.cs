@@ -16,6 +16,7 @@ namespace WLEditor
 
 		readonly PictureBox pictureBox;
 		readonly DirectBitmap tilesWorld8x8;
+		readonly Selection selection;
 
 		public event EventHandler EventChanged;
 		public event EventHandler EventIndexChanged;
@@ -96,10 +97,11 @@ namespace WLEditor
 			71
 		};
 
-		public EventForm(PictureBox pictureBox, DirectBitmap tilesWorld8x8)
+		public EventForm(PictureBox pictureBox, DirectBitmap tilesWorld8x8, Selection selection)
 		{
 			this.tilesWorld8x8 = tilesWorld8x8;
 			this.pictureBox = pictureBox;
+			this.selection = selection;
 		}
 
 		public void SetZoom(int zoomLevel)
@@ -141,8 +143,7 @@ namespace WLEditor
 				case Keys.PageUp:
 					if (worldEvent != worldEvents[worldEvents.Length - 1])
 					{
-						int eventId = Array.IndexOf(worldEvents, worldEvent);
-						worldEvent = worldEvents[eventId + 1];
+						NextEvent();
 						eventStep = 0;
 					}
 					else
@@ -150,6 +151,7 @@ namespace WLEditor
 						eventStep = worldEvent.Count;
 					}
 
+					selection.ClearUndo();
 					EventIndexChange();
 					pictureBox.Invalidate();
 					return true;
@@ -157,8 +159,7 @@ namespace WLEditor
 				case Keys.PageDown:
 					if (worldEvent != worldEvents[0])
 					{
-						int eventId = Array.IndexOf(worldEvents, worldEvent);
-						worldEvent = worldEvents[eventId - 1];
+						PreviousEvent();
 						eventStep = 0;
 					}
 					else
@@ -166,6 +167,7 @@ namespace WLEditor
 						eventStep = 0;
 					}
 
+					selection.ClearUndo();
 					EventIndexChange();
 					pictureBox.Invalidate();
 					return true;
@@ -177,9 +179,9 @@ namespace WLEditor
 					}
 					else if (worldEvent != worldEvents[worldEvents.Length - 1])
 					{
-						int eventId = Array.IndexOf(worldEvents, worldEvent);
-						worldEvent = worldEvents[eventId + 1];
+						NextEvent();
 						eventStep = 0;
+						selection.ClearUndo();
 					}
 
 					EventIndexChange();
@@ -193,9 +195,9 @@ namespace WLEditor
 					}
 					else if (worldEvent != worldEvents[0])
 					{
-						int eventId = Array.IndexOf(worldEvents, worldEvent);
-						worldEvent = worldEvents[eventId - 1];
+						PreviousEvent();
 						eventStep = worldEvent.Count;
+						selection.ClearUndo();
 					}
 
 					EventIndexChange();
@@ -203,16 +205,21 @@ namespace WLEditor
 					return true;
 
 				case Keys.Delete:
-					if (eventStep > 0)
+					if (!selection.HasSelection)
 					{
-						worldEvent.RemoveAt(eventStep - 1);
-						eventStep--;
+						if (eventStep > 0)
+						{
+							worldEvent.RemoveAt(eventStep - 1);
+							eventStep--;
 
-						pictureBox.Invalidate();
-						EventIndexChange();
-						SetChanges();
+							pictureBox.Invalidate();
+							EventIndexChange();
+							SetChanges();
+						}
+
+						return true;
 					}
-					return true;
+					break;
 
 				case Keys.Delete | Keys.Shift:
 					if (worldEvent.Count > 0)
@@ -230,12 +237,28 @@ namespace WLEditor
 			return false;
 		}
 
-		public int GetEvent(int tilePos)
+		void PreviousEvent()
 		{
-			int index = worldEvent.FindIndex(x => x.Key == tilePos);
+			int eventId = Array.IndexOf(worldEvents, worldEvent);
+			worldEvent = worldEvents[eventId - 1];
+		}
+
+		void NextEvent()
+		{
+			int eventId = Array.IndexOf(worldEvents, worldEvent);
+			worldEvent = worldEvents[eventId + 1];
+		}
+
+		public int FindEvent(int tilePos)
+		{
+			return worldEvent.FindIndex(x => x.Key == tilePos);
+		}
+
+		public int GetEvent(int index)
+		{
 			if (index != -1)
 			{
-				return index << 16 | worldEvent[index].Value;
+				return worldEvent[index].Value;
 			}
 
 			return -1;

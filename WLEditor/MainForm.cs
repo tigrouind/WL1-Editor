@@ -440,14 +440,14 @@ namespace WLEditor
 					return true;
 
 				case Keys.Control | Keys.X:
-					if (levelPictureBox.CutSelection(GetEmptyTile()))
+					if (levelPictureBox.CutSelection())
 					{
 						SetChanges(true);
 					}
 					return true;
 
 				case Keys.Delete:
-					if (levelPictureBox.DeleteSelection(GetEmptyTile()))
+					if (levelPictureBox.DeleteSelection())
 					{
 						SetChanges(true);
 					}
@@ -528,10 +528,7 @@ namespace WLEditor
 
 		void ToolboxToolStripMenuItemCheckedChanged(object sender, EventArgs e)
 		{
-			if(ToggleForm(toolboxForm, toolboxToolStripMenuItem.Checked))
-			{
-				levelPictureBox.ClearSelection();
-			}
+			ToggleForm(toolboxForm, toolboxToolStripMenuItem.Checked);
 		}
 
 		void ToolBoxFormClosing(object sender, EventArgs e)
@@ -558,14 +555,14 @@ namespace WLEditor
 					levelPictureBox.StartChanges();
 				}
 
-				if (e.Status == 0 || e.Status == 1)
+				if ((e.Status == 0 || e.Status == 1) && !levelPictureBox.HasSelection)
 				{
 					int tileIndex = levelPictureBox.CurrentTileIndex;
 					int selectedPanelIndex = toolboxForm.SelectedPanelIndex;
 					int currentTile = toolboxForm.CurrentTile;
 					int currentObject = toolboxForm.CurrentObject;
 
-					if (e.Button == MouseButtons.Left)
+					if (e.Button == MouseButtons.Right)
 					{
 						if(selectedPanelIndex == 0)
 						{
@@ -576,17 +573,6 @@ namespace WLEditor
 							UpdateObject(tileIndex, currentObject + 1);
 						}
 					}
-					else if (e.Button == MouseButtons.Right)
-					{
-						if (selectedPanelIndex == 0)
-						{
-							UpdateTile(tileIndex, GetEmptyTile());
-						}
-						else if(levelPictureBox.ShowObjects && selectedPanelIndex == 2)
-						{
-							UpdateObject(tileIndex, 0);
-						}
-					}
 				}
 
 				if (e.Status == 2) //up
@@ -594,7 +580,8 @@ namespace WLEditor
 					levelPictureBox.CommitChanges();
 				}
 			}
-			else if (e.Button == MouseButtons.Left)
+
+			if (e.Button == MouseButtons.Left)
 			{
 				if (e.Status == 0) //down
 				{
@@ -633,11 +620,6 @@ namespace WLEditor
 				levelPictureBox.InvalidateObject(tileIndex, currentObject, previousObject);
 				SetChanges(true);
 			}
-		}
-
-		int GetEmptyTile()
-		{
-			return Level.GetEmptyTile(Level.Tiles16x16.Bits, 16, 8);
 		}
 
 		void LevelPictureBoxSectorChanged(object sender, EventArgs e)
@@ -713,14 +695,13 @@ namespace WLEditor
 			toolboxForm.Invalidate(true);
 		}
 
-		bool ToggleForm(Form form, bool visible)
+		void ToggleForm(Form form, bool visible)
 		{
 			if (visible)
 			{
 				if (!form.Visible)
 				{
 					form.Show(this);
-					return true;
 				}
 			}
 			else
@@ -730,8 +711,6 @@ namespace WLEditor
 					form.Hide();
 				}
 			}
-
-			return false;
 		}
 
 		void OverworldToolStripMenuItemCheckedChanged(object sender, EventArgs e)

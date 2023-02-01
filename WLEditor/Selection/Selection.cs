@@ -68,7 +68,7 @@ namespace WLEditor
 				((end.Y - start.Y + 1) * tileSize) * zoom);
 		}
 
-		public void CopySelection(Func<int, int, int> getTileAt)
+		public bool CopySelection(Func<int, int, ClipboardData> getTileAt)
 		{
 			if (selection)
 			{
@@ -86,28 +86,22 @@ namespace WLEditor
 					{
 						for(int x = start.X ; x <= end.X ; x++)
 						{
-							writer.Write(getTileAt(x, y));
+							var item = getTileAt(x, y);
+							writer.Write(item.Index);
+							writer.Write(item.Tile);
 						}
 					}
 
 					Clipboard.SetData("WLEditor", memoryStream);
 				}
-			}
-		}
 
-		public bool CutSelection(Func<int, int, int> getTileAt, Action<int, int> clearTileAt)
-		{
-			if (selection)
-			{
-				CopySelection(getTileAt);
-				DeleteSelection(getTileAt, clearTileAt);
 				return true;
 			}
 
 			return false;
 		}
 
-		public bool DeleteSelection(Func<int, int, int> getTileAt, Action<int, int> clearTileAt)
+		public bool DeleteSelection(Func<int, int, int, int> setTileAt, int emptyTile)
 		{
 			if (selection)
 			{
@@ -120,8 +114,11 @@ namespace WLEditor
 				{
 					for(int x = start.X ; x <= end.X ; x++)
 					{
-						changes.Add(new SelectionChange { X = x, Y =  y, Data = getTileAt(x, y) });
-						clearTileAt(x, y);
+						int previous = setTileAt(x, y, emptyTile);
+						if (previous != emptyTile)
+						{
+							changes.Add(new SelectionChange { X = x, Y =  y, Data = previous });
+						}
 					}
 				}
 
@@ -137,7 +134,7 @@ namespace WLEditor
 			if (selection)
 			{
 				int selectionWidth = 0, selectionHeight = 0;
-				int[] selectionData = null;
+				ClipboardData[] selectionData = null;
 
 				var memoryStream = (MemoryStream)Clipboard.GetData("WLEditor");
 				if (memoryStream != null)
@@ -149,9 +146,9 @@ namespace WLEditor
 							selectionWidth = reader.ReadInt32();
 							selectionHeight = reader.ReadInt32();
 							selectionData = Enumerable.Range(0, selectionWidth * selectionHeight)
-								.Select((x, i) => new { Tile = reader.ReadInt32(), Index = i })
-								.OrderBy(x => x.Tile >> 16) //used for events
-								.Select(x =>  x.Index << 16 | x.Tile & 0xFFFF)
+								.Select((x, i) => new { Order = reader.ReadInt32(), Tile = reader.ReadInt32(), Index = i })
+								.OrderBy(x => x.Order)   //used for ordering events
+								.Select(x => new ClipboardData { Index = x.Index, Tile = x.Tile })
 								.ToArray();
 						}
 					}
@@ -166,17 +163,18 @@ namespace WLEditor
 
 					for (int ty = start.Y ; ty <= end.Y ; ty += selectionHeight)
 					for (int tx = start.X ; tx <= end.X ; tx += selectionWidth)
-					foreach (int data in selectionData)
+					foreach (var data in selectionData)
 					{
-						int destX = tx + ((data >> 16) % selectionWidth);
-						int destY = ty + ((data >> 16) / selectionWidth);
+						int destX = tx + data.Index % selectionWidth;
+						int destY = ty + data.Index / selectionWidth;
 
 						if ((destX <= end.X && destY <= end.Y) || (start.X == end.X && start.Y == end.Y))
 						{
-							int track = setTileAt(destX, destY, data & 0xFFFF);
-							if (track != -1)
+							int tile = data.Tile;
+							int previous = setTileAt(destX, destY, tile);
+							if (previous != tile)
 							{
-								changes.Add(new SelectionChange { X = destX, Y = destY, Data = track });
+								changes.Add(new SelectionChange { X = destX, Y = destY, Data = previous });
 							}
 						}
 					}
@@ -255,17 +253,17 @@ namespace WLEditor
 			}
 		}
 
-		public bool Undo(Action<int, int, int> setTileAt, Func<int, int, int> getTileAt)
+		public bool Undo(Func<int, int, int, int> setTileAt, Func<int, int, int> getTileAt)
 		{
 			return ApplyChanges(setTileAt, getTileAt, undo, redo);
 		}
 
-		public bool Redo(Action<int, int, int> setTileAt, Func<int, int, int> getTileAt)
+		public bool Redo(Func<int, int, int, int> setTileAt, Func<int, int, int> getTileAt)
 		{
 			return ApplyChanges(setTileAt, getTileAt, redo, undo);
 		}
 
-		bool ApplyChanges(Action<int, int, int> setTileAt, Func<int, int, int> getTileAt, List<List<SelectionChange>> source, List<List<SelectionChange>> dest)
+		bool ApplyChanges(Func<int, int, int, int> setTileAt, Func<int, int, int> getTileAt, List<List<SelectionChange>> source, List<List<SelectionChange>> dest)
 		{
 			if (source.Count > 0)
 			{

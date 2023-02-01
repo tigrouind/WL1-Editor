@@ -458,7 +458,7 @@ namespace WLEditor
 
 		public void CopySelection()
 		{
-			selection.CopySelection(GetTileAt);
+			selection.CopySelection(CopyTileAt);
 			selection.ClearSelection();
 		}
 
@@ -474,9 +474,9 @@ namespace WLEditor
 			return false;
 		}
 
-		public bool CutSelection(int emptyTile)
+		public bool CutSelection()
 		{
-			if (selection.CutSelection(GetTileAt, (x, y) => SetTileAt(x, y, emptyTile)))
+			if (selection.CopySelection(CopyTileAt) && selection.DeleteSelection(SetTileAt, GetEmptyTile()))
 			{
 				selection.ClearSelection();
 				Invalidate();
@@ -486,9 +486,9 @@ namespace WLEditor
 			return false;
 		}
 
-		public bool DeleteSelection(int emptyTile)
+		public bool DeleteSelection()
 		{
-			if (selection.DeleteSelection(GetTileAt, (x, y) => SetTileAt(x, y, emptyTile)))
+			if (selection.DeleteSelection(SetTileAt, GetEmptyTile()))
 			{
 				selection.ClearSelection();
 				Invalidate();
@@ -513,16 +513,27 @@ namespace WLEditor
 			selection.SetSelection(x, y);
 		}
 
+		public bool HasSelection
+		{
+			get
+			{
+				return selection.HasSelection;
+			}
+		}
+
 		int PasteTileAt(int x, int y, int data)
 		{
 			if (x < 256 && y < 32)
 			{
-				int previous = GetTileAt(x, y);
-				SetTileAt(x, y, data);
-				return previous;
+				return SetTileAt(x, y, data);
 			}
 
-			return -1;
+			return data; //no changes
+		}
+
+		ClipboardData CopyTileAt(int x, int y)
+		{
+			return new ClipboardData { Tile = GetTileAt(x, y) };
 		}
 
 		int GetTileAt(int x, int y)
@@ -531,12 +542,23 @@ namespace WLEditor
 			return (Level.ObjectsData[dest] << 8) | Level.LevelData[dest + 0x1000];
 		}
 
-		void SetTileAt(int x, int y, int data)
+		int SetTileAt(int x, int y, int data)
 		{
-			int dest = x + y * 256;
-			Level.ObjectsData[dest] = (byte)(data >> 8);
-			Level.LevelData[dest + 0x1000] = (byte)(data & 0xFF);
-			invalidTiles[dest] = false;
+			int previous = GetTileAt(x, y);
+			if (previous != data)
+			{
+				int dest = x + y * 256;
+				Level.ObjectsData[dest] = (byte)(data >> 8);
+				Level.LevelData[dest + 0x1000] = (byte)(data & 0xFF);
+				invalidTiles[dest] = false;
+			}
+
+			return previous;
+		}
+
+		int GetEmptyTile()
+		{
+			return Level.GetEmptyTile(Level.Tiles16x16.Bits, 16, 8);
 		}
 
 		#endregion
