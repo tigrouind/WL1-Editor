@@ -394,7 +394,6 @@ namespace WLEditor
 
 			Sprite.FindEnemiesData(rom, enemyPointer, out enemiesIdsPointer, out tilesPointer, out treasureId, out treasureCheck, out exitOpen, out bonus);
 
-
 			char[] treasureNames = { 'C', 'I', 'F', 'O', 'A', 'N', 'H', 'M', 'L', 'K', 'B', 'D', 'G', 'J', 'E' };
 			if (treasureId >= 1 && treasureId <= 15)
 			{
@@ -434,17 +433,12 @@ namespace WLEditor
 				ddlAnimation.Items.Clear();
 				ddlAnimation.Items.AddRange(tilesAnimation);
 
-				var sorted = enemyData.Select(x => new { Text = GetEnemyInfo(x[0]), Value = x })
+				ddlEnemies.Items.Clear();
+				ddlEnemies.Items.AddRange(enemyData.Select(x => new { Text = GetEnemyInfo(x[0]), Value = x })
 					.OrderBy(x => x.Text[0] == '[')
 					.ThenBy(x => x.Text)
-					.ToArray();
-
-				ddlEnemies.Items.Clear();
-				for(int i = 0 ; i < sorted.Length; i++)
-				{
-					var item = sorted[i];
-					ddlEnemies.Items.Add(new ComboboxItem<int[]>(item.Value, string.Format("{0:D3}   {1}", i, item.Text)));
-				}
+					.Select((x, i) => new ComboboxItem<int[]>(x.Value, string.Format("{0:D3}   {1}", i, x.Text)))
+					.ToArray());
 			}
 		}
 
