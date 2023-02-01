@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace WLEditor
 {
-	public partial class Overworld : Form
+	public partial class OverworldForm : Form
 	{
 		public event EventHandler<KeyEventArgs> ProcessCommandKey;
 		public event EventHandler WorldMapChanged;
@@ -39,7 +39,7 @@ namespace WLEditor
 		readonly PathForm pathForm;
 		readonly EventForm eventForm;
 
-		public Overworld()
+		public OverworldForm()
 		{
 			InitializeComponent();
 			eventForm = new EventForm(pictureBox1, tilesWorld8x8);

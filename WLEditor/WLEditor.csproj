@@ -53,9 +53,9 @@
     </Compile>
     <Compile Include="Overworld\EventForm.cs" />
     <Compile Include="Overworld\Map.cs" />
-    <Compile Include="Overworld\Overworld.cs" />
-    <Compile Include="Overworld\Overworld.Designer.cs">
-      <DependentUpon>Overworld.cs</DependentUpon>
+    <Compile Include="Overworld\OverworldForm.cs" />
+    <Compile Include="Overworld\OverworldForm.Designer.cs">
+      <DependentUpon>OverworldForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Overworld\PathForm.cs" />
     <Compile Include="Overworld\WorldPath\WorldPath.cs" />
@@ -91,8 +91,8 @@
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.Designer.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Overworld\Overworld.resx">
-      <DependentUpon>Overworld.Designer.cs</DependentUpon>
+    <EmbeddedResource Include="Overworld\OverworldForm.resx">
+      <DependentUpon>OverworldForm.Designer.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Toolbox\SectorForm.resx">
       <DependentUpon>SectorForm.cs</DependentUpon>

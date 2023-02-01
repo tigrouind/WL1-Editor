@@ -1,6 +1,6 @@
 namespace WLEditor
 {
-	partial class Overworld
+	partial class OverworldForm
 	{
 		/// <summary>
 		/// Designer variable used to keep track of non-visual components.

@@ -9,7 +9,7 @@ namespace WLEditor
 	{
 		Rom rom = new Rom();
 		ToolboxForm toolboxForm = new ToolboxForm();
-		Overworld overworldForm = new Overworld();
+		OverworldForm overworldForm = new OverworldForm();
 
 		public readonly static string[] LevelNames =
 		{
