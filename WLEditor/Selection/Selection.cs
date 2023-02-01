@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
+using System.Windows.Forms;
 
 namespace WLEditor
 {
@@ -12,8 +14,6 @@ namespace WLEditor
 
 		bool selection;
 		Point selectionStart, selectionEnd;
-		int selectionWidth, selectionHeight;
-		readonly List<int> selectionData = new List<int>();
 		public event EventHandler<SelectionEventArgs> InvalidateSelection;
 
 		readonly List<List<SelectionChange>> undo = new List<List<SelectionChange>>();
@@ -72,21 +72,26 @@ namespace WLEditor
 		{
 			if (selection)
 			{
-				selectionData.Clear();
-
 				Point start, end;
 				GetSelection(out start, out end);
 
-				for(int y = start.Y ; y <= end.Y ; y++)
+				using (var memoryStream = new MemoryStream())
+				using (var writer = new BinaryWriter(memoryStream))
 				{
-					for(int x = start.X ; x <= end.X ; x++)
-					{
-						selectionData.Add(getTileAt(x, y));
-					}
-				}
+					writer.Write(tileSize);
+					writer.Write(end.X - start.X + 1); //width
+					writer.Write(end.Y - start.Y + 1); //height
 
-				selectionWidth = end.X - start.X + 1;
-				selectionHeight = end.Y - start.Y + 1;
+					for(int y = start.Y ; y <= end.Y ; y++)
+					{
+						for(int x = start.X ; x <= end.X ; x++)
+						{
+							writer.Write(getTileAt(x, y));
+						}
+					}
+
+					Clipboard.SetData("WLEditor", memoryStream);
+				}
 			}
 		}
 
@@ -129,38 +134,56 @@ namespace WLEditor
 
 		public bool PasteSelection(Func<int, int, int, int> setTileAt)
 		{
-			if (selection && selectionWidth > 0 && selectionHeight > 0)
+			if (selection)
 			{
-				var changes = new List<SelectionChange>();
+				int selectionWidth = 0, selectionHeight = 0;
+				int[] selectionData = null;
 
-				Point start, end;
-				GetSelection(out start, out end);
-
-				var sortedData = selectionData.Select((x, i) => new { tile = x, index = i })
-					.OrderBy(x => x.tile >> 16) //used for events
-					.Select(x => x.index)
-					.ToArray();
-
-				for (int ty = start.Y ; ty <= end.Y ; ty += selectionHeight)
-				for (int tx = start.X ; tx <= end.X ; tx += selectionWidth)
-				foreach (int pos in sortedData)
+				var memoryStream = (MemoryStream)Clipboard.GetData("WLEditor");
+				if (memoryStream != null)
 				{
-					int destX = tx + (pos % selectionWidth);
-					int destY = ty + (pos / selectionWidth);
-
-					if ((destX <= end.X && destY <= end.Y) || (start.X == end.X && start.Y == end.Y))
+					using (var reader = new BinaryReader(memoryStream))
 					{
-						int data = selectionData[pos];
-						int track = setTileAt(destX, destY, data & 0xFFFF);
-						if (track != -1)
+						if (reader.ReadInt32() == tileSize)
 						{
-							changes.Add(new SelectionChange { X = destX, Y = destY, Data = track });
+							selectionWidth = reader.ReadInt32();
+							selectionHeight = reader.ReadInt32();
+							selectionData = Enumerable.Range(0, selectionWidth * selectionHeight)
+								.Select((x, i) => new { Tile = reader.ReadInt32(), Index = i })
+								.OrderBy(x => x.Tile >> 16) //used for events
+								.Select(x =>  x.Index << 16 | x.Tile & 0xFFFF)
+								.ToArray();
 						}
 					}
 				}
 
-				AddChanges(changes);
-				return true;
+				if (selectionData != null && selectionWidth > 0 && selectionHeight > 0)
+				{
+					var changes = new List<SelectionChange>();
+
+					Point start, end;
+					GetSelection(out start, out end);
+
+					for (int ty = start.Y ; ty <= end.Y ; ty += selectionHeight)
+					for (int tx = start.X ; tx <= end.X ; tx += selectionWidth)
+					foreach (int data in selectionData)
+					{
+						int destX = tx + ((data >> 16) % selectionWidth);
+						int destY = ty + ((data >> 16) / selectionWidth);
+
+						if ((destX <= end.X && destY <= end.Y) || (start.X == end.X && start.Y == end.Y))
+						{
+							int track = setTileAt(destX, destY, data & 0xFFFF);
+							if (track != -1)
+							{
+								changes.Add(new SelectionChange { X = destX, Y = destY, Data = track });
+							}
+						}
+					}
+
+					AddChanges(changes);
+					return true;
+				}
 			}
 
 			return false;
