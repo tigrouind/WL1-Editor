@@ -158,6 +158,9 @@ namespace WLEditor
 				{
 					var changes = new List<SelectionChange>();
 
+					bool invertX = selectionStart.X > selectionEnd.X;
+					bool invertY = selectionStart.Y > selectionEnd.Y;
+
 					Point start, end;
 					GetSelection(out start, out end);
 
@@ -165,16 +168,20 @@ namespace WLEditor
 					for (int tx = start.X ; tx <= end.X ; tx += selectionWidth)
 					foreach (var data in selectionData)
 					{
-						int destX = tx + data.Index % selectionWidth;
-						int destY = ty + data.Index / selectionWidth;
+						Point dest = new Point
+						{
+							X = (invertX ? start.X - tx + end.X - selectionWidth  + 1 : tx) + data.Index % selectionWidth,
+							Y = (invertY ? start.Y - ty + end.Y - selectionHeight + 1 : ty) + data.Index / selectionWidth
+						};
 
-						if ((destX <= end.X && destY <= end.Y) || (start.X == end.X && start.Y == end.Y))
+						if ((dest.X >= start.X && dest.Y >= start.Y && dest.X <= end.X && dest.Y <= end.Y)
+							|| (start.X == end.X && start.Y == end.Y))
 						{
 							int tile = data.Tile;
-							int previous = setTileAt(destX, destY, tile);
+							int previous = setTileAt(dest.X, dest.Y, tile);
 							if (previous != tile)
 							{
-								changes.Add(new SelectionChange { X = destX, Y = destY, Data = previous });
+								changes.Add(new SelectionChange { X = dest.X, Y = dest.Y, Data = previous });
 							}
 						}
 					}
