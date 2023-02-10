@@ -31,7 +31,7 @@ namespace WLEditor
 		int animationIndex;
 
 		int lastTilePos = -1;
-		int hasChanges;
+		ChangeEnum changesFlag;
 
 		Selection selection = new Selection(8);
 		bool selectionMode;
@@ -48,10 +48,10 @@ namespace WLEditor
 			InitializeComponent();
 			eventForm = new EventForm(pictureBox1, tilesWorld8x8, selection);
 			eventForm.EventIndexChanged += (s, e) => UpdateTitle();
-			eventForm.EventChanged += (s, e) => SetChanges(2);
+			eventForm.EventChanged += (s, e) => SetChanges(ChangeEnum.Event);
 
 			pathForm = new PathForm(pictureBox1);
-			pathForm.PathChanged += (s, e) => SetChanges(4);
+			pathForm.PathChanged += (s, e) => SetChanges(ChangeEnum.Path);
 
 			selection.InvalidateSelection += InvalidateSelection;
 		}
@@ -74,7 +74,7 @@ namespace WLEditor
 		{
 			this.rom = rom;
 			formLoaded = false;
-			hasChanges = 0;
+			changesFlag = ChangeEnum.None;
 
 			if (Visible)
 			{
@@ -154,7 +154,7 @@ namespace WLEditor
 		{
 			if (!ignoreEvents)
 			{
-				if (!SaveChanges(~4))
+				if (!SaveChanges(~ChangeEnum.Path))
 				{
 					ignoreEvents = true;
 					WorldComboBox.SelectedIndex = currentWorld;
@@ -171,13 +171,13 @@ namespace WLEditor
 
 		public bool SaveChanges()
 		{
-			return SaveChanges(~0);
+			return SaveChanges(~ChangeEnum.None);
 		}
 
-		bool SaveChanges(int flags)
+		bool SaveChanges(ChangeEnum flags)
 		{
 			string message;
-			if (((hasChanges & flags) & 1) != 0)
+			if (((changesFlag & flags) & ChangeEnum.Tile) != 0)
 			{
 				//improve tile compression
 				if (currentWorld != 8)
@@ -193,10 +193,10 @@ namespace WLEditor
 					return false;
 				}
 
-				hasChanges &= ~1;
+				changesFlag &= ~ChangeEnum.Tile;
 			}
 
-			if (((hasChanges & flags) & 2) != 0)
+			if (((changesFlag & flags) & ChangeEnum.Event) != 0)
 			{
 				if (!eventForm.SaveEvents(rom, out message))
 				{
@@ -204,10 +204,10 @@ namespace WLEditor
 					return false;
 				}
 
-				hasChanges &= ~2;
+				changesFlag &= ~ChangeEnum.Event;
 			}
 
-			if (((hasChanges & flags) & 4) != 0)
+			if (((changesFlag & flags) & ChangeEnum.Path) != 0)
 			{
 				if (!pathForm.SavePaths(rom, out message))
 				{
@@ -215,7 +215,7 @@ namespace WLEditor
 					return false;
 				}
 
-				hasChanges &= ~4;
+				changesFlag &= ~ChangeEnum.Path;
 			}
 
 			return true;
@@ -379,9 +379,9 @@ namespace WLEditor
 			return false;
 		}
 
-		void SetChanges(int mode)
+		void SetChanges(ChangeEnum mode)
 		{
-			hasChanges |= mode;
+			changesFlag |= mode;
 			WorldMapChanged(this, EventArgs.Empty);
 		}
 
@@ -468,7 +468,7 @@ namespace WLEditor
 					{
 						if (!selectionMode)
 						{
-							if (mode == 0)
+							if (mode == 0) //down
 							{
 								InvalidateCurrentTile();
 								currentTile = tilePosX + tilePosY * 16;
@@ -477,7 +477,7 @@ namespace WLEditor
 						}
 						else
 						{
-							if (mode == 0)
+							if (mode == 0) //down
 							{
 								changes = new List<SelectionChange>();
 							}
@@ -487,7 +487,7 @@ namespace WLEditor
 								UpdateTile(tilePosX, tilePosY, currentTile ^ 0x80);
 							}
 
-							if (mode == 2)
+							if (mode == 2) //up
 							{
 								selection.AddChanges(changes);
 							}
@@ -580,7 +580,7 @@ namespace WLEditor
 				{
 					selection.ClearSelection();
 					pictureBox1.Invalidate();
-					SetChanges(1);
+					SetChanges(ChangeEnum.Tile);
 				}
 			}
 		}
@@ -594,7 +594,7 @@ namespace WLEditor
 				{
 					selection.ClearSelection();
 					pictureBox1.Invalidate();
-					SetChanges(1);
+					SetChanges(ChangeEnum.Tile);
 				}
 			}
 		}
@@ -608,7 +608,7 @@ namespace WLEditor
 				{
 					selection.ClearSelection();
 					pictureBox1.Invalidate();
-					SetChanges(1);
+					SetChanges(ChangeEnum.Tile);
 				}
 			}
 		}
@@ -720,7 +720,7 @@ namespace WLEditor
 				if (selection.Undo(SetTileAt, GetTileAt))
 				{
 					pictureBox1.Invalidate();
-					SetChanges(1);
+					SetChanges(ChangeEnum.Tile);
 				}
 			}
 		}
@@ -732,7 +732,7 @@ namespace WLEditor
 				if (selection.Redo(SetTileAt, GetTileAt))
 				{
 					pictureBox1.Invalidate();
-					SetChanges(1);
+					SetChanges(ChangeEnum.Tile);
 				}
 			}
 		}
