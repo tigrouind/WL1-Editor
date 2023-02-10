@@ -123,7 +123,7 @@ namespace WLEditor
 				}
 
 				AddChanges(changes);
-				return true;
+				return changes.Count > 0;
 			}
 
 			return false;
@@ -187,7 +187,7 @@ namespace WLEditor
 					}
 
 					AddChanges(changes);
-					return true;
+					return changes.Any();
 				}
 			}
 

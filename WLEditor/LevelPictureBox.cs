@@ -459,14 +459,12 @@ namespace WLEditor
 		public void CopySelection()
 		{
 			selection.CopySelection(CopyTileAt);
-			selection.ClearSelection();
 		}
 
 		public bool PasteSelection()
 		{
 			if (selection.PasteSelection(PasteTileAt))
 			{
-				selection.ClearSelection();
 				Invalidate();
 				return true;
 			}
@@ -478,7 +476,6 @@ namespace WLEditor
 		{
 			if (selection.CopySelection(CopyTileAt) && selection.DeleteSelection(SetTileAt, GetEmptyTile()))
 			{
-				selection.ClearSelection();
 				Invalidate();
 				return true;
 			}
@@ -490,7 +487,6 @@ namespace WLEditor
 		{
 			if (selection.DeleteSelection(SetTileAt, GetEmptyTile()))
 			{
-				selection.ClearSelection();
 				Invalidate();
 				return true;
 			}

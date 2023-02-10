@@ -578,10 +578,11 @@ namespace WLEditor
 			{
 				if (selection.PasteSelection(PasteTileAt))
 				{
-					selection.ClearSelection();
 					pictureBox1.Invalidate();
 					SetChanges(ChangeEnum.Tile);
 				}
+
+				selection.ClearSelection();
 			}
 		}
 
@@ -592,10 +593,11 @@ namespace WLEditor
 				int tile = GetEmptyTile();
 				if (selection.CopySelection(CopyTileAt) && selection.DeleteSelection(SetTileAt, GetEmptyTile()))
 				{
-					selection.ClearSelection();
 					pictureBox1.Invalidate();
 					SetChanges(ChangeEnum.Tile);
 				}
+
+				selection.ClearSelection();
 			}
 		}
 
@@ -606,10 +608,11 @@ namespace WLEditor
 				int tile = GetEmptyTile();
 				if (selection.DeleteSelection(SetTileAt, GetEmptyTile()))
 				{
-					selection.ClearSelection();
 					pictureBox1.Invalidate();
 					SetChanges(ChangeEnum.Tile);
 				}
+
+				selection.ClearSelection();
 			}
 		}
 

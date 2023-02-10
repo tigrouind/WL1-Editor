@@ -430,6 +430,7 @@ namespace WLEditor
 
 				case Keys.Control | Keys.C:
 					levelPictureBox.CopySelection();
+					levelPictureBox.ClearSelection();
 					return true;
 
 				case Keys.Control | Keys.V:
@@ -437,6 +438,8 @@ namespace WLEditor
 					{
 						SetChanges(true);
 					}
+
+					levelPictureBox.ClearSelection();
 					return true;
 
 				case Keys.Control | Keys.X:
@@ -444,6 +447,8 @@ namespace WLEditor
 					{
 						SetChanges(true);
 					}
+
+					levelPictureBox.ClearSelection();
 					return true;
 
 				case Keys.Delete:
@@ -451,6 +456,8 @@ namespace WLEditor
 					{
 						SetChanges(true);
 					}
+
+					levelPictureBox.ClearSelection();
 					return true;
 
 				case Keys.Control | Keys.Z:
