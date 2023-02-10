@@ -279,7 +279,6 @@ namespace WLEditor
 
 			pictureBox.Invalidate();
 			EventIndexChange();
-			SetChanges();
 		}
 
 		public void RemoveEvent(int tilePos)
@@ -295,7 +294,6 @@ namespace WLEditor
 
 				pictureBox.Invalidate();
 				EventIndexChange();
-				SetChanges();
 			}
 		}
 

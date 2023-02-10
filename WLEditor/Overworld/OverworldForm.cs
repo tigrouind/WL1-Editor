@@ -449,6 +449,7 @@ namespace WLEditor
 			{
 				changes.Add(new SelectionChange { X = x, Y = y, Data = previousTile });
 				pictureBox1.Invalidate();
+				SetChanges(eventMode ? ChangeEnum.Event : ChangeEnum.Tile);
 			}
 		}
 
@@ -579,7 +580,7 @@ namespace WLEditor
 				if (selection.PasteSelection(PasteTileAt))
 				{
 					pictureBox1.Invalidate();
-					SetChanges(ChangeEnum.Tile);
+					SetChanges(eventMode ? ChangeEnum.Event : ChangeEnum.Tile);
 				}
 
 				selection.ClearSelection();
@@ -594,7 +595,7 @@ namespace WLEditor
 				if (selection.CopySelection(CopyTileAt) && selection.DeleteSelection(SetTileAt, GetEmptyTile()))
 				{
 					pictureBox1.Invalidate();
-					SetChanges(ChangeEnum.Tile);
+					SetChanges(eventMode ? ChangeEnum.Event : ChangeEnum.Tile);
 				}
 
 				selection.ClearSelection();
@@ -609,7 +610,7 @@ namespace WLEditor
 				if (selection.DeleteSelection(SetTileAt, GetEmptyTile()))
 				{
 					pictureBox1.Invalidate();
-					SetChanges(ChangeEnum.Tile);
+					SetChanges(eventMode ? ChangeEnum.Event : ChangeEnum.Tile);
 				}
 
 				selection.ClearSelection();
@@ -723,7 +724,7 @@ namespace WLEditor
 				if (selection.Undo(SetTileAt, GetTileAt))
 				{
 					pictureBox1.Invalidate();
-					SetChanges(ChangeEnum.Tile);
+					SetChanges(eventMode ? ChangeEnum.Event : ChangeEnum.Tile);
 				}
 			}
 		}
@@ -735,7 +736,7 @@ namespace WLEditor
 				if (selection.Redo(SetTileAt, GetTileAt))
 				{
 					pictureBox1.Invalidate();
-					SetChanges(ChangeEnum.Tile);
+					SetChanges(eventMode ? ChangeEnum.Event : ChangeEnum.Tile);
 				}
 			}
 		}
