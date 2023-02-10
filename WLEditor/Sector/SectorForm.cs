@@ -541,16 +541,13 @@ namespace WLEditor
 		int GetFreeWarp()
 		{
 			var used = Sector.GetWarpUsage(rom);
-			for (int i = 0 ; i < 370 ; i++)
-			{
-				int warp = 0x5B7A + i * 24;
-				if (!used.Contains(warp))
-				{
-					return warp;
-				}
-			}
+			var all = Enumerable.Range(0, 370)
+				.Select(x => 0x5B7A + x * 24);
 
-			return -1;
+			return all
+				.Except(used)
+				.DefaultIfEmpty(-1)
+				.First();
 		}
 
 		void LoadScroll()

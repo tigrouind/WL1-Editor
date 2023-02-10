@@ -886,26 +886,31 @@ namespace WLEditor
 				{
 					int offset = y * 256;
 					int scroll = y < 54 ? Map.GetScroll(rom, animationIndex + y) : 0;
-					if (scroll > 0)
-					{
-						Array.Copy(tilesWorld.Bits, offset, tilesWorldScroll.Bits, offset + scroll, 160 - scroll);
-						Array.Copy(tilesWorld.Bits, offset + 160 - scroll, tilesWorldScroll.Bits, offset, scroll);
-					}
-					else if (scroll < 0)
-					{
-						Array.Copy(tilesWorld.Bits, offset - scroll, tilesWorldScroll.Bits, offset, 160 + scroll);
-						Array.Copy(tilesWorld.Bits, offset, tilesWorldScroll.Bits, offset + 160 + scroll, -scroll);
-					}
-					else
-					{
-						Array.Copy(tilesWorld.Bits, offset, tilesWorldScroll.Bits, offset, 160);
-					}
+					ScrollLine(offset, scroll);
 				}
 
 				return tilesWorldScroll.Bitmap;
 			}
 
 			return tilesWorld.Bitmap;
+		}
+
+		void ScrollLine(int offset, int scroll)
+		{
+			if (scroll > 0)
+			{
+				Array.Copy(tilesWorld.Bits, offset, tilesWorldScroll.Bits, offset + scroll, 160 - scroll);
+				Array.Copy(tilesWorld.Bits, offset + 160 - scroll, tilesWorldScroll.Bits, offset, scroll);
+			}
+			else if (scroll < 0)
+			{
+				Array.Copy(tilesWorld.Bits, offset - scroll, tilesWorldScroll.Bits, offset, 160 + scroll);
+				Array.Copy(tilesWorld.Bits, offset, tilesWorldScroll.Bits, offset + 160 + scroll, -scroll);
+			}
+			else
+			{
+				Array.Copy(tilesWorld.Bits, offset, tilesWorldScroll.Bits, offset, 160);
+			}
 		}
 
 		#endregion

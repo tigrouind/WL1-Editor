@@ -134,10 +134,8 @@ namespace WLEditor
 			rom.WriteWord(warp + 22, (ushort)warpInfo.Enemy);
 		}
 
-		public static HashSet<int> GetWarpUsage(Rom rom)
+		public static IEnumerable<int> GetWarpUsage(Rom rom)
 		{
-			HashSet<int> used = new HashSet<int>();
-
 			rom.SetBank(0xC);
 			for(int i = 0 ; i < 43 ;i++)
 			{
@@ -146,12 +144,10 @@ namespace WLEditor
 					int warp = rom.ReadWord(0x4F30 + i * 64 + j * 2);
 					if (warp >= 0x5B7A)
 					{
-						used.Add(warp);
+						yield return warp;
 					}
 				}
 			}
-
-			return used;
 		}
 
 		public static int GetScroll(Rom rom, int course, int sector)
@@ -207,7 +203,7 @@ namespace WLEditor
 				}
 			}
 
-			return (posX != -1 && posY != -1);
+			return posX != -1 && posY != -1;
 		}
 	}
 }
