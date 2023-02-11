@@ -277,6 +277,11 @@ namespace WLEditor
 						for(int j = 0 ; j < 2 ; j++)
 						{
 							byte subTileIndex = rom.ReadByte(tileindexaddress + newTileIndex * 4 + k * 2 + j);
+							if ((switchMode == 2 && newTileIndex == 0x32) || (switchMode == 1 && newTileIndex == 0x39))
+							{
+								subTileIndex = (byte)(4 + k * 2 + j);
+							}
+
 							bool isAnimated = subTileIndex >= (2 * 16) && subTileIndex < (2 * 16 + 4);
 							isAnimatedTile |= isAnimated;
 							animated8x8Tiles[m++] = isAnimated ? subTileIndex : -1;
@@ -476,21 +481,22 @@ namespace WLEditor
 
 		public static int GetTypeOfSwitch()
 		{
+			int switchMode = 0;
 			for (int tileIndex = 0 ; tileIndex < 8192 ; tileIndex++)
 			{
 				byte data = Level.LevelData[tileIndex + 0x1000];
-				if(data == 0x39)
+				switch(data)
 				{
-					return 1;
-				}
-
-				if(data == 0x32)
-				{
-					return 2;
+					case 0x39:
+						switchMode |= 1;
+						break;
+					case 0x32:
+						switchMode |= 2;
+						break;
 				}
 			}
 
-			return 0;
+			return switchMode;
 		}
 
 		public static int GetEmptyTile(uint[] bitmap, int tileSize, int tileWidth)

@@ -115,6 +115,7 @@ namespace WLEditor
 					levelPictureBox.CurrentSector = -1;
 					var item = (ComboboxItem<int>)levelComboBox.SelectedItem;
 					currentCourseId = item.Value;
+					SetSwitchMode(0);
 					LoadLevel(true);
 					sectorForm.LoadSector(currentCourseId, -1);
 					levelPictureBox.ClearSelection();
@@ -229,32 +230,17 @@ namespace WLEditor
 			toolboxForm.Invalidate(true);
 		}
 
-		void NoneToolStripMenuItemClick(object sender, EventArgs e)
-		{
-			SetSwitchMode(0);
-		}
-
-		void AToolStripMenuItemClick(object sender, EventArgs e)
-		{
-			SetSwitchMode(1);
-		}
-
-		void BToolStripMenuItemClick(object sender, EventArgs e)
-		{
-			SetSwitchMode(2);
-		}
-
 		void SetSwitchMode(int value)
 		{
-			switchMode = value;
-			noneToolStripMenuItem.Checked = value == 0;
-			aToolStripMenuItem.Checked = value == 1;
-			bToolStripMenuItem.Checked = value == 2;
-			levelPictureBox.SwitchMode = value;
-			toolboxForm.SwitchMode = value;
-			toolboxForm.Invalidate(true);
+			if (switchMode != value)
+			{
+				switchMode = value;
+				levelPictureBox.SwitchMode = value;
+				toolboxForm.SwitchMode = value;
+				toolboxForm.Invalidate(true);
 
-			LoadLevel(false);
+				LoadLevel(false);
+			}
 		}
 
 		bool SaveChanges(bool saveFile)
@@ -415,15 +401,19 @@ namespace WLEditor
 					switch(typeOfSwitch)
 					{
 						case 1:
-							SetSwitchMode(switchMode == 1 ? 0 : 1);
+							SetSwitchMode(switchMode == 0 ? 1 : 0);
 							break;
 
 						case 2:
-							SetSwitchMode(switchMode == 2 ? 0 : 2);
+							SetSwitchMode(switchMode == 0 ? 2 : 0);
+							break;
+
+						case 3:
+							SetSwitchMode((switchMode + 1) % 3);
 							break;
 
 						default:
-							SetSwitchMode((switchMode + 1) % 3);
+							SetSwitchMode(0);
 							break;
 					}
 					return true;

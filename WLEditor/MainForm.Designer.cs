@@ -54,10 +54,6 @@ namespace WLEditor
 			this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
 			this.zoomInToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.zoomOutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.switchToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.noneToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.aToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.bToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
 			this.LevelPanel = new WLEditor.PanelUnScrollable();
@@ -149,8 +145,7 @@ namespace WLEditor
 			this.sectorsToolStripMenuItem,
 			this.overworldToolStripMenuItem,
 			this.animationToolStripMenuItem,
-			this.zoomToolStripMenuItem,
-			this.switchToolStripMenuItem});
+			this.zoomToolStripMenuItem});
 			this.viewToolStripMenuItem.Name = "viewToolStripMenuItem";
 			this.viewToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
 			this.viewToolStripMenuItem.Text = "&View";
@@ -303,42 +298,6 @@ namespace WLEditor
 			this.zoomOutToolStripMenuItem.Text = "Zoom out";
 			this.zoomOutToolStripMenuItem.Click += new System.EventHandler(this.ZoomOutToolStripMenuItemClick);
 			// 
-			// switchToolStripMenuItem
-			// 
-			this.switchToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-			this.noneToolStripMenuItem,
-			this.aToolStripMenuItem,
-			this.bToolStripMenuItem});
-			this.switchToolStripMenuItem.Name = "switchToolStripMenuItem";
-			this.switchToolStripMenuItem.Size = new System.Drawing.Size(198, 22);
-			this.switchToolStripMenuItem.Text = "Block switch";
-			// 
-			// noneToolStripMenuItem
-			// 
-			this.noneToolStripMenuItem.Checked = true;
-			this.noneToolStripMenuItem.CheckOnClick = true;
-			this.noneToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
-			this.noneToolStripMenuItem.Name = "noneToolStripMenuItem";
-			this.noneToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
-			this.noneToolStripMenuItem.Text = "None";
-			this.noneToolStripMenuItem.Click += new System.EventHandler(this.NoneToolStripMenuItemClick);
-			// 
-			// aToolStripMenuItem
-			// 
-			this.aToolStripMenuItem.CheckOnClick = true;
-			this.aToolStripMenuItem.Name = "aToolStripMenuItem";
-			this.aToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
-			this.aToolStripMenuItem.Text = "A";
-			this.aToolStripMenuItem.Click += new System.EventHandler(this.AToolStripMenuItemClick);
-			// 
-			// bToolStripMenuItem
-			// 
-			this.bToolStripMenuItem.CheckOnClick = true;
-			this.bToolStripMenuItem.Name = "bToolStripMenuItem";
-			this.bToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
-			this.bToolStripMenuItem.Text = "B";
-			this.bToolStripMenuItem.Click += new System.EventHandler(this.BToolStripMenuItemClick);
-			// 
 			// aboutToolStripMenuItem
 			// 
 			this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
@@ -407,10 +366,6 @@ namespace WLEditor
 
 		}
 		private System.Windows.Forms.ToolStripMenuItem saveToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem bToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem aToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem noneToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem switchToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem collidersToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem objectsToolStripMenuItem;
