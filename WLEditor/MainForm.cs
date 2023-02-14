@@ -396,6 +396,11 @@ namespace WLEditor
 					zoomOutToolStripMenuItem.PerformClick();
 					return true;
 
+				case Keys.S:
+					levelPictureBox.ScrollLines = (levelPictureBox.ScrollLines + 1) % 4;
+					levelPictureBox.Invalidate();
+					break;
+
 				case Keys.B:
 					int typeOfSwitch = Level.GetTypeOfSwitch();
 					switch(typeOfSwitch)

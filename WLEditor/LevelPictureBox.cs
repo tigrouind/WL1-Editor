@@ -20,6 +20,7 @@ namespace WLEditor
 		public int SwitchMode;
 		public int CurrentSector = -1;
 		public int CurrentTileIndex = -1;
+		public int ScrollLines;
 		int mouseDownSector;
 		readonly Selection selection = new Selection(16);
 		List<SelectionChange> changes = new List<SelectionChange>();
@@ -87,6 +88,7 @@ namespace WLEditor
 						DrawSectors(e.Graphics, e.ClipRectangle, font, format);
 						DrawCamera(e.Graphics, e.ClipRectangle);
 						DrawSelectedSector(e.Graphics, e.ClipRectangle);
+						DrawScrollLines(e.Graphics);
 					}
 
 					selection.DrawSelection(e.Graphics);
@@ -236,10 +238,28 @@ namespace WLEditor
 
 			byte scroll = Level.ScrollData[drawSector];
 			if ((scroll & 2) == 2)
+			{
 				g.FillRectangle(Brushes.Yellow, x * 256 * zoom, y * 256 * zoom, 6 * zoom, 256 * zoom);
+			}
 
 			if ((scroll & 1) == 1)
+			{
 				g.FillRectangle(Brushes.Yellow, ((x+1) * 256 - 6) * zoom, y * 256 * zoom, 6 * zoom, 256 * zoom);
+			}
+		}
+
+		void DrawScrollLines(Graphics g)
+		{
+			if (ScrollLines != 0)
+			{
+				int positionY = new[] { 23, 15, 7 }[ScrollLines - 1];
+				using (Pen pen = new Pen(Color.LightSeaGreen, 2.0f * zoom))
+				{
+					pen.DashPattern = new [] { 5.0f, 1.0f };
+					g.DrawLine(pen, 0, positionY * 16 * zoom, 4096 * zoom, positionY * 16 * zoom);
+					g.DrawLine(pen, 0, (positionY + 9) * 16 * zoom, 4096 * zoom, (positionY + 9) * 16 * zoom);
+				}
+			}
 		}
 
 		void DrawSectorInfo(int x, int y, Graphics g, Font font, StringFormat format)
