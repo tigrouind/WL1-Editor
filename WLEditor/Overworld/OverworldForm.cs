@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 using System.Linq;
+using Microsoft.VisualBasic;
 
 namespace WLEditor
 {
@@ -374,9 +375,24 @@ namespace WLEditor
 				case Keys.Control | Keys.Y:
 					Redo();
 					return true;
+
+				case Keys.M:
+					SetMusicTrack();
+					return true;
 			}
 
 			return false;
+		}
+
+		void SetMusicTrack()
+		{
+			int musicTrack = Map.GetMusic(rom, currentWorld);
+			string musicTrackTxt = Interaction.InputBox(string.Empty, "Enter music track number (1-8)", musicTrack == -1 ? string.Empty : (musicTrack + 1).ToString(), -1, -1);
+			if ((int.TryParse(musicTrackTxt, out musicTrack) && musicTrack >= 1 && musicTrack <= 8))
+			{
+				Map.SetMusic(rom, currentWorld, musicTrack - 1);
+				SetChanges(ChangeEnum.None);
+			}
 		}
 
 		void SetChanges(ChangeEnum mode)

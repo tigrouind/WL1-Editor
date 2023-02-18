@@ -20,6 +20,31 @@ namespace WLEditor
 			{ 0x57C3, 0x57B6 },
 		};
 
+		static readonly int[] music =
+		{
+			0x6204,
+			0x6204,
+			0x78AE,
+			0x7DB0,
+			0x7980,
+			0x7C04,
+			0x7B62,
+			0x7A9A,
+			0x4D55,
+		};
+
+		static readonly byte[] musicTracks =
+		{
+			0x15,
+			0x13,
+			0x14,
+			0x21,
+			0x23,
+			0x1F,
+			0x1D,
+			0x02
+		};
+
 		#region World 8x8 tiles
 
 		static void RLEDecompressTiles(Rom rom, int tilesdata, byte[] decompressed)
@@ -610,5 +635,22 @@ namespace WLEditor
 		}
 
 		#endregion
+
+		#region Music
+
+		public static int GetMusic(Rom rom, int world)
+		{
+			rom.SetBank(0x8);
+			return Array.IndexOf(musicTracks, rom.ReadByte(music[world]));
+		}
+
+		public static void SetMusic(Rom rom, int world, int musicTrack)
+		{
+			rom.SetBank(0x8);
+			rom.WriteByte(music[world], musicTracks[musicTrack]);
+		}
+
+		#endregion
+
 	}
 }
