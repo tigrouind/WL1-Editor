@@ -61,9 +61,9 @@ namespace WLEditor
 			new ComboboxItem<int[]>(new[] { 0x1D, 0x6A00, 0x6E00, 0x6A0A, 0xE1 }, "28   Boss 7")
 		};
 
-		readonly int[][] enemyData =
+		readonly int[][] enemyPointer =
 		{
-			//same enemyid / tilebank / tileaddress / tilecount / code
+			//pointers referencing similar code are grouped together
 			new [] { 0x41EF },
 			new [] { 0x4208 },
 			new [] { 0x4219 },
@@ -434,7 +434,7 @@ namespace WLEditor
 				ddlAnimation.Items.AddRange(tilesAnimation);
 
 				ddlEnemies.Items.Clear();
-				ddlEnemies.Items.AddRange(enemyData.Select(x => new { Text = GetEnemyInfo(x[0]), Value = x })
+				ddlEnemies.Items.AddRange(enemyPointer.Select(x => new { Text = GetEnemyInfo(x[0]), Value = x })
 					.OrderBy(x => x.Text[0] == '[')
 					.ThenBy(x => x.Text)
 					.Select((x, i) => new ComboboxItem<int[]>(x.Value, string.Format("{0:D3}   {1}", i, x.Text)))
