@@ -73,10 +73,15 @@ namespace WLEditor
 		public bool SavePaths(Rom rom, out string errorMessage)
 		{
 			bool result = Map.SavePaths(rom, pathData, currentWorld == 8, out errorMessage);
-
-			if (result && currentWorld != 8)
+			if (result)
 			{
-				SaveStartPosition(rom);
+				int[] worldIndex = { 0, 0, 1, 5, 2, 3, 4, 6, 7 };
+				Map.SaveProgressNextDirection(rom, pathData, levels[currentWorld], worldIndex[currentWorld]);
+
+				if (currentWorld != 8)
+				{
+					SaveStartPosition(rom);
+				}
 			}
 
 			return result;
@@ -244,7 +249,7 @@ namespace WLEditor
 
 		void SetProgress()
 		{
-			int[] flags = { 0xFD, 1, 2, 4, 8, 16, 32 };
+			int[] flags = { 0xFD, 1, 2, 4, 8, 16, 32, 64, 128 };
 			int progress = Array.IndexOf(flags, currentDirection.Progress);
 			currentDirection.Progress = flags[(progress + 1) % flags.Length];
 			var reverseDir = GetReverseDir(currentDirection);
@@ -600,7 +605,7 @@ namespace WLEditor
 					var dirs = currentPath.Directions[dir];
 					if (dirs.Path.Count > 0 && dirs.Progress != 0xFD)
 					{
-						int[] progressFlags = { 0, 1, 2, 4, 8, 16, 32 };
+						int[] progressFlags = { 0, 1, 2, 4, 8, 16, 32, 64, 128 };
 						int progress = Array.IndexOf(progressFlags, dirs.Progress);
 
 						g.FillRectangle(Brushes.Gray, (currentPath.X + offsets[dir, 0]) * zoom, (currentPath.Y + offsets[dir, 1]) * zoom, 8 * zoom, 8 * zoom);

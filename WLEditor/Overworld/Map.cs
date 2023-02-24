@@ -45,6 +45,16 @@ namespace WLEditor
 			0x02
 		};
 
+		static readonly int[] overWorldNextDir =
+		{
+			0x40A5,
+			0x40B5,
+			0x40C2,
+			0x40CD,
+			0x40DB,
+			0x40E6
+		};
+
 		#region World 8x8 tiles
 
 		static void RLEDecompressTiles(Rom rom, int tilesdata, byte[] decompressed)
@@ -652,5 +662,46 @@ namespace WLEditor
 
 		#endregion
 
+		#region Progress
+
+		public static void SaveProgressNextDirection(Rom rom, WorldPath[] pathData, int[] levels, int world)
+		{
+			rom.SetBank(8);
+			if (world == 7)
+			{
+				for(int flag = 0 ; flag < 6 ; flag++)
+				{
+					var nextDir = SearchProgressNextDirection(pathData, levels, 1 << flag);
+					rom.WriteByte(overWorldNextDir[flag], nextDir);
+				}
+			}
+			else
+			{
+				for(int flag = 0 ; flag < 8 ; flag++)
+				{
+					var nextDir = SearchProgressNextDirection(pathData, levels, 1 << flag);
+					rom.WriteByte(0x735D + 16 * world + flag + 8, nextDir);
+				}
+			}
+		}
+
+		static byte SearchProgressNextDirection(WorldPath[] pathData, int[] levels, int flag)
+		{
+			foreach (int level in levels)
+			{
+				for(int dir = 0 ; dir < 4 ; dir++)
+				{
+					var pathDir = pathData[level].Directions[dir];
+					if (pathDir.Path.Count > 0 && pathDir.Progress == flag)
+					{
+						return new byte[] { 0x10, 0x20, 0x40, 0x80 }[dir];
+					}
+				}
+			}
+
+			return (byte)0;
+		}
+
+		#endregion
 	}
 }
