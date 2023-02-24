@@ -32,6 +32,13 @@ Toolbox must be active. Select "Objects" view.
 
 Available enemies / objects depends of current sector / warp.
 
+| Key | Description |
+| :-: | - |
+| <kbd>S</kbd> | Display scroll lines.
+| <kbd>B</kbd> | Toggle [!] blocks (if any).
+| <kbd>Ctrl</kbd> + <kbd>C</kbd> <br> <kbd>Ctrl</kbd> + <kbd>V</kbd> | [Copy / paste](#copy--paste) tiles and enemies.
+| <kbd>Ctrl</kbd> + <kbd>Z</kbd> <br> <kbd>Ctrl</kbd> + <kbd>Y</kbd> | Undo / redo changes.
+
 ## Copy / paste 
 This is a powerful feature. Here is an overview of possibilities: 
 - Copy / move a block of tiles from one place to another.
@@ -69,6 +76,7 @@ Enemy sets specify which enemies will be loaded for a given warp (up to 6 enemie
 | <kbd>Right-click</kbd> in left side | Add a new tile.
 | <kbd>Ctrl</kbd> + <kbd>C</kbd> <br> <kbd>Ctrl</kbd> + <kbd>V</kbd> | [Copy / paste](#copy--paste) tiles (between left and right side or in left side).
 | <kbd>Ctrl</kbd> + <kbd>Z</kbd> <br> <kbd>Ctrl</kbd> + <kbd>Y</kbd> | Undo / redo changes.
+| <kbd>M</kbd> | Change music soundtrack.
 
 ### Editing events
 Events are used to update tiles during gameplay, it's usually triggered after completing a level (eg: event 1 is triggered after completing first level and so on).
@@ -94,7 +102,7 @@ Events are used to update tiles during gameplay, it's usually triggered after co
 | <kbd>P</kbd> | Enable / disable path mode.
 | <kbd>Page-Up</kbd> <br> <kbd>Page-Down</kbd> | Select a level.
 | <kbd>Ctrl</kbd> + <kbd>↑</kbd> <br> <kbd>Ctrl</kbd> + <kbd>↓</kbd> <br> <kbd>Ctrl</kbd> + <kbd>←</kbd> <br> <kbd>Ctrl</kbd> + <kbd>→</kbd> | Move current level. Position will be aligned on a 4 x 4 grid.
-| <kbd>←</kbd> <kbd>↑</kbd> <kbd>→</kbd> <kbd>↓</kbd> | Select a direction. There is 4 possible directions. If there is a path in chosen direction, it will be automatically highlighted.
+| <kbd>↑</kbd> <br> <kbd>←</kbd> <kbd>↓</kbd> <kbd>→</kbd> | Select a direction. There is 4 possible directions. If there is a path in chosen direction, it will be automatically highlighted.
 | <kbd>Shift</kbd> + <kbd>↑</kbd> <br> <kbd>Shift</kbd> + <kbd>↓</kbd> <br> <kbd>Shift</kbd> + <kbd>←</kbd> <br> <kbd>Shift</kbd> + <kbd>→</kbd> | Add a new path segment in that direction. 
 | <kbd>Delete</kbd> | Delete last path segment.
 | <kbd>Shift</kbd> + <kbd>Delete</kbd>  | Delete all paths in all directions.
