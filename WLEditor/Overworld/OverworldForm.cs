@@ -155,7 +155,7 @@ namespace WLEditor
 		{
 			if (!ignoreEvents)
 			{
-				if (!SaveChanges(~ChangeEnum.Path))
+				if (!SaveChanges())
 				{
 					ignoreEvents = true;
 					WorldComboBox.SelectedIndex = currentWorld;
@@ -172,13 +172,8 @@ namespace WLEditor
 
 		public bool SaveChanges()
 		{
-			return SaveChanges(~ChangeEnum.None);
-		}
-
-		bool SaveChanges(ChangeEnum flags)
-		{
 			string message;
-			if (((changesFlag & flags) & ChangeEnum.Tile) != 0)
+			if ((changesFlag & ChangeEnum.Tile) != 0)
 			{
 				//improve tile compression
 				if (currentWorld != 8)
@@ -197,7 +192,7 @@ namespace WLEditor
 				changesFlag &= ~ChangeEnum.Tile;
 			}
 
-			if (((changesFlag & flags) & ChangeEnum.Event) != 0)
+			if ((changesFlag & ChangeEnum.Event) != 0)
 			{
 				if (!eventForm.SaveEvents(rom, out message))
 				{
@@ -208,7 +203,7 @@ namespace WLEditor
 				changesFlag &= ~ChangeEnum.Event;
 			}
 
-			if (((changesFlag & flags) & ChangeEnum.Path) != 0)
+			if ((changesFlag & ChangeEnum.Path) != 0)
 			{
 				if (!pathForm.SavePaths(rom, out message))
 				{

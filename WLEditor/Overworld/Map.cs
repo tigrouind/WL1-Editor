@@ -413,7 +413,7 @@ namespace WLEditor
 
 			if (bytesToFree > 0)
 			{
-				errorMessage = string.Format("Path data is too big to fit in ROM. Please free at least {0} byte(s) in any world.", bytesToFree);
+				errorMessage = string.Format("Path data is too big to fit in ROM. Please free at least {0} byte(s).", bytesToFree);
 				return false;
 			}
 
