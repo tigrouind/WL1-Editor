@@ -30,7 +30,7 @@ Toolbox must be active. Select "Objects" view.
 - Select an enemy or a power up in the toolbox by clicking on it. 
 - Then, right-click inside level view. 
 
-Available enemies / objects depends of current sector / warp.
+Available enemies depends of current sector / warp.
 
 | Key | Description |
 | :-: | - |
@@ -38,6 +38,7 @@ Available enemies / objects depends of current sector / warp.
 | <kbd>B</kbd> | Toggle [!] blocks (if any).
 | <kbd>Ctrl</kbd> + <kbd>C</kbd> <br> <kbd>Ctrl</kbd> + <kbd>V</kbd> | [Copy / paste](#copy--paste) tiles and enemies.
 | <kbd>Ctrl</kbd> + <kbd>Z</kbd> <br> <kbd>Ctrl</kbd> + <kbd>Y</kbd> | Undo / redo changes.
+| <kbd>Ctrl</kbd> + <kbd>Mouse wheel</kbd> | Zoom in / out.
 
 ## Copy / paste 
 This is a powerful feature. Here is an overview of possibilities: 
@@ -51,9 +52,9 @@ How to :
 3. <kbd>Left-click</kbd> somewhere else (eg: a 1x1 block is selected).
 4. Press <kbd>Ctrl-V</kbd> to paste selection at that position. 
 
-- It's possible to repeat a selection (eg: to create a pattern) by creating a selection bigger than 1x1 in step 3.
+- It's possible to repeat a selection (eg: to create a pattern) by pasting content into a selection bigger than what was originally copied.
 - You can delete what is under selection by pressing <kbd>Delete</kbd> key.
-- You can undo or redo changes with <kbd>Ctrl-Z</kbd> and <kbd>Ctrl-Y</kbd>.
+- You can undo or redo changes with <kbd>Ctrl-Z</kbd> / <kbd>Ctrl-Y</kbd>.
 
 ## Warp / level header
 - Open "View" > "Warp / level header".
@@ -61,12 +62,11 @@ How to :
 If you click on a sector already selected, it will unselected sector and show level header (which has similar properties to warps).
 
 Enemy sets specify which enemies will be loaded for a given warp (up to 6 enemies loaded). Some enemy sets are specific to some places (eg: boss or treasure room, ...).
-"X" near treasure enemy set means game will check if related treasure key has already been collected. If it is, it will remove key and will already open skull door leading to treasure. It should be used for all warps leading to a sector that have treasure key or door.
+"X" near treasure enemy set means game will check if related treasure has already been collected. If it is, it removes key and open skull door leading to treasure. This should be used for all warps leading to an area that has a key or treasure door.
 
 ## Overworld / world maps
 - Open "View" > "Overworld".
 - Select a world in combobox. 
-- You can zoom in / out using <kbd>Ctrl</kbd> + <kbd>Mouse wheel</kbd>.
 
 ### Editing map tiles 
 
@@ -76,6 +76,7 @@ Enemy sets specify which enemies will be loaded for a given warp (up to 6 enemie
 | <kbd>Right-click</kbd> in left side | Add a new tile.
 | <kbd>Ctrl</kbd> + <kbd>C</kbd> <br> <kbd>Ctrl</kbd> + <kbd>V</kbd> | [Copy / paste](#copy--paste) tiles (between left and right side or in left side).
 | <kbd>Ctrl</kbd> + <kbd>Z</kbd> <br> <kbd>Ctrl</kbd> + <kbd>Y</kbd> | Undo / redo changes.
+| <kbd>Ctrl</kbd> + <kbd>Mouse wheel</kbd> | Zoom in / out.
 | <kbd>M</kbd> | Change music soundtrack.
 
 ### Editing events
@@ -101,14 +102,14 @@ Events are used to update tiles during gameplay, it's usually triggered after co
 | :-: | - |
 | <kbd>P</kbd> | Enable / disable path mode.
 | <kbd>Page-Up</kbd> <br> <kbd>Page-Down</kbd> | Select a level.
-| <kbd>Ctrl</kbd> + <kbd>↑</kbd> <br> <kbd>Ctrl</kbd> + <kbd>↓</kbd> <br> <kbd>Ctrl</kbd> + <kbd>←</kbd> <br> <kbd>Ctrl</kbd> + <kbd>→</kbd> | Move current level. Position will be aligned on a 4 x 4 grid.
-| <kbd>↑</kbd> <br> <kbd>←</kbd> <kbd>↓</kbd> <kbd>→</kbd> | Select a direction. There is 4 possible directions. If there is a path in chosen direction, it will be automatically highlighted.
-| <kbd>Shift</kbd> + <kbd>↑</kbd> <br> <kbd>Shift</kbd> + <kbd>↓</kbd> <br> <kbd>Shift</kbd> + <kbd>←</kbd> <br> <kbd>Shift</kbd> + <kbd>→</kbd> | Add a new path segment in that direction. 
+| <kbd>Ctrl</kbd> + <kbd>↑<br>← ↓ →</kbd> | Move current level. Position will be aligned on a 4 x 4 grid.
+| <kbd>↑<br>← ↓ →</kbd> | Select a direction (N/S/E/W). Path in current direction is highlighted.
+| <kbd>Shift</kbd> +  <kbd>↑<br>← ↓ →</kbd> | Add a new path segment in that direction. 
 | <kbd>Delete</kbd> | Delete last path segment.
-| <kbd>Shift</kbd> + <kbd>Delete</kbd>  | Delete all paths in all directions.
-| <kbd>I</kbd> | Enable / disable hidden path. Next path segment will be set as hidden (eg: player won't be visible when walking on that path segment). Hidden path is shown in red.
-| <kbd>W</kbd> | Enable / disable underwater path mode. Underwater path is shown in blue.
-| <kbd>F</kbd> | Set progress required to take that path. A direction must be selected. A number is shown near level to indicate progression required. Nothing shown means no progress is required.
+| <kbd>Shift</kbd> + <kbd>Delete</kbd> | Delete all paths in all directions.
+| <kbd>I</kbd> | Enable / disable hidden path mode. This will only be set for new paths.<br>Player won't be visible when walking on such paths. This is shown in red.
+| <kbd>W</kbd> | Enable / disable underwater path mode. This shown in blue.
+| <kbd>F</kbd> | Set progress required to take that path. A direction must be selected.<br>A number is shown near level to indicate progression required.<br>Nothing shown means no progress is required.
 | <kbd>X</kbd> | Set end of path exit target. A = Overworld. B = Sherbet Land. C = Mt Teapot.
 
 Tips for paths : 
