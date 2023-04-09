@@ -253,7 +253,7 @@ namespace WLEditor
 			if (ScrollLines != 0)
 			{
 				int positionY = new[] { 23, 15, 7 }[ScrollLines - 1];
-				using (Pen pen = new Pen(Color.LightSeaGreen, 2.0f * zoom))
+				using (Pen pen = new Pen(Color.Yellow, 2.0f * zoom))
 				{
 					pen.DashPattern = new [] { 5.0f, 1.0f };
 					g.DrawLine(pen, 0, positionY * 16 * zoom, 4096 * zoom, positionY * 16 * zoom);

@@ -465,10 +465,12 @@ namespace WLEditor
 					int posY = item.Y;
 
 					bool selected = currentPath == item;
-					bool connected = level == next;
 
-					g.DrawEllipse(pen, posX * zoom, posY * zoom, 8 * zoom, 8 * zoom);
-					g.FillEllipse(selected || connected ? Brushes.Lime : Brushes.MediumSeaGreen, posX * zoom, posY * zoom, 8 * zoom, 8 * zoom);
+					using (GraphicsPath path = RoundedRect(new Rectangle(posX * zoom, posY * zoom, 8 * zoom, 8 * zoom), zoom * 2))
+					{
+						g.DrawPath(pen, path);
+						g.FillPath(selected ? Brushes.Lime : Brushes.MediumSeaGreen, path);
+					}
 
 					g.DrawString((Array.IndexOf(levels[currentWorld], level) + 1).ToString(), font, Brushes.Black, (posX + 4) * zoom, (posY + 4) * zoom, format);
 				}
@@ -494,9 +496,12 @@ namespace WLEditor
 					int exitY = Math.Max(0, Math.Min(nextY, currentMapY - 8));
 					int[] flags = { 0xFD, 0xFA, 0xF9, 0xF8 };
 
-					bool selected = currentDirection == dir;
-					g.DrawEllipse(penBorder, exitX * zoom, exitY * zoom, 8 * zoom, 8 * zoom);
-					g.FillEllipse(selected ? Brushes.Lime : Brushes.MediumSeaGreen, exitX * zoom, exitY * zoom, 8 * zoom, 8 * zoom);
+					using (GraphicsPath path = RoundedRect(new Rectangle(exitX * zoom, exitY * zoom, 8 * zoom, 8 * zoom), zoom * 2))
+					{
+						g.DrawPath(penBorder, path);
+						g.FillPath(Brushes.MediumSeaGreen, path);
+					}
+
 					g.DrawString(new [] { "A", "B", "C", "C" } [Array.IndexOf(flags, dir.Next)], font, Brushes.Black, (exitX + 4) * zoom, (exitY + 4) * zoom, format);
 				}
 			}
@@ -529,14 +534,14 @@ namespace WLEditor
 
 		void DrawLine(Graphics g, List<Point> points, List<Color> colors)
 		{
-			using (var pen = new Pen(Color.Black, zoom * 5.0f))
+			using (var pen = new Pen(Color.Black, zoom * 6.0f))
 			{
 				g.DrawLines(pen, points.ToArray());
 			}
 
 			using (var brush = new SolidBrush(Color.Black))
 			{
-				var miterPoints = GetMitterPoints(points, zoom * 3.0f);
+				var miterPoints = GetMitterPoints(points, zoom * 4.0f);
 
 				int n = 0;
 				foreach(var item in colors.GroupByAdjacent(x => x, (x, y) => new { Color = x, Count = y.Count() } ))
@@ -823,5 +828,25 @@ namespace WLEditor
 		}
 
 		#endregion
+
+		static GraphicsPath RoundedRect(Rectangle bounds, int offset)
+		{
+			GraphicsPath path = new GraphicsPath();
+
+			path.AddLines(new []
+			{
+				new Point(bounds.Left + offset, bounds.Top),
+				new Point(bounds.Right - offset, bounds.Top),
+				new Point(bounds.Right, bounds.Top + offset),
+				new Point(bounds.Right, bounds.Bottom - offset),
+				new Point(bounds.Right - offset, bounds.Bottom),
+				new Point(bounds.Left + offset, bounds.Bottom),
+				new Point(bounds.Left, bounds.Bottom - offset),
+				new Point(bounds.Left, bounds.Top + offset)
+			});
+
+			path.CloseFigure();
+			return path;
+		}
 	}
 }
