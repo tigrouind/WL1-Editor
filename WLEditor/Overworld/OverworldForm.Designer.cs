@@ -11,6 +11,8 @@ namespace WLEditor
 		private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
 		private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
 		private System.Windows.Forms.ComboBox WorldComboBox;
+		private System.Windows.Forms.StatusStrip statusStrip1;
+		private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
 
 		/// <summary>
 		/// Disposes resources used by the form.
@@ -38,10 +40,13 @@ namespace WLEditor
 			this.pictureBox2 = new System.Windows.Forms.PictureBox();
 			this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
 			this.WorldComboBox = new System.Windows.Forms.ComboBox();
+			this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+			this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
 			this.tableLayoutPanel1.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
 			this.tableLayoutPanel2.SuspendLayout();
+			this.statusStrip1.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// tableLayoutPanel1
@@ -92,6 +97,7 @@ namespace WLEditor
 			this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
 			this.tableLayoutPanel2.Controls.Add(this.WorldComboBox, 0, 0);
 			this.tableLayoutPanel2.Controls.Add(this.tableLayoutPanel1, 0, 1);
+			this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.tableLayoutPanel2.Location = new System.Drawing.Point(0, 0);
 			this.tableLayoutPanel2.Margin = new System.Windows.Forms.Padding(0);
 			this.tableLayoutPanel2.Name = "tableLayoutPanel2";
@@ -112,7 +118,23 @@ namespace WLEditor
 			this.WorldComboBox.TabIndex = 0;
 			this.WorldComboBox.SelectedIndexChanged += new System.EventHandler(this.WorldComboBoxSelectedIndexChanged);
 			// 
-			// Overworld
+			// statusStrip1
+			// 
+			this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+			this.toolStripStatusLabel1});
+			this.statusStrip1.Location = new System.Drawing.Point(0, 276);
+			this.statusStrip1.Name = "statusStrip1";
+			this.statusStrip1.Size = new System.Drawing.Size(525, 22);
+			this.statusStrip1.SizingGrip = false;
+			this.statusStrip1.TabIndex = 4;
+			this.statusStrip1.Text = "statusStrip1";
+			// 
+			// toolStripStatusLabel1
+			// 
+			this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
+			this.toolStripStatusLabel1.Size = new System.Drawing.Size(0, 17);
+			// 
+			// OverworldForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -120,10 +142,11 @@ namespace WLEditor
 			this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.ClientSize = new System.Drawing.Size(525, 298);
 			this.Controls.Add(this.tableLayoutPanel2);
+			this.Controls.Add(this.statusStrip1);
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
 			this.MaximizeBox = false;
 			this.MinimizeBox = false;
-			this.Name = "Overworld";
+			this.Name = "OverworldForm";
 			this.ShowIcon = false;
 			this.ShowInTaskbar = false;
 			this.Text = "Overworld";
@@ -134,9 +157,10 @@ namespace WLEditor
 			((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
 			this.tableLayoutPanel2.ResumeLayout(false);
 			this.tableLayoutPanel2.PerformLayout();
+			this.statusStrip1.ResumeLayout(false);
+			this.statusStrip1.PerformLayout();
 			this.ResumeLayout(false);
 			this.PerformLayout();
-
 		}
 	}
 }

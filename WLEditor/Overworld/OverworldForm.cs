@@ -427,11 +427,12 @@ namespace WLEditor
 		{
 			if (eventMode)
 			{
-				Text = "Overworld - " + eventForm.GetTitle();
+				toolStripStatusLabel1.Text = eventForm.GetTitle();
+				statusStrip1.Visible = true;
 			}
 			else
 			{
-				Text = "Overworld";
+				statusStrip1.Visible = false;
 			}
 		}
 
