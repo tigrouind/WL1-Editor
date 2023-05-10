@@ -42,7 +42,6 @@ namespace WLEditor
 			this.regionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.objectsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.collidersToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.tileNumbersToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.sectorsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.overworldToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.animationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -141,7 +140,6 @@ namespace WLEditor
 			this.regionsToolStripMenuItem,
 			this.objectsToolStripMenuItem,
 			this.collidersToolStripMenuItem,
-			this.tileNumbersToolStripMenuItem,
 			this.sectorsToolStripMenuItem,
 			this.overworldToolStripMenuItem,
 			this.animationToolStripMenuItem,
@@ -193,21 +191,12 @@ namespace WLEditor
 			this.collidersToolStripMenuItem.Text = "Colliders";
 			this.collidersToolStripMenuItem.Click += new System.EventHandler(this.CollidersToolStripMenuItemClick);
 			// 
-			// tileNumbersToolStripMenuItem
-			// 
-			this.tileNumbersToolStripMenuItem.CheckOnClick = true;
-			this.tileNumbersToolStripMenuItem.Name = "tileNumbersToolStripMenuItem";
-			this.tileNumbersToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F6;
-			this.tileNumbersToolStripMenuItem.Size = new System.Drawing.Size(198, 22);
-			this.tileNumbersToolStripMenuItem.Text = "Tile numbers";
-			this.tileNumbersToolStripMenuItem.Click += new System.EventHandler(this.TileNumbersToolStripMenuItemClick);
-			// 
 			// sectorsToolStripMenuItem
 			// 
 			this.sectorsToolStripMenuItem.CheckOnClick = true;
 			this.sectorsToolStripMenuItem.Enabled = false;
 			this.sectorsToolStripMenuItem.Name = "sectorsToolStripMenuItem";
-			this.sectorsToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F7;
+			this.sectorsToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F6;
 			this.sectorsToolStripMenuItem.Size = new System.Drawing.Size(198, 22);
 			this.sectorsToolStripMenuItem.Text = "Warp / Level header";
 			this.sectorsToolStripMenuItem.CheckedChanged += new System.EventHandler(this.SectorsToolStripMenuItemCheckedChanged);
@@ -217,7 +206,7 @@ namespace WLEditor
 			this.overworldToolStripMenuItem.CheckOnClick = true;
 			this.overworldToolStripMenuItem.Enabled = false;
 			this.overworldToolStripMenuItem.Name = "overworldToolStripMenuItem";
-			this.overworldToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F8;
+			this.overworldToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F7;
 			this.overworldToolStripMenuItem.Size = new System.Drawing.Size(198, 22);
 			this.overworldToolStripMenuItem.Text = "Overworld";
 			this.overworldToolStripMenuItem.CheckedChanged += new System.EventHandler(this.OverworldToolStripMenuItemCheckedChanged);
@@ -392,7 +381,6 @@ namespace WLEditor
 		private System.Windows.Forms.ToolStripSeparator toolStripMenuItem1;
 		private System.Windows.Forms.Timer timer;
 		private System.Windows.Forms.ToolStripMenuItem animationToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem tileNumbersToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem sectorsToolStripMenuItem;
 
 

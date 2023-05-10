@@ -1,7 +1,6 @@
 using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Drawing.Text;
 using System.Windows.Forms;
 
 namespace WLEditor
@@ -10,7 +9,6 @@ namespace WLEditor
 	{
 		public int CurrentTile;
 		public bool ShowColliders = true;
-		public bool ShowTileNumbers;
 		public int SwitchMode;
 		DirectBitmap tiles = new DirectBitmap(128, 256);
 		int zoom;
@@ -23,7 +21,7 @@ namespace WLEditor
 				{
 					g.DrawImage(Level.Tiles16x16.Bitmap, 0, 0, 128, 256);
 
-					if (ShowColliders || ShowTileNumbers)
+					if (ShowColliders)
 					{
 						DrawTiles(g, e.ClipRectangle);
 					}
@@ -42,13 +40,8 @@ namespace WLEditor
 
 		void DrawTiles(Graphics g, Rectangle clipRectangle)
 		{
-			using (Font font = new Font("Verdana", 7))
-			using (StringFormat format = new StringFormat())
 			using (Brush brush = new SolidBrush(Color.FromArgb(64, 0, 0, 0)))
 			{
-				format.Alignment = StringAlignment.Center;
-				format.LineAlignment = StringAlignment.Center;
-
 				for(int j = 0 ; j < 16 ; j++)
 				{
 					for(int i = 0 ; i < 8 ; i++)
@@ -67,14 +60,6 @@ namespace WLEditor
 								{
 									g.FillRectangle(LevelPictureBox.TransparentBrushes[specialTile], destRect);
 								}
-							}
-
-							if (ShowTileNumbers)
-							{
-								g.FillRectangle(brush, destRect);
-								g.TextRenderingHint = TextRenderingHint.SingleBitPerPixelGridFit;
-								g.DrawString(tileIndex.ToString("X2"), font, Brushes.White, i * 16 + 8, j * 16 + 8, format);
-								g.TextRenderingHint = TextRenderingHint.SystemDefault;
 							}
 						}
 					}

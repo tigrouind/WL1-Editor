@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Drawing.Text;
 using System.Windows.Forms;
 
 namespace WLEditor
@@ -16,7 +15,6 @@ namespace WLEditor
 		public bool ShowSectors = true;
 		public bool ShowObjects = true;
 		public bool ShowColliders = true;
-		public bool ShowTileNumbers;
 		public int SwitchMode;
 		public int CurrentSector = -1;
 		int currentTileIndex = -1;
@@ -52,7 +50,6 @@ namespace WLEditor
 			{
 				using (StringFormat format = new StringFormat())
 				using (Font font = new Font("Arial", 8 * zoom))
-				using (Font smallFont = new Font("Verdana", 7))
 				using (Brush transparentBrush = new SolidBrush(Color.FromArgb(64, 0, 0, 0)))
 				using (Graphics g = Graphics.FromImage(levelTiles.Bitmap))
 				{
@@ -60,7 +57,7 @@ namespace WLEditor
 					format.Alignment = StringAlignment.Center;
 
 					//draw tiles to cache
-					DrawTiles(g, e.ClipRectangle, ShowColliders, ShowTileNumbers, smallFont, format, transparentBrush);
+					DrawTiles(g, e.ClipRectangle, ShowColliders, format, transparentBrush);
 
 					//draw tiles from cache
 					e.Graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
@@ -137,7 +134,7 @@ namespace WLEditor
 			}
 		}
 
-		void DrawTiles(Graphics g, Rectangle clipRectangle, bool viewColliders, bool viewTileNumbers, Font smallFont, StringFormat format, Brush transparentBrush)
+		void DrawTiles(Graphics g, Rectangle clipRectangle, bool viewColliders, StringFormat format, Brush transparentBrush)
 		{
 			clipRectangle = GetClipRectangle(clipRectangle, 16 * zoom);
 
@@ -150,26 +147,15 @@ namespace WLEditor
 						invalidTiles[i + j * 256] = true;
 						DrawTileToBitmap(i, j);
 
-						if(viewColliders || viewTileNumbers)
+						if(viewColliders)
 						{
 							byte tileIndex = Level.LevelData[i + j * 256 + 0x1000];
 							tileIndex = (byte)Level.SwitchTile(tileIndex, SwitchMode);
 
-							if(viewColliders)
+							int specialTile = Level.IsSpecialTile(tileIndex);
+							if(specialTile != -1)
 							{
-								int specialTile = Level.IsSpecialTile(tileIndex);
-								if(specialTile != -1)
-								{
-									g.FillRectangle(TransparentBrushes[specialTile], new Rectangle(i * 16, j * 16, 16, 16));
-								}
-							}
-
-							if(viewTileNumbers)
-							{
-								g.FillRectangle(transparentBrush, i * 16, j * 16, 16, 16);
-								g.TextRenderingHint = TextRenderingHint.SingleBitPerPixelGridFit;
-								g.DrawString(tileIndex.ToString("X2"), smallFont, Brushes.White, i * 16 + 8, j * 16 + 8, format);
-								g.TextRenderingHint = TextRenderingHint.SystemDefault;
+								g.FillRectangle(TransparentBrushes[specialTile], new Rectangle(i * 16, j * 16, 16, 16));
 							}
 						}
 					}

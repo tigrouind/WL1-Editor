@@ -687,16 +687,6 @@ namespace WLEditor
 			overworldForm.ResetTimer();
 		}
 
-		void TileNumbersToolStripMenuItemClick(object sender, EventArgs e)
-		{
-			bool showTileNumbers = tileNumbersToolStripMenuItem.Checked;
-			levelPictureBox.ShowTileNumbers = showTileNumbers;
-			levelPictureBox.ClearTileCache();
-			levelPictureBox.Invalidate();
-			toolboxForm.ShowTileNumbers = showTileNumbers;
-			toolboxForm.Invalidate(true);
-		}
-
 		void ToggleForm(Form form, bool visible)
 		{
 			if (visible)
