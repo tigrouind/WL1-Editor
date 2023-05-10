@@ -3,14 +3,17 @@ using System.Windows.Forms;
 
 namespace WLEditor
 {
-	public class TileEventArgs : MouseEventArgs
+	public class TileEventArgs : EventArgs
 	{
-		public int Status { private set; get; }
+		public readonly int TileIndex;
+		public readonly MouseButtons Button;
+		public readonly TileEventStatus Status;
 
-		public TileEventArgs(MouseEventArgs e, int status)
-			: base(e.Button, e.Clicks, e.X, e.Y, e.Delta)
+		public TileEventArgs(MouseButtons button, TileEventStatus status, int index)
 		{
+			this.Button = button;
 			this.Status = status;
+			this.TileIndex = index;
 		}
 	}
 }

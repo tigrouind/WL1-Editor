@@ -19,7 +19,7 @@ namespace WLEditor
 		public bool ShowTileNumbers;
 		public int SwitchMode;
 		public int CurrentSector = -1;
-		public int CurrentTileIndex = -1;
+		int currentTileIndex = -1;
 		public int ScrollLines;
 		int mouseDownSector;
 		readonly Selection selection = new Selection(16);
@@ -392,17 +392,17 @@ namespace WLEditor
 			}
 		}
 
-		void OnMouseEvent(TileEventArgs e)
+		void OnMouseEvent(MouseEventArgs e, TileEventStatus status)
 		{
 			if(e.Button == MouseButtons.Left || e.Button == MouseButtons.Right)
 			{
 				int tileIndex = e.Location.X / 16 / zoom + (e.Location.Y / 16 / zoom) * 256;
-				if(tileIndex != CurrentTileIndex)
+				if(tileIndex != currentTileIndex)
 				{
-					CurrentTileIndex = tileIndex;
+					currentTileIndex = tileIndex;
 					if (TileMouseDown != null)
 					{
-						TileMouseDown(this, e);
+						TileMouseDown(this, new TileEventArgs(e.Button, status, currentTileIndex));
 					}
 				}
 			}
@@ -411,17 +411,17 @@ namespace WLEditor
 				Point coordinates = e.Location;
 				int sector = e.Location.X / 256 / zoom + (e.Location.Y / 256 / zoom) * 16;
 
-				switch (e.Status)
+				switch (status)
 				{
-					case 0: //down
+					case TileEventStatus.MouseDown:
 						mouseDownSector = CurrentSector;
 						break;
 
-					case 1: //move
+					case TileEventStatus.MouseMove:
 						mouseDownSector = -1;
 						break;
 
-					case 2: //up
+					case TileEventStatus.MouseUp:
 						if (CurrentSector == mouseDownSector)
 						{
 							sector = -1;
@@ -442,22 +442,22 @@ namespace WLEditor
 
 		protected override void OnMouseDown(MouseEventArgs e)
 		{
-			CurrentTileIndex = -1;
-			OnMouseEvent(new TileEventArgs(e, 0));
+			currentTileIndex = -1;
+			OnMouseEvent(e, TileEventStatus.MouseDown);
 		}
 
 		protected override void OnMouseMove(MouseEventArgs e)
 		{
 			if (ClientRectangle.Contains(e.Location))
 			{
-				OnMouseEvent(new TileEventArgs(e, 1));
+				OnMouseEvent(e, TileEventStatus.MouseMove);
 			}
 		}
 
 		protected override void OnMouseUp(MouseEventArgs e)
 		{
-			CurrentTileIndex = -1;
-			OnMouseEvent(new TileEventArgs(e, 2));
+			currentTileIndex = -1;
+			OnMouseEvent(e, TileEventStatus.MouseUp);
 		}
 
 		public void SetZoom(int zoomLevel)

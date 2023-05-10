@@ -465,7 +465,7 @@ namespace WLEditor
 			}
 		}
 
-		void MouseEvent(MouseEventArgs e, int mode)
+		void MouseEvent(MouseEventArgs e, TileEventStatus mode)
 		{
 			if ((e.Button == MouseButtons.Left || e.Button == MouseButtons.Right) && !pathMode)
 			{
@@ -481,7 +481,7 @@ namespace WLEditor
 					{
 						if (!selectionMode)
 						{
-							if (mode == 0) //down
+							if (mode == TileEventStatus.MouseDown)
 							{
 								InvalidateCurrentTile();
 								currentTile = tilePosX + tilePosY * 16;
@@ -490,17 +490,17 @@ namespace WLEditor
 						}
 						else
 						{
-							if (mode == 0) //down
+							if (mode == TileEventStatus.MouseDown)
 							{
 								changes = new List<SelectionChange>();
 							}
 
-							if ((mode == 0 || mode == 1) && !selection.HasSelection)
+							if ((mode == TileEventStatus.MouseDown || mode == TileEventStatus.MouseMove) && !selection.HasSelection)
 							{
 								UpdateTile(tilePosX, tilePosY, currentTile ^ 0x80);
 							}
 
-							if (mode == 2) //up
+							if (mode == TileEventStatus.MouseUp)
 							{
 								selection.AddChanges(changes);
 							}
@@ -509,11 +509,11 @@ namespace WLEditor
 
 					if (e.Button == MouseButtons.Left)
 					{
-						if (mode == 0) //down
+						if (mode == TileEventStatus.MouseDown)
 						{
 							selection.StartSelection(tilePosX, tilePosY);
 						}
-						else if(mode == 1) //move
+						else if(mode == TileEventStatus.MouseMove)
 						{
 							selection.SetSelection(tilePosX, tilePosY);
 						}
@@ -530,7 +530,7 @@ namespace WLEditor
 		{
 			if (pictureBox1.ClientRectangle.Contains(e.Location))
 			{
-				MouseEvent(e, 1);
+				MouseEvent(e, TileEventStatus.MouseMove);
 			}
 		}
 
@@ -543,20 +543,20 @@ namespace WLEditor
 				selectionMode = true;
 			}
 
-			MouseEvent(e, 0);
+			MouseEvent(e, TileEventStatus.MouseDown);
 		}
 
 		void PictureBox1MouseUp(object sender, MouseEventArgs e)
 		{
 			lastTilePos = -1;
-			MouseEvent(e, 2);
+			MouseEvent(e, TileEventStatus.MouseUp);
 		}
 
 		void PictureBox2MouseMove(object sender, MouseEventArgs e)
 		{
 			if (pictureBox2.ClientRectangle.Contains(e.Location))
 			{
-				MouseEvent(e, 1);
+				MouseEvent(e, TileEventStatus.MouseMove);
 			}
 		}
 
@@ -569,7 +569,7 @@ namespace WLEditor
 				selectionMode = false;
 			}
 
-			MouseEvent(e, 0);
+			MouseEvent(e, TileEventStatus.MouseDown);
 		}
 
 		#endregion

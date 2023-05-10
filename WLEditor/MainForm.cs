@@ -552,14 +552,14 @@ namespace WLEditor
 		{
 			if(toolboxForm.Visible)
 			{
-				if (e.Status == 0) //down
+				if (e.Status == TileEventStatus.MouseDown)
 				{
 					levelPictureBox.StartChanges();
 				}
 
-				if ((e.Status == 0 || e.Status == 1) && !levelPictureBox.HasSelection)
+				if ((e.Status == TileEventStatus.MouseMove || e.Status == TileEventStatus.MouseDown) && !levelPictureBox.HasSelection)
 				{
-					int tileIndex = levelPictureBox.CurrentTileIndex;
+					int tileIndex = e.TileIndex;
 					int selectedPanelIndex = toolboxForm.SelectedPanelIndex;
 					int currentTile = toolboxForm.CurrentTile;
 					int currentObject = toolboxForm.CurrentObject;
@@ -577,7 +577,7 @@ namespace WLEditor
 					}
 				}
 
-				if (e.Status == 2) //up
+				if (e.Status == TileEventStatus.MouseUp)
 				{
 					levelPictureBox.CommitChanges();
 				}
@@ -585,13 +585,13 @@ namespace WLEditor
 
 			if (e.Button == MouseButtons.Left)
 			{
-				if (e.Status == 0) //down
+				if (e.Status == TileEventStatus.MouseDown)
 				{
-					levelPictureBox.StartSelection(levelPictureBox.CurrentTileIndex % 256, levelPictureBox.CurrentTileIndex / 256);
+					levelPictureBox.StartSelection(e.TileIndex % 256, e.TileIndex / 256);
 				}
-				else if (e.Status == 1) //move
+				else if (e.Status == TileEventStatus.MouseMove)
 				{
-					levelPictureBox.SetSelection(levelPictureBox.CurrentTileIndex % 256, levelPictureBox.CurrentTileIndex / 256);
+					levelPictureBox.SetSelection(e.TileIndex % 256, e.TileIndex / 256);
 				}
 			}
 			else
