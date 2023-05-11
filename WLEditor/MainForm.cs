@@ -243,6 +243,20 @@ namespace WLEditor
 			}
 		}
 
+		int GetNextSwitchMode(int value)
+		{
+			int typeOfSwitch = Level.GetTypeOfSwitch();
+			int[] flags = { 0, 1, 2, 4 };
+			int nextMode = value;
+
+			do
+			{
+				nextMode = (nextMode + 1) % 4;
+			}
+			while (nextMode != 0 && (flags[nextMode] & typeOfSwitch) == 0);
+			return nextMode;
+		}
+
 		bool SaveChanges(bool saveFile)
 		{
 			if (rom.IsLoaded)
@@ -402,25 +416,7 @@ namespace WLEditor
 					break;
 
 				case Keys.B:
-					int typeOfSwitch = Level.GetTypeOfSwitch();
-					switch(typeOfSwitch)
-					{
-						case 1:
-							SetSwitchMode(switchMode == 0 ? 1 : 0);
-							break;
-
-						case 2:
-							SetSwitchMode(switchMode == 0 ? 2 : 0);
-							break;
-
-						case 3:
-							SetSwitchMode((switchMode + 1) % 3);
-							break;
-
-						default:
-							SetSwitchMode(0);
-							break;
-					}
+					SetSwitchMode(GetNextSwitchMode(switchMode));
 					return true;
 
 				case Keys.Control | Keys.C:

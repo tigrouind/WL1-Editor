@@ -277,7 +277,7 @@ namespace WLEditor
 						for(int j = 0 ; j < 2 ; j++)
 						{
 							byte subTileIndex = rom.ReadByte(tileindexaddress + newTileIndex * 4 + k * 2 + j);
-							if ((switchMode == 2 && newTileIndex == 0x32) || (switchMode == 1 && newTileIndex == 0x39))
+							if ((switchMode == 2 && newTileIndex == 0x32) || (switchMode == 1 && newTileIndex == 0x39) || (switchMode == 3 && newTileIndex == 0x38))
 							{
 								subTileIndex = (byte)(4 + k * 2 + j);
 							}
@@ -490,8 +490,13 @@ namespace WLEditor
 					case 0x39:
 						switchMode |= 1;
 						break;
+
 					case 0x32:
 						switchMode |= 2;
+						break;
+
+					case 0x38:
+						switchMode |= 4;
 						break;
 				}
 			}
