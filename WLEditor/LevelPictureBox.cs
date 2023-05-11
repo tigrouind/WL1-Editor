@@ -396,13 +396,16 @@ namespace WLEditor
 		{
 			if(e.Button == MouseButtons.Left || e.Button == MouseButtons.Right)
 			{
-				int tileIndex = e.Location.X / 16 / zoom + (e.Location.Y / 16 / zoom) * 256;
+				int tilePosX = e.Location.X / 16 / zoom;
+				int tilePosY = e.Location.Y / 16 / zoom;
+				int tileIndex = tilePosX + tilePosY * 256;
+
 				if(tileIndex != currentTileIndex)
 				{
 					currentTileIndex = tileIndex;
 					if (TileMouseDown != null)
 					{
-						TileMouseDown(this, new TileEventArgs(e.Button, status, currentTileIndex));
+						TileMouseDown(this, new TileEventArgs(e.Button, status, tilePosX, tilePosY));
 					}
 				}
 			}
