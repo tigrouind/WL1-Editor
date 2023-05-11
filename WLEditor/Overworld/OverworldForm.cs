@@ -21,7 +21,7 @@ namespace WLEditor
 		int currentWorld;
 
 		List<SelectionChange> changes = new List<SelectionChange>();
-		int currentTile;
+		int selectedTile;
 
 		bool eventMode;
 		bool pathMode;
@@ -31,7 +31,7 @@ namespace WLEditor
 		int timerTicks;
 		int animationIndex;
 
-		int lastTilePos = -1;
+		int currentTile = -1;
 		ChangeEnum changesFlag;
 
 		Selection selection = new Selection(8);
@@ -273,7 +273,7 @@ namespace WLEditor
 
 				using (Brush brush = new SolidBrush(Color.FromArgb(128, 255, 0, 0)))
 				{
-					e.Graphics.FillRectangle(brush, (currentTile % 16) * 8 * zoom, (currentTile / 16) * 8 * zoom, 8 * zoom, 8 * zoom);
+					e.Graphics.FillRectangle(brush, (selectedTile % 16) * 8 * zoom, (selectedTile / 16) * 8 * zoom, 8 * zoom, 8 * zoom);
 				}
 			}
 		}
@@ -473,9 +473,9 @@ namespace WLEditor
 				int tilePosY = e.Location.Y / 8 / zoom;
 
 				int tilePos = tilePosX + tilePosY * 32;
-				if (tilePos != lastTilePos)
+				if (tilePos != currentTile)
 				{
-					lastTilePos = tilePos;
+					currentTile = tilePos;
 
 					if (e.Button == MouseButtons.Right)
 					{
@@ -484,7 +484,7 @@ namespace WLEditor
 							if (mode == TileEventStatus.MouseDown)
 							{
 								InvalidateCurrentTile();
-								currentTile = tilePosX + tilePosY * 16;
+								selectedTile = tilePosX + tilePosY * 16;
 								InvalidateCurrentTile();
 							}
 						}
@@ -497,7 +497,7 @@ namespace WLEditor
 
 							if ((mode == TileEventStatus.MouseDown || mode == TileEventStatus.MouseMove) && !selection.HasSelection)
 							{
-								UpdateTile(tilePosX, tilePosY, currentTile ^ 0x80);
+								UpdateTile(tilePosX, tilePosY, selectedTile ^ 0x80);
 							}
 
 							if (mode == TileEventStatus.MouseUp)
@@ -536,7 +536,7 @@ namespace WLEditor
 
 		void PictureBox1MouseDown(object sender, MouseEventArgs e)
 		{
-			lastTilePos = -1;
+			currentTile = -1;
 			if (!selectionMode)
 			{
 				selection.ClearSelection();
@@ -548,7 +548,7 @@ namespace WLEditor
 
 		void PictureBox1MouseUp(object sender, MouseEventArgs e)
 		{
-			lastTilePos = -1;
+			currentTile = -1;
 			MouseEvent(e, TileEventStatus.MouseUp);
 		}
 
@@ -562,7 +562,7 @@ namespace WLEditor
 
 		void PictureBox2MouseDown(object sender, MouseEventArgs e)
 		{
-			lastTilePos = -1;
+			currentTile = -1;
 			if (selectionMode)
 			{
 				selection.ClearSelection();
@@ -719,9 +719,9 @@ namespace WLEditor
 
 		void InvalidateCurrentTile()
 		{
-			if (currentTile != -1)
+			if (selectedTile != -1)
 			{
-				pictureBox2.Invalidate(new Rectangle((currentTile % 16) * 8 * zoom, (currentTile / 16) * 8 * zoom, 8 * zoom, 8 * zoom));
+				pictureBox2.Invalidate(new Rectangle((selectedTile % 16) * 8 * zoom, (selectedTile / 16) * 8 * zoom, 8 * zoom, 8 * zoom));
 			}
 		}
 
