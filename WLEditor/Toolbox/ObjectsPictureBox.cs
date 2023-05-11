@@ -9,7 +9,9 @@ namespace WLEditor
 	public class ObjectsPictureBox : PictureBox
 	{
 		public int CurrentObject;
+		public event EventHandler<TileEventArgs> TileMouseMove;
 		int zoom;
+		int lastTile;
 
 		protected override void OnPaint(PaintEventArgs e)
 		{
@@ -81,6 +83,27 @@ namespace WLEditor
 			Height = 128 * zoomlevel;
 			Width = 128 * zoomlevel;
 			zoom = zoomlevel;
+		}
+
+		protected override void OnMouseMove(MouseEventArgs e)
+		{
+			int tilePosX = e.Location.X / 32 / zoom;
+			int tilePosY = e.Location.Y / 32 / zoom;
+			int tilePos = tilePosX + tilePosY * 4;
+
+			if (tilePos != lastTile)
+			{
+				lastTile = tilePos;
+				RaiseTileMouseMoveEvent();
+			}
+		}
+
+		void RaiseTileMouseMoveEvent()
+		{
+			if (TileMouseMove != null)
+			{
+				TileMouseMove(this, new TileEventArgs(MouseButtons.None, TileEventStatus.MouseDown, lastTile % 4, lastTile / 4));
+			}
 		}
 	}
 }

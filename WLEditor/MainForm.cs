@@ -73,11 +73,14 @@ namespace WLEditor
 		{
 			InitializeComponent();
 			LevelPanel.MouseWheel += LevelPanelMouseWheel;
+			levelPictureBox.TileMouseMove += LevelPictureBoxTileMouseMove;
 			levelPictureBox.TileMouseDown += LevelPictureBoxTileMouseDown;
 			levelPictureBox.SectorChanged += LevelPictureBoxSectorChanged;
 
 			toolboxForm.MouseWheel += LevelPanelMouseWheel;
 			toolboxForm.FormClosing += ToolBoxFormClosing;
+			toolboxForm.Tile16x16MouseMove += ToolBoxTile16x16MouseMove;
+			toolboxForm.ObjectTileMouseMove += ToolBoxObjectMouseMove;
 			toolboxForm.ProcessCommandKey += ToolBoxProcessCommandKey;
 
 			overworldForm.FormClosing += OverworldFormClosing;
@@ -200,6 +203,7 @@ namespace WLEditor
 		void ObjectsToolStripMenuItemClick(object sender, EventArgs e)
 		{
 			levelPictureBox.ShowObjects = objectsToolStripMenuItem.Checked;
+			levelPictureBox.RaiseTileMoveEvent();
 			levelPictureBox.Invalidate();
 		}
 
@@ -544,6 +548,8 @@ namespace WLEditor
 			sectorsToolStripMenuItem.Checked = false;
 		}
 
+		#region MouseDown
+
 		void LevelPictureBoxTileMouseDown(object sender, TileEventArgs e)
 		{
 			if(toolboxForm.Visible)
@@ -619,6 +625,8 @@ namespace WLEditor
 				SetChanges(true);
 			}
 		}
+
+		#endregion
 
 		void LevelPictureBoxSectorChanged(object sender, EventArgs e)
 		{
@@ -710,5 +718,35 @@ namespace WLEditor
 		{
 			ToggleForm(sectorForm, sectorsToolStripMenuItem.Checked);
 		}
+
+		#region MouseMove
+
+		void LevelPictureBoxTileMouseMove(object sender, TileEventArgs e)
+		{
+			int data = 0;
+			if (levelPictureBox.ShowObjects)
+			{
+				data = Level.ObjectsData[e.TileX + e.TileY * 256];
+			}
+
+			if (data == 0)
+			{
+				data = Level.LevelData[e.TileX + e.TileY * 256 + 0x1000];
+			}
+
+			toolStripStatusLabel1.Text = string.Format("{0:X2} {1}:{2}", data, e.TileX, e.TileY);
+		}
+
+		void ToolBoxTile16x16MouseMove(object sender, TileEventArgs e)
+		{
+			toolStripStatusLabel1.Text = string.Format("{0:X2}", e.TileX + e.TileY * 8);
+		}
+
+		void ToolBoxObjectMouseMove(object sender, TileEventArgs e)
+		{
+			toolStripStatusLabel1.Text = string.Format("{0:X2}", e.TileX + e.TileY * 4);
+		}
+
+		#endregion
 	}
 }

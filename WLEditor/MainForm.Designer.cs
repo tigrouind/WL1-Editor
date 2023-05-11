@@ -58,10 +58,13 @@ namespace WLEditor
 			this.LevelPanel = new WLEditor.PanelUnScrollable();
 			this.levelPictureBox = new WLEditor.LevelPictureBox();
 			this.timer = new System.Windows.Forms.Timer(this.components);
+			this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+			this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
 			this.menuStrip1.SuspendLayout();
 			this.tableLayoutPanel1.SuspendLayout();
 			this.LevelPanel.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.levelPictureBox)).BeginInit();
+			this.statusStrip1.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// levelComboBox
@@ -334,12 +337,28 @@ namespace WLEditor
 			this.timer.Interval = 120;
 			this.timer.Tick += new System.EventHandler(this.TimerTick);
 			// 
+			// statusStrip1
+			// 
+			this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+			this.toolStripStatusLabel1});
+			this.statusStrip1.Location = new System.Drawing.Point(0, 540);
+			this.statusStrip1.Name = "statusStrip1";
+			this.statusStrip1.Size = new System.Drawing.Size(4096, 25);
+			this.statusStrip1.TabIndex = 3;
+			this.statusStrip1.Text = "statusStrip1";
+			// 
+			// toolStripStatusLabel1
+			// 
+			this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
+			this.toolStripStatusLabel1.Size = new System.Drawing.Size(151, 20);
+			// 
 			// MainForm
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(1209, 643);
 			this.Controls.Add(this.tableLayoutPanel1);
 			this.Controls.Add(this.menuStrip1);
+			this.Controls.Add(this.statusStrip1);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MainMenuStrip = this.menuStrip1;
 			this.Name = "MainForm";
@@ -349,7 +368,10 @@ namespace WLEditor
 			this.menuStrip1.PerformLayout();
 			this.tableLayoutPanel1.ResumeLayout(false);
 			this.LevelPanel.ResumeLayout(false);
+			this.LevelPanel.PerformLayout();
 			((System.ComponentModel.ISupportInitialize)(this.levelPictureBox)).EndInit();
+			this.statusStrip1.ResumeLayout(false);
+			this.statusStrip1.PerformLayout();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -382,6 +404,8 @@ namespace WLEditor
 		private System.Windows.Forms.Timer timer;
 		private System.Windows.Forms.ToolStripMenuItem animationToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem sectorsToolStripMenuItem;
+		private System.Windows.Forms.StatusStrip statusStrip1;
+		private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
 
 
 

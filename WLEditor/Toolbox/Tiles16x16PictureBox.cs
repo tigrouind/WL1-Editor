@@ -10,6 +10,9 @@ namespace WLEditor
 		public int CurrentTile;
 		public bool ShowColliders = true;
 		public int SwitchMode;
+		public event EventHandler<TileEventArgs> TileMouseMove;
+
+		int lastTile;
 		DirectBitmap tiles = new DirectBitmap(128, 256);
 		int zoom;
 
@@ -78,6 +81,27 @@ namespace WLEditor
 			Height = 256 * zoomlevel;
 			Width = 128 * zoomlevel;
 			zoom = zoomlevel;
+		}
+
+		protected override void OnMouseMove(MouseEventArgs e)
+		{
+			int tilePosX = e.Location.X / 16 / zoom;
+			int tilePosY = e.Location.Y / 16 / zoom;
+			int tilePos = tilePosX + tilePosY * 8;
+
+			if (tilePos != lastTile)
+			{
+				lastTile = tilePos;
+				RaiseTileMouseMoveEvent();
+			}
+		}
+
+		void RaiseTileMouseMoveEvent()
+		{
+			if (TileMouseMove != null)
+			{
+				TileMouseMove(this, new TileEventArgs(MouseButtons.None, TileEventStatus.MouseDown, lastTile % 8, lastTile / 8));
+			}
 		}
 	}
 }

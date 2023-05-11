@@ -105,5 +105,31 @@ namespace WLEditor
 				tiles16x16PictureBox.SwitchMode = value;
 			}
 		}
+
+		public event EventHandler<TileEventArgs> Tile16x16MouseMove
+		{
+			add
+			{
+				tiles16x16PictureBox.TileMouseMove += value;
+			}
+
+			remove
+			{
+				tiles16x16PictureBox.TileMouseMove -= value;
+			}
+		}
+
+		public event EventHandler<TileEventArgs> ObjectTileMouseMove
+		{
+			add
+			{
+				objectsPictureBox.TileMouseMove += value;
+			}
+
+			remove
+			{
+				objectsPictureBox.TileMouseMove -= value;
+			}
+		}
 	}
 }

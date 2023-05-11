@@ -32,6 +32,8 @@ namespace WLEditor
 		int animationIndex;
 
 		int currentTile = -1;
+		int lastTile = -1;
+		bool lastTileSide;
 		ChangeEnum changesFlag;
 
 		Selection selection = new Selection(8);
@@ -423,17 +425,44 @@ namespace WLEditor
 			}
 		}
 
+		void RaiseTileMoveEvent()
+		{
+			UpdateTitle();
+		}
+
 		void UpdateTitle()
 		{
-			if (eventMode)
+			var items = new List<string>();
+
+			if (!pathMode)
 			{
-				toolStripStatusLabel1.Text = eventForm.GetTitle();
-				statusStrip1.Visible = true;
+				if (eventMode)
+				{
+					items.Add(eventForm.GetTitle());
+				}
+
+				if (lastTile != -1)
+				{
+					if (lastTileSide)
+					{
+						int tileIndex = eventForm.GetTileAt(lastTile);
+						if (tileIndex == -1)
+						{
+							tileIndex = worldTiles[lastTile];
+						}
+
+						items.Add(string.Format("{0:X2} {1}:{2}", tileIndex, lastTile % 32, lastTile / 32));
+					}
+					else
+					{
+						items.Add(string.Format("{0:X2}", lastTile ^ 0x80));
+					}
+				}
+
+				toolStripStatusLabel1.Text = string.Join(new string(' ', 5), items.ToArray());
 			}
-			else
-			{
-				statusStrip1.Visible = false;
-			}
+
+			statusStrip1.Visible = eventMode || !pathMode;
 		}
 
 		int currentMapX
@@ -465,112 +494,172 @@ namespace WLEditor
 			}
 		}
 
-		void MouseEvent(MouseEventArgs e, TileEventStatus mode)
+		void UpdateSelection(TileEventArgs e, bool mode)
 		{
+			if (selectionMode != mode)
+			{
+				selection.ClearSelection();
+				selectionMode = mode;
+			}
+
+			if (e.Button == MouseButtons.Left)
+			{
+				if (e.Status == TileEventStatus.MouseDown)
+				{
+					selection.StartSelection(e.TileX, e.TileY);
+				}
+				else if(e.Status == TileEventStatus.MouseMove)
+				{
+					selection.SetSelection(e.TileX, e.TileY);
+				}
+			}
+			else
+			{
+				selection.ClearSelection();
+			}
+		}
+
+		#region PictureBox1
+
+		void PictureBox1MouseEvent(MouseEventArgs e, TileEventStatus status)
+		{
+			int tilePosX = e.Location.X / 8 / zoom;
+			int tilePosY = e.Location.Y / 8 / zoom;
+			int tilePos = tilePosX + tilePosY * 32;
+
 			if ((e.Button == MouseButtons.Left || e.Button == MouseButtons.Right) && !pathMode)
 			{
-				int tilePosX = e.Location.X / 8 / zoom;
-				int tilePosY = e.Location.Y / 8 / zoom;
-
-				int tilePos = tilePosX + tilePosY * 32;
 				if (tilePos != currentTile)
 				{
 					currentTile = tilePos;
-
-					if (e.Button == MouseButtons.Right)
-					{
-						if (!selectionMode)
-						{
-							if (mode == TileEventStatus.MouseDown)
-							{
-								InvalidateCurrentTile();
-								selectedTile = tilePosX + tilePosY * 16;
-								InvalidateCurrentTile();
-							}
-						}
-						else
-						{
-							if (mode == TileEventStatus.MouseDown)
-							{
-								changes = new List<SelectionChange>();
-							}
-
-							if ((mode == TileEventStatus.MouseDown || mode == TileEventStatus.MouseMove) && !selection.HasSelection)
-							{
-								UpdateTile(tilePosX, tilePosY, selectedTile ^ 0x80);
-							}
-
-							if (mode == TileEventStatus.MouseUp)
-							{
-								selection.AddChanges(changes);
-							}
-						}
-					}
-
-					if (e.Button == MouseButtons.Left)
-					{
-						if (mode == TileEventStatus.MouseDown)
-						{
-							selection.StartSelection(tilePosX, tilePosY);
-						}
-						else if(mode == TileEventStatus.MouseMove)
-						{
-							selection.SetSelection(tilePosX, tilePosY);
-						}
-					}
-					else
-					{
-						selection.ClearSelection();
-					}
+					PictureBox1TileMouseDown(new TileEventArgs(e.Button, status, tilePosX, tilePosY));
 				}
 			}
+
+			if (status == TileEventStatus.MouseDown || status == TileEventStatus.MouseMove)
+			{
+				if (tilePos != lastTile)
+				{
+					lastTileSide = true;
+					lastTile = tilePos;
+					RaiseTileMoveEvent();
+				}
+			}
+		}
+
+		void PictureBox1TileMouseDown(TileEventArgs e)
+		{
+			if (e.Button == MouseButtons.Right)
+			{
+				if (e.Status == TileEventStatus.MouseDown)
+				{
+					changes = new List<SelectionChange>();
+				}
+
+				if ((e.Status == TileEventStatus.MouseDown || e.Status == TileEventStatus.MouseMove) && !selection.HasSelection)
+				{
+					UpdateTile(e.TileX, e.TileY, selectedTile ^ 0x80);
+				}
+
+				if (e.Status == TileEventStatus.MouseUp)
+				{
+					selection.AddChanges(changes);
+				}
+			}
+
+			UpdateSelection(e, true);
 		}
 
 		void PictureBox1MouseMove(object sender, MouseEventArgs e)
 		{
 			if (pictureBox1.ClientRectangle.Contains(e.Location))
 			{
-				MouseEvent(e, TileEventStatus.MouseMove);
+				PictureBox1MouseEvent(e, TileEventStatus.MouseMove);
 			}
 		}
 
 		void PictureBox1MouseDown(object sender, MouseEventArgs e)
 		{
 			currentTile = -1;
-			if (!selectionMode)
-			{
-				selection.ClearSelection();
-				selectionMode = true;
-			}
-
-			MouseEvent(e, TileEventStatus.MouseDown);
+			lastTile = -1;
+			PictureBox1MouseEvent(e, TileEventStatus.MouseDown);
 		}
 
 		void PictureBox1MouseUp(object sender, MouseEventArgs e)
 		{
 			currentTile = -1;
-			MouseEvent(e, TileEventStatus.MouseUp);
+			lastTile = -1;
+			PictureBox1MouseEvent(e, TileEventStatus.MouseUp);
+		}
+
+		#endregion
+
+		#region PictureBox2
+
+		void PictureBox2MouseEvent(MouseEventArgs e, TileEventStatus status)
+		{
+			int tilePosX = e.Location.X / 8 / zoom;
+			int tilePosY = e.Location.Y / 8 / zoom;
+			int tilePos = tilePosX + tilePosY * 16;
+
+			if ((e.Button == MouseButtons.Left || e.Button == MouseButtons.Right) && !pathMode)
+			{
+				if (tilePos != currentTile)
+				{
+					currentTile = tilePos;
+					PictureBox2TileMouseDown(new TileEventArgs(e.Button, status, tilePosX, tilePosY));
+				}
+			}
+
+			if (status == TileEventStatus.MouseDown || status == TileEventStatus.MouseMove)
+			{
+				if (tilePos != lastTile)
+				{
+					lastTileSide = false;
+					lastTile = tilePos;
+					RaiseTileMoveEvent();
+				}
+			}
+		}
+
+		void PictureBox2TileMouseDown(TileEventArgs e)
+		{
+			if (e.Button == MouseButtons.Right)
+			{
+				if (e.Status == TileEventStatus.MouseDown)
+				{
+					InvalidateCurrentTile();
+					selectedTile = e.TileX + e.TileY * 16;
+					InvalidateCurrentTile();
+				}
+			}
+
+			UpdateSelection(e, false);
 		}
 
 		void PictureBox2MouseMove(object sender, MouseEventArgs e)
 		{
 			if (pictureBox2.ClientRectangle.Contains(e.Location))
 			{
-				MouseEvent(e, TileEventStatus.MouseMove);
+				PictureBox2MouseEvent(e, TileEventStatus.MouseMove);
 			}
 		}
 
 		void PictureBox2MouseDown(object sender, MouseEventArgs e)
 		{
 			currentTile = -1;
+			lastTile = -1;
+
 			if (selectionMode)
 			{
 				selection.ClearSelection();
 				selectionMode = false;
 			}
 
-			MouseEvent(e, TileEventStatus.MouseDown);
+			PictureBox2MouseEvent(e, TileEventStatus.MouseDown);
 		}
+
+		#endregion
 
 		#endregion
 
@@ -591,6 +680,7 @@ namespace WLEditor
 			{
 				if (selection.PasteSelection(PasteTileAt))
 				{
+					RaiseTileMoveEvent();
 					pictureBox1.Invalidate();
 					SetChanges(eventMode ? ChangeEnum.Event : ChangeEnum.Tile);
 				}
@@ -606,6 +696,7 @@ namespace WLEditor
 				int tile = GetEmptyTile();
 				if (selection.CopySelection(CopyTileAt) && selection.DeleteSelection(SetTileAt, GetEmptyTile()))
 				{
+					RaiseTileMoveEvent();
 					pictureBox1.Invalidate();
 					SetChanges(eventMode ? ChangeEnum.Event : ChangeEnum.Tile);
 				}
@@ -621,6 +712,7 @@ namespace WLEditor
 				int tile = GetEmptyTile();
 				if (selection.DeleteSelection(SetTileAt, GetEmptyTile()))
 				{
+					RaiseTileMoveEvent();
 					pictureBox1.Invalidate();
 					SetChanges(eventMode ? ChangeEnum.Event : ChangeEnum.Tile);
 				}
@@ -735,6 +827,7 @@ namespace WLEditor
 			{
 				if (selection.Undo(SetTileAt, GetTileAt))
 				{
+					RaiseTileMoveEvent();
 					pictureBox1.Invalidate();
 					SetChanges(eventMode ? ChangeEnum.Event : ChangeEnum.Tile);
 				}
@@ -747,6 +840,7 @@ namespace WLEditor
 			{
 				if (selection.Redo(SetTileAt, GetTileAt))
 				{
+					RaiseTileMoveEvent();
 					pictureBox1.Invalidate();
 					SetChanges(eventMode ? ChangeEnum.Event : ChangeEnum.Tile);
 				}

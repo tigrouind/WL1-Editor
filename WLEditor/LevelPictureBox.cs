@@ -18,12 +18,14 @@ namespace WLEditor
 		public int SwitchMode;
 		public int CurrentSector = -1;
 		int currentTileIndex = -1;
+		int lastTile = -1;
 		public int ScrollLines;
 		int mouseDownSector;
 		readonly Selection selection = new Selection(16);
 		List<SelectionChange> changes = new List<SelectionChange>();
 
 		public event EventHandler<TileEventArgs> TileMouseDown;
+		public event EventHandler<TileEventArgs> TileMouseMove;
 		public event EventHandler SectorChanged;
 
 		public static Brush[] TransparentBrushes =
@@ -427,11 +429,30 @@ namespace WLEditor
 					}
 				}
 			}
+
+			if (status == TileEventStatus.MouseDown || status == TileEventStatus.MouseMove)
+			{
+				int currentTile = e.Location.X / 16 / zoom + (e.Location.Y / 16 / zoom) * 256;
+				if (currentTile != lastTile)
+				{
+					lastTile = currentTile;
+					RaiseTileMoveEvent();
+				}
+			}
+		}
+
+		public void RaiseTileMoveEvent()
+		{
+			if (TileMouseMove != null && lastTile != -1)
+			{
+				TileMouseMove(this, new TileEventArgs(MouseButtons.None, TileEventStatus.MouseDown, lastTile % 256, lastTile / 256));
+			}
 		}
 
 		protected override void OnMouseDown(MouseEventArgs e)
 		{
 			currentTileIndex = -1;
+			lastTile = -1;
 			OnMouseEvent(e, TileEventStatus.MouseDown);
 		}
 
@@ -446,6 +467,7 @@ namespace WLEditor
 		protected override void OnMouseUp(MouseEventArgs e)
 		{
 			currentTileIndex = -1;
+			lastTile = -1;
 			OnMouseEvent(e, TileEventStatus.MouseUp);
 		}
 
@@ -474,6 +496,7 @@ namespace WLEditor
 		{
 			if (selection.PasteSelection(PasteTileAt))
 			{
+				RaiseTileMoveEvent();
 				Invalidate();
 				return true;
 			}
@@ -485,6 +508,7 @@ namespace WLEditor
 		{
 			if (selection.CopySelection(CopyTileAt) && selection.DeleteSelection(SetTileAt, GetEmptyTile()))
 			{
+				RaiseTileMoveEvent();
 				Invalidate();
 				return true;
 			}
@@ -496,6 +520,7 @@ namespace WLEditor
 		{
 			if (selection.DeleteSelection(SetTileAt, GetEmptyTile()))
 			{
+				RaiseTileMoveEvent();
 				Invalidate();
 				return true;
 			}
@@ -589,6 +614,7 @@ namespace WLEditor
 		{
 			if (selection.Undo(SetTileAt, GetTileAt))
 			{
+				RaiseTileMoveEvent();
 				Invalidate();
 				return true;
 			}
@@ -600,6 +626,7 @@ namespace WLEditor
 		{
 			if (selection.Redo(SetTileAt, GetTileAt))
 			{
+				RaiseTileMoveEvent();
 				Invalidate();
 				return true;
 			}

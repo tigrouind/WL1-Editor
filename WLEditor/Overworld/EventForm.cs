@@ -249,6 +249,36 @@ namespace WLEditor
 			worldEvent = worldEvents[eventId + 1];
 		}
 
+		public int GetTileAt(int tilePos)
+		{
+			foreach(var worldEv in worldEvents)
+			{
+				bool selected = worldEv == worldEvent;
+
+				int index;
+				if (selected)
+				{
+					index = worldEv.FindIndex(0, eventStep, x => x.Key == tilePos);
+				}
+				else
+				{
+					index = worldEv.FindIndex(x => x.Key == tilePos);
+				}
+
+				if (index != -1)
+				{
+					return worldEv[index].Value;
+				}
+
+				if (selected)
+				{
+					break;
+				}
+			}
+
+			return -1;
+		}
+
 		public int FindEvent(int tilePos)
 		{
 			return worldEvent.FindIndex(x => x.Key == tilePos);
@@ -311,6 +341,7 @@ namespace WLEditor
 			{
 				foreach(var worldEv in worldEvents)
 				{
+					bool selected = worldEv == worldEvent;
 					for(int i = 0 ; i < worldEv.Count ; i++)
 					{
 						var item = worldEv[i];
@@ -319,7 +350,6 @@ namespace WLEditor
 						int y = position / 32;
 						byte tileIndex = item.Value;
 
-						bool selected = worldEv == worldEvent;
 						if (i >= eventStep && selected)
 						{
 							graphics.FillRectangle(brushEvent, new Rectangle(x * 8 * zoom, y * 8 * zoom, 8 * zoom, 8 * zoom));
@@ -340,7 +370,7 @@ namespace WLEditor
 						}
 					}
 
-					if (worldEv == worldEvent)
+					if (selected)
 					{
 						break;
 					}
