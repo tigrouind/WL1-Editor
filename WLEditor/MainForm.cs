@@ -568,7 +568,7 @@ namespace WLEditor
 						}
 						else if(levelPictureBox.ShowObjects && selectedPanelIndex == 2)
 						{
-							UpdateObject(tileIndex, currentObject + 1);
+							UpdateObject(tileIndex, currentObject);
 						}
 					}
 				}
