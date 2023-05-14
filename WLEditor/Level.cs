@@ -392,7 +392,8 @@ namespace WLEditor
 				case 0x46:
 				case 0x53:
 				case 0x3E:
-					return 3; //coins or sand
+				case 0x49:
+					return 3; //coins or sand or hidden block
 
 				case 0x59:
 				case 0x5A:
