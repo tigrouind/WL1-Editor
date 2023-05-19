@@ -359,16 +359,16 @@ namespace WLEditor
 			}
 		}
 
-		public static List<KeyValuePair<int, int>> GetCourseIds(Rom rom)
+		public static List<Tuple<int, int>> GetCourseIds(Rom rom)
 		{
 			//convert course id => course no using data in ROM
 			rom.SetBank(0);
-			var courseIdToNo = new List<KeyValuePair<int, int>>();
+			var courseIdToNo = new List<Tuple<int, int>>();
 			for (int i = 0 ; i <= 0x2A ; i++)
 			{
 				int levelpointer = rom.ReadWord(0x0534 + i * 2);
 				int courseNo = (levelpointer - 0x0587) / 3;
-				courseIdToNo.Add(new KeyValuePair<int, int>(i, courseNo));
+				courseIdToNo.Add(new Tuple<int, int>(i, courseNo));
 			}
 
 			return courseIdToNo;

@@ -217,16 +217,16 @@ namespace WLEditor
 
 		#region Events
 
-		public static List<KeyValuePair<int, byte>>[] LoadEvents(Rom rom, int[] events)
+		public static List<Tuple<int, byte>>[] LoadEvents(Rom rom, int[] events)
 		{
 			rom.SetBank(8);
 
-			var result = new List<List<KeyValuePair<int, byte>>>();
+			var result = new List<List<Tuple<int, byte>>>();
 			foreach (var item in events)
 			{
 				int tileIndexAddress = rom.ReadWord(item + 1);
 				int tilePositionAddress = rom.ReadWord(item + 4);
-				var eventItem = new List<KeyValuePair<int, byte>>();
+				var eventItem = new List<Tuple<int, byte>>();
 
 				int position = 0;
 				while (true)
@@ -239,7 +239,7 @@ namespace WLEditor
 						break;
 					}
 
-					eventItem.Add(new KeyValuePair<int, byte>(tilePosition - 0x9800, tileIndex));
+					eventItem.Add(new Tuple<int, byte>(tilePosition - 0x9800, tileIndex));
 					position++;
 				};
 
@@ -249,7 +249,7 @@ namespace WLEditor
 			return result.ToArray();
 		}
 
-		public static bool SaveEvents(Rom rom, List<KeyValuePair<int, byte>>[] events,
+		public static bool SaveEvents(Rom rom, List<Tuple<int, byte>>[] events,
 			int[][] eventPointers, int[,] eventAddressOffset, int maxSize, out string errorMessage)
 		{
 			int size = events.Sum(x => x.Sum(y => 3) + 2);
@@ -279,7 +279,7 @@ namespace WLEditor
 				//tile
 				foreach (var item in worldEvent)
 				{
-					rom.WriteByte(position++, item.Value);
+					rom.WriteByte(position++, item.Item2);
 				}
 				rom.WriteByte(position++, 0xFF);
 
@@ -296,7 +296,7 @@ namespace WLEditor
 				//position
 				foreach (var item in worldEvent)
 				{
-					rom.WriteWordSwap(position, (ushort)(item.Key + 0x9800));
+					rom.WriteWordSwap(position, (ushort)(item.Item1 + 0x9800));
 					position += 2;
 				}
 				rom.WriteByte(position++, 0xFF);
