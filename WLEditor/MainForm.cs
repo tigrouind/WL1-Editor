@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
+using System.Reflection;
 using System.Windows.Forms;
 
 namespace WLEditor
@@ -72,6 +74,8 @@ namespace WLEditor
 		public MainForm()
 		{
 			InitializeComponent();
+			Icon = Icon.ExtractAssociatedIcon(Assembly.GetExecutingAssembly().Location);
+
 			LevelPanel.MouseWheel += LevelPanelMouseWheel;
 			levelPictureBox.TileMouseMove += LevelPictureBoxTileMouseMove;
 			levelPictureBox.TileMouseDown += LevelPictureBoxTileMouseDown;
