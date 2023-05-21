@@ -477,7 +477,7 @@ namespace WLEditor
 			KeyEventArgs args = new KeyEventArgs(keyData);
 
 			ProcessCommandKey(this, args);
-			if(args.Handled)
+			if (args.Handled)
 			{
 				return true;
 			}

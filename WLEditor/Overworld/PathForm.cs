@@ -167,7 +167,7 @@ namespace WLEditor
 
 		void RemoveAllPaths()
 		{
-			foreach(var dir in currentPath.Directions)
+			foreach (var dir in currentPath.Directions)
 			{
 				UnbindPath(dir);
 				dir.Path.Clear();
@@ -184,7 +184,7 @@ namespace WLEditor
 			int posX = currentPath.X / gridSnap * gridSnap;
 			int posY = currentPath.Y / gridSnap * gridSnap;
 
-			switch(key)
+			switch (key)
 			{
 				case Keys.Up:
 					currentPath.Y = Math.Max(posY - gridSnap, 0);
@@ -222,7 +222,7 @@ namespace WLEditor
 			//unbind paths linked to that level
 			foreach (int level in levels[currentWorld])
 			{
-				foreach(var dir in pathData[level].Directions)
+				foreach (var dir in pathData[level].Directions)
 				{
 					if (dir.Next == currentLevel)
 					{
@@ -305,7 +305,7 @@ namespace WLEditor
 
 		public bool ProcessPathKey(Keys key)
 		{
-			switch(key)
+			switch (key)
 			{
 				case Keys.PageUp:
 					NextLevel();
@@ -397,7 +397,7 @@ namespace WLEditor
 
 		int GetDirection(Keys key)
 		{
-			switch(key)
+			switch (key)
 			{
 				case Keys.Right:
 					return 0;
@@ -458,7 +458,7 @@ namespace WLEditor
 
 				int next = currentDirection == null ? -1 : currentDirection.Next;
 
-				foreach(var level in levels[currentWorld].OrderBy(x => x == currentLevel))
+				foreach (var level in levels[currentWorld].OrderBy(x => x == currentLevel))
 				{
 					var item = pathData[level];
 					int posX = item.X;
@@ -544,7 +544,7 @@ namespace WLEditor
 				var miterPoints = GetMitterPoints(points, zoom * 4.0f);
 
 				int n = 0;
-				foreach(var item in colors.GroupByAdjacent(x => x, (x, y) => new { Color = x, Count = y.Count() } ))
+				foreach (var item in colors.GroupByAdjacent(x => x, (x, y) => new { Color = x, Count = y.Count() } ))
 				{
 					brush.Color = item.Color;
 					g.FillPolygon(brush, GetLineStrip(miterPoints, n, item.Count + 1).ToArray(), FillMode.Winding);
@@ -685,15 +685,15 @@ namespace WLEditor
 		void BindPaths()
 		{
 			var levelPositions = new Dictionary<int, int>();
-			foreach(var level in levels[currentWorld])
+			foreach (var level in levels[currentWorld])
 			{
 				levelPositions[pathData[level].X + pathData[level].Y * 256] = level;
 			}
 
-			foreach(var level in levels[currentWorld])
+			foreach (var level in levels[currentWorld])
 			{
 				var item = pathData[level];
-				foreach(var dir in item.Directions.Where(x => x.Path.Count > 0))
+				foreach (var dir in item.Directions.Where(x => x.Path.Count > 0))
 				{
 					int posX, posY;
 					GetPathPosition(item, dir, out posX, out posY);
@@ -725,7 +725,7 @@ namespace WLEditor
 			posX = level.X;
 			posY = level.Y;
 
-			foreach(var path in direction.Path)
+			foreach (var path in direction.Path)
 			{
 				GetPathPosition(path, ref posX, ref posY);
 			}
@@ -792,7 +792,7 @@ namespace WLEditor
 
 		int GetReverseDir(int dir)
 		{
-			switch(dir)
+			switch (dir)
 			{
 				case 0:
 					return 1;

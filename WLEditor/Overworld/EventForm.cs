@@ -251,7 +251,7 @@ namespace WLEditor
 
 		public int GetTileAt(int tilePos)
 		{
-			foreach(var worldEv in worldEvents)
+			foreach (var worldEv in worldEvents)
 			{
 				bool selected = worldEv == worldEvent;
 
@@ -339,10 +339,10 @@ namespace WLEditor
 			using (var brushEvent = new SolidBrush(Color.FromArgb(128, 255, 128, 0)))
 			using (var brushStep = new SolidBrush(Color.FromArgb(128, 64, 192, 192)))
 			{
-				foreach(var worldEv in worldEvents)
+				foreach (var worldEv in worldEvents)
 				{
 					bool selected = worldEv == worldEvent;
-					for(int i = 0 ; i < worldEv.Count ; i++)
+					for (int i = 0 ; i < worldEv.Count ; i++)
 					{
 						var item = worldEv[i];
 						int position = item.Key;

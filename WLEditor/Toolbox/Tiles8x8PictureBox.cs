@@ -10,7 +10,7 @@ namespace WLEditor
 
 		protected override void OnPaint(PaintEventArgs e)
 		{
-			if(Level.LevelData != null && !DesignMode)
+			if (Level.LevelData != null && !DesignMode)
 			{
 				e.Graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
 				e.Graphics.PixelOffsetMode = PixelOffsetMode.Half;

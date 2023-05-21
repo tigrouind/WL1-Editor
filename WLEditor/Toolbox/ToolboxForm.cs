@@ -28,9 +28,9 @@ namespace WLEditor
 			controlToShow.Visible = true;
 			controlToShow.Location = new Point(controlToShow.Margin.Left, controlToShow.Margin.Top);
 
-			foreach(Control control in panel1.Controls)
+			foreach (Control control in panel1.Controls)
 			{
-				if(control != controlToShow)
+				if (control != controlToShow)
 				{
 					control.Visible = false;
 				}
@@ -58,7 +58,7 @@ namespace WLEditor
 			KeyEventArgs args = new KeyEventArgs(keyData);
 
 			ProcessCommandKey(this, args);
-			if(args.Handled)
+			if (args.Handled)
 			{
 				return true;
 			}

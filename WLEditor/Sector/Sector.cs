@@ -137,9 +137,9 @@ namespace WLEditor
 		public static IEnumerable<int> GetWarpUsage(Rom rom)
 		{
 			rom.SetBank(0xC);
-			for(int i = 0 ; i < 43 ;i++)
+			for (int i = 0 ; i < 43 ;i++)
 			{
-				for(int j = 0 ; j < 32 ; j++)
+				for (int j = 0 ; j < 32 ; j++)
 				{
 					int warp = rom.ReadWord(0x4F30 + i * 64 + j * 2);
 					if (warp >= 0x5B7A)

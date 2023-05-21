@@ -48,7 +48,7 @@ namespace WLEditor
 
 		protected override void OnPaint(PaintEventArgs e)
 		{
-			if(Level.LevelData != null && !DesignMode)
+			if (Level.LevelData != null && !DesignMode)
 			{
 				using (StringFormat format = new StringFormat())
 				using (Font font = new Font("Arial", 8 * zoom))
@@ -67,7 +67,7 @@ namespace WLEditor
 					e.Graphics.DrawImage(levelTiles.Bitmap, 0, 0, 4096 * zoom, 512 * zoom);
 
 					//sector objects (enemies, powerups)
-					if(ShowObjects)
+					if (ShowObjects)
 					{
 						DrawObjects(font, format, e, EnemyBrush);
 
@@ -82,7 +82,7 @@ namespace WLEditor
 					}
 
 					//sectors
-					if(ShowSectors)
+					if (ShowSectors)
 					{
 						DrawSectors(e.Graphics, e.ClipRectangle, font, format);
 						DrawCamera(e.Graphics, e.ClipRectangle);
@@ -140,22 +140,22 @@ namespace WLEditor
 		{
 			clipRectangle = GetClipRectangle(clipRectangle, 16 * zoom);
 
-			for(int j = clipRectangle.Top ; j < clipRectangle.Bottom ; j++)
+			for (int j = clipRectangle.Top ; j < clipRectangle.Bottom ; j++)
 			{
-				for(int i = clipRectangle.Left ; i < clipRectangle.Right ; i++)
+				for (int i = clipRectangle.Left ; i < clipRectangle.Right ; i++)
 				{
-					if(!invalidTiles[i + j * 256])
+					if (!invalidTiles[i + j * 256])
 					{
 						invalidTiles[i + j * 256] = true;
 						DrawTileToBitmap(i, j);
 
-						if(viewColliders)
+						if (viewColliders)
 						{
 							byte tileIndex = Level.LevelData[i + j * 256 + 0x1000];
 							tileIndex = (byte)Level.SwitchTile(tileIndex, SwitchMode);
 
 							int specialTile = Level.IsSpecialTile(tileIndex);
-							if(specialTile != -1)
+							if (specialTile != -1)
 							{
 								g.FillRectangle(TransparentBrushes[specialTile], new Rectangle(i * 16, j * 16, 16, 16));
 							}
@@ -171,7 +171,7 @@ namespace WLEditor
 			Point dest = new Point(x * 16, y * 16);
 			Point src = new Point((tileIndex % 8) * 16, (tileIndex / 8) * 16);
 
-			for(int i = 0 ; i < 16 ; i++)
+			for (int i = 0 ; i < 16 ; i++)
 			{
 				Array.Copy(Level.Tiles16x16.Bits, src.X + (src.Y + i) * Level.Tiles16x16.Width, levelTiles.Bits, dest.X + (dest.Y + i) * levelTiles.Width, 16);
 			}
@@ -179,15 +179,15 @@ namespace WLEditor
 
 		void DrawObjects(Font font, StringFormat format, PaintEventArgs e, Brush brush)
 		{
-			for(int j = 0 ; j < 32 ; j++)
+			for (int j = 0 ; j < 32 ; j++)
 			{
-				for(int i = 0 ; i < 256 ; i++)
+				for (int i = 0 ; i < 256 ; i++)
 				{
 					byte data = Level.ObjectsData[i + j * 256];
-					if(data > 0)
+					if (data > 0)
 					{
 						Rectangle destRect = new Rectangle(i * 16 * zoom, j * 16 * zoom, 16 * zoom, 16 * zoom);
-						if(destRect.IntersectsWith(e.ClipRectangle))
+						if (destRect.IntersectsWith(e.ClipRectangle))
 						{
 							e.Graphics.FillRectangle(brush, destRect);
 
@@ -199,13 +199,13 @@ namespace WLEditor
 						}
 
 						//enemy
-						if(data <= 6)
+						if (data <= 6)
 						{
 							if (Sprite.LoadedSprites[data - 1] != Rectangle.Empty)
 							{
 								Rectangle enemyRect = Sprite.LoadedSprites[data - 1];
 								destRect = new Rectangle((i * 16 + enemyRect.X - 32 + 8) * zoom, (j * 16 + enemyRect.Y - (data - 1) * 128 - 104) * zoom, enemyRect.Width * zoom, enemyRect.Height * zoom);
-								if(destRect.IntersectsWith(e.ClipRectangle))
+								if (destRect.IntersectsWith(e.ClipRectangle))
 								{
 									e.Graphics.DrawImage(Sprite.TilesEnemies.Bitmap, destRect, enemyRect, GraphicsUnit.Pixel);
 								}
@@ -258,7 +258,7 @@ namespace WLEditor
 			g.DrawString(drawSector.ToString("D2"), font, Brushes.White, (x * 256 + 8) * zoom, (y * 256 + 8) * zoom, format);
 
 			int sectorTarget = Level.Warps[drawSector];
-			if(sectorTarget != 255)
+			if (sectorTarget != 255)
 			{
 				string text = GetWarpName(sectorTarget);
 				var result = TextRenderer.MeasureText(text, font);
@@ -276,11 +276,11 @@ namespace WLEditor
 			{
 				penBlue.DashPattern = new [] { 5.0f, 1.0f };
 
-				for(int i = 1 ; i < 16 ; i++)
+				for (int i = 1 ; i < 16 ; i++)
 				{
 					int x = i * 256 * zoom;
 					Rectangle lineRect = new Rectangle(x - zoom, 0, 2 * zoom, 512 * zoom);
-					if(lineRect.IntersectsWith(clipRectangle))
+					if (lineRect.IntersectsWith(clipRectangle))
 					{
 						g.DrawLine(penBlue, x, 0, x, 512 * zoom);
 					}
@@ -293,9 +293,9 @@ namespace WLEditor
 		IEnumerable<Point> GetVisibleSectors(Rectangle clipRectangle)
 		{
 			clipRectangle = GetClipRectangle(clipRectangle, 256 * zoom);
-			for(int y = clipRectangle.Top ; y < clipRectangle.Bottom ; y++)
+			for (int y = clipRectangle.Top ; y < clipRectangle.Bottom ; y++)
 			{
-				for(int x = clipRectangle.Left ; x < clipRectangle.Right ; x++)
+				for (int x = clipRectangle.Left ; x < clipRectangle.Right ; x++)
 				{
 					yield return new Point(x, y);
 				}
@@ -312,7 +312,7 @@ namespace WLEditor
 		string GetWarpName(int sectorTarget)
 		{
 			string warpText;
-			switch(sectorTarget)
+			switch (sectorTarget)
 			{
 				case 32:
 					warpText = "EXIT MAP";
@@ -333,7 +333,7 @@ namespace WLEditor
 
 		public void InvalidateTile(int tileIndex)
 		{
-			using(Region r = new Region(new Rectangle((tileIndex % 256) * 16 * zoom, (tileIndex / 256) * 16 * zoom, 16 * zoom, 16 * zoom)))
+			using (Region r = new Region(new Rectangle((tileIndex % 256) * 16 * zoom, (tileIndex / 256) * 16 * zoom, 16 * zoom, 16 * zoom)))
 			{
 				invalidTiles[tileIndex] = false;
 				Invalidate(r);
@@ -342,12 +342,12 @@ namespace WLEditor
 
 		public void InvalidateAnimatedTiles()
 		{
-			using(Region r = new Region(Rectangle.Empty))
+			using (Region r = new Region(Rectangle.Empty))
 			{
 				for (int tileIndex = 0 ; tileIndex < 8192 ; tileIndex++)
 				{
 					byte data = Level.LevelData[tileIndex + 0x1000];
-					if(Level.Animated16x16Tiles[data])
+					if (Level.Animated16x16Tiles[data])
 					{
 						r.Union(new Rectangle((tileIndex % 256) * 16 * zoom, (tileIndex / 256) * 16 * zoom, 16 * zoom, 16 * zoom));
 						invalidTiles[tileIndex] = false;
@@ -360,10 +360,10 @@ namespace WLEditor
 
 		void AddEnemyRegion(Region region, int tileIndex, int enemyIndex)
 		{
-			if(enemyIndex >= 1 && enemyIndex <= 6)
+			if (enemyIndex >= 1 && enemyIndex <= 6)
 			{
 				Rectangle enemyRect = Sprite.LoadedSprites[enemyIndex - 1];
-				if(enemyRect != Rectangle.Empty)
+				if (enemyRect != Rectangle.Empty)
 				{
 					region.Union(new Rectangle(((tileIndex % 256) * 16 + enemyRect.X - 32 + 8) * zoom, ((tileIndex / 256) * 16 + enemyRect.Y - (enemyIndex - 1) * 128 - 104) * zoom, enemyRect.Width * zoom, enemyRect.Height * zoom));
 				}
@@ -372,7 +372,7 @@ namespace WLEditor
 
 		public void InvalidateObject(int tileIndex, int currentObject, int previousObject)
 		{
-			using(Region r = new Region(new Rectangle((tileIndex % 256) * 16 * zoom, (tileIndex / 256) * 16 * zoom, 16 * zoom, 16 * zoom)))
+			using (Region r = new Region(new Rectangle((tileIndex % 256) * 16 * zoom, (tileIndex / 256) * 16 * zoom, 16 * zoom, 16 * zoom)))
 			{
 				AddEnemyRegion(r, tileIndex, previousObject);
 				AddEnemyRegion(r, tileIndex, currentObject);
@@ -382,13 +382,13 @@ namespace WLEditor
 
 		void OnMouseEvent(MouseEventArgs e, TileEventStatus status)
 		{
-			if(e.Button == MouseButtons.Left || e.Button == MouseButtons.Right)
+			if (e.Button == MouseButtons.Left || e.Button == MouseButtons.Right)
 			{
 				int tilePosX = e.Location.X / 16 / zoom;
 				int tilePosY = e.Location.Y / 16 / zoom;
 				int tileIndex = tilePosX + tilePosY * 256;
 
-				if(tileIndex != currentTileIndex)
+				if (tileIndex != currentTileIndex)
 				{
 					currentTileIndex = tileIndex;
 					if (TileMouseDown != null)
@@ -397,7 +397,7 @@ namespace WLEditor
 					}
 				}
 			}
-			else if(e.Button == MouseButtons.Middle)
+			else if (e.Button == MouseButtons.Middle)
 			{
 				Point coordinates = e.Location;
 				int sector = e.Location.X / 256 / zoom + (e.Location.Y / 256 / zoom) * 16;
@@ -420,7 +420,7 @@ namespace WLEditor
 						break;
 				}
 
-				if(sector != CurrentSector)
+				if (sector != CurrentSector)
 				{
 					CurrentSector = sector;
 					if (SectorChanged != null)

@@ -82,9 +82,9 @@ namespace WLEditor
 					writer.Write(end.X - start.X + 1); //width
 					writer.Write(end.Y - start.Y + 1); //height
 
-					for(int y = start.Y ; y <= end.Y ; y++)
+					for (int y = start.Y ; y <= end.Y ; y++)
 					{
-						for(int x = start.X ; x <= end.X ; x++)
+						for (int x = start.X ; x <= end.X ; x++)
 						{
 							var item = getTileAt(x, y);
 							writer.Write(item.Index);
@@ -110,9 +110,9 @@ namespace WLEditor
 				Point start, end;
 				GetSelection(out start, out end);
 
-				for(int y = start.Y ; y <= end.Y ; y++)
+				for (int y = start.Y ; y <= end.Y ; y++)
 				{
-					for(int x = start.X ; x <= end.X ; x++)
+					for (int x = start.X ; x <= end.X ; x++)
 					{
 						int previous = setTileAt(x, y, emptyTile);
 						if (previous != emptyTile)
@@ -275,7 +275,7 @@ namespace WLEditor
 			if (source.Count > 0)
 			{
 				var changes = new List<SelectionChange>();
-				foreach(var tile in source.Last())
+				foreach (var tile in source.Last())
 				{
 					changes.Add(new SelectionChange { X = tile.X, Y = tile.Y, Data = getTileAt(tile.X, tile.Y) } );
 					setTileAt(tile.X, tile.Y, tile.Data);

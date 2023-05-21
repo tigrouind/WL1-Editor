@@ -135,9 +135,9 @@ namespace WLEditor
 
 		void ClearAllTiles()
 		{
-			for(int y = 0 ; y < currentMapY ; y++)
+			for (int y = 0 ; y < currentMapY ; y++)
 			{
-				for(int x = 0 ; x < currentMapX ; x++)
+				for (int x = 0 ; x < currentMapX ; x++)
 				{
 					previousWorldTiles[x + y * 32] = -1;
 				}
@@ -147,7 +147,7 @@ namespace WLEditor
 		void LoadWorldCombobox()
 		{
 			WorldComboBox.Items.Clear();
-			for(int i = 0 ; i < worldData.Length ;i++)
+			for (int i = 0 ; i < worldData.Length ;i++)
 			{
 				WorldComboBox.Items.Add(worldData[i]);
 			}
@@ -233,7 +233,7 @@ namespace WLEditor
 
 		void PictureBox1Paint(object sender, PaintEventArgs e)
 		{
-			if(!DesignMode)
+			if (!DesignMode)
 			{
 				RenderTiles();
 
@@ -262,7 +262,7 @@ namespace WLEditor
 
 		void PictureBox2Paint(object sender, PaintEventArgs e)
 		{
-			if(!DesignMode)
+			if (!DesignMode)
 			{
 				e.Graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
 				e.Graphics.PixelOffsetMode = PixelOffsetMode.Half;
@@ -314,7 +314,7 @@ namespace WLEditor
 			}
 
 			ProcessCommandKey(this, args);
-			if(args.Handled)
+			if (args.Handled)
 			{
 				return true;
 			}
@@ -334,7 +334,7 @@ namespace WLEditor
 				return true;
 			}
 
-			switch(keyData)
+			switch (keyData)
 			{
 				case Keys.E:
 				case Keys.P:
@@ -400,9 +400,9 @@ namespace WLEditor
 
 		void RenderTiles()
 		{
-			for(int y = 0 ; y < currentMapY ; y++)
+			for (int y = 0 ; y < currentMapY ; y++)
 			{
-				for(int x = 0 ; x < currentMapX ; x++)
+				for (int x = 0 ; x < currentMapX ; x++)
 				{
 					byte tileIndex = (byte)(worldTiles[x + y * 32] ^ 0x80);
 					int previousTileIndex = previousWorldTiles[x + y * 32];
@@ -418,7 +418,7 @@ namespace WLEditor
 		void Dump8x8Tile(Point dest, int tileIndex, DirectBitmap bitmap)
 		{
 			Point source = new Point((tileIndex % 16) * 8, (tileIndex / 16) * 8);
-			for(int y = 0 ; y < 8 ; y++)
+			for (int y = 0 ; y < 8 ; y++)
 			{
 				Array.Copy(tilesWorld8x8.Bits, source.X + (source.Y + y) * tilesWorld8x8.Width,
 						bitmap.Bits, dest.X + (dest.Y + y) * bitmap.Width, 8);
@@ -508,7 +508,7 @@ namespace WLEditor
 				{
 					selection.StartSelection(e.TileX, e.TileY);
 				}
-				else if(e.Status == TileEventStatus.MouseMove)
+				else if (e.Status == TileEventStatus.MouseMove)
 				{
 					selection.SetSelection(e.TileX, e.TileY);
 				}
@@ -971,9 +971,9 @@ namespace WLEditor
 
 		void InvalidateAnimatedTiles()
 		{
-			for(int y = 0 ; y < currentMapY ; y++)
+			for (int y = 0 ; y < currentMapY ; y++)
 			{
-				for(int x = 0 ; x < currentMapX ; x++)
+				for (int x = 0 ; x < currentMapX ; x++)
 				{
 					var previousTile = previousWorldTiles[x + y * 32];
 					if (invalidTiles[previousTile])
@@ -988,7 +988,7 @@ namespace WLEditor
 		{
 			if (currentWorld == 7 && timerTicks != 0)
 			{
-				for(int y = 0 ; y < 144 ; y++)
+				for (int y = 0 ; y < 144 ; y++)
 				{
 					int offset = y * 256;
 					int scroll = y < 54 ? Map.GetScroll(rom, animationIndex + y) : 0;

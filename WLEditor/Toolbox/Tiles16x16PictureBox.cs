@@ -18,7 +18,7 @@ namespace WLEditor
 
 		protected override void OnPaint(PaintEventArgs e)
 		{
-			if(Level.LevelData != null && !DesignMode)
+			if (Level.LevelData != null && !DesignMode)
 			{
 				using (Graphics g = Graphics.FromImage(tiles.Bitmap))
 				{
@@ -45,13 +45,13 @@ namespace WLEditor
 		{
 			using (Brush brush = new SolidBrush(Color.FromArgb(64, 0, 0, 0)))
 			{
-				for(int j = 0 ; j < 16 ; j++)
+				for (int j = 0 ; j < 16 ; j++)
 				{
-					for(int i = 0 ; i < 8 ; i++)
+					for (int i = 0 ; i < 8 ; i++)
 					{
 						Rectangle destRect = new Rectangle(i * 16, j * 16, 16, 16);
 
-						if(destRect.IntersectsWith(clipRectangle))
+						if (destRect.IntersectsWith(clipRectangle))
 						{
 							int tileIndex = i + j * 8;
 							tileIndex = Level.SwitchTile(tileIndex, SwitchMode);
@@ -59,7 +59,7 @@ namespace WLEditor
 							if (ShowColliders)
 							{
 								int specialTile = Level.IsSpecialTile(tileIndex);
-								if(specialTile != -1)
+								if (specialTile != -1)
 								{
 									g.FillRectangle(LevelPictureBox.TransparentBrushes[specialTile], destRect);
 								}

@@ -60,7 +60,7 @@ namespace WLEditor
 		static void RLEDecompressTiles(Rom rom, int tilesdata, byte[] decompressed)
 		{
 			int position = 0;
-			while(position < decompressed.Length)
+			while (position < decompressed.Length)
 			{
 				byte rep = rom.ReadByte(tilesdata++);
 				if (rep == 0)
@@ -68,10 +68,10 @@ namespace WLEditor
 					break;
 				}
 
-				if((rep & 0x80) != 0)
+				if ((rep & 0x80) != 0)
 				{
 					rep = (byte)(rep & 0x7F);
-					for(int j = 0 ; j < rep && position < decompressed.Length ; j++)
+					for (int j = 0 ; j < rep && position < decompressed.Length ; j++)
 					{
 						decompressed[position++] = rom.ReadByte(tilesdata++);
 					}
@@ -79,7 +79,7 @@ namespace WLEditor
 				else
 				{
 					byte data = rom.ReadByte(tilesdata++);
-					for(int j = 0 ; j < rep && position < decompressed.Length ; j++)
+					for (int j = 0 ; j < rep && position < decompressed.Length ; j++)
 					{
 						decompressed[position++] = data;
 					}
@@ -91,22 +91,22 @@ namespace WLEditor
 		{
 			List<byte> result = new List<byte>();
 			int current = 0;
-			while(current < tilesdata.Length)
+			while (current < tilesdata.Length)
 			{
 				byte repeat = 1;
 				byte data = tilesdata[current++];
-				while(current < tilesdata.Length && tilesdata[current] == data && repeat < 127)
+				while (current < tilesdata.Length && tilesdata[current] == data && repeat < 127)
 				{
 					current++;
 					repeat++;
 				}
 
-				if(repeat > 2)
+				if (repeat > 2)
 				{
 					if (result.Count > 0)
 					{
 						yield return (byte)(0x80 | result.Count);
-						foreach(byte val in result)
+						foreach (byte val in result)
 						{
 							yield return val;
 						}
@@ -118,14 +118,14 @@ namespace WLEditor
 				}
 				else
 				{
-					for(int i = 0 ; i < repeat ; i++)
+					for (int i = 0 ; i < repeat ; i++)
 					{
 						result.Add(data);
 
 						if (result.Count == 127)
 						{
 							yield return (byte)(0x80 | result.Count);
-							foreach(byte val in result)
+							foreach (byte val in result)
 							{
 								yield return val;
 							}
@@ -138,7 +138,7 @@ namespace WLEditor
 			if (result.Count > 0)
 			{
 				yield return (byte)(0x80 | result.Count);
-				foreach(byte val in result)
+				foreach (byte val in result)
 				{
 					yield return val;
 				}
@@ -170,7 +170,7 @@ namespace WLEditor
 
 		static IEnumerable<TResult> Zip<T, TResult>(IEnumerable<T> source, Func<T, TResult> first, Func<T, TResult> second)
 		{
-			foreach(var item in source)
+			foreach (var item in source)
 			{
 				yield return first(item);
 				yield return second(item);
@@ -229,12 +229,12 @@ namespace WLEditor
 				var eventItem = new List<KeyValuePair<int, byte>>();
 
 				int position = 0;
-				while(true)
+				while (true)
 				{
 					byte tileIndex = rom.ReadByte(tileIndexAddress + position);
 					int tilePosition = rom.ReadWordSwap(tilePositionAddress + position * 2);
 
-					if(tileIndex == 0xFF)
+					if (tileIndex == 0xFF)
 					{
 						break;
 					}
@@ -262,12 +262,12 @@ namespace WLEditor
 			rom.SetBank(8);
 			int position = rom.ReadWord(eventPointers[0][0] + eventAddressOffset[0, 0]);
 
-			for(int i = 0 ; i < events.Length; i++)
+			for (int i = 0 ; i < events.Length; i++)
 			{
 				var worldEvent = events[i];
 
 				//fix pointers
-				for(int j = 0 ; j < eventPointers.GetLength(0) ; j++)
+				for (int j = 0 ; j < eventPointers.GetLength(0) ; j++)
 				{
 					var item = eventPointers[j];
 					if (i < item.Length && item[i] != 0)
@@ -277,14 +277,14 @@ namespace WLEditor
 				}
 
 				//tile
-				foreach(var item in worldEvent)
+				foreach (var item in worldEvent)
 				{
 					rom.WriteByte(position++, item.Value);
 				}
 				rom.WriteByte(position++, 0xFF);
 
 				//fix pointers
-				for(int j = 0 ; j < eventPointers.GetLength(0) ; j++)
+				for (int j = 0 ; j < eventPointers.GetLength(0) ; j++)
 				{
 					var item = eventPointers[j];
 					if (i < item.Length && item[i] != 0)
@@ -294,7 +294,7 @@ namespace WLEditor
 				}
 
 				//position
-				foreach(var item in worldEvent)
+				foreach (var item in worldEvent)
 				{
 					rom.WriteWordSwap(position, (ushort)(item.Key + 0x9800));
 					position += 2;
@@ -315,7 +315,7 @@ namespace WLEditor
 			var result = new WorldPath[overWorld ? 8 : 43];
 
 			rom.SetBank(8);
-			for(int level = 0 ; level < result.Length ; level++)
+			for (int level = 0 ; level < result.Length ; level++)
 			{
 				int levelPos = rom.ReadWord((overWorld ? 0x45BA : 0x556D) + level * 2);
 				int posX = rom.ReadByte(levelPos + 1) - 12;
@@ -333,7 +333,7 @@ namespace WLEditor
 
 				var dirs = new WorldPathDirection[4];
 
-				for(int dir = 0 ; dir < 4 ; dir++)
+				for (int dir = 0 ; dir < 4 ; dir++)
 				{
 					var direction = new WorldPathDirection
 					{
@@ -465,7 +465,7 @@ namespace WLEditor
 							rom.WriteWord(positionDirHeader, (ushort)positionPath);
 							positionDirHeader += 2;
 
-							foreach(var path in direction.Path)
+							foreach (var path in direction.Path)
 							{
 								rom.WriteByte(positionPath++, (byte)directions[path.Direction]);
 								rom.WriteByte(positionPath++, (byte)path.Steps);
@@ -502,7 +502,7 @@ namespace WLEditor
 			SaveProgression(rom, pathData, overWorld);
 			SaveLevelsPosition(rom, pathData, overWorld);
 
-			if(overWorld)
+			if (overWorld)
 			{
 				SaveFlags(rom, pathData);
 			}
@@ -669,7 +669,7 @@ namespace WLEditor
 			rom.SetBank(8);
 			if (world == 7)
 			{
-				for(int flag = 0 ; flag < 6 ; flag++)
+				for (int flag = 0 ; flag < 6 ; flag++)
 				{
 					var nextDir = SearchProgressNextDirection(pathData, levels, 1 << flag);
 					rom.WriteByte(overWorldNextDir[flag], nextDir);
@@ -677,7 +677,7 @@ namespace WLEditor
 			}
 			else
 			{
-				for(int flag = 0 ; flag < 8 ; flag++)
+				for (int flag = 0 ; flag < 8 ; flag++)
 				{
 					var nextDir = SearchProgressNextDirection(pathData, levels, 1 << flag);
 					rom.WriteByte(0x735D + 16 * world + flag + 8, nextDir);
@@ -689,7 +689,7 @@ namespace WLEditor
 		{
 			foreach (int level in levels)
 			{
-				for(int dir = 0 ; dir < 4 ; dir++)
+				for (int dir = 0 ; dir < 4 ; dir++)
 				{
 					var pathDir = pathData[level].Directions[dir];
 					if (pathDir.Path.Count > 0 && pathDir.Progress == flag)

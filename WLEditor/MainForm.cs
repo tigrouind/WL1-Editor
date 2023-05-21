@@ -97,7 +97,7 @@ namespace WLEditor
 
 		void LoadLevel(bool reloadAll)
 		{
-			if(rom.IsLoaded && levelComboBox.SelectedItem != null)
+			if (rom.IsLoaded && levelComboBox.SelectedItem != null)
 			{
 				Level.DumpLevel(rom, currentCourseId, currentWarp, reloadAll, switchMode, animatedTileIndex, false);
 
@@ -110,9 +110,9 @@ namespace WLEditor
 
 		void LevelComboBoxSelectedIndexChanged(object sender, EventArgs e)
 		{
-			if(!ignoreEvents && levelComboBox.SelectedItem != null)
+			if (!ignoreEvents && levelComboBox.SelectedItem != null)
 			{
-				if(SaveChanges(false))
+				if (SaveChanges(false))
 				{
 					currentWarp = -1;
 					levelPictureBox.CurrentSector = -1;
@@ -185,7 +185,7 @@ namespace WLEditor
 			levelComboBox.Items.Clear();
 
 			var items = new List<ComboboxItem<int>>();
-			foreach(var levelInfo in Level.GetCourseIds(rom).OrderBy(x => x.Value))
+			foreach (var levelInfo in Level.GetCourseIds(rom).OrderBy(x => x.Value))
 			{
 				var item = new ComboboxItem<int>(levelInfo.Key, string.Format("{0:D2} {1}", levelInfo.Value, LevelNames[levelInfo.Key]));
 				items.Add(item);
@@ -268,7 +268,7 @@ namespace WLEditor
 				if (hasChanges)
 				{
 					string message;
-					if(!Level.SaveChanges(rom, currentCourseId, out message))
+					if (!Level.SaveChanges(rom, currentCourseId, out message))
 					{
 						MessageBox.Show(message, Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
 						return false;
@@ -280,7 +280,7 @@ namespace WLEditor
 					return false;
 				}
 
-				if(saveFile)
+				if (saveFile)
 				{
 					rom.FixCRC();
 					rom.Save(romFilePath);
@@ -293,10 +293,10 @@ namespace WLEditor
 
 		bool AskForSavingChanges()
 		{
-			if(hasChanges)
+			if (hasChanges)
 			{
 				DialogResult result = MessageBox.Show("Save pending changes ?", Text, MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
-				switch(result)
+				switch (result)
 				{
 					case DialogResult.Yes:
 						return SaveChanges(true);
@@ -384,7 +384,7 @@ namespace WLEditor
 
 		void ToolBoxProcessCommandKey(object sender, KeyEventArgs e)
 		{
-			if(DispatchCommandKey(e.KeyData))
+			if (DispatchCommandKey(e.KeyData))
 			{
 				e.Handled = true;
 			}
@@ -392,7 +392,7 @@ namespace WLEditor
 
 		protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
 		{
-			if(DispatchCommandKey(keyData))
+			if (DispatchCommandKey(keyData))
 			{
 				return true;
 			}
@@ -402,7 +402,7 @@ namespace WLEditor
 
 		bool DispatchCommandKey(Keys keyData)
 		{
-			switch(keyData)
+			switch (keyData)
 			{
 				case Keys.Control | Keys.Add:
 				case Keys.Control | Keys.Oemplus:
@@ -473,7 +473,7 @@ namespace WLEditor
 			ToolStripMenuItem toolStrip = GetAllMenuItems(menuStrip1.Items)
 				.FirstOrDefault(x => x.ShortcutKeys == keyData);
 
-			if(toolStrip != null)
+			if (toolStrip != null)
 			{
 				toolStrip.PerformClick();
 				return true;
@@ -484,18 +484,18 @@ namespace WLEditor
 
 		IEnumerable<ToolStripMenuItem> GetAllMenuItems(ToolStripItemCollection items)
 		{
-			foreach(ToolStripItem item in items)
+			foreach (ToolStripItem item in items)
 			{
 				ToolStripMenuItem toolStrip = item as ToolStripMenuItem;
-				if(toolStrip != null)
+				if (toolStrip != null)
 				{
 					yield return toolStrip;
 				}
 
 				ToolStripDropDownItem toolStripDropDown = item as ToolStripDropDownItem;
-				if(toolStripDropDown != null)
+				if (toolStripDropDown != null)
 				{
-					foreach(var child in GetAllMenuItems(toolStripDropDown.DropDownItems))
+					foreach (var child in GetAllMenuItems(toolStripDropDown.DropDownItems))
 					{
 						yield return child;
 					}
@@ -517,11 +517,11 @@ namespace WLEditor
 		{
 			if (Control.ModifierKeys == Keys.Control)
 			{
-				if(e.Delta > 0 && zoom < 4)
+				if (e.Delta > 0 && zoom < 4)
 				{
 					SetZoomLevel(zoom + 1);
 				}
-				else if(e.Delta < 0 && zoom > 1)
+				else if (e.Delta < 0 && zoom > 1)
 				{
 					SetZoomLevel(zoom - 1);
 				}
@@ -552,7 +552,7 @@ namespace WLEditor
 
 		void LevelPictureBoxTileMouseDown(object sender, TileEventArgs e)
 		{
-			if(toolboxForm.Visible)
+			if (toolboxForm.Visible)
 			{
 				if (e.Status == TileEventStatus.MouseDown)
 				{
@@ -568,11 +568,11 @@ namespace WLEditor
 
 					if (e.Button == MouseButtons.Right)
 					{
-						if(selectedPanelIndex == 0)
+						if (selectedPanelIndex == 0)
 						{
 							UpdateTile(tileIndex, currentTile);
 						}
-						else if(levelPictureBox.ShowObjects && selectedPanelIndex == 2)
+						else if (levelPictureBox.ShowObjects && selectedPanelIndex == 2)
 						{
 							UpdateObject(tileIndex, currentObject);
 						}
@@ -605,7 +605,7 @@ namespace WLEditor
 		void UpdateTile(int tileIndex, int currentTile)
 		{
 			int previousTile = Level.LevelData[tileIndex + 0x1000];
-			if(previousTile != currentTile)
+			if (previousTile != currentTile)
 			{
 				levelPictureBox.AddChange(tileIndex % 256, tileIndex / 256);
 				Level.LevelData[tileIndex + 0x1000] = (byte)currentTile;
@@ -617,7 +617,7 @@ namespace WLEditor
 		void UpdateObject(int tileIndex, int currentObject)
 		{
 			int previousObject = Level.ObjectsData[tileIndex];
-			if(previousObject != currentObject)
+			if (previousObject != currentObject)
 			{
 				levelPictureBox.AddChange(tileIndex % 256, tileIndex / 256);
 				Level.ObjectsData[tileIndex] = (byte)currentObject;
@@ -631,7 +631,7 @@ namespace WLEditor
 		void LevelPictureBoxSectorChanged(object sender, EventArgs e)
 		{
 			int warpTarget = Sector.SearchWarp(rom, currentCourseId, levelPictureBox.CurrentSector);
-			if(warpTarget != currentWarp)
+			if (warpTarget != currentWarp)
 			{
 				currentWarp = warpTarget;
 				LoadLevel(false);
@@ -646,12 +646,12 @@ namespace WLEditor
 
 		void TimerTick(object sender, EventArgs e)
 		{
-			if(rom.IsLoaded)
+			if (rom.IsLoaded)
 			{
 				timerTicks++;
 				if (levelComboBox.SelectedItem != null && Level.AnimatedTilesMask != 0)
 				{
-					if((timerTicks & (Level.AnimatedTilesMask >> 2)) == 0)
+					if ((timerTicks & (Level.AnimatedTilesMask >> 2)) == 0)
 					{
 						animatedTileIndex = (animatedTileIndex + 1) % 4;
 						RefreshAnimatedTiles();
@@ -668,9 +668,9 @@ namespace WLEditor
 
 			//redraw
 			levelPictureBox.InvalidateAnimatedTiles();
-			if(toolboxForm.Visible)
+			if (toolboxForm.Visible)
 			{
-				switch(toolboxForm.SelectedPanelIndex)
+				switch (toolboxForm.SelectedPanelIndex)
 				{
 					case 0: //16x16 tiles
 					case 1: //8x8 tiles

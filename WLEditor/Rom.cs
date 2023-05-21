@@ -24,7 +24,7 @@ namespace WLEditor
 
 		public byte ReadByte(int position)
 		{
-			if(position < 0x4000)
+			if (position < 0x4000)
 			{
 				return data[position];
 			}
@@ -34,7 +34,7 @@ namespace WLEditor
 
 		public void WriteByte(int position, byte value)
 		{
-			if(position < 0x4000)
+			if (position < 0x4000)
 			{
 				data[position] = value;
 			}
@@ -46,7 +46,7 @@ namespace WLEditor
 
 		public void WriteBytes(int position, params byte[] data)
 		{
-			for(int i = 0 ; i < data.Length ; i++)
+			for (int i = 0 ; i < data.Length ; i++)
 			{
 				WriteByte(position + i, data[i]);
 			}
@@ -76,7 +76,7 @@ namespace WLEditor
 
 		public void ReadBytes(int position, int size, byte[] result)
 		{
-			for(int i = 0 ; i < size ; i++)
+			for (int i = 0 ; i < size ; i++)
 			{
 				result[i] = ReadByte(position + i);
 			}
@@ -116,7 +116,7 @@ namespace WLEditor
 			ushort globalCRC = 0;
 			for (int i = 0 ; i < data.Length ; i++)
 			{
-				if(i != 0x14e && i != 0x14f) //skip CRC itself
+				if (i != 0x14e && i != 0x14f) //skip CRC itself
 				{
 					unchecked
 					{
@@ -145,7 +145,7 @@ namespace WLEditor
 		{
 			get
 			{
-				if(data.Length >= 0x150) //header size
+				if (data.Length >= 0x150) //header size
 				{
 					return Encoding.ASCII.GetString(data, 0x134, 16).TrimEnd('\0');
 				}

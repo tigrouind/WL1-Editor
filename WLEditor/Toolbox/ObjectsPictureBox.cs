@@ -15,7 +15,7 @@ namespace WLEditor
 
 		protected override void OnPaint(PaintEventArgs e)
 		{
-			if(Level.LevelData != null && !DesignMode)
+			if (Level.LevelData != null && !DesignMode)
 			{
 				StringFormat format = new StringFormat();
 				format.LineAlignment = StringAlignment.Center;
@@ -29,7 +29,7 @@ namespace WLEditor
 					e.Graphics.PixelOffsetMode = PixelOffsetMode.Half;
 					e.Graphics.FillRectangle(LevelPictureBox.EnemyBrush, 0, 0, Width, Height);
 
-					for(int index = 0 ; index < 16 ; index++)
+					for (int index = 0 ; index < 16 ; index++)
 					{
 						DrawTile(e.Graphics, e.ClipRectangle, pen, font, format, index);
 					}
@@ -52,9 +52,9 @@ namespace WLEditor
 					g.DrawLine(pen, (x + 8) * zoom, (y + 8) * zoom, (x + 24) * zoom, (y + 24) * zoom);
 					g.DrawLine(pen, (x + 24) * zoom, (y + 8) * zoom, (x + 8) * zoom, (y + 24) * zoom);
 				}
-				if(index >= 1 && index <= 6) //enemy
+				if (index >= 1 && index <= 6) //enemy
 				{
-					if(Sprite.LoadedSprites[index - 1] != Rectangle.Empty)
+					if (Sprite.LoadedSprites[index - 1] != Rectangle.Empty)
 					{
 						Rectangle enemyRect = Sprite.LoadedSprites[index - 1];
 						g.DrawImage(Sprite.TilesEnemies.Bitmap, destRect, new Rectangle(enemyRect.X - 16 + enemyRect.Width / 2, enemyRect.Y - 16 + enemyRect.Height / 2, 32, 32), GraphicsUnit.Pixel);
