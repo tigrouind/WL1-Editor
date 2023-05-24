@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="3.5" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build">
+<Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build">
   <PropertyGroup>
     <ProjectGuid>{9AF489D5-BCAC-487E-83AE-4A3E0CBDD1CB}</ProjectGuid>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -7,11 +7,16 @@
     <OutputType>WinExe</OutputType>
     <RootNamespace>WLEditor</RootNamespace>
     <AssemblyName>WLEditor</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <ApplicationIcon>icon32x32.ico</ApplicationIcon>
     <NoWin32Manifest>False</NoWin32Manifest>
     <TargetFrameworkProfile />
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>3.5</OldToolsVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Platform)' == 'AnyCPU' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -32,6 +37,14 @@
     <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
     <DefineConstants>TRACE</DefineConstants>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="System" />
@@ -46,15 +59,21 @@
     <Compile Include="DirectBitmap.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Level.cs" />
-    <Compile Include="LevelPictureBox.cs" />
-    <Compile Include="MainForm.cs" />
+    <Compile Include="LevelPictureBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MainForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Overworld\ChangeEnum.cs" />
     <Compile Include="Overworld\EventForm.cs" />
     <Compile Include="Overworld\Map.cs" />
-    <Compile Include="Overworld\OverworldForm.cs" />
+    <Compile Include="Overworld\OverworldForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Overworld\OverworldForm.Designer.cs">
       <DependentUpon>OverworldForm.cs</DependentUpon>
     </Compile>
@@ -62,12 +81,16 @@
     <Compile Include="Overworld\WorldPath\WorldPath.cs" />
     <Compile Include="Overworld\WorldPath\WorldPathDirection.cs" />
     <Compile Include="Overworld\WorldPath\WorldPathSegment.cs" />
-    <Compile Include="PanelUnscrollable.cs" />
+    <Compile Include="PanelUnscrollable.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Rom.cs" />
     <Compile Include="Sector\Sector.cs" />
-    <Compile Include="Sector\SectorForm.cs" />
+    <Compile Include="Sector\SectorForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Sector\SectorForm.Designer.cs">
       <DependentUpon>SectorForm.cs</DependentUpon>
     </Compile>
@@ -78,10 +101,18 @@
     <Compile Include="Sprite.cs" />
     <Compile Include="TileEventArgs.cs" />
     <Compile Include="TileEventStatus.cs" />
-    <Compile Include="Toolbox\ObjectsPictureBox.cs" />
-    <Compile Include="Toolbox\Tiles16x16PictureBox.cs" />
-    <Compile Include="Toolbox\Tiles8x8PictureBox.cs" />
-    <Compile Include="Toolbox\ToolboxForm.cs" />
+    <Compile Include="Toolbox\ObjectsPictureBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Toolbox\Tiles16x16PictureBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Toolbox\Tiles8x8PictureBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Toolbox\ToolboxForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Toolbox\ToolboxForm.Designer.cs">
       <DependentUpon>ToolboxForm.cs</DependentUpon>
     </Compile>
@@ -92,7 +123,7 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="MainForm.resx">
-      <DependentUpon>MainForm.Designer.cs</DependentUpon>
+      <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Overworld\OverworldForm.resx">
       <DependentUpon>OverworldForm.Designer.cs</DependentUpon>
@@ -104,12 +135,6 @@
       <DependentUpon>ToolboxForm.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Sector" />
-    <Folder Include="Overworld\WorldPath" />
-    <Folder Include="Selection" />
-    <Folder Include="Overworld" />
-    <Folder Include="Toolbox" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
