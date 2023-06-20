@@ -72,9 +72,9 @@ namespace WLEditor
 			this.comboBox1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.comboBox1.FormattingEnabled = true;
 			this.comboBox1.Items.AddRange(new object[] {
-			"16x16 Tiles ",
-			"8x8 Tiles",
-			"Objects"});
+            "16x16 Tiles ",
+            "8x8 Tiles",
+            "Objects"});
 			this.comboBox1.Location = new System.Drawing.Point(3, 3);
 			this.comboBox1.Name = "comboBox1";
 			this.comboBox1.Size = new System.Drawing.Size(90, 21);

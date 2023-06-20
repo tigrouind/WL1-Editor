@@ -105,7 +105,7 @@ namespace WLEditor
 			// ddlWarp
 			// 
 			this.ddlWarp.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-			| System.Windows.Forms.AnchorStyles.Right)));
+            | System.Windows.Forms.AnchorStyles.Right)));
 			this.ddlWarp.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.ddlWarp.DropDownWidth = 300;
 			this.ddlWarp.FormattingEnabled = true;
@@ -174,7 +174,7 @@ namespace WLEditor
 			// cmdCalculatePos
 			// 
 			this.cmdCalculatePos.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-			| System.Windows.Forms.AnchorStyles.Right)));
+            | System.Windows.Forms.AnchorStyles.Right)));
 			this.cmdCalculatePos.Location = new System.Drawing.Point(201, 133);
 			this.cmdCalculatePos.Name = "cmdCalculatePos";
 			this.cmdCalculatePos.Size = new System.Drawing.Size(111, 47);
@@ -186,7 +186,7 @@ namespace WLEditor
 			// ddlTileSet
 			// 
 			this.ddlTileSet.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-			| System.Windows.Forms.AnchorStyles.Right)));
+            | System.Windows.Forms.AnchorStyles.Right)));
 			this.ddlTileSet.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.ddlTileSet.FormattingEnabled = true;
 			this.ddlTileSet.Location = new System.Drawing.Point(88, 8);
@@ -208,10 +208,10 @@ namespace WLEditor
 			// 
 			this.txbCameraX.Location = new System.Drawing.Point(88, 160);
 			this.txbCameraX.Maximum = new decimal(new int[] {
-			511,
-			0,
-			0,
-			0});
+            511,
+            0,
+            0,
+            0});
 			this.txbCameraX.Name = "txbCameraX";
 			this.txbCameraX.Size = new System.Drawing.Size(50, 20);
 			this.txbCameraX.TabIndex = 37;
@@ -249,10 +249,10 @@ namespace WLEditor
 			// 
 			this.txbCameraY.Location = new System.Drawing.Point(145, 160);
 			this.txbCameraY.Maximum = new decimal(new int[] {
-			63,
-			0,
-			0,
-			0});
+            63,
+            0,
+            0,
+            0});
 			this.txbCameraY.Name = "txbCameraY";
 			this.txbCameraY.Size = new System.Drawing.Size(50, 20);
 			this.txbCameraY.TabIndex = 38;
@@ -261,7 +261,7 @@ namespace WLEditor
 			// ddlCameraType
 			// 
 			this.ddlCameraType.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-			| System.Windows.Forms.AnchorStyles.Right)));
+            | System.Windows.Forms.AnchorStyles.Right)));
 			this.ddlCameraType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.ddlCameraType.FormattingEnabled = true;
 			this.ddlCameraType.Location = new System.Drawing.Point(88, 105);
@@ -274,10 +274,10 @@ namespace WLEditor
 			// 
 			this.txbWarioY.Location = new System.Drawing.Point(145, 133);
 			this.txbWarioY.Maximum = new decimal(new int[] {
-			63,
-			0,
-			0,
-			0});
+            63,
+            0,
+            0,
+            0});
 			this.txbWarioY.Name = "txbWarioY";
 			this.txbWarioY.Size = new System.Drawing.Size(50, 20);
 			this.txbWarioY.TabIndex = 36;
@@ -295,7 +295,7 @@ namespace WLEditor
 			// ddlEnemies
 			// 
 			this.ddlEnemies.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-			| System.Windows.Forms.AnchorStyles.Right)));
+            | System.Windows.Forms.AnchorStyles.Right)));
 			this.ddlEnemies.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.ddlEnemies.DropDownWidth = 380;
 			this.ddlEnemies.FormattingEnabled = true;
@@ -327,10 +327,10 @@ namespace WLEditor
 			// 
 			this.txbWarioX.Location = new System.Drawing.Point(88, 133);
 			this.txbWarioX.Maximum = new decimal(new int[] {
-			511,
-			0,
-			0,
-			0});
+            511,
+            0,
+            0,
+            0});
 			this.txbWarioX.Name = "txbWarioX";
 			this.txbWarioX.Size = new System.Drawing.Size(50, 20);
 			this.txbWarioX.TabIndex = 35;
@@ -339,7 +339,7 @@ namespace WLEditor
 			// ddlAnimationSpeed
 			// 
 			this.ddlAnimationSpeed.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-			| System.Windows.Forms.AnchorStyles.Right)));
+            | System.Windows.Forms.AnchorStyles.Right)));
 			this.ddlAnimationSpeed.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.ddlAnimationSpeed.FormattingEnabled = true;
 			this.ddlAnimationSpeed.Location = new System.Drawing.Point(238, 37);
@@ -361,7 +361,7 @@ namespace WLEditor
 			// ddlMusic
 			// 
 			this.ddlMusic.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-			| System.Windows.Forms.AnchorStyles.Right)));
+            | System.Windows.Forms.AnchorStyles.Right)));
 			this.ddlMusic.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.ddlMusic.DropDownWidth = 300;
 			this.ddlMusic.FormattingEnabled = true;

@@ -81,9 +81,9 @@ namespace WLEditor
 			// 
 			this.menuStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
 			this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-			this.fileToolStripMenuItem,
-			this.viewToolStripMenuItem,
-			this.aboutToolStripMenuItem});
+            this.fileToolStripMenuItem,
+            this.viewToolStripMenuItem,
+            this.aboutToolStripMenuItem});
 			this.menuStrip1.Location = new System.Drawing.Point(0, 0);
 			this.menuStrip1.Name = "menuStrip1";
 			this.menuStrip1.Size = new System.Drawing.Size(1209, 24);
@@ -93,10 +93,10 @@ namespace WLEditor
 			// fileToolStripMenuItem
 			// 
 			this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-			this.loadToolStripMenuItem,
-			this.saveToolStripMenuItem,
-			this.saveAsToolStripMenuItem,
-			this.exitToolStripMenuItem});
+            this.loadToolStripMenuItem,
+            this.saveToolStripMenuItem,
+            this.saveAsToolStripMenuItem,
+            this.exitToolStripMenuItem});
 			this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
 			this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
 			this.fileToolStripMenuItem.Text = "&File";
@@ -123,7 +123,7 @@ namespace WLEditor
 			this.saveAsToolStripMenuItem.Enabled = false;
 			this.saveAsToolStripMenuItem.Name = "saveAsToolStripMenuItem";
 			this.saveAsToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Alt) 
-			| System.Windows.Forms.Keys.S)));
+            | System.Windows.Forms.Keys.S)));
 			this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(186, 22);
 			this.saveAsToolStripMenuItem.Text = "Save As...";
 			this.saveAsToolStripMenuItem.Click += new System.EventHandler(this.SaveAsToolStripMenuItemClick);
@@ -138,14 +138,14 @@ namespace WLEditor
 			// viewToolStripMenuItem
 			// 
 			this.viewToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-			this.toolboxToolStripMenuItem,
-			this.regionsToolStripMenuItem,
-			this.objectsToolStripMenuItem,
-			this.collidersToolStripMenuItem,
-			this.sectorsToolStripMenuItem,
-			this.overworldToolStripMenuItem,
-			this.animationToolStripMenuItem,
-			this.zoomToolStripMenuItem});
+            this.toolboxToolStripMenuItem,
+            this.regionsToolStripMenuItem,
+            this.objectsToolStripMenuItem,
+            this.collidersToolStripMenuItem,
+            this.sectorsToolStripMenuItem,
+            this.overworldToolStripMenuItem,
+            this.animationToolStripMenuItem,
+            this.zoomToolStripMenuItem});
 			this.viewToolStripMenuItem.Name = "viewToolStripMenuItem";
 			this.viewToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
 			this.viewToolStripMenuItem.Text = "&View";
@@ -226,13 +226,13 @@ namespace WLEditor
 			// zoomToolStripMenuItem
 			// 
 			this.zoomToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-			this.zoom100ToolStripMenuItem,
-			this.zoom200ToolStripMenuItem,
-			this.zoom300ToolStripMenuItem,
-			this.zoom400ToolStripMenuItem,
-			this.toolStripMenuItem1,
-			this.zoomInToolStripMenuItem,
-			this.zoomOutToolStripMenuItem});
+            this.zoom100ToolStripMenuItem,
+            this.zoom200ToolStripMenuItem,
+            this.zoom300ToolStripMenuItem,
+            this.zoom400ToolStripMenuItem,
+            this.toolStripMenuItem1,
+            this.zoomInToolStripMenuItem,
+            this.zoomOutToolStripMenuItem});
 			this.zoomToolStripMenuItem.Name = "zoomToolStripMenuItem";
 			this.zoomToolStripMenuItem.Size = new System.Drawing.Size(198, 22);
 			this.zoomToolStripMenuItem.Text = "Zoom";
@@ -339,7 +339,7 @@ namespace WLEditor
 			// statusStrip1
 			// 
 			this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-			this.toolStripStatusLabel1});
+            this.toolStripStatusLabel1});
 			this.statusStrip1.Location = new System.Drawing.Point(0, 540);
 			this.statusStrip1.Name = "statusStrip1";
 			this.statusStrip1.Size = new System.Drawing.Size(4096, 25);
