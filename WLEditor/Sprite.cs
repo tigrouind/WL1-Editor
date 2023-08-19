@@ -67,10 +67,10 @@ namespace WLEditor
 			Level.Dump8x8Tiles(rom, Level.Tiles8x8, 0x4C81, 23, 0, 0x1E, enemyPalette, true);
 
 			rom.SetBank(0x11);
-			Level.Dump8x8Tiles(rom, Level.Tiles8x8, 0x7300, 4, 16+23, 0x1E, enemyPalette, true);
+			Level.Dump8x8Tiles(rom, Level.Tiles8x8, 0x7300, 4, 16 + 23, 0x1E, enemyPalette, true);
 
 			rom.SetBank(0xF);
-			for (int i = 0 ; i < bonusSpriteAddress.Length ; i++)
+			for (int i = 0; i < bonusSpriteAddress.Length; i++)
 			{
 				DumpSprite(rom, 8 + i * 16, 16, bonusSpriteAddress[i], TilesObjects);
 			}
@@ -93,7 +93,7 @@ namespace WLEditor
 			Rectangle rectangle = Rectangle.Empty;
 			int pos = spriteAddress;
 
-			Func<sbyte, sbyte> hflip = x => (sbyte)(horizontalFlip ? ((~(sbyte)x) - 7) : x);
+			sbyte hflip(sbyte x) => (sbyte)(horizontalFlip ? ((~x) - 7) : x);
 
 			pos = rom.ReadWord(pos);
 			while (rom.ReadByte(pos) != 0x80)
@@ -168,12 +168,12 @@ namespace WLEditor
 				getY = y => y;
 			}
 
-			for (int y = 0 ; y < 8 ; y++)
+			for (int y = 0; y < 8; y++)
 			{
 				int src = source.X + (source.Y + getY(y)) * Level.Tiles8x8.Width;
 				int dst = spx + (spy + y) * tilesDest.Width;
 
-				for (int x = 0 ; x < 8 ; x++)
+				for (int x = 0; x < 8; x++)
 				{
 					if (tilesDest.Bits[dst + x] == 0)
 					{
@@ -189,7 +189,7 @@ namespace WLEditor
 		{
 			rom.SetBank(0x7);
 			List<int> enemyIds = new List<int>();
-			for (int i = 0 ; i < 6 ; i++)
+			for (int i = 0; i < 6; i++)
 			{
 				int enemyId = rom.ReadWord(enemyPointer + (i + 1) * 2);
 				enemyId = (enemyId - 0x530F) / 4;
@@ -266,7 +266,7 @@ namespace WLEditor
 
 		static bool MatchPattern(Rom rom, int position, byte[] pattern)
 		{
-			for (int j = 0 ; j < pattern.Length ; j++)
+			for (int j = 0; j < pattern.Length; j++)
 			{
 				byte valueFromRom = rom.ReadByte(position + j);
 				byte valueToCompare = pattern[j];
@@ -285,7 +285,7 @@ namespace WLEditor
 			Array.Clear(TilesEnemies.Bits, 0, TilesEnemies.Bits.Length);
 			Array.Clear(LoadedSprites, 0, LoadedSprites.Length);
 
-			for (int i = 0 ; i < 6 ; i++)
+			for (int i = 0; i < 6; i++)
 			{
 				rom.SetBank(0x7);
 				int enemyId = rom.ReadWord(enemiesIdsPointer + (i + 1) * 2);

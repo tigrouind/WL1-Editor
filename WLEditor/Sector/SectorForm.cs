@@ -1,9 +1,9 @@
+using Microsoft.VisualBasic;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
-using Microsoft.VisualBasic;
 
 namespace WLEditor
 {
@@ -559,7 +559,7 @@ namespace WLEditor
 
 		void LoadWarp()
 		{
-			LoadDropdown(ddlTileSet, new []
+			LoadDropdown(ddlTileSet, new[]
 			{
 				currentWarp.Bank,
 				currentWarp.TileSetB,

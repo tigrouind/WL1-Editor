@@ -140,9 +140,9 @@ namespace WLEditor
 		{
 			clipRectangle = GetClipRectangle(clipRectangle, 16 * zoom);
 
-			for (int j = clipRectangle.Top ; j < clipRectangle.Bottom ; j++)
+			for (int j = clipRectangle.Top; j < clipRectangle.Bottom; j++)
 			{
-				for (int i = clipRectangle.Left ; i < clipRectangle.Right ; i++)
+				for (int i = clipRectangle.Left; i < clipRectangle.Right; i++)
 				{
 					if (!invalidTiles[i + j * 256])
 					{
@@ -171,7 +171,7 @@ namespace WLEditor
 			Point dest = new Point(x * 16, y * 16);
 			Point src = new Point((tileIndex % 8) * 16, (tileIndex / 8) * 16);
 
-			for (int i = 0 ; i < 16 ; i++)
+			for (int i = 0; i < 16; i++)
 			{
 				Array.Copy(Level.Tiles16x16.Bits, src.X + (src.Y + i) * Level.Tiles16x16.Width, levelTiles.Bits, dest.X + (dest.Y + i) * levelTiles.Width, 16);
 			}
@@ -179,9 +179,9 @@ namespace WLEditor
 
 		void DrawObjects(Font font, StringFormat format, PaintEventArgs e, Brush brush)
 		{
-			for (int j = 0 ; j < 32 ; j++)
+			for (int j = 0; j < 32; j++)
 			{
-				for (int i = 0 ; i < 256 ; i++)
+				for (int i = 0; i < 256; i++)
 				{
 					byte data = Level.ObjectsData[i + j * 256];
 					if (data > 0)
@@ -232,7 +232,7 @@ namespace WLEditor
 
 			if ((scroll & 1) == 1)
 			{
-				g.FillRectangle(Brushes.Yellow, ((x+1) * 256 - 6) * zoom, y * 256 * zoom, 6 * zoom, 256 * zoom);
+				g.FillRectangle(Brushes.Yellow, ((x + 1) * 256 - 6) * zoom, y * 256 * zoom, 6 * zoom, 256 * zoom);
 			}
 		}
 
@@ -243,7 +243,7 @@ namespace WLEditor
 				int positionY = new[] { 23, 15, 7 }[ScrollLines - 1];
 				using (Pen pen = new Pen(Color.Yellow, 2.0f * zoom))
 				{
-					pen.DashPattern = new [] { 5.0f, 1.0f };
+					pen.DashPattern = new[] { 5.0f, 1.0f };
 					g.DrawLine(pen, 0, positionY * 16 * zoom, 4096 * zoom, positionY * 16 * zoom);
 					g.DrawLine(pen, 0, (positionY + 9) * 16 * zoom, 4096 * zoom, (positionY + 9) * 16 * zoom);
 				}
@@ -263,7 +263,7 @@ namespace WLEditor
 				string text = GetWarpName(sectorTarget);
 				var result = TextRenderer.MeasureText(text, font);
 
-				g.FillRectangle(Brushes.Blue,  (x * 256 + 20) * zoom, y * 256 * zoom, result.Width, 16 * zoom);
+				g.FillRectangle(Brushes.Blue, (x * 256 + 20) * zoom, y * 256 * zoom, result.Width, 16 * zoom);
 				g.DrawString(text, font, Brushes.White, (x * 256) * zoom + result.Width / 2 + 20 * zoom, (y * 256 + 8) * zoom, format);
 			}
 
@@ -274,9 +274,9 @@ namespace WLEditor
 			//draw sector borders
 			using (Pen penBlue = new Pen(Color.Blue, 2.0f * zoom))
 			{
-				penBlue.DashPattern = new [] { 5.0f, 1.0f };
+				penBlue.DashPattern = new[] { 5.0f, 1.0f };
 
-				for (int i = 1 ; i < 16 ; i++)
+				for (int i = 1; i < 16; i++)
 				{
 					int x = i * 256 * zoom;
 					Rectangle lineRect = new Rectangle(x - zoom, 0, 2 * zoom, 512 * zoom);
@@ -293,9 +293,9 @@ namespace WLEditor
 		IEnumerable<Point> GetVisibleSectors(Rectangle clipRectangle)
 		{
 			clipRectangle = GetClipRectangle(clipRectangle, 256 * zoom);
-			for (int y = clipRectangle.Top ; y < clipRectangle.Bottom ; y++)
+			for (int y = clipRectangle.Top; y < clipRectangle.Bottom; y++)
 			{
-				for (int x = clipRectangle.Left ; x < clipRectangle.Right ; x++)
+				for (int x = clipRectangle.Left; x < clipRectangle.Right; x++)
 				{
 					yield return new Point(x, y);
 				}
@@ -344,7 +344,7 @@ namespace WLEditor
 		{
 			using (Region r = new Region(Rectangle.Empty))
 			{
-				for (int tileIndex = 0 ; tileIndex < 8192 ; tileIndex++)
+				for (int tileIndex = 0; tileIndex < 8192; tileIndex++)
 				{
 					byte data = Level.LevelData[tileIndex + 0x1000];
 					if (Level.Animated16x16Tiles[data])

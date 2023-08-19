@@ -1,5 +1,3 @@
-using System;
-
 namespace WLEditor
 {
 	public class ClipboardData

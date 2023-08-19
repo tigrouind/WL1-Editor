@@ -45,9 +45,9 @@ namespace WLEditor
 		{
 			using (Brush brush = new SolidBrush(Color.FromArgb(64, 0, 0, 0)))
 			{
-				for (int j = 0 ; j < 16 ; j++)
+				for (int j = 0; j < 16; j++)
 				{
-					for (int i = 0 ; i < 8 ; i++)
+					for (int i = 0; i < 8; i++)
 					{
 						Rectangle destRect = new Rectangle(i * 16, j * 16, 16, 16);
 

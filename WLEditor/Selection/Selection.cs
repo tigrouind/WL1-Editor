@@ -82,9 +82,9 @@ namespace WLEditor
 					writer.Write(end.X - start.X + 1); //width
 					writer.Write(end.Y - start.Y + 1); //height
 
-					for (int y = start.Y ; y <= end.Y ; y++)
+					for (int y = start.Y; y <= end.Y; y++)
 					{
-						for (int x = start.X ; x <= end.X ; x++)
+						for (int x = start.X; x <= end.X; x++)
 						{
 							var item = getTileAt(x, y);
 							writer.Write(item.Index);
@@ -110,14 +110,14 @@ namespace WLEditor
 				Point start, end;
 				GetSelection(out start, out end);
 
-				for (int y = start.Y ; y <= end.Y ; y++)
+				for (int y = start.Y; y <= end.Y; y++)
 				{
-					for (int x = start.X ; x <= end.X ; x++)
+					for (int x = start.X; x <= end.X; x++)
 					{
 						int previous = setTileAt(x, y, emptyTile);
 						if (previous != emptyTile)
 						{
-							changes.Add(new SelectionChange { X = x, Y =  y, Data = previous });
+							changes.Add(new SelectionChange { X = x, Y = y, Data = previous });
 						}
 					}
 				}
@@ -164,27 +164,27 @@ namespace WLEditor
 					Point start, end;
 					GetSelection(out start, out end);
 
-					for (int ty = start.Y ; ty <= end.Y ; ty += selectionHeight)
-					for (int tx = start.X ; tx <= end.X ; tx += selectionWidth)
-					foreach (var data in selectionData)
-					{
-						Point dest = new Point
-						{
-							X = (invertX ? start.X - tx + end.X - selectionWidth  + 1 : tx) + data.Index % selectionWidth,
-							Y = (invertY ? start.Y - ty + end.Y - selectionHeight + 1 : ty) + data.Index / selectionWidth
-						};
-
-						if ((dest.X >= start.X && dest.Y >= start.Y && dest.X <= end.X && dest.Y <= end.Y)
-							|| (start.X == end.X && start.Y == end.Y))
-						{
-							int tile = data.Tile;
-							int previous = setTileAt(dest.X, dest.Y, tile);
-							if (previous != tile)
+					for (int ty = start.Y; ty <= end.Y; ty += selectionHeight)
+						for (int tx = start.X; tx <= end.X; tx += selectionWidth)
+							foreach (var data in selectionData)
 							{
-								changes.Add(new SelectionChange { X = dest.X, Y = dest.Y, Data = previous });
+								Point dest = new Point
+								{
+									X = (invertX ? start.X - tx + end.X - selectionWidth + 1 : tx) + data.Index % selectionWidth,
+									Y = (invertY ? start.Y - ty + end.Y - selectionHeight + 1 : ty) + data.Index / selectionWidth
+								};
+
+								if ((dest.X >= start.X && dest.Y >= start.Y && dest.X <= end.X && dest.Y <= end.Y)
+									|| (start.X == end.X && start.Y == end.Y))
+								{
+									int tile = data.Tile;
+									int previous = setTileAt(dest.X, dest.Y, tile);
+									if (previous != tile)
+									{
+										changes.Add(new SelectionChange { X = dest.X, Y = dest.Y, Data = previous });
+									}
+								}
 							}
-						}
-					}
 
 					AddChanges(changes);
 					return changes.Any();
@@ -277,7 +277,7 @@ namespace WLEditor
 				var changes = new List<SelectionChange>();
 				foreach (var tile in source.Last())
 				{
-					changes.Add(new SelectionChange { X = tile.X, Y = tile.Y, Data = getTileAt(tile.X, tile.Y) } );
+					changes.Add(new SelectionChange { X = tile.X, Y = tile.Y, Data = getTileAt(tile.X, tile.Y) });
 					setTileAt(tile.X, tile.Y, tile.Data);
 				}
 

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace WLEditor
+﻿namespace WLEditor
 {
 	public class Warp
 	{

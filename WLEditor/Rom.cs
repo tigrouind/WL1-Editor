@@ -46,7 +46,7 @@ namespace WLEditor
 
 		public void WriteBytes(int position, params byte[] data)
 		{
-			for (int i = 0 ; i < data.Length ; i++)
+			for (int i = 0; i < data.Length; i++)
 			{
 				WriteByte(position + i, data[i]);
 			}
@@ -76,7 +76,7 @@ namespace WLEditor
 
 		public void ReadBytes(int position, int size, byte[] result)
 		{
-			for (int i = 0 ; i < size ; i++)
+			for (int i = 0; i < size; i++)
 			{
 				result[i] = ReadByte(position + i);
 			}
@@ -114,7 +114,7 @@ namespace WLEditor
 		ushort GetGlobalCRC()
 		{
 			ushort globalCRC = 0;
-			for (int i = 0 ; i < data.Length ; i++)
+			for (int i = 0; i < data.Length; i++)
 			{
 				if (i != 0x14e && i != 0x14f) //skip CRC itself
 				{
@@ -135,9 +135,9 @@ namespace WLEditor
 			WriteByte(0x0147, 0x13); //MBC3+RAM+BATTERY
 			WriteByte(0x0148, 0x05); //1MB
 
-			if (data.Length == 512*1024)
+			if (data.Length == 512 * 1024)
 			{
-				Array.Resize(ref data, 1024*1024);
+				Array.Resize(ref data, 1024 * 1024);
 			}
 		}
 

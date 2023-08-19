@@ -342,7 +342,7 @@ namespace WLEditor
 				foreach (var worldEv in worldEvents)
 				{
 					bool selected = worldEv == worldEvent;
-					for (int i = 0 ; i < worldEv.Count ; i++)
+					for (int i = 0; i < worldEv.Count; i++)
 					{
 						var item = worldEv[i];
 						int position = item.Item1;

@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 
 namespace WLEditor
@@ -87,13 +86,13 @@ namespace WLEditor
 			if (warp >= 0x5B7A)
 			{
 				int warioSector = rom.ReadByte(warp);
-				int cameraSector = rom.ReadByte(warp+4);
+				int cameraSector = rom.ReadByte(warp + 4);
 
-				warpInfo.WarioY = rom.ReadByte(warp+1) / 8 + (warioSector / 16) * 32;
-				warpInfo.WarioX = rom.ReadByte(warp+2) / 8 + (warioSector % 16) * 32;
-				warpInfo.CameraY = rom.ReadByte(warp+5) / 8 + (cameraSector / 16) * 32;
-				warpInfo.CameraX = rom.ReadByte(warp+6) / 8 + (cameraSector % 16) * 32;
-				warpInfo.CameraType = rom.ReadByte(warp+7);
+				warpInfo.WarioY = rom.ReadByte(warp + 1) / 8 + (warioSector / 16) * 32;
+				warpInfo.WarioX = rom.ReadByte(warp + 2) / 8 + (warioSector % 16) * 32;
+				warpInfo.CameraY = rom.ReadByte(warp + 5) / 8 + (cameraSector / 16) * 32;
+				warpInfo.CameraX = rom.ReadByte(warp + 6) / 8 + (cameraSector % 16) * 32;
+				warpInfo.CameraType = rom.ReadByte(warp + 7);
 				warpInfo.AnimationSpeed = rom.ReadByte(warp + 9);
 				warpInfo.Palette = rom.ReadByte(warp + 10);
 				warpInfo.Bank = rom.ReadByte(warp + 11);
@@ -137,9 +136,9 @@ namespace WLEditor
 		public static IEnumerable<int> GetWarpUsage(Rom rom)
 		{
 			rom.SetBank(0xC);
-			for (int i = 0 ; i < 43 ;i++)
+			for (int i = 0; i < 43; i++)
 			{
-				for (int j = 0 ; j < 32 ; j++)
+				for (int j = 0; j < 32; j++)
 				{
 					int warp = rom.ReadWord(0x4F30 + i * 64 + j * 2);
 					if (warp >= 0x5B7A)
@@ -178,9 +177,9 @@ namespace WLEditor
 			posX = -1;
 			posY = -1;
 
-			for (int y = 0 ; y < 16 ; y++)
+			for (int y = 0; y < 16; y++)
 			{
-				for (int x = 0 ; x < 16 ; x++)
+				for (int x = 0; x < 16; x++)
 				{
 					int block = Level.LevelData[(x + startX) + (y + startY) * 256 + 0x1000];
 					switch (block)

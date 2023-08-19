@@ -62,21 +62,15 @@ namespace WLEditor
 			PathChanged(this, EventArgs.Empty);
 		}
 
-		WorldPath[] pathData
-		{
-			get
-			{
-				return currentWorld == 8 ? overWorldData : worldData;
-			}
-		}
+		WorldPath[] PathData => currentWorld == 8 ? overWorldData : worldData;
 
 		public bool SavePaths(Rom rom, out string errorMessage)
 		{
-			bool result = Map.SavePaths(rom, pathData, currentWorld == 8, out errorMessage);
+			bool result = Map.SavePaths(rom, PathData, currentWorld == 8, out errorMessage);
 			if (result)
 			{
 				int[] worldIndex = { 0, 0, 1, 5, 2, 3, 4, 6, 7 };
-				Map.SaveProgressNextDirection(rom, pathData, levels[currentWorld], worldIndex[currentWorld]);
+				Map.SaveProgressNextDirection(rom, PathData, levels[currentWorld], worldIndex[currentWorld]);
 
 				if (currentWorld != 8)
 				{
@@ -102,7 +96,7 @@ namespace WLEditor
 		{
 			currentWorld = world;
 			currentLevel = levels[currentWorld][0];
-			currentPath = pathData[currentLevel];
+			currentPath = PathData[currentLevel];
 			currentDirection = null;
 		}
 
@@ -142,7 +136,7 @@ namespace WLEditor
 				currentDirection.Path.Add(new WorldPathSegment
 				{
 					Direction = newDir,
-					Status = GetStatus(newDir, new [] { 0, 14, 12 }[pathMode]),
+					Status = GetStatus(newDir, new[] { 0, 14, 12 }[pathMode]),
 					Steps = gridSnap
 				});
 			}
@@ -191,7 +185,7 @@ namespace WLEditor
 					break;
 
 				case Keys.Down:
-					currentPath.Y = Math.Min(posY + gridSnap, currentMapY - 8);
+					currentPath.Y = Math.Min(posY + gridSnap, CurrentMapY - 8);
 					break;
 
 				case Keys.Left:
@@ -199,7 +193,7 @@ namespace WLEditor
 					break;
 
 				case Keys.Right:
-					currentPath.X = Math.Min(posX + gridSnap, currentMapX - 8);
+					currentPath.X = Math.Min(posX + gridSnap, CurrentMapX - 8);
 					break;
 			}
 
@@ -222,7 +216,7 @@ namespace WLEditor
 			//unbind paths linked to that level
 			foreach (int level in levels[currentWorld])
 			{
-				foreach (var dir in pathData[level].Directions)
+				foreach (var dir in PathData[level].Directions)
 				{
 					if (dir.Next == currentLevel)
 					{
@@ -282,7 +276,7 @@ namespace WLEditor
 			{
 				currentDirection = null;
 				currentLevel = levels[currentWorld][level + 1];
-				currentPath = pathData[currentLevel];
+				currentPath = PathData[currentLevel];
 
 				pathMode = 0;
 				pictureBox.Invalidate();
@@ -296,7 +290,7 @@ namespace WLEditor
 			{
 				currentDirection = null;
 				currentLevel = levels[currentWorld][level - 1];
-				currentPath = pathData[currentLevel];
+				currentPath = PathData[currentLevel];
 
 				pathMode = 0;
 				pictureBox.Invalidate();
@@ -460,7 +454,7 @@ namespace WLEditor
 
 				foreach (var level in levels[currentWorld].OrderBy(x => x == currentLevel))
 				{
-					var item = pathData[level];
+					var item = PathData[level];
 					int posX = item.X;
 					int posY = item.Y;
 
@@ -489,11 +483,10 @@ namespace WLEditor
 				foreach (var dir in currentPath.Directions.Where(x => x.Path.Count > 0 && (x.Next == 0xFD || x.Next == 0xFA || x.Next == 0xF9 || x.Next == 0xF8))
 						.OrderBy(x => x == currentDirection))
 				{
-					int nextX, nextY;
-					GetPathPosition(currentPath, dir, out nextX, out nextY);
+					GetPathPosition(currentPath, dir, out int nextX, out int nextY);
 
-					int exitX = Math.Max(0, Math.Min(nextX, currentMapX - 8));
-					int exitY = Math.Max(0, Math.Min(nextY, currentMapY - 8));
+					int exitX = Math.Max(0, Math.Min(nextX, CurrentMapX - 8));
+					int exitY = Math.Max(0, Math.Min(nextY, CurrentMapY - 8));
 					int[] flags = { 0xFD, 0xFA, 0xF9, 0xF8 };
 
 					using (GraphicsPath path = RoundedRect(new Rectangle(exitX * zoom, exitY * zoom, 8 * zoom, 8 * zoom), zoom * 2))
@@ -502,7 +495,7 @@ namespace WLEditor
 						g.FillPath(Brushes.MediumSeaGreen, path);
 					}
 
-					g.DrawString(new [] { "A", "B", "C", "C" } [Array.IndexOf(flags, dir.Next)], font, Brushes.Black, (exitX + 4) * zoom, (exitY + 4) * zoom, format);
+					g.DrawString(new[] { "A", "B", "C", "C" }[Array.IndexOf(flags, dir.Next)], font, Brushes.Black, (exitX + 4) * zoom, (exitY + 4) * zoom, format);
 				}
 			}
 		}
@@ -544,7 +537,7 @@ namespace WLEditor
 				var miterPoints = GetMitterPoints(points, zoom * 4.0f);
 
 				int n = 0;
-				foreach (var item in colors.GroupByAdjacent(x => x, (x, y) => new { Color = x, Count = y.Count() } ))
+				foreach (var item in colors.GroupByAdjacent(x => x, (x, y) => new { Color = x, Count = y.Count() }))
 				{
 					brush.Color = item.Color;
 					g.FillPolygon(brush, GetLineStrip(miterPoints, n, item.Count + 1).ToArray(), FillMode.Winding);
@@ -556,10 +549,10 @@ namespace WLEditor
 		List<PointF> GetMitterPoints(List<Point> points, float thickness)
 		{
 			var result = new List<PointF>();
-			for (int i = 0 ; i < points.Count ; i++)
+			for (int i = 0; i < points.Count; i++)
 			{
-				Func<PointF> getLineA = () => new PointF(points[i].X - points[i - 1].X, points[i].Y - points[i - 1].Y).Normalized();
-				Func<PointF> getLineB = () => new PointF(points[i + 1].X - points[i].X, points[i + 1].Y - points[i].Y).Normalized();
+				PointF getLineA() => new PointF(points[i].X - points[i - 1].X, points[i].Y - points[i - 1].Y).Normalized();
+				PointF getLineB() => new PointF(points[i + 1].X - points[i].X, points[i + 1].Y - points[i].Y).Normalized();
 
 				PointF lineA = (i == 0) ? getLineB() : getLineA();
 				PointF lineB = (i == points.Count - 1) ? getLineA() : getLineB();
@@ -568,7 +561,7 @@ namespace WLEditor
 				PointF tangent = new PointF(lineA.X + lineB.X, lineA.Y + lineB.Y).Normalized();
 				PointF miter = new PointF(-tangent.Y, tangent.X);
 
-				float length = (thickness * 0.5f) / (normal.X * miter.X + normal.Y * miter.Y);
+				float length = thickness * 0.5f / (normal.X * miter.X + normal.Y * miter.Y);
 				result.Add(new PointF(points[i].X + miter.X * length, points[i].Y + miter.Y * length));
 				result.Add(new PointF(points[i].X - miter.X * length, points[i].Y - miter.Y * length));
 			}
@@ -578,12 +571,12 @@ namespace WLEditor
 
 		IEnumerable<PointF> GetLineStrip(List<PointF> points, int index, int count)
 		{
-			for (int i = 0 ; i < count ; i++)
+			for (int i = 0; i < count; i++)
 			{
 				yield return points[(index + i) * 2];
 			}
 
-			for (int i = count - 1 ; i >= 0 ; i--)
+			for (int i = count - 1; i >= 0; i--)
 			{
 				yield return points[(index + i) * 2 + 1];
 			}
@@ -605,7 +598,7 @@ namespace WLEditor
 					{  0,  8 }
 				};
 
-				for (int dir = 0 ; dir < 4; dir++)
+				for (int dir = 0; dir < 4; dir++)
 				{
 					var dirs = currentPath.Directions[dir];
 					if (dirs.Path.Count > 0 && dirs.Progress != 0xFD)
@@ -642,8 +635,7 @@ namespace WLEditor
 		{
 			foreach (var pos in startPositionData[currentWorld])
 			{
-				int posX, posY;
-				FindExitPosition(pos[2], out posX, out posY);
+				FindExitPosition(pos[2], out int posX, out int posY);
 				Map.SaveStartPosition(rom, posX, posY, FindClosestSide(posX, posY), pos[0], pos[1]);
 			}
 		}
@@ -653,7 +645,7 @@ namespace WLEditor
 			int[] borders = { x, 160 - x, y, 144 - y };
 			int bestSide = -1, min = int.MaxValue;
 
-			for (int i = 0 ; i < borders.Length ; i++)
+			for (int i = 0; i < borders.Length; i++)
 			{
 				if (borders[i] < min)
 				{
@@ -669,7 +661,7 @@ namespace WLEditor
 		{
 			int level = levels[currentWorld][startLevel];
 
-			var item = pathData[level];
+			var item = PathData[level];
 			var dir = item.Directions.FirstOrDefault(x => x.Path.Count > 0 && (x.Next == 0xFD || x.Next == 0xFA || x.Next == 0xF9 || x.Next == 0xF8));
 			if (dir != null)
 			{
@@ -687,19 +679,17 @@ namespace WLEditor
 			var levelPositions = new Dictionary<int, int>();
 			foreach (var level in levels[currentWorld])
 			{
-				levelPositions[pathData[level].X + pathData[level].Y * 256] = level;
+				levelPositions[PathData[level].X + PathData[level].Y * 256] = level;
 			}
 
 			foreach (var level in levels[currentWorld])
 			{
-				var item = pathData[level];
+				var item = PathData[level];
 				foreach (var dir in item.Directions.Where(x => x.Path.Count > 0))
 				{
-					int posX, posY;
-					GetPathPosition(item, dir, out posX, out posY);
+					GetPathPosition(item, dir, out int posX, out int posY);
 
-					int nextLevel;
-					if (levelPositions.TryGetValue(posX + posY * 256, out nextLevel))
+					if (levelPositions.TryGetValue(posX + posY * 256, out int nextLevel))
 					{
 						if (dir.Next != nextLevel)
 						{
@@ -753,21 +743,9 @@ namespace WLEditor
 			}
 		}
 
-		int currentMapX
-		{
-			get
-			{
-				return currentWorld == 8 ? 256 : 160;
-			}
-		}
+		int CurrentMapX => currentWorld == 8 ? 256 : 160;
 
-		int currentMapY
-		{
-			get
-			{
-				return currentWorld == 8 ? 256 : 144;
-			}
-		}
+		int CurrentMapY => currentWorld == 8 ? 256 : 144;
 
 		#region Reverse
 
@@ -812,7 +790,7 @@ namespace WLEditor
 			if (dir.Path.Count > 0 && dir.Next != 0xFA && dir.Next != 0xF9 && dir.Next != 0xF8 && dir.Next != 0xFD)
 			{
 				int reverseDir = GetReverseDir(dir.Path.Last().Direction);
-				return pathData[dir.Next].Directions[reverseDir];
+				return PathData[dir.Next].Directions[reverseDir];
 			}
 
 			return null;
@@ -833,7 +811,7 @@ namespace WLEditor
 		{
 			GraphicsPath path = new GraphicsPath();
 
-			path.AddLines(new []
+			path.AddLines(new[]
 			{
 				new Point(bounds.Left + offset, bounds.Top),
 				new Point(bounds.Right - offset, bounds.Top),

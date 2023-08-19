@@ -29,7 +29,7 @@ namespace WLEditor
 					e.Graphics.PixelOffsetMode = PixelOffsetMode.Half;
 					e.Graphics.FillRectangle(LevelPictureBox.EnemyBrush, 0, 0, Width, Height);
 
-					for (int index = 0 ; index < 16 ; index++)
+					for (int index = 0; index < 16; index++)
 					{
 						DrawTile(e.Graphics, e.ClipRectangle, pen, font, format, index);
 					}
@@ -66,7 +66,7 @@ namespace WLEditor
 				}
 				else //power up
 				{
-					g.DrawImage(Sprite.TilesObjects.Bitmap, new Rectangle((x + 8) * zoom, (y + 8) * zoom, 16 * zoom, 16 * zoom), new Rectangle((index - 7) * 16, 0, 16, 16),  GraphicsUnit.Pixel);
+					g.DrawImage(Sprite.TilesObjects.Bitmap, new Rectangle((x + 8) * zoom, (y + 8) * zoom, 16 * zoom, 16 * zoom), new Rectangle((index - 7) * 16, 0, 16, 16), GraphicsUnit.Pixel);
 				}
 			}
 		}
