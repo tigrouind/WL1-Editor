@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace WLEditor
 {
-	public class Map
+	public class Overworld
 	{
 		static uint[] paletteColors = { 0xFFFFFFFF, 0xFFAAAAAA, 0xFF555555, 0xFF000000 };
 		static int[] directions = { 0xF0, 0xFE, 0xE0, 0xEE };

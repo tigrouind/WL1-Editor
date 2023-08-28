@@ -58,7 +58,7 @@
     <Compile Include="ComboboxItem.cs" />
     <Compile Include="DirectBitmap.cs" />
     <Compile Include="Extensions.cs" />
-    <Compile Include="Level.cs" />
+    <Compile Include="Rom\Level.cs" />
     <Compile Include="LevelPictureBox.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -70,7 +70,7 @@
     </Compile>
     <Compile Include="Overworld\ChangeEnum.cs" />
     <Compile Include="Overworld\EventForm.cs" />
-    <Compile Include="Overworld\Map.cs" />
+    <Compile Include="Rom\Overworld.cs" />
     <Compile Include="Overworld\OverworldForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -78,16 +78,16 @@
       <DependentUpon>OverworldForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Overworld\PathForm.cs" />
-    <Compile Include="Overworld\WorldPath\WorldPath.cs" />
-    <Compile Include="Overworld\WorldPath\WorldPathDirection.cs" />
-    <Compile Include="Overworld\WorldPath\WorldPathSegment.cs" />
+    <Compile Include="Rom\WorldPath\WorldPath.cs" />
+    <Compile Include="Rom\WorldPath\WorldPathDirection.cs" />
+    <Compile Include="Rom\WorldPath\WorldPathSegment.cs" />
     <Compile Include="PanelUnscrollable.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Rom.cs" />
-    <Compile Include="Sector\Sector.cs" />
+    <Compile Include="Rom\Sector.cs" />
     <Compile Include="Sector\SectorForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -98,7 +98,7 @@
     <Compile Include="Selection\Selection.cs" />
     <Compile Include="Selection\SelectionChange.cs" />
     <Compile Include="Selection\SelectionEventArgs.cs" />
-    <Compile Include="Sprite.cs" />
+    <Compile Include="Rom\Sprite.cs" />
     <Compile Include="TileEventArgs.cs" />
     <Compile Include="TileEventStatus.cs" />
     <Compile Include="Toolbox\ObjectsPictureBox.cs">

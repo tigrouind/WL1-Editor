@@ -66,11 +66,11 @@ namespace WLEditor
 
 		public bool SavePaths(Rom rom, out string errorMessage)
 		{
-			bool result = Map.SavePaths(rom, PathData, currentWorld == 8, out errorMessage);
+			bool result = Overworld.SavePaths(rom, PathData, currentWorld == 8, out errorMessage);
 			if (result)
 			{
 				int[] worldIndex = { 0, 0, 1, 5, 2, 3, 4, 6, 7 };
-				Map.SaveProgressNextDirection(rom, PathData, levels[currentWorld], worldIndex[currentWorld]);
+				Overworld.SaveProgressNextDirection(rom, PathData, levels[currentWorld], worldIndex[currentWorld]);
 
 				if (currentWorld != 8)
 				{
@@ -88,8 +88,8 @@ namespace WLEditor
 
 		public void LoadPaths(Rom rom)
 		{
-			worldData = Map.LoadPaths(rom, false);
-			overWorldData = Map.LoadPaths(rom, true);
+			worldData = Overworld.LoadPaths(rom, false);
+			overWorldData = Overworld.LoadPaths(rom, true);
 		}
 
 		public void LoadWorld(int world)
@@ -636,7 +636,7 @@ namespace WLEditor
 			foreach (var pos in startPositionData[currentWorld])
 			{
 				FindExitPosition(pos[2], out int posX, out int posY);
-				Map.SaveStartPosition(rom, posX, posY, FindClosestSide(posX, posY), pos[0], pos[1]);
+				Overworld.SaveStartPosition(rom, posX, posY, FindClosestSide(posX, posY), pos[0], pos[1]);
 			}
 		}
 

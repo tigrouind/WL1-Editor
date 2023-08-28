@@ -114,13 +114,13 @@ namespace WLEditor
 		void LoadWorld()
 		{
 			var data = worldData[currentWorld].Value;
-			Map.Dump8x8Tiles(rom, data[0], data[1], tilesWorld8x8);
+			Overworld.Dump8x8Tiles(rom, data[0], data[1], tilesWorld8x8);
 			if (timerTicks != 0)
 			{
 				DumpAnimatedTiles();
 			}
 
-			Map.LoadTiles(rom, data[2], data[3], worldTiles);
+			Overworld.LoadTiles(rom, data[2], data[3], worldTiles);
 
 			eventForm.LoadWorld(rom, currentWorld);
 			pathForm.LoadWorld(currentWorld);
@@ -184,7 +184,7 @@ namespace WLEditor
 				}
 
 				var worldInfo = worldData[currentWorld].Value;
-				if (!Map.SaveTiles(rom, worldInfo[2], worldInfo[3],
+				if (!Overworld.SaveTiles(rom, worldInfo[2], worldInfo[3],
 								currentWorld == 8 ? worldTiles : worldTiles.Take(564).ToArray(), worldInfo[4], out message))
 				{
 					MessageBox.Show(message, Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -383,11 +383,11 @@ namespace WLEditor
 
 		void SetMusicTrack()
 		{
-			int musicTrack = Map.GetMusic(rom, currentWorld);
+			int musicTrack = Overworld.GetMusic(rom, currentWorld);
 			string musicTrackTxt = Interaction.InputBox(string.Empty, "Enter music track number (1-8)", musicTrack == -1 ? string.Empty : (musicTrack + 1).ToString(), -1, -1);
 			if ((int.TryParse(musicTrackTxt, out musicTrack) && musicTrack >= 1 && musicTrack <= 8))
 			{
-				Map.SetMusic(rom, currentWorld, musicTrack - 1);
+				Overworld.SetMusic(rom, currentWorld, musicTrack - 1);
 				SetChanges(ChangeEnum.None);
 			}
 		}
@@ -935,7 +935,7 @@ namespace WLEditor
 				case 1:
 					for (int i = 0; i < animationSea.GetLength(0); i++)
 					{
-						Map.DumpAnimatedTilesA(rom, animationSea[i, 0], animationSea[i, 1], tilesWorld8x8, animationIndex % 6, 6);
+						Overworld.DumpAnimatedTilesA(rom, animationSea[i, 0], animationSea[i, 1], tilesWorld8x8, animationIndex % 6, 6);
 						invalidTiles[animationSea[i, 1]] = true;
 					}
 					break;
@@ -945,7 +945,7 @@ namespace WLEditor
 						int index = animationIndex % 2;
 						for (int i = 0; i < animationLava.GetLength(1); i++)
 						{
-							Map.DumpAnimatedTilesB(rom, animationLava[index, i, 0], animationLava[index, i, 1], tilesWorld8x8);
+							Overworld.DumpAnimatedTilesB(rom, animationLava[index, i, 0], animationLava[index, i, 1], tilesWorld8x8);
 							invalidTiles[animationLava[index, i, 1]] = true;
 						}
 						break;
@@ -956,14 +956,14 @@ namespace WLEditor
 						int index = animationIndex % 2;
 						for (int i = 0; i < animationWater.GetLength(1); i++)
 						{
-							Map.DumpAnimatedTilesB(rom, animationWater[index, i, 0], animationWater[index, i, 1], tilesWorld8x8);
+							Overworld.DumpAnimatedTilesB(rom, animationWater[index, i, 0], animationWater[index, i, 1], tilesWorld8x8);
 							invalidTiles[animationWater[index, i, 1]] = true;
 						}
 						break;
 					}
 
 				case 8:
-					Map.DumpAnimatedTilesA(rom, animationOverworld[0, 0], animationOverworld[0, 1], tilesWorld8x8, animationIndex % 8, 8);
+					Overworld.DumpAnimatedTilesA(rom, animationOverworld[0, 0], animationOverworld[0, 1], tilesWorld8x8, animationIndex % 8, 8);
 					invalidTiles[animationOverworld[0, 1]] = true;
 					break;
 			}
@@ -991,7 +991,7 @@ namespace WLEditor
 				for (int y = 0; y < 144; y++)
 				{
 					int offset = y * 256;
-					int scroll = y < 54 ? Map.GetScroll(rom, animationIndex + y) : 0;
+					int scroll = y < 54 ? Overworld.GetScroll(rom, animationIndex + y) : 0;
 					ScrollLine(offset, scroll);
 				}
 

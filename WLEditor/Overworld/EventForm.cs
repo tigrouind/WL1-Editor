@@ -117,14 +117,14 @@ namespace WLEditor
 		public void LoadWorld(Rom rom, int world)
 		{
 			currentWorld = world;
-			worldEvents = Map.LoadEvents(rom, eventPointers[currentWorld][0]);
+			worldEvents = Overworld.LoadEvents(rom, eventPointers[currentWorld][0]);
 			eventStep = 0;
 			worldEvent = worldEvents[0];
 		}
 
 		public bool SaveEvents(Rom rom, out string message)
 		{
-			return Map.SaveEvents(rom, worldEvents, eventPointers[currentWorld], eventAddressOffset,
+			return Overworld.SaveEvents(rom, worldEvents, eventPointers[currentWorld], eventAddressOffset,
 				eventMaxSize[currentWorld], out message);
 		}
 
