@@ -10,9 +10,9 @@ namespace WLEditor
 	public partial class MainForm : Form
 	{
 		Rom rom = new Rom();
-		ToolboxForm toolboxForm = new ToolboxForm();
-		OverworldForm overworldForm = new OverworldForm();
-		SectorForm sectorForm = new SectorForm();
+		readonly ToolboxForm toolboxForm = new ToolboxForm();
+		readonly OverworldForm overworldForm = new OverworldForm();
+		readonly SectorForm sectorForm = new SectorForm();
 
 		public readonly static string[] LevelNames =
 		{
@@ -85,15 +85,15 @@ namespace WLEditor
 			toolboxForm.FormClosing += ToolBoxFormClosing;
 			toolboxForm.Tile16x16MouseMove += ToolBoxTile16x16MouseMove;
 			toolboxForm.ObjectTileMouseMove += ToolBoxObjectMouseMove;
-			toolboxForm.ProcessCommandKey += ToolBoxProcessCommandKey;
+			toolboxForm.ProcessCommandKey += ProcessSubFormCommand;
 
 			overworldForm.FormClosing += OverworldFormClosing;
-			overworldForm.ProcessCommandKey += ToolBoxProcessCommandKey;
+			overworldForm.ProcessCommandKey += ProcessSubFormCommand;
 			overworldForm.MouseWheel += LevelPanelMouseWheel;
 			overworldForm.WorldMapChanged += WorldMapChanged;
 
 			sectorForm.FormClosing += SectorFormClosing;
-			sectorForm.ProcessCommandKey += ToolBoxProcessCommandKey;
+			sectorForm.ProcessCommandKey += ProcessSubFormCommand;
 			sectorForm.SectorChanged += SectorChanged;
 
 			SetZoomLevel(2);
@@ -402,6 +402,20 @@ namespace WLEditor
 			}
 
 			return base.ProcessCmdKey(ref msg, keyData);
+		}
+
+		void ProcessSubFormCommand(object sender, KeyEventArgs e)
+		{
+			foreach (var toolStripMenuItem in new[] { toolboxToolStripMenuItem, sectorsToolStripMenuItem, overworldToolStripMenuItem })
+			{
+				if (e.KeyCode == toolStripMenuItem.ShortcutKeys)
+				{
+					toolStripMenuItem.Checked = !toolStripMenuItem.Checked;
+					e.Handled = true;
+					Focus();
+					break;
+				}
+			}
 		}
 
 		bool DispatchCommandKey(Keys keyData)
