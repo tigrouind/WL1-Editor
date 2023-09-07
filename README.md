@@ -66,7 +66,11 @@ Tips :
 If you click on a sector already selected, it will unselected sector and show level header (which has similar properties to warps).
 
 Enemy sets specify which enemies will be loaded for a given warp (up to 6 enemies loaded). Some enemy sets are specific to some places (eg: boss or treasure room, ...).
-"X" near treasure enemy set means game will check if related treasure has already been collected. If it is, it removes key and open skull door leading to treasure. This should be used for all warps leading to an area that has a key or treasure door.
+
+Tips : 
+- Red items are boss enemies sets.
+- Yellow items are related to treasure rooms. Warps that lead to a sector with a treasure key or a skull door should always use the related treasure enemy set. This will automatically open skull door and remove key if treasure has already been collected.
+- Skulls in green will be already open (no need to use coins)
 
 ## Overworld / world maps
 - Open <kbd>View</kbd> > <kbd>Overworld</kbd>
