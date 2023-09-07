@@ -1,6 +1,5 @@
 using Microsoft.VisualBasic;
 using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
@@ -11,6 +10,10 @@ namespace WLEditor
 	{
 		public event EventHandler<KeyEventArgs> ProcessCommandKey;
 		public event EventHandler SectorChanged;
+		public DirectBitmap TilesEnemies = new DirectBitmap(64 * 147, 128 * 6);
+		public Rectangle[] enemiesRects = new Rectangle[6 * 147];
+		readonly char[] treasureNames = { 'C', 'I', 'F', 'O', 'A', 'N', 'H', 'M', 'L', 'K', 'B', 'D', 'G', 'J', 'E' };
+		readonly int[] boss = { 0x4CA9, 0x460D, 0x4C0C, 0x4E34, 0x4B06, 0x4D1A, 0x527D };
 
 		Rom rom;
 		int currentCourseId;
@@ -277,137 +280,95 @@ namespace WLEditor
 			new ComboboxItem<int>(0x5B7A, "Sector")
 		};
 
-		readonly string[] enemyNames =
+		EnemyInfo GetEnemyInfo(int index)
 		{
-			"Wanderin' Goom",
-			"Sparky",
-			"Big",
-			"Spiked ball",
-			"Pirate Goom",
-			"Helmut",
-			"Bobo",
-			"100 Coin",
-			"Pouncer",
-			"Pouncer",
-			"Dropper",
-			"White puff",
-			"Bō",
-			"Door",
-			"Exit",
-			"Cart",
-			"Cart",
-			"Gaugau",
-			"Penkoon",
-			"D.D.",
-			"Checkpoint",
-			"Chest",
-			"Flame",
-			"Treasure",
-			"Halo",
-			"Watch",
-			"Watch",
-			"Chicken Duck",
-			"Minotaur",
-			"Penguin",
-			"Spiked Koopa",
-			"Ghost",
-			"Yarikuri Obake",
-			"Devil's Head",
-			"Devil's Eyes",
-			"Devil's Tongue",
-			"Rock",
-			"Floater",
-			"Treasure door",
-			"Bridge",
-			"Bucket Head",
-			"! Block",
-			"Lava",
-			"Elevator up",
-			"Elevator down",
-			"Yadorā",
-			"Yarikuri Obake",
-			"Pinwheel",
-			"Giant block",
-			"Mine",
-			"Captain Syrup",
-			"Lamp",
-			"Cloud",
-			"Mini genie",
-			"Pecan",
-			"Skewer",
-			"Skewer",
-			"Skewer",
-			"Skewer",
-			"Maizō",
-			"Sinking platform",
-			"Togemaru",
-			"Pikkarikun",
-			"Guragura",
-			"Spike ball",
-			"Ukiwani",
-			"Goboten",
-			"3-Up heart",
-			"Paidan",
-			"Harisu",
-			"Guragura",
-			"Kōmori Missile",
-			"Konotako",
-			"Knight",
-			"Door",
-			"Bee Fly",
-			"Skull",
-			"Demon Bat"
-		};
+			int[] enemyPointers = enemyPointer[index];
 
-		string EnemyToString(int enemyId, bool exitOpen)
-		{
-			string enemyName;
-			if (enemyId >= 1 && enemyId <= enemyNames.Length)
+			Sprite.FindEnemiesData(rom, enemyPointers[0], out int enemiesIdsPointer, out int tilesPointer, out int treasureId, out _, out bool exitOpen);
+			Sprite.DumpEnemiesSprites(rom, enemiesIdsPointer, tilesPointer, TilesEnemies, index * 64, enemiesRects, index * 6, out int[] enemyIds);
+
+			return new EnemyInfo
 			{
-				enemyName = enemyNames[enemyId - 1];
-				if (enemyId == 15 && exitOpen)
-				{
-					enemyName += " open";
-				}
-
-				return enemyName;
-			}
-
-			return enemyId.ToString("D2");
+				EnemyPointers = enemyPointers,
+				EnemyIds = enemyIds,
+				Index = index,
+				BossId = Array.IndexOf(boss, enemyPointers[0]),
+				TreasureId = treasureId,
+				ExitOpen = exitOpen
+			};
 		}
 
-		string GetEnemyInfo(int enemyPointer)
+		void DdlEnemiesDrawItem(object sender, DrawItemEventArgs e)
 		{
-			string prefix = string.Empty;
-
-			//boss
-			int[] boss = { 0x4CA9, 0x460D, 0x4C0C, 0x4E34, 0x4B06, 0x4D1A, 0x527D };
-			int bossId = Array.IndexOf(boss, enemyPointer);
-			if (bossId != -1)
+			if (e.Index >= 0)
 			{
-				prefix += string.Format("[Boss {0}]   ", bossId + 1);
+				var item = ((ComboboxItem<EnemyInfo>)ddlEnemies.Items[e.Index]).Value;
+				bool drawLegend = (e.State & DrawItemState.ComboBoxEdit) == 0;
+
+				DrawBackground();
+				DrawSprites();
+				DrawText();
+
+				void DrawBackground()
+				{
+					e.DrawBackground();
+
+					if (drawLegend)
+					{
+						if (item.BossId >= 0)
+						{
+							e.Graphics.FillRectangle(Brushes.MistyRose, new Rectangle(e.Bounds.Left, e.Bounds.Top, 32, e.Bounds.Height));
+						}
+						else if (item.TreasureId >= 1 && item.TreasureId <= 15)
+						{
+							e.Graphics.FillRectangle(Brushes.Wheat, new Rectangle(e.Bounds.Left, e.Bounds.Top, 32, e.Bounds.Height));
+						}
+					}
+				}
+
+				void DrawSprites()
+				{
+					for (int index = 0; index < 6; index++)
+					{
+						var enemyRect = enemiesRects[item.Index * 6 + index];
+						if (enemyRect != Rectangle.Empty)
+						{
+							var destRect = new Rectangle(e.Bounds.Left + index * 32 + 32, e.Bounds.Top, 32, 32);
+
+							if (item.ExitOpen && drawLegend && item.EnemyIds[index] == 15) //skull open
+							{
+								e.Graphics.FillRectangle(Brushes.DarkSeaGreen, destRect);
+							}
+
+							e.Graphics.DrawImage(TilesEnemies.Bitmap, destRect,
+								new Rectangle(enemyRect.X - 16 + enemyRect.Width / 2, enemyRect.Y - 16 + enemyRect.Height / 2, 32, 32), GraphicsUnit.Pixel);
+						}
+					}
+				}
+
+				void DrawText()
+				{
+					using (var format = new StringFormat())
+					{
+						format.Alignment = StringAlignment.Center;
+						format.LineAlignment = StringAlignment.Center;
+						var dest = new RectangleF(e.Bounds.Left + 16, e.Bounds.Top + 16.0f, 0.0f, 0.0f);
+
+						if (item.BossId >= 0)
+						{
+							e.Graphics.DrawString(string.Format("B{0}", item.BossId + 1), e.Font, Brushes.Black, dest, format);
+						}
+						else if (item.TreasureId >= 1 && item.TreasureId <= 15)
+						{
+							e.Graphics.DrawString(string.Format("{0}", treasureNames[item.TreasureId - 1]), e.Font, Brushes.Black, dest, format);
+						}
+						else
+						{
+							e.Graphics.DrawString(string.Format("{0:D2}", e.Index), e.Font, Brushes.Black, dest, format);
+						}
+					}
+				}
 			}
-
-			//treasure/exit open
-			int enemiesIdsPointer, tilesPointer, treasureId;
-			bool exitOpen, treasureCheck, bonus;
-
-			Sprite.FindEnemiesData(rom, enemyPointer, out enemiesIdsPointer, out tilesPointer, out treasureId, out treasureCheck, out exitOpen, out bonus);
-
-			char[] treasureNames = { 'C', 'I', 'F', 'O', 'A', 'N', 'H', 'M', 'L', 'K', 'B', 'D', 'G', 'J', 'E' };
-			if (treasureId >= 1 && treasureId <= 15)
-			{
-				prefix += string.Format("[Treasure {0}]{1}   ", treasureNames[treasureId - 1], treasureCheck ? " [X]" : string.Empty);
-			}
-
-			if (bonus)
-			{
-				prefix += "[Heart]   ";
-			}
-
-			//enemy ids
-			List<int> enemies = Sprite.GetEnemyIds(rom, enemiesIdsPointer);
-			return prefix + string.Join(" / ", enemies.Select(x => EnemyToString(x, exitOpen)).ToArray());
 		}
 
 		void InitForm()
@@ -433,11 +394,17 @@ namespace WLEditor
 				ddlAnimation.Items.Clear();
 				ddlAnimation.Items.AddRange(tilesAnimation);
 
+				Array.Clear(TilesEnemies.Bits, 0, TilesEnemies.Bits.Length);
 				ddlEnemies.Items.Clear();
-				ddlEnemies.Items.AddRange(enemyPointer.Select(x => new { Text = GetEnemyInfo(x[0]), Value = x })
-					.OrderBy(x => x.Text[0] == '[')
-					.ThenBy(x => x.Text)
-					.Select((x, i) => new ComboboxItem<int[]>(x.Value, string.Format("{0:D3}   {1}", i, x.Text)))
+				ddlEnemies.Items.AddRange(enemyPointer.Select((x, i) => new ComboboxItem<EnemyInfo>(GetEnemyInfo(i), string.Empty))
+					.OrderBy(x => x.Value.BossId)
+					.ThenBy(x => (x.Value.TreasureId >= 1 && x.Value.TreasureId <= 15) ? treasureNames[x.Value.TreasureId - 1] : 0)
+					.ThenBy(x => x.Value.EnemyIds[0])
+					.ThenBy(x => x.Value.EnemyIds[1])
+					.ThenBy(x => x.Value.EnemyIds[2])
+					.ThenBy(x => x.Value.EnemyIds[3])
+					.ThenBy(x => x.Value.EnemyIds[4])
+					.ThenBy(x => x.Value.EnemyIds[5])
 					.ToArray());
 			}
 		}
@@ -569,7 +536,7 @@ namespace WLEditor
 			});
 			LoadDropdown(ddlAnimation, currentWarp.TileAnimation);
 			LoadDropdown(ddlAnimationSpeed, currentWarp.AnimationSpeed);
-			LoadDropdownAny(ddlEnemies, currentWarp.Enemy);
+			LoadDropdownAny<EnemyInfo>(ddlEnemies, currentWarp.Enemy, x => x.EnemyPointers);
 
 			LoadDropdown(ddlCameraType, currentWarp.CameraType);
 			LoadNumericUpDown(txbCameraX, currentWarp.CameraX);
@@ -605,10 +572,10 @@ namespace WLEditor
 			ignoreEvents = false;
 		}
 
-		void LoadDropdownAny(ComboBox combo, int value)
+		void LoadDropdownAny<T>(ComboBox combo, int value, Func<T, int[]> filter)
 		{
 			ignoreEvents = true;
-			combo.SelectedIndex = combo.Items.Cast<ComboboxItem<int[]>>().FindIndex(x => x.Value.Contains(value));
+			combo.SelectedIndex = combo.Items.Cast<ComboboxItem<T>>().FindIndex(x => filter(x.Value).Contains(value));
 			ignoreEvents = false;
 		}
 
@@ -723,8 +690,8 @@ namespace WLEditor
 		{
 			if (!ignoreEvents)
 			{
-				var item = (ComboboxItem<int[]>)ddlEnemies.SelectedItem;
-				currentWarp.Enemy = item.Value[0];
+				var item = (ComboboxItem<EnemyInfo>)ddlEnemies.SelectedItem;
+				currentWarp.Enemy = item.Value.EnemyPointers[0];
 
 				SaveWarp();
 				OnSectorChanged();

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 
 namespace WLEditor
 {
@@ -14,6 +15,7 @@ namespace WLEditor
 		public static DirectBitmap TilesObjects = new DirectBitmap(16 * 9, 16);
 		public static DirectBitmap TilesEnemies = new DirectBitmap(64, 128 * 6);
 		public static DirectBitmap PlayerSprite = new DirectBitmap(64, 64 * 2);
+		public static DirectBitmap Tiles8x8 = new DirectBitmap(16 * 8, 4 * 8);
 
 		readonly static ushort[] enemySpriteAddress =
 		{
@@ -53,21 +55,15 @@ namespace WLEditor
 			0xEA, 0x76, 0xA3 // ld (A376), a
 		};
 
-		readonly static byte[] bonusPattern =
-		{
-			0x3E, 0x00,      // ld a, ..
-			0xEA, 0xB6, 0xA3 // ld (A3B6), a
-		};
-
 		public static void DumpBonusSprites(Rom rom)
 		{
-			Array.Clear(Level.Tiles8x8.Bits, 0, Level.Tiles8x8.Bits.Length);
+			Array.Clear(Tiles8x8.Bits, 0, Tiles8x8.Bits.Length);
 			//bonus sprites
 			rom.SetBank(0x5);
-			Level.Dump8x8Tiles(rom, Level.Tiles8x8, 0x4C81, 23, 0, 0x1E, enemyPalette, true);
+			Level.Dump8x8Tiles(rom, Tiles8x8, 0x4C81, 23, 0, 0x1E, enemyPalette, true);
 
 			rom.SetBank(0x11);
-			Level.Dump8x8Tiles(rom, Level.Tiles8x8, 0x7300, 4, 16 + 23, 0x1E, enemyPalette, true);
+			Level.Dump8x8Tiles(rom, Tiles8x8, 0x7300, 4, 16 + 23, 0x1E, enemyPalette, true);
 
 			rom.SetBank(0xF);
 			for (int i = 0; i < bonusSpriteAddress.Length; i++)
@@ -80,10 +76,10 @@ namespace WLEditor
 
 		public static void DumpPlayerSprite(Rom rom)
 		{
-			Array.Clear(Level.Tiles8x8.Bits, 0, Level.Tiles8x8.Bits.Length);
+			Array.Clear(Tiles8x8.Bits, 0, Tiles8x8.Bits.Length);
 
 			rom.SetBank(0x5);
-			Level.Dump8x8Tiles(rom, Level.Tiles8x8, 0x42F1, 64, 0, 0x1E, enemyPalette, true);
+			Level.Dump8x8Tiles(rom, Tiles8x8, 0x42F1, 64, 0, 0x1E, enemyPalette, true);
 			PlayerRectangles[0] = DumpSpritePlayer(rom, 32, 56, 0x603B, false);
 			PlayerRectangles[1] = DumpSpritePlayer(rom, 32, 56 + 64, 0x603B, true);
 		}
@@ -170,14 +166,14 @@ namespace WLEditor
 
 			for (int y = 0; y < 8; y++)
 			{
-				int src = source.X + (source.Y + getY(y)) * Level.Tiles8x8.Width;
+				int src = source.X + (source.Y + getY(y)) * Tiles8x8.Width;
 				int dst = spx + (spy + y) * tilesDest.Width;
 
 				for (int x = 0; x < 8; x++)
 				{
 					if (tilesDest.Bits[dst + x] == 0)
 					{
-						tilesDest.Bits[dst + x] = Level.Tiles8x8.Bits[src + getX(x)];
+						tilesDest.Bits[dst + x] = Tiles8x8.Bits[src + getX(x)];
 					}
 				}
 			}
@@ -185,27 +181,8 @@ namespace WLEditor
 
 		#region Enemies
 
-		public static List<int> GetEnemyIds(Rom rom, int enemyPointer)
-		{
-			rom.SetBank(0x7);
-			List<int> enemyIds = new List<int>();
-			for (int i = 0; i < 6; i++)
-			{
-				int enemyId = rom.ReadWord(enemyPointer + (i + 1) * 2);
-				enemyId = (enemyId - 0x530F) / 4;
-				if (enemyId == 0)
-				{
-					break;
-				}
-
-				enemyIds.Add(enemyId);
-			}
-
-			return enemyIds;
-		}
-
 		public static void FindEnemiesData(Rom rom, int enemiesPointer, out int enemyId, out int tilesPointer,
-										out int treasureID, out bool treasureCheck, out bool exitOpen, out bool bonus)
+										out int treasureID, out bool treasureCheck, out bool exitOpen)
 		{
 			rom.SetBank(0x7);
 			int position = enemiesPointer;
@@ -217,7 +194,7 @@ namespace WLEditor
 					tilesPointer = rom.ReadWord(position + 11);
 
 					position += enemyCodePattern.Length;
-					CheckExtraCode(rom, position, out treasureID, out treasureCheck, out exitOpen, out bonus);
+					CheckExtraCode(rom, position, out treasureID, out treasureCheck, out exitOpen);
 					return;
 				}
 
@@ -227,11 +204,10 @@ namespace WLEditor
 			throw new Exception("cannot find enemies data");
 		}
 
-		static void CheckExtraCode(Rom rom, int position, out int treasureID, out bool treasureCheck, out bool exitOpen, out bool bonus)
+		static void CheckExtraCode(Rom rom, int position, out int treasureID, out bool treasureCheck, out bool exitOpen)
 		{
 			treasureCheck = false;
 			exitOpen = false;
-			bonus = false;
 			treasureID = -1;
 
 			while (rom.ReadByte(position) != 0xC9) //ret
@@ -251,11 +227,6 @@ namespace WLEditor
 				{
 					exitOpen = true;
 					position += exitPattern.Length;
-				}
-				else if (MatchPattern(rom, position, bonusPattern))
-				{
-					bonus = true;
-					position += bonusPattern.Length;
 				}
 				else
 				{
@@ -285,50 +256,59 @@ namespace WLEditor
 			Array.Clear(TilesEnemies.Bits, 0, TilesEnemies.Bits.Length);
 			Array.Clear(LoadedSprites, 0, LoadedSprites.Length);
 
-			for (int i = 0; i < 6; i++)
-			{
-				rom.SetBank(0x7);
-				int enemyId = rom.ReadWord(enemiesIdsPointer + (i + 1) * 2);
-				enemyId = (enemyId - 0x530F) / 4;
+			DumpEnemiesSprites(rom, enemiesIdsPointer, tilesDataAddress, TilesEnemies, 0, LoadedSprites, 0, out _);
+		}
 
+		public static void DumpEnemiesSprites(Rom rom, int enemiesIdsPointer, int tilesDataAddress,
+			DirectBitmap bitmap, int destX, Rectangle[] spriteRects, int index, out int[] enemyIds)
+		{
+			enemyIds = GetEnemyIds(rom, enemiesIdsPointer).ToArray();
+			var enemyTileInfo = LoadEnemiesTiles(rom, tilesDataAddress).ToArray();
+
+			for (int i = 0; i < enemyTileInfo.Length; i++)
+			{
+				int enemyId = enemyIds[i];
 				if (enemyId > 0 && enemyId <= enemySpriteAddress.Length)
 				{
 					int spriteDataAddress = enemySpriteAddress[enemyId - 1];
 					if (spriteDataAddress != 0)
 					{
-						if (LoadEnemiesTiles(rom, i, spriteDataAddress, tilesDataAddress))
-						{
-							Rectangle rectangle = DumpSprite(rom, 32, 120 + i * 128, spriteDataAddress, TilesEnemies);
-							LoadedSprites[i] = rectangle;
-						}
+						var (tileBank, tileAddress, tileCount) = enemyTileInfo[i];
+						LoadEnemiesTilesInternal(rom, spriteDataAddress, tileBank, tileCount, tileAddress);
+
+						Rectangle rectangle = DumpSprite(rom, destX + 32, 120 + i * 128, spriteDataAddress, bitmap);
+						spriteRects[index + i] = rectangle;
 					}
 				}
 			}
 		}
 
-		static bool LoadEnemiesTiles(Rom rom, int enemyIndex, int spriteDataAddress, int tilesDataAddress)
+		static IEnumerable<int> GetEnemyIds(Rom rom, int enemiesIdsPointer)
 		{
-			int index = 0;
+			rom.SetBank(0x7);
+			for (int i = 0; i < 6; i++)
+			{
+				int enemyId = rom.ReadWord(enemiesIdsPointer + (i + 1) * 2);
+				enemyId = (enemyId - 0x530F) / 4;
+				yield return enemyId;
+			}
+		}
 
+		static IEnumerable<(int Bank, int Address, int Count)> LoadEnemiesTiles(Rom rom, int tilesDataAddress)
+		{
+			rom.SetBank(0x7);
 			do
 			{
-				rom.SetBank(0x7);
 				int tilesBank = rom.ReadByte(tilesDataAddress++);
 				int tilesAddress = rom.ReadWord(tilesDataAddress++); tilesDataAddress++;
 				int tilesCount = rom.ReadByte(tilesDataAddress++);
 
 				if (tilesCount == 0xFF)
 				{
-					return false;
+					yield break;
 				}
 
-				if (index == enemyIndex)
-				{
-					LoadEnemiesTilesInternal(rom, spriteDataAddress, tilesBank, tilesCount, tilesAddress);
-					return true;
-				}
-
-				index++;
+				yield return (tilesBank, tilesAddress, tilesCount);
 			}
 			while (true);
 		}
@@ -340,8 +320,8 @@ namespace WLEditor
 			int spriteFlags = rom.ReadByte(pos);
 			int palette = (spriteFlags & 0x10) != 0 ? 0xD1 : 0x1E;
 
-			Array.Clear(Level.Tiles8x8.Bits, 0, Level.Tiles8x8.Bits.Length);
-			Level.Dump8x8Tiles(rom, Level.Tiles8x8, tilesAddress, tilesCount, 0, (byte)palette, enemyPalette, true);
+			Array.Clear(Tiles8x8.Bits, 0, Tiles8x8.Bits.Length);
+			Level.Dump8x8Tiles(rom, Tiles8x8, tilesAddress, tilesCount, 0, (byte)palette, enemyPalette, true);
 		}
 
 		#endregion

@@ -59,10 +59,9 @@ namespace WLEditor
 
 			if (!reloadAnimatedTilesOnly)
 			{
-				int enemiesIdsPointer, enemiesTiles, treasureID;
-				bool exitOpen, treasureCheck, bonus;
+				int enemiesIdsPointer, enemiesTiles;
 
-				Sprite.FindEnemiesData(rom, enemiesData, out enemiesIdsPointer, out enemiesTiles, out treasureID, out treasureCheck, out exitOpen, out bonus);
+				Sprite.FindEnemiesData(rom, enemiesData, out enemiesIdsPointer, out enemiesTiles, out _, out _, out _);
 				Sprite.DumpEnemiesSprites(rom, enemiesIdsPointer, enemiesTiles);
 
 				//dump 8x8 tiles

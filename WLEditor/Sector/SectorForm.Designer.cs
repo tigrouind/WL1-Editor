@@ -175,7 +175,7 @@ namespace WLEditor
 			// 
 			this.cmdCalculatePos.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.cmdCalculatePos.Location = new System.Drawing.Point(201, 133);
+			this.cmdCalculatePos.Location = new System.Drawing.Point(201, 138);
 			this.cmdCalculatePos.Name = "cmdCalculatePos";
 			this.cmdCalculatePos.Size = new System.Drawing.Size(111, 47);
 			this.cmdCalculatePos.TabIndex = 30;
@@ -206,7 +206,7 @@ namespace WLEditor
 			// 
 			// txbCameraX
 			// 
-			this.txbCameraX.Location = new System.Drawing.Point(88, 160);
+			this.txbCameraX.Location = new System.Drawing.Point(88, 165);
 			this.txbCameraX.Maximum = new decimal(new int[] {
             511,
             0,
@@ -219,7 +219,7 @@ namespace WLEditor
 			// 
 			// labEnemies
 			// 
-			this.labEnemies.Location = new System.Drawing.Point(11, 65);
+			this.labEnemies.Location = new System.Drawing.Point(11, 75);
 			this.labEnemies.Name = "labEnemies";
 			this.labEnemies.Size = new System.Drawing.Size(71, 18);
 			this.labEnemies.TabIndex = 16;
@@ -228,7 +228,7 @@ namespace WLEditor
 			// 
 			// labWario
 			// 
-			this.labWario.Location = new System.Drawing.Point(13, 134);
+			this.labWario.Location = new System.Drawing.Point(13, 139);
 			this.labWario.Name = "labWario";
 			this.labWario.Size = new System.Drawing.Size(66, 18);
 			this.labWario.TabIndex = 19;
@@ -247,7 +247,7 @@ namespace WLEditor
 			// 
 			// txbCameraY
 			// 
-			this.txbCameraY.Location = new System.Drawing.Point(145, 160);
+			this.txbCameraY.Location = new System.Drawing.Point(145, 165);
 			this.txbCameraY.Maximum = new decimal(new int[] {
             63,
             0,
@@ -264,7 +264,7 @@ namespace WLEditor
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.ddlCameraType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.ddlCameraType.FormattingEnabled = true;
-			this.ddlCameraType.Location = new System.Drawing.Point(88, 105);
+			this.ddlCameraType.Location = new System.Drawing.Point(88, 110);
 			this.ddlCameraType.Name = "ddlCameraType";
 			this.ddlCameraType.Size = new System.Drawing.Size(223, 21);
 			this.ddlCameraType.TabIndex = 40;
@@ -272,7 +272,7 @@ namespace WLEditor
 			// 
 			// txbWarioY
 			// 
-			this.txbWarioY.Location = new System.Drawing.Point(145, 133);
+			this.txbWarioY.Location = new System.Drawing.Point(145, 138);
 			this.txbWarioY.Maximum = new decimal(new int[] {
             63,
             0,
@@ -285,7 +285,7 @@ namespace WLEditor
 			// 
 			// labCameraType
 			// 
-			this.labCameraType.Location = new System.Drawing.Point(17, 106);
+			this.labCameraType.Location = new System.Drawing.Point(17, 111);
 			this.labCameraType.Name = "labCameraType";
 			this.labCameraType.Size = new System.Drawing.Size(66, 18);
 			this.labCameraType.TabIndex = 28;
@@ -296,13 +296,16 @@ namespace WLEditor
 			// 
 			this.ddlEnemies.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.ddlEnemies.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
 			this.ddlEnemies.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.ddlEnemies.DropDownWidth = 380;
 			this.ddlEnemies.FormattingEnabled = true;
+			this.ddlEnemies.IntegralHeight = false;
+			this.ddlEnemies.ItemHeight = 32;
 			this.ddlEnemies.Location = new System.Drawing.Point(88, 65);
 			this.ddlEnemies.Name = "ddlEnemies";
-			this.ddlEnemies.Size = new System.Drawing.Size(223, 21);
+			this.ddlEnemies.Size = new System.Drawing.Size(223, 38);
 			this.ddlEnemies.TabIndex = 15;
+			this.ddlEnemies.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.DdlEnemiesDrawItem);
 			this.ddlEnemies.SelectedIndexChanged += new System.EventHandler(this.DdlEnemiesSelectedIndexChanged);
 			// 
 			// labTileSet
@@ -316,7 +319,7 @@ namespace WLEditor
 			// 
 			// labCamera
 			// 
-			this.labCamera.Location = new System.Drawing.Point(8, 160);
+			this.labCamera.Location = new System.Drawing.Point(8, 165);
 			this.labCamera.Name = "labCamera";
 			this.labCamera.Size = new System.Drawing.Size(71, 18);
 			this.labCamera.TabIndex = 20;
@@ -325,7 +328,7 @@ namespace WLEditor
 			// 
 			// txbWarioX
 			// 
-			this.txbWarioX.Location = new System.Drawing.Point(88, 133);
+			this.txbWarioX.Location = new System.Drawing.Point(88, 138);
 			this.txbWarioX.Maximum = new decimal(new int[] {
             511,
             0,
