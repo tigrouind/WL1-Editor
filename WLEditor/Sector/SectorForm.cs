@@ -10,8 +10,9 @@ namespace WLEditor
 	{
 		public event EventHandler<KeyEventArgs> ProcessCommandKey;
 		public event EventHandler SectorChanged;
-		public DirectBitmap TilesEnemies = new DirectBitmap(64 * 147, 128 * 6);
+		public DirectBitmap TilesEnemies = new DirectBitmap(32 * 6, 32 * 147);
 		public Rectangle[] enemiesRects = new Rectangle[6 * 147];
+		public Point[] enemiesOffsets = new Point[6 * 147];
 		readonly char[] treasureNames = { 'C', 'I', 'F', 'O', 'A', 'N', 'H', 'M', 'L', 'K', 'B', 'D', 'G', 'J', 'E' };
 		readonly int[] boss = { 0x4CA9, 0x460D, 0x4C0C, 0x4E34, 0x4B06, 0x4D1A, 0x527D };
 
@@ -285,7 +286,7 @@ namespace WLEditor
 			int[] enemyPointers = enemyPointer[index];
 
 			Sprite.FindEnemiesData(rom, enemyPointers[0], out int enemiesIdsPointer, out int tilesPointer, out int treasureId, out _, out bool exitOpen);
-			Sprite.DumpEnemiesSprites(rom, enemiesIdsPointer, tilesPointer, TilesEnemies, index * 64, enemiesRects, index * 6, out int[] enemyIds);
+			Sprite.DumpEnemiesSprites(rom, enemiesIdsPointer, tilesPointer, TilesEnemies, index * 32, enemiesRects, enemiesOffsets, index * 6, 32, out int[] enemyIds);
 
 			return new EnemyInfo
 			{
@@ -300,7 +301,7 @@ namespace WLEditor
 
 		void DdlEnemiesDrawItem(object sender, DrawItemEventArgs e)
 		{
-			if (e.Index >= 0)
+			if (e.Index >= 0 && !DesignMode)
 			{
 				var item = ((ComboboxItem<EnemyInfo>)ddlEnemies.Items[e.Index]).Value;
 				bool drawLegend = (e.State & DrawItemState.ComboBoxEdit) == 0;
@@ -340,8 +341,9 @@ namespace WLEditor
 								e.Graphics.FillRectangle(Brushes.DarkSeaGreen, destRect);
 							}
 
-							e.Graphics.DrawImage(TilesEnemies.Bitmap, destRect,
-								new Rectangle(enemyRect.X - 16 + enemyRect.Width / 2, enemyRect.Y - 16 + enemyRect.Height / 2, 32, 32), GraphicsUnit.Pixel);
+							var imgRect = new Rectangle(index * 32, item.Index * 32, 32, 32);
+
+							e.Graphics.DrawImage(TilesEnemies.Bitmap, destRect, imgRect, GraphicsUnit.Pixel);
 						}
 					}
 				}

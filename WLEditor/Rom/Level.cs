@@ -61,8 +61,11 @@ namespace WLEditor
 			{
 				int enemiesIdsPointer, enemiesTiles;
 
+				Array.Clear(Sprite.TilesEnemies.Bits, 0, Sprite.TilesEnemies.Bits.Length);
+				Array.Clear(Sprite.LoadedSprites, 0, Sprite.LoadedSprites.Length);
+
 				Sprite.FindEnemiesData(rom, enemiesData, out enemiesIdsPointer, out enemiesTiles, out _, out _, out _);
-				Sprite.DumpEnemiesSprites(rom, enemiesIdsPointer, enemiesTiles);
+				Sprite.DumpEnemiesSprites(rom, enemiesIdsPointer, enemiesTiles, Sprite.TilesEnemies, 0, Sprite.LoadedSprites, Sprite.LoadedOffsets, 0, 40, out _);
 
 				//dump 8x8 tiles
 				Array.Clear(Tiles8x8.Bits, 0, Tiles8x8.Width * Tiles8x8.Height);

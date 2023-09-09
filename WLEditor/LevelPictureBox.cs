@@ -73,7 +73,12 @@ namespace WLEditor
 						//wario position
 						int index = Level.WarioRightFacing ? 0 : 1;
 						Rectangle playerRectangle = Sprite.PlayerRectangles[index];
-						Rectangle destRect = new Rectangle((Level.WarioPosition % 4096 + playerRectangle.X - 32) * zoom, (Level.WarioPosition / 4096 + playerRectangle.Y - 56 - index * 64) * zoom, playerRectangle.Width * zoom, playerRectangle.Height * zoom);
+						Point playerOffset = Sprite.PlayerOffsets[index];
+
+						Rectangle destRect = new Rectangle(
+							(Level.WarioPosition % 4096 + playerOffset.X) * zoom,
+							(Level.WarioPosition / 4096 + playerOffset.Y) * zoom, playerRectangle.Width * zoom, playerRectangle.Height * zoom);
+
 						if (destRect.IntersectsWith(e.ClipRectangle))
 						{
 							e.Graphics.DrawImage(Sprite.PlayerSprite.Bitmap, destRect, playerRectangle, GraphicsUnit.Pixel);
@@ -200,10 +205,12 @@ namespace WLEditor
 						//enemy
 						if (data <= 6)
 						{
-							if (Sprite.LoadedSprites[data - 1] != Rectangle.Empty)
+							Rectangle enemyRect = Sprite.LoadedSprites[data - 1];
+							if (enemyRect != Rectangle.Empty)
 							{
-								Rectangle enemyRect = Sprite.LoadedSprites[data - 1];
-								destRect = new Rectangle((i * 16 + enemyRect.X - 32 + 8) * zoom, (j * 16 + enemyRect.Y - (data - 1) * 128 - 104) * zoom, enemyRect.Width * zoom, enemyRect.Height * zoom);
+								Point enemyOffset = Sprite.LoadedOffsets[data - 1];
+
+								destRect = new Rectangle((i * 16 + enemyOffset.X) * zoom, (j * 16 + enemyOffset.Y) * zoom, enemyRect.Width * zoom, enemyRect.Height * zoom);
 								if (destRect.IntersectsWith(e.ClipRectangle))
 								{
 									e.Graphics.DrawImage(Sprite.TilesEnemies.Bitmap, destRect, enemyRect, GraphicsUnit.Pixel);
@@ -362,9 +369,11 @@ namespace WLEditor
 			if (enemyIndex >= 1 && enemyIndex <= 6)
 			{
 				Rectangle enemyRect = Sprite.LoadedSprites[enemyIndex - 1];
+				Point enemyOffset = Sprite.LoadedOffsets[enemyIndex - 1];
+
 				if (enemyRect != Rectangle.Empty)
 				{
-					region.Union(new Rectangle(((tileIndex % 256) * 16 + enemyRect.X - 32 + 8) * zoom, ((tileIndex / 256) * 16 + enemyRect.Y - (enemyIndex - 1) * 128 - 104) * zoom, enemyRect.Width * zoom, enemyRect.Height * zoom));
+					region.Union(new Rectangle(((tileIndex % 256) * 16 + enemyOffset.X) * zoom, ((tileIndex / 256) * 16 + enemyOffset.Y) * zoom, enemyRect.Width * zoom, enemyRect.Height * zoom));
 				}
 			}
 		}

@@ -56,10 +56,11 @@ namespace WLEditor
 				}
 				if (index >= 1 && index <= 6) //enemy
 				{
-					if (Sprite.LoadedSprites[index - 1] != Rectangle.Empty)
+					Rectangle enemyRect = Sprite.LoadedSprites[index - 1];
+					if (enemyRect != Rectangle.Empty)
 					{
-						Rectangle enemyRect = Sprite.LoadedSprites[index - 1];
-						g.DrawImage(Sprite.TilesEnemies.Bitmap, destRect, new Rectangle(enemyRect.X - 16 + enemyRect.Width / 2, enemyRect.Y - 16 + enemyRect.Height / 2, 32, 32), GraphicsUnit.Pixel);
+						var imgRect = new Rectangle((index - 1) * 40 + 4, 4, 32, 32);
+						g.DrawImage(Sprite.TilesEnemies.Bitmap, destRect, imgRect, GraphicsUnit.Pixel);
 					}
 					else
 					{

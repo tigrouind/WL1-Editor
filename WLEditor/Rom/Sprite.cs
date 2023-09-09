@@ -10,11 +10,13 @@ namespace WLEditor
 		readonly static uint[] enemyPalette = { 0xFFFFFFFF, 0xFF9DC9FD, 0xFFFF00FF, 0xFF000029 };
 
 		public static Rectangle[] PlayerRectangles = new Rectangle[2];
+		public static Point[] PlayerOffsets = new Point[2];
 		public static Rectangle[] LoadedSprites = new Rectangle[6];
+		public static Point[] LoadedOffsets = new Point[6];
 
 		public static DirectBitmap TilesObjects = new DirectBitmap(16 * 9, 16);
-		public static DirectBitmap TilesEnemies = new DirectBitmap(64, 128 * 6);
-		public static DirectBitmap PlayerSprite = new DirectBitmap(64, 64 * 2);
+		public static DirectBitmap TilesEnemies = new DirectBitmap(40 * 6, 40);
+		public static DirectBitmap PlayerSprite = new DirectBitmap(32, 32 * 2);
 		public static DirectBitmap Tiles8x8 = new DirectBitmap(16 * 8, 4 * 8);
 
 		readonly static ushort[] enemySpriteAddress =
@@ -68,7 +70,7 @@ namespace WLEditor
 			rom.SetBank(0xF);
 			for (int i = 0; i < bonusSpriteAddress.Length; i++)
 			{
-				DumpSprite(rom, 8 + i * 16, 16, bonusSpriteAddress[i], TilesObjects);
+				DumpSprite(rom, i * 16, 0, bonusSpriteAddress[i], TilesObjects, 16);
 			}
 		}
 
@@ -80,13 +82,38 @@ namespace WLEditor
 
 			rom.SetBank(0x5);
 			Level.Dump8x8Tiles(rom, Tiles8x8, 0x42F1, 64, 0, 0x1E, enemyPalette, true);
-			PlayerRectangles[0] = DumpSpritePlayer(rom, 32, 56, 0x603B, false);
-			PlayerRectangles[1] = DumpSpritePlayer(rom, 32, 56 + 64, 0x603B, true);
+			var info0 = DumpSpritePlayer(rom, 0, 0, 0x603B, false);
+			var info1 = DumpSpritePlayer(rom, 0, 32, 0x603B, true);
+
+			PlayerRectangles[0] = info0.rect;
+			PlayerRectangles[1] = info1.rect;
+			PlayerOffsets[0] = info0.offset;
+			PlayerOffsets[1] = info1.offset;
 		}
 
-		static Rectangle DumpSpritePlayer(Rom rom, int posx, int posy, int spriteAddress, bool horizontalFlip)
+		static (Rectangle rect, Point offset) DumpSpritePlayer(Rom rom, int posx, int posy, int spriteAddress, bool horizontalFlip)
 		{
 			Rectangle rectangle = Rectangle.Empty;
+			foreach (var sprite in GetPlayerInfo(rom, spriteAddress, horizontalFlip))
+			{
+				Rectangle tileRect = new Rectangle(sprite.posx, sprite.posy, 8, 8);
+				rectangle = rectangle == Rectangle.Empty ? tileRect : Rectangle.Union(rectangle, tileRect);
+			}
+
+			var bounds = new Rectangle(posx, posy, 32, 32);
+			foreach (var sprite in GetPlayerInfo(rom, spriteAddress, horizontalFlip))
+			{
+				DumpSpriteInternal(
+					posx + sprite.posx - rectangle.X,
+					posy + sprite.posy - rectangle.Y,
+					sprite.index, sprite.flags, PlayerSprite, bounds);
+			}
+
+			return (new Rectangle(posx, posy, rectangle.Width, rectangle.Height), new Point(rectangle.X, rectangle.Y));
+		}
+
+		static IEnumerable<(int posx, int posy, int index, int flags)> GetPlayerInfo(Rom rom, int spriteAddress, bool horizontalFlip)
+		{
 			int pos = spriteAddress;
 
 			sbyte hflip(sbyte x) => (sbyte)(horizontalFlip ? ((~x) - 7) : x);
@@ -97,23 +124,43 @@ namespace WLEditor
 				int spx, spy;
 				unchecked
 				{
-					spy = (sbyte)rom.ReadByte(pos++) + posy;
-					spx = hflip((sbyte)rom.ReadByte(pos++)) + posx;
+					spy = (sbyte)rom.ReadByte(pos++);
+					spx = hflip((sbyte)rom.ReadByte(pos++));
 				}
 				int spriteIndex = rom.ReadByte(pos++);
 				int spriteFlags = rom.ReadByte(pos++) ^ (horizontalFlip ? 0x40 : 0x00);
 
-				DumpSpriteInternal(spx, spy, spriteIndex, spriteFlags, PlayerSprite, ref rectangle);
+				yield return (spx, spy, spriteIndex, spriteFlags);
 			}
-
-			return rectangle;
 		}
 
 		#endregion
 
-		static Rectangle DumpSprite(Rom rom, int posx, int posy, int spriteAddress, DirectBitmap tilesDest)
+		static (Rectangle rect, Point point) DumpSprite(Rom rom, int posx, int posy, int spriteAddress, DirectBitmap tilesDest, int width)
 		{
 			Rectangle rectangle = Rectangle.Empty;
+			foreach (var sprite in GetSpriteInfo(rom, spriteAddress))
+			{
+				Rectangle tileRect = new Rectangle(sprite.posx, sprite.posy, 8, 8);
+				rectangle = rectangle == Rectangle.Empty ? tileRect : Rectangle.Union(rectangle, tileRect);
+			}
+
+			var bounds = new Rectangle(posx, posy, width, width);
+			var center = new Point((width - rectangle.Width) / 2, (width - rectangle.Height) / 2);
+
+			foreach (var sprite in GetSpriteInfo(rom, spriteAddress))
+			{
+				DumpSpriteInternal(
+					posx + sprite.posx - rectangle.X + center.X,
+					posy + sprite.posy - rectangle.Y + center.Y,
+					sprite.index, sprite.flags, tilesDest, bounds);
+			}
+
+			return (new Rectangle(posx + center.X, posy + center.Y, rectangle.Width, rectangle.Height), new Point(rectangle.X + 8, rectangle.Y + 16));
+		}
+
+		static IEnumerable<(int posx, int posy, int flags, int index)> GetSpriteInfo(Rom rom, int spriteAddress)
+		{
 			int pos = spriteAddress;
 
 			pos = rom.ReadWord(pos);
@@ -124,56 +171,56 @@ namespace WLEditor
 				int spx, spy;
 				unchecked
 				{
-					spy = (sbyte)rom.ReadByte(pos++) + posy;
-					spx = (sbyte)rom.ReadByte(pos++) + posx;
+					spy = (sbyte)rom.ReadByte(pos++);
+					spx = (sbyte)rom.ReadByte(pos++);
 				}
 				int spriteData = rom.ReadByte(pos++);
-				int spriteIndex = (spriteData & 0x3F);
+				int spriteIndex = spriteData & 0x3F;
 
-				DumpSpriteInternal(spx, spy, spriteIndex, spriteData, tilesDest, ref rectangle);
+				yield return (spx, spy, spriteData, spriteIndex);
 			}
-
-			return rectangle;
 		}
 
-		static void DumpSpriteInternal(int spx, int spy, int spriteIndex, int spriteFlags, DirectBitmap tilesDest, ref Rectangle rectangle)
+		static void DumpSpriteInternal(int spx, int spy, int spriteIndex, int spriteFlags, DirectBitmap tilesDest, Rectangle bounds)
 		{
-			Point source = new Point((spriteIndex % 16) * 8, (spriteIndex / 16) * 8);
-
-			Rectangle tileRect = new Rectangle(spx, spy, 8, 8);
-			rectangle = rectangle == Rectangle.Empty ? tileRect : Rectangle.Union(rectangle, tileRect);
-
-			Func<int, int> getY;
-			Func<int, int> getX;
-
-			if ((spriteFlags & 0x40) != 0) //horizontal flip
+			if (new Rectangle(spx, spy, 8, 8).IntersectsWith(bounds))
 			{
-				getX = x => 7 - x;
-			}
-			else
-			{
-				getX = x => x;
-			}
+				Func<int, int> getY;
+				Func<int, int> getX;
 
-			if ((spriteFlags & 0x80) != 0) //vertical flip
-			{
-				getY = y => 7 - y;
-			}
-			else
-			{
-				getY = y => y;
-			}
-
-			for (int y = 0; y < 8; y++)
-			{
-				int src = source.X + (source.Y + getY(y)) * Tiles8x8.Width;
-				int dst = spx + (spy + y) * tilesDest.Width;
-
-				for (int x = 0; x < 8; x++)
+				if ((spriteFlags & 0x40) != 0) //horizontal flip
 				{
-					if (tilesDest.Bits[dst + x] == 0)
+					getX = x => 7 - x;
+				}
+				else
+				{
+					getX = x => x;
+				}
+
+				if ((spriteFlags & 0x80) != 0) //vertical flip
+				{
+					getY = y => 7 - y;
+				}
+				else
+				{
+					getY = y => y;
+				}
+
+				Point source = new Point((spriteIndex % 16) * 8, (spriteIndex / 16) * 8);
+				for (int y = 0; y < 8; y++)
+				{
+					if ((spy + y) >= bounds.Top && (spy + y) < bounds.Bottom)
 					{
-						tilesDest.Bits[dst + x] = Tiles8x8.Bits[src + getX(x)];
+						int src = source.X + (source.Y + getY(y)) * Tiles8x8.Width;
+						int dst = spx + (spy + y) * tilesDest.Width;
+
+						for (int x = 0; x < 8; x++)
+						{
+							if ((spx + x) >= bounds.Left && (spx + x) < bounds.Right && tilesDest.Bits[dst + x] == 0)
+							{
+								tilesDest.Bits[dst + x] = Tiles8x8.Bits[src + getX(x)];
+							}
+						}
 					}
 				}
 			}
@@ -251,16 +298,8 @@ namespace WLEditor
 			return true;
 		}
 
-		public static void DumpEnemiesSprites(Rom rom, int enemiesIdsPointer, int tilesDataAddress)
-		{
-			Array.Clear(TilesEnemies.Bits, 0, TilesEnemies.Bits.Length);
-			Array.Clear(LoadedSprites, 0, LoadedSprites.Length);
-
-			DumpEnemiesSprites(rom, enemiesIdsPointer, tilesDataAddress, TilesEnemies, 0, LoadedSprites, 0, out _);
-		}
-
 		public static void DumpEnemiesSprites(Rom rom, int enemiesIdsPointer, int tilesDataAddress,
-			DirectBitmap bitmap, int destX, Rectangle[] spriteRects, int index, out int[] enemyIds)
+			DirectBitmap bitmap, int destY, Rectangle[] spriteRects, Point[] offsets, int index, int width, out int[] enemyIds)
 		{
 			enemyIds = GetEnemyIds(rom, enemiesIdsPointer).ToArray();
 			var enemyTileInfo = LoadEnemiesTiles(rom, tilesDataAddress).ToArray();
@@ -276,8 +315,9 @@ namespace WLEditor
 						var (tileBank, tileAddress, tileCount) = enemyTileInfo[i];
 						LoadEnemiesTilesInternal(rom, spriteDataAddress, tileBank, tileCount, tileAddress);
 
-						Rectangle rectangle = DumpSprite(rom, destX + 32, 120 + i * 128, spriteDataAddress, bitmap);
-						spriteRects[index + i] = rectangle;
+						var (rect, offset) = DumpSprite(rom, i * width, destY, spriteDataAddress, bitmap, width);
+						spriteRects[index + i] = rect;
+						offsets[index + i] = offset;
 					}
 				}
 			}
