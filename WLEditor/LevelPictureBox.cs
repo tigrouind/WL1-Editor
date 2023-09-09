@@ -52,14 +52,13 @@ namespace WLEditor
 			{
 				using (StringFormat format = new StringFormat())
 				using (Font font = new Font("Arial", 8 * zoom))
-				using (Brush transparentBrush = new SolidBrush(Color.FromArgb(64, 0, 0, 0)))
 				using (Graphics g = Graphics.FromImage(levelTiles.Bitmap))
 				{
 					format.LineAlignment = StringAlignment.Center;
 					format.Alignment = StringAlignment.Center;
 
 					//draw tiles to cache
-					DrawTiles(g, e.ClipRectangle, ShowColliders, format, transparentBrush);
+					DrawTiles(g, e.ClipRectangle, ShowColliders);
 
 					//draw tiles from cache
 					e.Graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
@@ -136,7 +135,7 @@ namespace WLEditor
 			}
 		}
 
-		void DrawTiles(Graphics g, Rectangle clipRectangle, bool viewColliders, StringFormat format, Brush transparentBrush)
+		void DrawTiles(Graphics g, Rectangle clipRectangle, bool viewColliders)
 		{
 			clipRectangle = GetClipRectangle(clipRectangle, 16 * zoom);
 

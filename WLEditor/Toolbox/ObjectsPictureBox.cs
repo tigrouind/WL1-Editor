@@ -17,9 +17,11 @@ namespace WLEditor
 		{
 			if (Level.LevelData != null && !DesignMode)
 			{
-				StringFormat format = new StringFormat();
-				format.LineAlignment = StringAlignment.Center;
-				format.Alignment = StringAlignment.Center;
+				StringFormat format = new StringFormat
+				{
+					LineAlignment = StringAlignment.Center,
+					Alignment = StringAlignment.Center
+				};
 
 				using (Brush brush = new SolidBrush(Color.FromArgb(128, 255, 0, 0)))
 				using (Pen pen = new Pen(Color.White, 1.5f * zoom))
