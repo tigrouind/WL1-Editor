@@ -13,7 +13,7 @@ namespace WLEditor
 		public event EventHandler<TileEventArgs> TileMouseMove;
 
 		int lastTile;
-		DirectBitmap tiles = new DirectBitmap(128, 256);
+		readonly DirectBitmap tiles = new DirectBitmap(128, 256);
 		int zoom;
 
 		protected override void OnPaint(PaintEventArgs e)
@@ -38,30 +38,30 @@ namespace WLEditor
 				{
 					e.Graphics.FillRectangle(brush, (CurrentTile % 8) * 16 * zoom, (CurrentTile / 8) * 16 * zoom, 16 * zoom, 16 * zoom);
 				}
-			}
-		}
 
-		void DrawTiles(Graphics g, Rectangle clipRectangle)
-		{
-			using (Brush brush = new SolidBrush(Color.FromArgb(64, 0, 0, 0)))
-			{
-				for (int j = 0; j < 16; j++)
+				void DrawTiles(Graphics g, Rectangle clipRectangle)
 				{
-					for (int i = 0; i < 8; i++)
+					using (Brush brush = new SolidBrush(Color.FromArgb(64, 0, 0, 0)))
 					{
-						Rectangle destRect = new Rectangle(i * 16, j * 16, 16, 16);
-
-						if (destRect.IntersectsWith(clipRectangle))
+						for (int j = 0; j < 16; j++)
 						{
-							int tileIndex = i + j * 8;
-							tileIndex = Level.SwitchTile(tileIndex, SwitchMode);
-
-							if (ShowColliders)
+							for (int i = 0; i < 8; i++)
 							{
-								int specialTile = Level.IsSpecialTile(tileIndex);
-								if (specialTile != -1)
+								Rectangle destRect = new Rectangle(i * 16, j * 16, 16, 16);
+
+								if (destRect.IntersectsWith(clipRectangle))
 								{
-									g.FillRectangle(LevelPictureBox.TransparentBrushes[specialTile], destRect);
+									int tileIndex = i + j * 8;
+									tileIndex = Level.SwitchTile(tileIndex, SwitchMode);
+
+									if (ShowColliders)
+									{
+										int specialTile = Level.IsSpecialTile(tileIndex);
+										if (specialTile != -1)
+										{
+											g.FillRectangle(LevelPictureBox.TransparentBrushes[specialTile], destRect);
+										}
+									}
 								}
 							}
 						}
@@ -98,10 +98,7 @@ namespace WLEditor
 
 		void RaiseTileMouseMoveEvent()
 		{
-			if (TileMouseMove != null)
-			{
-				TileMouseMove(this, new TileEventArgs(MouseButtons.None, TileEventStatus.MouseDown, lastTile % 8, lastTile / 8));
-			}
+			TileMouseMove?.Invoke(this, new TileEventArgs(MouseButtons.None, TileEventStatus.MouseDown, lastTile % 8, lastTile / 8));
 		}
 	}
 }

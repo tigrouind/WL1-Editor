@@ -33,43 +33,43 @@ namespace WLEditor
 
 					for (int index = 0; index < 16; index++)
 					{
-						DrawTile(e.Graphics, e.ClipRectangle, pen, font, format, index);
+						DrawTile(e.ClipRectangle, pen, font, format, index);
 					}
 
 					e.Graphics.FillRectangle(brush, (CurrentObject % 4) * 32 * zoom, (CurrentObject / 4) * 32 * zoom, 32 * zoom, 32 * zoom);
 				}
 			}
-		}
 
-		void DrawTile(Graphics g, Rectangle clipRectangle, Pen pen, Font font, StringFormat format, int index)
-		{
-			int x = (index % 4) * 32;
-			int y = (index / 4) * 32;
-
-			Rectangle destRect = new Rectangle(x * zoom, y * zoom, 32 * zoom, 32 * zoom);
-			if (destRect.IntersectsWith(clipRectangle))
+			void DrawTile(Rectangle clipRectangle, Pen pen, Font font, StringFormat format, int index)
 			{
-				if (index == 0)
+				int x = (index % 4) * 32;
+				int y = (index / 4) * 32;
+
+				Rectangle destRect = new Rectangle(x * zoom, y * zoom, 32 * zoom, 32 * zoom);
+				if (destRect.IntersectsWith(clipRectangle))
 				{
-					g.DrawLine(pen, (x + 8) * zoom, (y + 8) * zoom, (x + 24) * zoom, (y + 24) * zoom);
-					g.DrawLine(pen, (x + 24) * zoom, (y + 8) * zoom, (x + 8) * zoom, (y + 24) * zoom);
-				}
-				if (index >= 1 && index <= 6) //enemy
-				{
-					Rectangle enemyRect = Sprite.LoadedSprites[index - 1];
-					if (enemyRect != Rectangle.Empty)
+					if (index == 0)
 					{
-						var imgRect = new Rectangle((index - 1) * 40 + 4, 4, 32, 32);
-						g.DrawImage(Sprite.TilesEnemies.Bitmap, destRect, imgRect, GraphicsUnit.Pixel);
+						e.Graphics.DrawLine(pen, (x + 8) * zoom, (y + 8) * zoom, (x + 24) * zoom, (y + 24) * zoom);
+						e.Graphics.DrawLine(pen, (x + 24) * zoom, (y + 8) * zoom, (x + 8) * zoom, (y + 24) * zoom);
 					}
-					else
+					if (index >= 1 && index <= 6) //enemy
 					{
-						g.DrawString(index.ToString(), font, Brushes.White, (x + 16) * zoom, (y + 16) * zoom, format);
+						Rectangle enemyRect = Sprite.LoadedSprites[index - 1];
+						if (enemyRect != Rectangle.Empty)
+						{
+							var imgRect = new Rectangle((index - 1) * 40 + 4, 4, 32, 32);
+							e.Graphics.DrawImage(Sprite.TilesEnemies.Bitmap, destRect, imgRect, GraphicsUnit.Pixel);
+						}
+						else
+						{
+							e.Graphics.DrawString(index.ToString(), font, Brushes.White, (x + 16) * zoom, (y + 16) * zoom, format);
+						}
 					}
-				}
-				else //power up
-				{
-					g.DrawImage(Sprite.TilesObjects.Bitmap, new Rectangle((x + 8) * zoom, (y + 8) * zoom, 16 * zoom, 16 * zoom), new Rectangle((index - 7) * 16, 0, 16, 16), GraphicsUnit.Pixel);
+					else //power up
+					{
+						e.Graphics.DrawImage(Sprite.TilesObjects.Bitmap, new Rectangle((x + 8) * zoom, (y + 8) * zoom, 16 * zoom, 16 * zoom), new Rectangle((index - 7) * 16, 0, 16, 16), GraphicsUnit.Pixel);
+					}
 				}
 			}
 		}
@@ -103,10 +103,7 @@ namespace WLEditor
 
 		void RaiseTileMouseMoveEvent()
 		{
-			if (TileMouseMove != null)
-			{
-				TileMouseMove(this, new TileEventArgs(MouseButtons.None, TileEventStatus.MouseDown, lastTile % 4, lastTile / 4));
-			}
+			TileMouseMove?.Invoke(this, new TileEventArgs(MouseButtons.None, TileEventStatus.MouseDown, lastTile % 4, lastTile / 4));
 		}
 	}
 }

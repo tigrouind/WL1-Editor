@@ -15,9 +15,9 @@ namespace WLEditor
 
 		Rom rom;
 		int zoom;
-		DirectBitmap tilesWorld8x8 = new DirectBitmap(16 * 8, 16 * 8);
-		DirectBitmap tilesWorld = new DirectBitmap(32 * 8, 32 * 8);
-		DirectBitmap tilesWorldScroll = new DirectBitmap(32 * 8, 32 * 8);
+		readonly DirectBitmap tilesWorld8x8 = new DirectBitmap(16 * 8, 16 * 8);
+		readonly DirectBitmap tilesWorld = new DirectBitmap(32 * 8, 32 * 8);
+		readonly DirectBitmap tilesWorldScroll = new DirectBitmap(32 * 8, 32 * 8);
 		int currentWorld;
 
 		List<SelectionChange> changes = new List<SelectionChange>();
@@ -36,12 +36,12 @@ namespace WLEditor
 		bool lastTileSide;
 		ChangeEnum changesFlag;
 
-		Selection selection = new Selection(8);
+		readonly Selection selection = new Selection(8);
 		bool selectionMode;
 
-		byte[] worldTiles = new byte[32 * 32];
-		int[] previousWorldTiles = new int[32 * 32];
-		bool[] invalidTiles = new bool[16 * 16];
+		readonly byte[] worldTiles = new byte[32 * 32];
+		readonly int[] previousWorldTiles = new int[32 * 32];
+		readonly bool[] invalidTiles = new bool[16 * 16];
 
 		readonly PathForm pathForm;
 		readonly EventForm eventForm;
@@ -57,6 +57,18 @@ namespace WLEditor
 			pathForm.PathChanged += (s, e) => SetChanges(ChangeEnum.Path);
 
 			selection.InvalidateSelection += InvalidateSelection;
+
+			void InvalidateSelection(object sender, SelectionEventArgs e)
+			{
+				if (selectionMode)
+				{
+					pictureBox1.Invalidate(e.ClipRectangle);
+				}
+				else
+				{
+					pictureBox2.Invalidate(e.ClipRectangle);
+				}
+			}
 		}
 
 		readonly ComboboxItem<int[]>[] worldData =
@@ -109,6 +121,15 @@ namespace WLEditor
 				LoadWorld();
 				SetZoom(zoom);
 			}
+
+			void LoadWorldCombobox()
+			{
+				WorldComboBox.Items.Clear();
+				for (int i = 0; i < worldData.Length; i++)
+				{
+					WorldComboBox.Items.Add(worldData[i]);
+				}
+			}
 		}
 
 		void LoadWorld()
@@ -131,25 +152,16 @@ namespace WLEditor
 			ClearAllTiles();
 			pictureBox1.Invalidate();
 			pictureBox2.Invalidate();
-		}
 
-		void ClearAllTiles()
-		{
-			for (int y = 0; y < currentMapY; y++)
+			void ClearAllTiles()
 			{
-				for (int x = 0; x < currentMapX; x++)
+				for (int y = 0; y < CurrentMapY; y++)
 				{
-					previousWorldTiles[x + y * 32] = -1;
+					for (int x = 0; x < CurrentMapX; x++)
+					{
+						previousWorldTiles[x + y * 32] = -1;
+					}
 				}
-			}
-		}
-
-		void LoadWorldCombobox()
-		{
-			WorldComboBox.Items.Clear();
-			for (int i = 0; i < worldData.Length; i++)
-			{
-				WorldComboBox.Items.Add(worldData[i]);
 			}
 		}
 
@@ -217,16 +229,16 @@ namespace WLEditor
 			}
 
 			return true;
-		}
 
-		void CopyTilesOnTheRightSide()
-		{
-			for (int y = 0; y < 17; y++)
+			void CopyTilesOnTheRightSide()
 			{
-				var data = worldTiles[19 + y * 32];
-				for (int x = 20; x < 32; x++)
+				for (int y = 0; y < 17; y++)
 				{
-					worldTiles[x + y * 32] = data;
+					var data = worldTiles[19 + y * 32];
+					for (int x = 20; x < 32; x++)
+					{
+						worldTiles[x + y * 32] = data;
+					}
 				}
 			}
 		}
@@ -241,8 +253,8 @@ namespace WLEditor
 				e.Graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
 				e.Graphics.PixelOffsetMode = PixelOffsetMode.Half;
 				e.Graphics.DrawImage(GetTilesWorldBitmap(),
-									new Rectangle(0, 0, currentMapX * 8 * zoom, currentMapY * 8 * zoom),
-									new Rectangle(0, 0, currentMapX * 8, currentMapY * 8),
+									new Rectangle(0, 0, CurrentMapX * 8 * zoom, CurrentMapY * 8 * zoom),
+									new Rectangle(0, 0, CurrentMapX * 8, CurrentMapY * 8),
 									GraphicsUnit.Pixel);
 
 				if (eventMode)
@@ -256,6 +268,68 @@ namespace WLEditor
 				if (selectionMode)
 				{
 					selection.DrawSelection(e.Graphics);
+				}
+			}
+
+			void RenderTiles()
+			{
+				for (int y = 0; y < CurrentMapY; y++)
+				{
+					for (int x = 0; x < CurrentMapX; x++)
+					{
+						byte tileIndex = (byte)(worldTiles[x + y * 32] ^ 0x80);
+						int previousTileIndex = previousWorldTiles[x + y * 32];
+						if (tileIndex != previousTileIndex)
+						{
+							previousWorldTiles[x + y * 32] = tileIndex;
+							Dump8x8Tile(new Point(x * 8, y * 8), tileIndex, tilesWorld);
+						}
+					}
+				}
+
+				void Dump8x8Tile(Point dest, int tileIndex, DirectBitmap bitmap)
+				{
+					Point source = new Point((tileIndex % 16) * 8, (tileIndex / 16) * 8);
+					for (int y = 0; y < 8; y++)
+					{
+						Array.Copy(tilesWorld8x8.Bits, source.X + (source.Y + y) * tilesWorld8x8.Width,
+								bitmap.Bits, dest.X + (dest.Y + y) * bitmap.Width, 8);
+					}
+				}
+			}
+
+			Bitmap GetTilesWorldBitmap()
+			{
+				if (currentWorld == 7 && timerTicks != 0)
+				{
+					for (int y = 0; y < 144; y++)
+					{
+						int offset = y * 256;
+						int scroll = y < 54 ? Overworld.GetScroll(rom, animationIndex + y) : 0;
+						ScrollLine(offset, scroll);
+					}
+
+					return tilesWorldScroll.Bitmap;
+				}
+
+				return tilesWorld.Bitmap;
+
+				void ScrollLine(int offset, int scroll)
+				{
+					if (scroll > 0)
+					{
+						Array.Copy(tilesWorld.Bits, offset, tilesWorldScroll.Bits, offset + scroll, 160 - scroll);
+						Array.Copy(tilesWorld.Bits, offset + 160 - scroll, tilesWorldScroll.Bits, offset, scroll);
+					}
+					else if (scroll < 0)
+					{
+						Array.Copy(tilesWorld.Bits, offset - scroll, tilesWorldScroll.Bits, offset, 160 + scroll);
+						Array.Copy(tilesWorld.Bits, offset, tilesWorldScroll.Bits, offset + 160 + scroll, -scroll);
+					}
+					else
+					{
+						Array.Copy(tilesWorld.Bits, offset, tilesWorldScroll.Bits, offset, 160);
+					}
 				}
 			}
 		}
@@ -282,8 +356,8 @@ namespace WLEditor
 
 		public void SetZoom(int zoomlevel)
 		{
-			pictureBox1.Width = currentMapX * 8 * zoomlevel;
-			pictureBox1.Height = currentMapY * 8 * zoomlevel;
+			pictureBox1.Width = CurrentMapX * 8 * zoomlevel;
+			pictureBox1.Height = CurrentMapY * 8 * zoomlevel;
 
 			pictureBox2.Width = 128 * zoomlevel;
 			pictureBox2.Height = 128 * zoomlevel;
@@ -308,7 +382,7 @@ namespace WLEditor
 		{
 			KeyEventArgs args = new KeyEventArgs(keyData);
 
-			if (DispatchCommandKey(keyData))
+			if (DispatchCommandKey())
 			{
 				return true;
 			}
@@ -320,75 +394,201 @@ namespace WLEditor
 			}
 
 			return base.ProcessCmdKey(ref msg, keyData);
-		}
 
-		bool DispatchCommandKey(Keys keyData)
-		{
-			if (eventMode && eventForm.ProcessEventKey(keyData))
+			bool DispatchCommandKey()
 			{
-				return true;
-			}
-
-			if (pathMode && pathForm.ProcessPathKey(keyData))
-			{
-				return true;
-			}
-
-			switch (keyData)
-			{
-				case Keys.E:
-				case Keys.P:
-					eventMode = keyData == Keys.E && !eventMode;
-					pathMode = keyData == Keys.P && !pathMode;
-
-					UpdateTitle();
-					pictureBox1.Invalidate();
-					pictureBox2.Visible = !pathMode;
-					UpdateBounds();
-					selection.ClearUndo();
-					selection.ClearSelection();
+				if (eventMode && eventForm.ProcessEventKey(keyData))
+				{
 					return true;
+				}
 
-				case Keys.Control | Keys.C:
-					CopySelection();
+				if (pathMode && pathForm.ProcessPathKey(keyData))
+				{
 					return true;
+				}
 
-				case Keys.Control | Keys.V:
-					PasteSelection();
-					return true;
+				switch (keyData)
+				{
+					case Keys.E:
+					case Keys.P:
+						eventMode = keyData == Keys.E && !eventMode;
+						pathMode = keyData == Keys.P && !pathMode;
 
-				case Keys.Control | Keys.X:
-					CutSelection();
-					return true;
+						UpdateTitle();
+						pictureBox1.Invalidate();
+						pictureBox2.Visible = !pathMode;
+						UpdateBounds();
+						selection.ClearUndo();
+						selection.ClearSelection();
+						return true;
 
-				case Keys.Delete:
-					DeleteSelection();
-					return true;
+					case Keys.Control | Keys.C:
+						CopySelection();
+						return true;
 
-				case Keys.Control | Keys.Z:
-					Undo();
-					return true;
+					case Keys.Control | Keys.V:
+						PasteSelection();
+						return true;
 
-				case Keys.Control | Keys.Y:
-					Redo();
-					return true;
+					case Keys.Control | Keys.X:
+						CutSelection();
+						return true;
 
-				case Keys.M:
-					SetMusicTrack();
-					return true;
-			}
+					case Keys.Delete:
+						DeleteSelection();
+						return true;
 
-			return false;
-		}
+					case Keys.Control | Keys.Z:
+						Undo();
+						return true;
 
-		void SetMusicTrack()
-		{
-			int musicTrack = Overworld.GetMusic(rom, currentWorld);
-			string musicTrackTxt = Interaction.InputBox(string.Empty, "Enter music track number (1-8)", musicTrack == -1 ? string.Empty : (musicTrack + 1).ToString(), -1, -1);
-			if ((int.TryParse(musicTrackTxt, out musicTrack) && musicTrack >= 1 && musicTrack <= 8))
-			{
-				Overworld.SetMusic(rom, currentWorld, musicTrack - 1);
-				SetChanges(ChangeEnum.None);
+					case Keys.Control | Keys.Y:
+						Redo();
+						return true;
+
+					case Keys.M:
+						SetMusicTrack();
+						return true;
+				}
+
+				return false;
+
+				#region Selection
+
+				void CopySelection()
+				{
+					if (!pathMode)
+					{
+						selection.CopySelection(CopyTileAt);
+						selection.ClearSelection();
+					}
+				}
+
+				void PasteSelection()
+				{
+					if (!pathMode && selectionMode)
+					{
+						if (selection.PasteSelection(PasteTileAt))
+						{
+							RaiseTileMoveEvent();
+							pictureBox1.Invalidate();
+							SetChanges(eventMode ? ChangeEnum.Event : ChangeEnum.Tile);
+						}
+
+						selection.ClearSelection();
+					}
+
+					int PasteTileAt(int x, int y, int data)
+					{
+						if (x < CurrentMapX && y < CurrentMapY && data != -1)
+						{
+							return SetTileAt(x, y, data);
+						}
+
+						return data; //no changes
+					}
+				}
+
+				void CutSelection()
+				{
+					if (!pathMode && selectionMode)
+					{
+						int tile = GetEmptyTile();
+						if (selection.CopySelection(CopyTileAt) && selection.DeleteSelection(SetTileAt, GetEmptyTile()))
+						{
+							RaiseTileMoveEvent();
+							pictureBox1.Invalidate();
+							SetChanges(eventMode ? ChangeEnum.Event : ChangeEnum.Tile);
+						}
+
+						selection.ClearSelection();
+					}
+				}
+
+				void DeleteSelection()
+				{
+					if (!pathMode && selectionMode)
+					{
+						int tile = GetEmptyTile();
+						if (selection.DeleteSelection(SetTileAt, GetEmptyTile()))
+						{
+							RaiseTileMoveEvent();
+							pictureBox1.Invalidate();
+							SetChanges(eventMode ? ChangeEnum.Event : ChangeEnum.Tile);
+						}
+
+						selection.ClearSelection();
+					}
+				}
+
+				ClipboardData CopyTileAt(int x, int y)
+				{
+					if (selectionMode)
+					{
+						if (eventMode)
+						{
+							int index = eventForm.FindEvent(x + y * 32);
+							return new ClipboardData { Index = index, Tile = eventForm.GetEvent(index) };
+						}
+
+						return new ClipboardData { Tile = GetTileAt(x, y) };
+					}
+
+					return new ClipboardData { Tile = (x + y * 16) ^ 0x80 };
+				}
+
+				int GetEmptyTile()
+				{
+					if (eventMode)
+					{
+						return -1;
+					}
+
+					return Level.GetEmptyTile(tilesWorld8x8.Bits, 8, 16) ^ 0x80;
+				}
+
+				#endregion
+
+				#region Undo
+
+				void Undo()
+				{
+					if (!pathMode)
+					{
+						if (selection.Undo(SetTileAt, GetTileAt))
+						{
+							RaiseTileMoveEvent();
+							pictureBox1.Invalidate();
+							SetChanges(eventMode ? ChangeEnum.Event : ChangeEnum.Tile);
+						}
+					}
+				}
+
+				void Redo()
+				{
+					if (!pathMode)
+					{
+						if (selection.Redo(SetTileAt, GetTileAt))
+						{
+							RaiseTileMoveEvent();
+							pictureBox1.Invalidate();
+							SetChanges(eventMode ? ChangeEnum.Event : ChangeEnum.Tile);
+						}
+					}
+				}
+
+				#endregion
+
+				void SetMusicTrack()
+				{
+					int musicTrack = Overworld.GetMusic(rom, currentWorld);
+					string musicTrackTxt = Interaction.InputBox(string.Empty, "Enter music track number (1-8)", musicTrack == -1 ? string.Empty : (musicTrack + 1).ToString(), -1, -1);
+					if ((int.TryParse(musicTrackTxt, out musicTrack) && musicTrack >= 1 && musicTrack <= 8))
+					{
+						Overworld.SetMusic(rom, currentWorld, musicTrack - 1);
+						SetChanges(ChangeEnum.None);
+					}
+				}
 			}
 		}
 
@@ -396,33 +596,6 @@ namespace WLEditor
 		{
 			changesFlag |= mode;
 			WorldMapChanged(this, EventArgs.Empty);
-		}
-
-		void RenderTiles()
-		{
-			for (int y = 0; y < currentMapY; y++)
-			{
-				for (int x = 0; x < currentMapX; x++)
-				{
-					byte tileIndex = (byte)(worldTiles[x + y * 32] ^ 0x80);
-					int previousTileIndex = previousWorldTiles[x + y * 32];
-					if (tileIndex != previousTileIndex)
-					{
-						previousWorldTiles[x + y * 32] = tileIndex;
-						Dump8x8Tile(new Point(x * 8, y * 8), tileIndex, tilesWorld);
-					}
-				}
-			}
-		}
-
-		void Dump8x8Tile(Point dest, int tileIndex, DirectBitmap bitmap)
-		{
-			Point source = new Point((tileIndex % 16) * 8, (tileIndex / 16) * 8);
-			for (int y = 0; y < 8; y++)
-			{
-				Array.Copy(tilesWorld8x8.Bits, source.X + (source.Y + y) * tilesWorld8x8.Width,
-						bitmap.Bits, dest.X + (dest.Y + y) * bitmap.Width, 8);
-			}
 		}
 
 		void RaiseTileMoveEvent()
@@ -465,7 +638,7 @@ namespace WLEditor
 			statusStrip1.Visible = eventMode || !pathMode;
 		}
 
-		int currentMapX
+		int CurrentMapX
 		{
 			get
 			{
@@ -473,7 +646,7 @@ namespace WLEditor
 			}
 		}
 
-		int currentMapY
+		int CurrentMapY
 		{
 			get
 			{
@@ -482,17 +655,6 @@ namespace WLEditor
 		}
 
 		#region Mouse
-
-		void UpdateTile(int x, int y, int newTile)
-		{
-			int previousTile = SetTileAt(x, y, newTile);
-			if (previousTile != newTile)
-			{
-				changes.Add(new SelectionChange { X = x, Y = y, Data = previousTile });
-				pictureBox1.Invalidate();
-				SetChanges(eventMode ? ChangeEnum.Event : ChangeEnum.Tile);
-			}
-		}
 
 		void UpdateSelection(TileEventArgs e, bool mode)
 		{
@@ -568,6 +730,17 @@ namespace WLEditor
 			}
 
 			UpdateSelection(e, true);
+
+			void UpdateTile(int x, int y, int newTile)
+			{
+				int previousTile = SetTileAt(x, y, newTile);
+				if (previousTile != newTile)
+				{
+					changes.Add(new SelectionChange { X = x, Y = y, Data = previousTile });
+					pictureBox1.Invalidate();
+					SetChanges(eventMode ? ChangeEnum.Event : ChangeEnum.Tile);
+				}
+			}
 		}
 
 		void PictureBox1MouseMove(object sender, MouseEventArgs e)
@@ -635,6 +808,14 @@ namespace WLEditor
 			}
 
 			UpdateSelection(e, false);
+
+			void InvalidateCurrentTile()
+			{
+				if (selectedTile != -1)
+				{
+					pictureBox2.Invalidate(new Rectangle((selectedTile % 16) * 8 * zoom, (selectedTile / 16) * 8 * zoom, 8 * zoom, 8 * zoom));
+				}
+			}
 		}
 
 		void PictureBox2MouseMove(object sender, MouseEventArgs e)
@@ -664,88 +845,6 @@ namespace WLEditor
 		#endregion
 
 		#region Selection
-
-		void CopySelection()
-		{
-			if (!pathMode)
-			{
-				selection.CopySelection(CopyTileAt);
-				selection.ClearSelection();
-			}
-		}
-
-		void PasteSelection()
-		{
-			if (!pathMode && selectionMode)
-			{
-				if (selection.PasteSelection(PasteTileAt))
-				{
-					RaiseTileMoveEvent();
-					pictureBox1.Invalidate();
-					SetChanges(eventMode ? ChangeEnum.Event : ChangeEnum.Tile);
-				}
-
-				selection.ClearSelection();
-			}
-		}
-
-		void CutSelection()
-		{
-			if (!pathMode && selectionMode)
-			{
-				int tile = GetEmptyTile();
-				if (selection.CopySelection(CopyTileAt) && selection.DeleteSelection(SetTileAt, GetEmptyTile()))
-				{
-					RaiseTileMoveEvent();
-					pictureBox1.Invalidate();
-					SetChanges(eventMode ? ChangeEnum.Event : ChangeEnum.Tile);
-				}
-
-				selection.ClearSelection();
-			}
-		}
-
-		void DeleteSelection()
-		{
-			if (!pathMode && selectionMode)
-			{
-				int tile = GetEmptyTile();
-				if (selection.DeleteSelection(SetTileAt, GetEmptyTile()))
-				{
-					RaiseTileMoveEvent();
-					pictureBox1.Invalidate();
-					SetChanges(eventMode ? ChangeEnum.Event : ChangeEnum.Tile);
-				}
-
-				selection.ClearSelection();
-			}
-		}
-
-		int PasteTileAt(int x, int y, int data)
-		{
-			if (x < currentMapX && y < currentMapY && data != -1)
-			{
-				return SetTileAt(x, y, data);
-			}
-
-			return data; //no changes
-		}
-
-		ClipboardData CopyTileAt(int x, int y)
-		{
-			if (selectionMode)
-			{
-				if (eventMode)
-				{
-					int index = eventForm.FindEvent(x + y * 32);
-					return new ClipboardData { Index = index, Tile = eventForm.GetEvent(index) };
-				}
-
-				return new ClipboardData { Tile = GetTileAt(x, y) };
-			}
-
-			return new ClipboardData { Tile = (x + y * 16) ^ 0x80 };
-		}
 
 		int GetTileAt(int x, int y)
 		{
@@ -785,66 +884,6 @@ namespace WLEditor
 			}
 
 			return previous;
-		}
-
-		int GetEmptyTile()
-		{
-			if (eventMode)
-			{
-				return -1;
-			}
-
-			return Level.GetEmptyTile(tilesWorld8x8.Bits, 8, 16) ^ 0x80;
-		}
-
-		void InvalidateSelection(object sender, SelectionEventArgs e)
-		{
-			if (selectionMode)
-			{
-				pictureBox1.Invalidate(e.ClipRectangle);
-			}
-			else
-			{
-				pictureBox2.Invalidate(e.ClipRectangle);
-			}
-		}
-
-		void InvalidateCurrentTile()
-		{
-			if (selectedTile != -1)
-			{
-				pictureBox2.Invalidate(new Rectangle((selectedTile % 16) * 8 * zoom, (selectedTile / 16) * 8 * zoom, 8 * zoom, 8 * zoom));
-			}
-		}
-
-		#endregion
-
-		#region Undo
-
-		void Undo()
-		{
-			if (!pathMode)
-			{
-				if (selection.Undo(SetTileAt, GetTileAt))
-				{
-					RaiseTileMoveEvent();
-					pictureBox1.Invalidate();
-					SetChanges(eventMode ? ChangeEnum.Event : ChangeEnum.Tile);
-				}
-			}
-		}
-
-		void Redo()
-		{
-			if (!pathMode)
-			{
-				if (selection.Redo(SetTileAt, GetTileAt))
-				{
-					RaiseTileMoveEvent();
-					pictureBox1.Invalidate();
-					SetChanges(eventMode ? ChangeEnum.Event : ChangeEnum.Tile);
-				}
-			}
 		}
 
 		#endregion
@@ -913,6 +952,21 @@ namespace WLEditor
 						break;
 				}
 			}
+
+			void InvalidateAnimatedTiles()
+			{
+				for (int y = 0; y < CurrentMapY; y++)
+				{
+					for (int x = 0; x < CurrentMapX; x++)
+					{
+						var previousTile = previousWorldTiles[x + y * 32];
+						if (invalidTiles[previousTile])
+						{
+							previousWorldTiles[x + y * 32] = -1;
+						}
+					}
+				}
+			}
 		}
 
 		public void ResetTimer()
@@ -966,56 +1020,6 @@ namespace WLEditor
 					Overworld.DumpAnimatedTilesA(rom, animationOverworld[0, 0], animationOverworld[0, 1], tilesWorld8x8, animationIndex % 8, 8);
 					invalidTiles[animationOverworld[0, 1]] = true;
 					break;
-			}
-		}
-
-		void InvalidateAnimatedTiles()
-		{
-			for (int y = 0; y < currentMapY; y++)
-			{
-				for (int x = 0; x < currentMapX; x++)
-				{
-					var previousTile = previousWorldTiles[x + y * 32];
-					if (invalidTiles[previousTile])
-					{
-						previousWorldTiles[x + y * 32] = -1;
-					}
-				}
-			}
-		}
-
-		Bitmap GetTilesWorldBitmap()
-		{
-			if (currentWorld == 7 && timerTicks != 0)
-			{
-				for (int y = 0; y < 144; y++)
-				{
-					int offset = y * 256;
-					int scroll = y < 54 ? Overworld.GetScroll(rom, animationIndex + y) : 0;
-					ScrollLine(offset, scroll);
-				}
-
-				return tilesWorldScroll.Bitmap;
-			}
-
-			return tilesWorld.Bitmap;
-		}
-
-		void ScrollLine(int offset, int scroll)
-		{
-			if (scroll > 0)
-			{
-				Array.Copy(tilesWorld.Bits, offset, tilesWorldScroll.Bits, offset + scroll, 160 - scroll);
-				Array.Copy(tilesWorld.Bits, offset + 160 - scroll, tilesWorldScroll.Bits, offset, scroll);
-			}
-			else if (scroll < 0)
-			{
-				Array.Copy(tilesWorld.Bits, offset - scroll, tilesWorldScroll.Bits, offset, 160 + scroll);
-				Array.Copy(tilesWorld.Bits, offset, tilesWorldScroll.Bits, offset + 160 + scroll, -scroll);
-			}
-			else
-			{
-				Array.Copy(tilesWorld.Bits, offset, tilesWorldScroll.Bits, offset, 160);
 			}
 		}
 

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace WLEditor
@@ -203,6 +204,52 @@ namespace WLEditor
 			}
 
 			return posX != -1 && posY != -1;
+		}
+
+		public static void LimitScroll(Rom rom, int currentCourseId, int sector, int cameraType, ref int cameraX, ref int cameraY, ref int warioY)
+		{
+			int scrollData = GetScroll(rom, currentCourseId, sector);
+			bool allowLeft = (scrollData & 2) != 2;
+			bool allowRight = (scrollData & 1) != 1;
+			int sectorX = sector % 16;
+
+			if (!allowLeft)
+			{
+				cameraX = Math.Max(cameraX, sectorX * 32);
+			}
+			else
+			{
+				cameraX = Math.Max(cameraX, 0);
+			}
+
+			if (!allowRight)
+			{
+				cameraX = Math.Min(cameraX, sectorX * 32 + 10);
+			}
+			else
+			{
+				cameraX = Math.Min(cameraX, 15 * 32 + 10);
+			}
+
+			cameraY = Math.Max(cameraY, 0);  //top limit
+			cameraY = Math.Min(cameraY, 32 + 12); //bottom limit
+
+			if (cameraType == 0) //scroll X
+			{
+				if (cameraY < 16)
+				{
+					cameraY = 12;
+					warioY = Math.Max(warioY, 16);
+				}
+				else if (cameraY >= 16 && cameraY < 32)
+				{
+					cameraY = 28;
+				}
+				else
+				{
+					cameraY = 44;
+				}
+			}
 		}
 	}
 }

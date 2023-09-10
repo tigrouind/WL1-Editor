@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Windows.Forms;
 
 namespace WLEditor
 {
@@ -36,8 +37,11 @@ namespace WLEditor
 			{
 				if (enumerator.MoveNext())
 				{
-					List<TSource> buffer = new List<TSource>();
-					buffer.Add(enumerator.Current);
+					List<TSource> buffer = new List<TSource>
+					{
+						enumerator.Current
+					};
+
 					TKey lastKey = selector(enumerator.Current);
 
 					while (enumerator.MoveNext())
@@ -56,6 +60,25 @@ namespace WLEditor
 					}
 
 					yield return resultSelector(lastKey, buffer);
+				}
+			}
+		}
+
+		public static IEnumerable<ToolStripMenuItem> GetAllMenuItems(this ToolStripItemCollection items)
+		{
+			foreach (ToolStripItem item in items)
+			{
+				if (item is ToolStripMenuItem toolStrip)
+				{
+					yield return toolStrip;
+				}
+
+				if (item is ToolStripDropDownItem toolStripDropDown)
+				{
+					foreach (var child in GetAllMenuItems(toolStripDropDown.DropDownItems))
+					{
+						yield return child;
+					}
 				}
 			}
 		}

@@ -235,18 +235,18 @@ namespace WLEditor
 			}
 
 			return false;
-		}
 
-		void PreviousEvent()
-		{
-			int eventId = Array.IndexOf(worldEvents, worldEvent);
-			worldEvent = worldEvents[eventId - 1];
-		}
+			void PreviousEvent()
+			{
+				int eventId = Array.IndexOf(worldEvents, worldEvent);
+				worldEvent = worldEvents[eventId - 1];
+			}
 
-		void NextEvent()
-		{
-			int eventId = Array.IndexOf(worldEvents, worldEvent);
-			worldEvent = worldEvents[eventId + 1];
+			void NextEvent()
+			{
+				int eventId = Array.IndexOf(worldEvents, worldEvent);
+				worldEvent = worldEvents[eventId + 1];
+			}
 		}
 
 		public int GetTileAt(int tilePos)

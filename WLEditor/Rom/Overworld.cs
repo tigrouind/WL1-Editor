@@ -6,8 +6,8 @@ namespace WLEditor
 {
 	public class Overworld
 	{
-		static uint[] paletteColors = { 0xFFFFFFFF, 0xFFAAAAAA, 0xFF555555, 0xFF000000 };
-		static int[] directions = { 0xF0, 0xFE, 0xE0, 0xEE };
+		static readonly uint[] paletteColors = { 0xFFFFFFFF, 0xFFAAAAAA, 0xFF555555, 0xFF000000 };
+		static readonly int[] directions = { 0xF0, 0xFE, 0xE0, 0xEE };
 
 		static readonly int[,] flagsPosition =
 		{
@@ -312,10 +312,10 @@ namespace WLEditor
 
 		public static WorldPath[] LoadPaths(Rom rom, bool overWorld)
 		{
-			var result = new WorldPath[overWorld ? 8 : 43];
+			var pathData = new WorldPath[overWorld ? 8 : 43];
 
 			rom.SetBank(8);
-			for (int level = 0; level < result.Length; level++)
+			for (int level = 0; level < pathData.Length; level++)
 			{
 				int levelPos = rom.ReadWord((overWorld ? 0x45BA : 0x556D) + level * 2);
 				int posX = rom.ReadByte(levelPos + 1) - 12;
@@ -372,19 +372,48 @@ namespace WLEditor
 					dirs[dir] = direction;
 				}
 
-				result[level] = new WorldPath { X = posX, Y = posY, Directions = dirs };
+				pathData[level] = new WorldPath { X = posX, Y = posY, Directions = dirs };
 			}
 
 			if (overWorld)
 			{
-				LoadFlags(rom, result);
+				LoadFlags();
 			}
 			else
 			{
-				LoadTreasures(rom, result);
+				LoadTreasures();
 			}
 
-			return result;
+			return pathData;
+
+			void LoadFlags()
+			{
+				rom.SetBank(0x14);
+				for (int level = 0; level < flagsPosition.GetLength(0); level++)
+				{
+					var item = pathData[level];
+					item.FlagX = rom.ReadByte(flagsPosition[level, 0] + 1) - 12;
+					item.FlagY = rom.ReadByte(flagsPosition[level, 1] + 1) - 20;
+				}
+			}
+
+			void LoadTreasures()
+			{
+				rom.SetBank(0x14);
+				for (int level = 0; level < pathData.Length; level++)
+				{
+					var item = pathData[level];
+
+					int pointer = rom.ReadByte(0x5A38 + level);
+					if (pointer != 0xFF)
+					{
+						pointer = rom.ReadWord(0x5A63 + pointer * 2);
+						item.TreasureX = rom.ReadByte(pointer + 1) - 12;
+						item.TreasureY = rom.ReadByte(pointer + 0) - 20;
+					}
+				}
+			}
+
 		}
 
 		public static bool SavePaths(Rom rom, WorldPath[] pathData, bool overWorld, out string errorMessage)
@@ -499,61 +528,89 @@ namespace WLEditor
 				}
 			}
 
-			SaveProgression(rom, pathData, overWorld);
-			SaveLevelsPosition(rom, pathData, overWorld);
+			SaveProgression();
+			SaveLevelsPosition();
 
 			if (overWorld)
 			{
-				SaveFlags(rom, pathData);
+				SaveFlags();
 			}
 			else
 			{
-				SaveTreasures(rom, pathData);
+				SaveTreasures();
 			}
 
 			errorMessage = string.Empty;
 			return true;
-		}
 
-		static void SaveProgression(Rom rom, WorldPath[] pathData, bool overWorld)
-		{
-			rom.SetBank(8);
-			for (int level = 0; level < pathData.Length; level++)
+			void SaveFlags()
 			{
-				var item = pathData[level];
-				for (int dir = 0; dir < 4; dir++)
+				rom.SetBank(0x14);
+				for (int level = 0; level < flagsPosition.GetLength(0); level++)
 				{
-					var direction = item.Directions[dir];
-					int pointer = rom.ReadWord((overWorld ? 0x6486 : 0x6496) + level * 2);
-					rom.WriteByte(pointer + 1 + dir * 2, (byte)direction.Progress);
+					var item = pathData[level];
+					rom.WriteByte(flagsPosition[level, 0] + 1, (byte)Math.Max(0, Math.Min(255, item.FlagX + 12)));
+					rom.WriteByte(flagsPosition[level, 1] + 1, (byte)Math.Max(0, Math.Min(255, item.FlagY + 20)));
 				}
 			}
-		}
 
-		static void SaveLevelsPosition(Rom rom, WorldPath[] pathData, bool overWorld)
-		{
-			rom.SetBank(8);
-			for (int level = 0; level < pathData.Length; level++)
+			void SaveTreasures()
 			{
-				var item = pathData[level];
-				int posX = item.X + 12;
-				int posY = item.Y + 20;
-				int pointer = rom.ReadWord((overWorld ? 0x45BA : 0x556D) + level * 2);
-
-				if (overWorld)
+				rom.SetBank(0x14);
+				for (int level = 0; level < pathData.Length; level++)
 				{
-					int scrollX = Math.Max(0, Math.Min(96, posX - 88));
-					int scrollY = Math.Max(0, Math.Min(112, posY - 96));
+					var item = pathData[level];
 
-					rom.WriteByte(pointer + 3, (byte)scrollX);
-					rom.WriteByte(pointer + 2, (byte)scrollY);
-					rom.WriteByte(pointer + 1, (byte)Math.Max(0, Math.Min(255, posX - scrollX)));
-					rom.WriteByte(pointer + 0, (byte)Math.Max(0, Math.Min(255, posY - scrollY)));
+					int pointer = rom.ReadByte(0x5A38 + level);
+					if (pointer != 0xFF)
+					{
+						pointer = rom.ReadWord(0x5A63 + pointer * 2);
+						rom.WriteByte(pointer + 1, (byte)Math.Max(0, Math.Min(255, item.TreasureX + 12)));
+						rom.WriteByte(pointer + 0, (byte)Math.Max(0, Math.Min(255, item.TreasureY + 20)));
+					}
 				}
-				else
+			}
+
+			void SaveProgression()
+			{
+				rom.SetBank(8);
+				for (int level = 0; level < pathData.Length; level++)
 				{
-					rom.WriteByte(pointer + 1, (byte)Math.Max(0, Math.Min(255, posX)));
-					rom.WriteByte(pointer + 0, (byte)Math.Max(0, Math.Min(255, posY)));
+					var item = pathData[level];
+					for (int dir = 0; dir < 4; dir++)
+					{
+						var direction = item.Directions[dir];
+						int pointer = rom.ReadWord((overWorld ? 0x6486 : 0x6496) + level * 2);
+						rom.WriteByte(pointer + 1 + dir * 2, (byte)direction.Progress);
+					}
+				}
+			}
+
+			void SaveLevelsPosition()
+			{
+				rom.SetBank(8);
+				for (int level = 0; level < pathData.Length; level++)
+				{
+					var item = pathData[level];
+					int posX = item.X + 12;
+					int posY = item.Y + 20;
+					int pointer = rom.ReadWord((overWorld ? 0x45BA : 0x556D) + level * 2);
+
+					if (overWorld)
+					{
+						int scrollX = Math.Max(0, Math.Min(96, posX - 88));
+						int scrollY = Math.Max(0, Math.Min(112, posY - 96));
+
+						rom.WriteByte(pointer + 3, (byte)scrollX);
+						rom.WriteByte(pointer + 2, (byte)scrollY);
+						rom.WriteByte(pointer + 1, (byte)Math.Max(0, Math.Min(255, posX - scrollX)));
+						rom.WriteByte(pointer + 0, (byte)Math.Max(0, Math.Min(255, posY - scrollY)));
+					}
+					else
+					{
+						rom.WriteByte(pointer + 1, (byte)Math.Max(0, Math.Min(255, posX)));
+						rom.WriteByte(pointer + 0, (byte)Math.Max(0, Math.Min(255, posY)));
+					}
 				}
 			}
 		}
@@ -582,70 +639,6 @@ namespace WLEditor
 			}
 		}
 
-		#region Flags
-
-		static void LoadFlags(Rom rom, WorldPath[] pathData)
-		{
-			rom.SetBank(0x14);
-			for (int level = 0; level < flagsPosition.GetLength(0); level++)
-			{
-				var item = pathData[level];
-				item.FlagX = rom.ReadByte(flagsPosition[level, 0] + 1) - 12;
-				item.FlagY = rom.ReadByte(flagsPosition[level, 1] + 1) - 20;
-			}
-		}
-
-		static void SaveFlags(Rom rom, WorldPath[] pathData)
-		{
-			rom.SetBank(0x14);
-			for (int level = 0; level < flagsPosition.GetLength(0); level++)
-			{
-				var item = pathData[level];
-				rom.WriteByte(flagsPosition[level, 0] + 1, (byte)Math.Max(0, Math.Min(255, item.FlagX + 12)));
-				rom.WriteByte(flagsPosition[level, 1] + 1, (byte)Math.Max(0, Math.Min(255, item.FlagY + 20)));
-			}
-		}
-
-		#endregion
-
-		#region Treasures
-
-		static void LoadTreasures(Rom rom, WorldPath[] pathData)
-		{
-			rom.SetBank(0x14);
-			for (int level = 0; level < pathData.Length; level++)
-			{
-				var item = pathData[level];
-
-				int pointer = rom.ReadByte(0x5A38 + level);
-				if (pointer != 0xFF)
-				{
-					pointer = rom.ReadWord(0x5A63 + pointer * 2);
-					item.TreasureX = rom.ReadByte(pointer + 1) - 12;
-					item.TreasureY = rom.ReadByte(pointer + 0) - 20;
-				}
-			}
-		}
-
-		static void SaveTreasures(Rom rom, WorldPath[] pathData)
-		{
-			rom.SetBank(0x14);
-			for (int level = 0; level < pathData.Length; level++)
-			{
-				var item = pathData[level];
-
-				int pointer = rom.ReadByte(0x5A38 + level);
-				if (pointer != 0xFF)
-				{
-					pointer = rom.ReadWord(0x5A63 + pointer * 2);
-					rom.WriteByte(pointer + 1, (byte)Math.Max(0, Math.Min(255, item.TreasureX + 12)));
-					rom.WriteByte(pointer + 0, (byte)Math.Max(0, Math.Min(255, item.TreasureY + 20)));
-				}
-			}
-		}
-
-		#endregion
-
 		#region Music
 
 		public static int GetMusic(Rom rom, int world)
@@ -671,7 +664,7 @@ namespace WLEditor
 			{
 				for (int flag = 0; flag < 6; flag++)
 				{
-					var nextDir = SearchProgressNextDirection(pathData, levels, 1 << flag);
+					var nextDir = SearchProgressNextDirection(1 << flag);
 					rom.WriteByte(overWorldNextDir[flag], nextDir);
 				}
 			}
@@ -679,27 +672,27 @@ namespace WLEditor
 			{
 				for (int flag = 0; flag < 8; flag++)
 				{
-					var nextDir = SearchProgressNextDirection(pathData, levels, 1 << flag);
+					var nextDir = SearchProgressNextDirection(1 << flag);
 					rom.WriteByte(0x735D + 16 * world + flag + 8, nextDir);
 				}
 			}
-		}
 
-		static byte SearchProgressNextDirection(WorldPath[] pathData, int[] levels, int flag)
-		{
-			foreach (int level in levels)
+			byte SearchProgressNextDirection(int flag)
 			{
-				for (int dir = 0; dir < 4; dir++)
+				foreach (int level in levels)
 				{
-					var pathDir = pathData[level].Directions[dir];
-					if (pathDir.Path.Count > 0 && pathDir.Progress == flag)
+					for (int dir = 0; dir < 4; dir++)
 					{
-						return new byte[] { 0x10, 0x20, 0x40, 0x80 }[dir];
+						var pathDir = pathData[level].Directions[dir];
+						if (pathDir.Path.Count > 0 && pathDir.Progress == flag)
+						{
+							return new byte[] { 0x10, 0x20, 0x40, 0x80 }[dir];
+						}
 					}
 				}
-			}
 
-			return 0;
+				return 0;
+			}
 		}
 
 		#endregion

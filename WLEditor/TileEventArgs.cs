@@ -12,10 +12,10 @@ namespace WLEditor
 
 		public TileEventArgs(MouseButtons button, TileEventStatus status, int x, int y)
 		{
-			this.Button = button;
-			this.Status = status;
-			this.TileX = x;
-			this.TileY = y;
+			Button = button;
+			Status = status;
+			TileX = x;
+			TileY = y;
 		}
 	}
 }

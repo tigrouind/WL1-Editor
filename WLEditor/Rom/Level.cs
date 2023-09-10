@@ -9,19 +9,19 @@ namespace WLEditor
 	{
 		readonly static uint[] paletteColors = { 0xFFFFFFFF, 0xFFAAAAAA, 0xFF555555, 0xFF000000 };
 
-		public static byte[] LevelData = new byte[0x3000];
-		public static byte[] ObjectsData = new byte[0x2000];
-		public static byte[] ScrollData = new byte[32];
-		public static byte[] Warps = new byte[32];
+		public readonly static byte[] LevelData = new byte[0x3000];
+		public readonly static byte[] ObjectsData = new byte[0x2000];
+		public readonly static byte[] ScrollData = new byte[32];
+		public readonly static byte[] Warps = new byte[32];
 		public static int WarioPosition;
 		public static int CameraPosition;
-		public static bool[] Animated16x16Tiles = new bool[16 * 8];
-		private static int[] animated8x8Tiles = new int[16 * 8 * 2 * 2];
+		public readonly static bool[] Animated16x16Tiles = new bool[16 * 8];
+		private readonly static int[] animated8x8Tiles = new int[16 * 8 * 2 * 2];
 		public static int AnimatedTilesMask;
 		public static bool WarioRightFacing;
 
-		public static DirectBitmap Tiles8x8 = new DirectBitmap(16 * 8, 8 * 8);
-		public static DirectBitmap Tiles16x16 = new DirectBitmap(16 * 8, 16 * 16);
+		public readonly static DirectBitmap Tiles8x8 = new DirectBitmap(16 * 8, 8 * 8);
+		public readonly static DirectBitmap Tiles16x16 = new DirectBitmap(16 * 8, 16 * 16);
 
 		public static void DumpLevel(Rom rom, int course, int warp, bool reloadAll, int switchMode, int animatedTileIndex, bool reloadAnimatedTilesOnly)
 		{
@@ -59,12 +59,10 @@ namespace WLEditor
 
 			if (!reloadAnimatedTilesOnly)
 			{
-				int enemiesIdsPointer, enemiesTiles;
-
 				Array.Clear(Sprite.TilesEnemies.Bits, 0, Sprite.TilesEnemies.Bits.Length);
 				Array.Clear(Sprite.LoadedSprites, 0, Sprite.LoadedSprites.Length);
 
-				Sprite.FindEnemiesData(rom, enemiesData, out enemiesIdsPointer, out enemiesTiles, out _, out _, out _);
+				var (enemiesIdsPointer, enemiesTiles, _, _, _) = Sprite.FindEnemiesData(rom, enemiesData);
 				Sprite.DumpEnemiesSprites(rom, enemiesIdsPointer, enemiesTiles, Sprite.TilesEnemies, 0, Sprite.LoadedSprites, Sprite.LoadedOffsets, 0, 40, out _);
 
 				//dump 8x8 tiles
@@ -124,7 +122,7 @@ namespace WLEditor
 			else
 			{
 				rom.SetBank(0xB);
-				Dump16x16Tiles(rom, blockindex, switchMode, paletteColors[0]);
+				Dump16x16Tiles(blockindex, paletteColors[0]);
 			}
 
 			if (reloadAll)
@@ -142,6 +140,65 @@ namespace WLEditor
 				rom.SetBank(0x7);
 				int objectsPosition = rom.ReadWord(0x4199 + course * 2);
 				RLEDecompressObjects(rom, objectsPosition, ObjectsData);
+			}
+
+
+			void DumpAnimated16x16Tiles(uint defaultColor)
+			{
+				int m = 0;
+				for (int n = 0; n < 16; n++)
+				{
+					for (int i = 0; i < 8; i++)
+					{
+						for (int k = 0; k < 2; k++)
+						{
+							for (int j = 0; j < 2; j++)
+							{
+								int subTileIndex = animated8x8Tiles[m++];
+								if (subTileIndex != -1)
+								{
+									Point dest = new Point(j * 8 + i * 16, k * 8 + n * 16);
+									Dump8x8Tile(dest, subTileIndex, defaultColor);
+								}
+							}
+						}
+					}
+				}
+			}
+
+			void Dump16x16Tiles(int tileindexaddress, uint defaultColor)
+			{
+				int m = 0;
+				for (int n = 0; n < 16; n++)
+				{
+					for (int i = 0; i < 8; i++)
+					{
+						int tileIndex = i + n * 8;
+						int newTileIndex = SwitchTile(tileIndex, switchMode);
+
+						bool isAnimatedTile = false;
+						for (int k = 0; k < 2; k++)
+						{
+							for (int j = 0; j < 2; j++)
+							{
+								byte subTileIndex = rom.ReadByte(tileindexaddress + newTileIndex * 4 + k * 2 + j);
+								if ((switchMode == 2 && newTileIndex == 0x32) || (switchMode == 1 && newTileIndex == 0x39) || (switchMode == 3 && newTileIndex == 0x38))
+								{
+									subTileIndex = (byte)(4 + k * 2 + j);
+								}
+
+								bool isAnimated = subTileIndex >= (2 * 16) && subTileIndex < (2 * 16 + 4);
+								isAnimatedTile |= isAnimated;
+								animated8x8Tiles[m++] = isAnimated ? subTileIndex : -1;
+
+								Point dest = new Point(j * 8 + i * 16, k * 8 + n * 16);
+								Dump8x8Tile(dest, subTileIndex, defaultColor);
+							}
+						}
+
+						Animated16x16Tiles[tileIndex] = isAnimatedTile;
+					}
+				}
 			}
 		}
 
@@ -168,31 +225,6 @@ namespace WLEditor
 			}
 		}
 
-		static IEnumerable<byte> RLECompressTiles(byte[] tilesdata)
-		{
-			int current = 0;
-			while (current < tilesdata.Length)
-			{
-				byte repeat = 0;
-				byte data = tilesdata[current++];
-				while (current < tilesdata.Length && tilesdata[current] == data && repeat < 255 && current % 256 != 0)
-				{
-					current++;
-					repeat++;
-				}
-
-				if (repeat > 0)
-				{
-					yield return (byte)(0x80 | data);
-					yield return repeat;
-				}
-				else
-				{
-					yield return data;
-				}
-			}
-		}
-
 		static void RLEDecompressObjects(Rom rom, int enemiesData, byte[] decompressed)
 		{
 			int position = 0;
@@ -208,92 +240,6 @@ namespace WLEditor
 				{
 					decompressed[position++] = 0;
 					decompressed[position++] = 0;
-				}
-			}
-		}
-
-		static IEnumerable<byte> RLECompressObjectsHelper(byte[] data)
-		{
-			for (int i = 0; i < data.Length; i += 2)
-			{
-				yield return (byte)((data[i] << 4) | data[i + 1]);
-			}
-		}
-
-		static IEnumerable<byte> RLECompressObjects(byte[] data)
-		{
-			byte[] halfData = RLECompressObjectsHelper(data).ToArray();
-
-			int current = 0;
-			while (current < halfData.Length)
-			{
-				byte value = halfData[current++];
-				yield return value;
-
-				byte count = 0;
-				while (current < halfData.Length && halfData[current] == 0 && count < 255)
-				{
-					current++;
-					count++;
-				}
-				yield return count;
-			}
-		}
-
-		static void DumpAnimated16x16Tiles(uint defaultColor)
-		{
-			int m = 0;
-			for (int n = 0; n < 16; n++)
-			{
-				for (int i = 0; i < 8; i++)
-				{
-					for (int k = 0; k < 2; k++)
-					{
-						for (int j = 0; j < 2; j++)
-						{
-							int subTileIndex = animated8x8Tiles[m++];
-							if (subTileIndex != -1)
-							{
-								Point dest = new Point(j * 8 + i * 16, k * 8 + n * 16);
-								Dump8x8Tile(dest, subTileIndex, defaultColor);
-							}
-						}
-					}
-				}
-			}
-		}
-
-		static void Dump16x16Tiles(Rom rom, int tileindexaddress, int switchMode, uint defaultColor)
-		{
-			int m = 0;
-			for (int n = 0; n < 16; n++)
-			{
-				for (int i = 0; i < 8; i++)
-				{
-					int tileIndex = i + n * 8;
-					int newTileIndex = SwitchTile(tileIndex, switchMode);
-
-					bool isAnimatedTile = false;
-					for (int k = 0; k < 2; k++)
-					{
-						for (int j = 0; j < 2; j++)
-						{
-							byte subTileIndex = rom.ReadByte(tileindexaddress + newTileIndex * 4 + k * 2 + j);
-							if ((switchMode == 2 && newTileIndex == 0x32) || (switchMode == 1 && newTileIndex == 0x39) || (switchMode == 3 && newTileIndex == 0x38))
-							{
-								subTileIndex = (byte)(4 + k * 2 + j);
-							}
-
-							bool isAnimated = subTileIndex >= (2 * 16) && subTileIndex < (2 * 16 + 4);
-							isAnimatedTile |= isAnimated;
-							animated8x8Tiles[m++] = isAnimated ? subTileIndex : -1;
-
-							Point dest = new Point(j * 8 + i * 16, k * 8 + n * 16);
-							Dump8x8Tile(dest, subTileIndex, defaultColor);
-						}
-					}
-
-					Animated16x16Tiles[tileIndex] = isAnimatedTile;
 				}
 			}
 		}
@@ -534,100 +480,153 @@ namespace WLEditor
 			//rom expansion give new banks for level data
 			rom.ExpandTo1MB();
 
-			SaveBlocksToRom(rom, course);
-			if (!SaveObjectsToRom(rom, course, out errorMessage))
+			SaveBlocksToRom();
+			if (!SaveObjectsToRom(out errorMessage))
 			{
 				return false;
 			}
 
 			return true;
-		}
 
-		static void SaveBlocksToRom(Rom rom, int course)
-		{
-			//grab all levels data at once
-			byte[][] allTiles = new byte[0x2B][];
-
-			for (int i = 0; i < 0x2B; i++)
+			void SaveBlocksToRom()
 			{
-				rom.SetBank(0xC);
-				int headerposition = rom.ReadWord(0x4560 + i * 2);
-				int tilebank = rom.ReadByte(headerposition + 9);
-				int tilesubbank = rom.ReadByte(headerposition + 10);
+				//grab all levels data at once
+				byte[][] allTiles = new byte[0x2B][];
 
-				rom.SetBank(tilebank);
-				int tilePosition = rom.ReadWord(0x4000 + tilesubbank * 2);
-				allTiles[i] = new byte[0x3000];
-				RLEDecompressTiles(rom, tilePosition, allTiles[i]);
-			}
-
-			Array.Copy(LevelData, allTiles[course], 0x3000);
-
-			//write them back to ROM
-			byte bank = 0x20;
-			byte subbank = 0;
-			int writePosition = 0x4040; //first 64 bytes are reserved for level pointers
-			for (int i = 0; i < 0x2B; i++)
-			{
-				byte[] tileData = RLECompressTiles(allTiles[i]).ToArray();
-				if ((writePosition + tileData.Length) >= 0x8000 || subbank >= 32)
+				for (int i = 0; i < 0x2B; i++)
 				{
-					//no more space, switch to another bank
-					bank++;
-					subbank = 0;
-					writePosition = 0x4040;
+					rom.SetBank(0xC);
+					int headerposition = rom.ReadWord(0x4560 + i * 2);
+					int tilebank = rom.ReadByte(headerposition + 9);
+					int tilesubbank = rom.ReadByte(headerposition + 10);
+
+					rom.SetBank(tilebank);
+					int tilePosition = rom.ReadWord(0x4000 + tilesubbank * 2);
+					allTiles[i] = new byte[0x3000];
+					RLEDecompressTiles(rom, tilePosition, allTiles[i]);
 				}
 
-				//write data to bank
-				rom.SetBank(bank);
-				rom.WriteWord(0x4000 + subbank * 2, (ushort)writePosition);
-				rom.WriteBytes(writePosition, tileData);
+				Array.Copy(LevelData, allTiles[course], 0x3000);
 
-				//update level header
-				rom.SetBank(0xC);
-				int headerposition = rom.ReadWord(0x4560 + i * 2);
-				rom.WriteByte(headerposition + 9, bank);
-				rom.WriteByte(headerposition + 10, subbank);
+				//write them back to ROM
+				byte bank = 0x20;
+				byte subbank = 0;
+				int writePosition = 0x4040; //first 64 bytes are reserved for level pointers
+				for (int i = 0; i < 0x2B; i++)
+				{
+					byte[] tileData = RLECompressTiles(allTiles[i]).ToArray();
+					if ((writePosition + tileData.Length) >= 0x8000 || subbank >= 32)
+					{
+						//no more space, switch to another bank
+						bank++;
+						subbank = 0;
+						writePosition = 0x4040;
+					}
 
-				subbank++;
-				writePosition += tileData.Length;
+					//write data to bank
+					rom.SetBank(bank);
+					rom.WriteWord(0x4000 + subbank * 2, (ushort)writePosition);
+					rom.WriteBytes(writePosition, tileData);
+
+					//update level header
+					rom.SetBank(0xC);
+					int headerposition = rom.ReadWord(0x4560 + i * 2);
+					rom.WriteByte(headerposition + 9, bank);
+					rom.WriteByte(headerposition + 10, subbank);
+
+					subbank++;
+					writePosition += tileData.Length;
+				}
+
+				IEnumerable<byte> RLECompressTiles(byte[] tilesdata)
+				{
+					int current = 0;
+					while (current < tilesdata.Length)
+					{
+						byte repeat = 0;
+						byte data = tilesdata[current++];
+						while (current < tilesdata.Length && tilesdata[current] == data && repeat < 255 && current % 256 != 0)
+						{
+							current++;
+							repeat++;
+						}
+
+						if (repeat > 0)
+						{
+							yield return (byte)(0x80 | data);
+							yield return repeat;
+						}
+						else
+						{
+							yield return data;
+						}
+					}
+				}
 			}
-		}
 
-		static bool SaveObjectsToRom(Rom rom, int course, out string errorMessage)
-		{
-			byte[][] enemyData = new byte[0x2B][];
-
-			//save objects
-			rom.SetBank(0x7);
-			for (int i = 0; i < 0x2B; i++)
+			bool SaveObjectsToRom(out string message)
 			{
-				int objectsPos = rom.ReadWord(0x4199 + i * 2);
-				enemyData[i] = new byte[0x2000];
-				RLEDecompressObjects(rom, objectsPos, enemyData[i]);
-			}
-			enemyData[course] = ObjectsData;
+				byte[][] enemyData = new byte[0x2B][];
 
-			const int maxSize = 4198;
-			int objectSize = enemyData.Sum(x => RLECompressObjects(x).Count());
-			if (objectSize > maxSize)
+				//save objects
+				rom.SetBank(0x7);
+				for (int i = 0; i < 0x2B; i++)
+				{
+					int objectsPos = rom.ReadWord(0x4199 + i * 2);
+					enemyData[i] = new byte[0x2000];
+					RLEDecompressObjects(rom, objectsPos, enemyData[i]);
+				}
+				enemyData[course] = ObjectsData;
+
+				const int maxSize = 4198;
+				int objectSize = enemyData.Sum(x => RLECompressObjects(x).Count());
+				if (objectSize > maxSize)
+				{
+					message = string.Format("Object data is too big to fit in ROM.\r\nPlease remove some objects to free at least {0} byte(s).", objectSize - maxSize);
+					return false;
+				}
+
+				int startPos = rom.ReadWord(0x4199);
+				for (int i = 0; i < 0x2B; i++)
+				{
+					rom.WriteWord(0x4199 + i * 2, (ushort)startPos);
+
+					byte[] data = RLECompressObjects(enemyData[i]).ToArray();
+					rom.WriteBytes(startPos, data);
+					startPos += data.Length;
+				}
+
+				message = string.Empty;
+				return true;
+			}
+
+			IEnumerable<byte> RLECompressObjects(byte[] data)
 			{
-				errorMessage = string.Format("Object data is too big to fit in ROM.\r\nPlease remove some objects to free at least {0} byte(s).", objectSize - maxSize);
-				return false;
+				byte[] halfData = RLECompressObjectsHelper().ToArray();
+
+				int current = 0;
+				while (current < halfData.Length)
+				{
+					byte value = halfData[current++];
+					yield return value;
+
+					byte count = 0;
+					while (current < halfData.Length && halfData[current] == 0 && count < 255)
+					{
+						current++;
+						count++;
+					}
+					yield return count;
+				}
+
+				IEnumerable<byte> RLECompressObjectsHelper()
+				{
+					for (int i = 0; i < data.Length; i += 2)
+					{
+						yield return (byte)((data[i] << 4) | data[i + 1]);
+					}
+				}
 			}
-
-			int startPos = rom.ReadWord(0x4199);
-			for (int i = 0; i < 0x2B; i++)
-			{
-				rom.WriteWord(0x4199 + i * 2, (ushort)startPos);
-
-				byte[] data = RLECompressObjects(enemyData[i]).ToArray();
-				rom.WriteBytes(startPos, data);
-				startPos += data.Length;
-			}
-
-			errorMessage = string.Empty;
-			return true;
 		}
 	}
 }

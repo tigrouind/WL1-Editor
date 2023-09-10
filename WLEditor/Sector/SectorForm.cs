@@ -10,9 +10,9 @@ namespace WLEditor
 	{
 		public event EventHandler<KeyEventArgs> ProcessCommandKey;
 		public event EventHandler SectorChanged;
-		public DirectBitmap TilesEnemies = new DirectBitmap(32 * 6, 32 * 147);
-		public Rectangle[] enemiesRects = new Rectangle[6 * 147];
-		public Point[] enemiesOffsets = new Point[6 * 147];
+		public readonly DirectBitmap TilesEnemies = new DirectBitmap(32 * 6, 32 * 147);
+		public readonly Rectangle[] enemiesRects = new Rectangle[6 * 147];
+		public readonly Point[] enemiesOffsets = new Point[6 * 147];
 		readonly char[] treasureNames = { 'C', 'I', 'F', 'O', 'A', 'N', 'H', 'M', 'L', 'K', 'B', 'D', 'G', 'J', 'E' };
 		readonly int[] boss = { 0x4CA9, 0x460D, 0x4C0C, 0x4E34, 0x4B06, 0x4D1A, 0x527D };
 
@@ -281,24 +281,6 @@ namespace WLEditor
 			new ComboboxItem<int>(0x5B7A, "Sector")
 		};
 
-		EnemyInfo GetEnemyInfo(int index)
-		{
-			int[] enemyPointers = enemyPointer[index];
-
-			Sprite.FindEnemiesData(rom, enemyPointers[0], out int enemiesIdsPointer, out int tilesPointer, out int treasureId, out _, out bool exitOpen);
-			Sprite.DumpEnemiesSprites(rom, enemiesIdsPointer, tilesPointer, TilesEnemies, index * 32, enemiesRects, enemiesOffsets, index * 6, 32, out int[] enemyIds);
-
-			return new EnemyInfo
-			{
-				EnemyPointers = enemyPointers,
-				EnemyIds = enemyIds,
-				Index = index,
-				BossId = Array.IndexOf(boss, enemyPointers[0]),
-				TreasureId = treasureId,
-				ExitOpen = exitOpen
-			};
-		}
-
 		void DdlEnemiesDrawItem(object sender, DrawItemEventArgs e)
 		{
 			if (e.Index >= 0 && !DesignMode)
@@ -373,6 +355,15 @@ namespace WLEditor
 			}
 		}
 
+		void Panel3Paint(object sender, PaintEventArgs e)
+		{
+			//draw border
+			using (var pen = new Pen(SystemColors.ControlLight))
+			{
+				e.Graphics.DrawRectangle(pen, new Rectangle(0, 0, panel3.Width - 1, panel3.Height - 1));
+			}
+		}
+
 		void InitForm()
 		{
 			if (!formLoaded)
@@ -408,6 +399,24 @@ namespace WLEditor
 					.ThenBy(x => x.Value.EnemyIds[4])
 					.ThenBy(x => x.Value.EnemyIds[5])
 					.ToArray());
+			}
+
+			EnemyInfo GetEnemyInfo(int index)
+			{
+				int[] enemyPointers = enemyPointer[index];
+
+				var (enemiesIdsPointer, tilesPointer, treasureId, _, exitOpen) = Sprite.FindEnemiesData(rom, enemyPointers[0]);
+				Sprite.DumpEnemiesSprites(rom, enemiesIdsPointer, tilesPointer, TilesEnemies, index * 32, enemiesRects, enemiesOffsets, index * 6, 32, out int[] enemyIds);
+
+				return new EnemyInfo
+				{
+					EnemyPointers = enemyPointers,
+					EnemyIds = enemyIds,
+					Index = index,
+					BossId = Array.IndexOf(boss, enemyPointers[0]),
+					TreasureId = treasureId,
+					ExitOpen = exitOpen
+				};
 			}
 		}
 
@@ -489,13 +498,27 @@ namespace WLEditor
 			}
 
 			SetControlsVisibility();
-		}
 
-		void LoadLevel()
-		{
-			currentWarp = Sector.GetLevelHeader(rom, currentCourseId);
-			isWarp = false;
-			LoadWarp();
+			void LoadLevel()
+			{
+				currentWarp = Sector.GetLevelHeader(rom, currentCourseId);
+				isWarp = false;
+				LoadWarp();
+			}
+
+			void LoadScroll()
+			{
+				scroll = Sector.GetScroll(rom, currentCourseId, currentSector);
+				LoadCheckBox(checkBoxLeft, (scroll & 2) == 2);
+				LoadCheckBox(checkBoxRight, (scroll & 1) == 1);
+
+				void LoadCheckBox(CheckBox checkBox, bool value)
+				{
+					ignoreEvents = true;
+					checkBox.Checked = value;
+					ignoreEvents = false;
+				}
+			}
 		}
 
 		void LoadWarp(int warp)
@@ -505,25 +528,6 @@ namespace WLEditor
 			isWarp = true;
 
 			LoadWarp();
-		}
-
-		int GetFreeWarp()
-		{
-			var used = Sector.GetWarpUsage(rom);
-			var all = Enumerable.Range(0, 370)
-				.Select(x => 0x5B7A + x * 24);
-
-			return all
-				.Except(used)
-				.DefaultIfEmpty(-1)
-				.First();
-		}
-
-		void LoadScroll()
-		{
-			scroll = Sector.GetScroll(rom, currentCourseId, currentSector);
-			LoadCheckBox(checkBoxLeft, (scroll & 2) == 2);
-			LoadCheckBox(checkBoxRight, (scroll & 1) == 1);
 		}
 
 		void LoadWarp()
@@ -551,33 +555,26 @@ namespace WLEditor
 			{
 				LoadDropdown(ddlMusic, currentWarp.Music);
 			}
-		}
 
-		void LoadCheckBox(CheckBox checkBox, bool value)
-		{
-			ignoreEvents = true;
-			checkBox.Checked = value;
-			ignoreEvents = false;
-		}
+			void LoadNumericUpDown(NumericUpDown numericUpDown, int value)
+			{
+				ignoreEvents = true;
+				numericUpDown.Value = Math.Min(Math.Max(value, (int)numericUpDown.Minimum), (int)numericUpDown.Maximum);
+				ignoreEvents = false;
+			}
 
-		void LoadNumericUpDown(NumericUpDown numericUpDown, int value)
-		{
-			ignoreEvents = true;
-			numericUpDown.Value = Math.Min(Math.Max(value, (int)numericUpDown.Minimum), (int)numericUpDown.Maximum);
-			ignoreEvents = false;
+			void LoadDropdownAny<T>(ComboBox combo, int value, Func<T, int[]> filter)
+			{
+				ignoreEvents = true;
+				combo.SelectedIndex = combo.Items.Cast<ComboboxItem<T>>().FindIndex(x => filter(x.Value).Contains(value));
+				ignoreEvents = false;
+			}
 		}
 
 		void LoadDropdown(ComboBox combo, int value)
 		{
 			ignoreEvents = true;
 			combo.SelectedIndex = combo.Items.Cast<ComboboxItem<int>>().FindIndex(x => x.Value == value);
-			ignoreEvents = false;
-		}
-
-		void LoadDropdownAny<T>(ComboBox combo, int value, Func<T, int[]> filter)
-		{
-			ignoreEvents = true;
-			combo.SelectedIndex = combo.Items.Cast<ComboboxItem<T>>().FindIndex(x => filter(x.Value).Contains(value));
 			ignoreEvents = false;
 		}
 
@@ -646,9 +643,21 @@ namespace WLEditor
 				OnSectorChanged();
 				SetControlsVisibility();
 			}
+
+			int GetFreeWarp()
+			{
+				var used = Sector.GetWarpUsage(rom);
+				var all = Enumerable.Range(0, 370)
+					.Select(x => 0x5B7A + x * 24);
+
+				return all
+					.Except(used)
+					.DefaultIfEmpty(-1)
+					.First();
+			}
 		}
 
-		protected void DdlTileSetSelectedIndexChanged(object sender, EventArgs e)
+		void DdlTileSetSelectedIndexChanged(object sender, EventArgs e)
 		{
 			if (!ignoreEvents)
 			{
@@ -664,7 +673,7 @@ namespace WLEditor
 			}
 		}
 
-		protected void DdlAnimationSelectedIndexChanged(object sender, EventArgs e)
+		void DdlAnimationSelectedIndexChanged(object sender, EventArgs e)
 		{
 			if (!ignoreEvents)
 			{
@@ -676,7 +685,7 @@ namespace WLEditor
 			}
 		}
 
-		protected void DdlAnimationSpeedSelectedIndexChanged(object sender, EventArgs e)
+		void DdlAnimationSpeedSelectedIndexChanged(object sender, EventArgs e)
 		{
 			if (!ignoreEvents)
 			{
@@ -688,7 +697,7 @@ namespace WLEditor
 			}
 		}
 
-		protected void DdlEnemiesSelectedIndexChanged(object sender, EventArgs e)
+		void DdlEnemiesSelectedIndexChanged(object sender, EventArgs e)
 		{
 			if (!ignoreEvents)
 			{
@@ -700,7 +709,7 @@ namespace WLEditor
 			}
 		}
 
-		protected void TxbWarioXValueChanged(object sender, EventArgs e)
+		void TxbWarioXValueChanged(object sender, EventArgs e)
 		{
 			if (!ignoreEvents)
 			{
@@ -711,7 +720,7 @@ namespace WLEditor
 			}
 		}
 
-		protected void TxbWarioYValueChanged(object sender, EventArgs e)
+		void TxbWarioYValueChanged(object sender, EventArgs e)
 		{
 			if (!ignoreEvents)
 			{
@@ -770,10 +779,7 @@ namespace WLEditor
 
 		void OnSectorChanged()
 		{
-			if (SectorChanged != null)
-			{
-				SectorChanged(this, EventArgs.Empty);
-			}
+			SectorChanged?.Invoke(this, EventArgs.Empty);
 		}
 
 		void SaveWarp()
@@ -805,8 +811,7 @@ namespace WLEditor
 			currentWarp.WarioX = (sector % 16) * 32 + currentWarp.WarioX % 32;
 			currentWarp.WarioY = (sector / 16) * 32 + currentWarp.WarioY % 32;
 
-			int doorX, doorY;
-			if (Sector.FindDoorInSector(sector, currentWarp.WarioX % 32, currentWarp.WarioY % 32, out doorX, out doorY))
+			if (Sector.FindDoorInSector(sector, currentWarp.WarioX % 32, currentWarp.WarioY % 32, out int doorX, out int doorY))
 			{
 				//player position
 				currentWarp.WarioX = (sector % 16) * 32 + Math.Min(doorX * 2 + 1, 31);
@@ -817,7 +822,7 @@ namespace WLEditor
 			int cameraX = currentWarp.WarioX - 12;
 			int cameraY = currentWarp.WarioY - 16;
 
-			LimitScroll(sector, ref cameraX, ref cameraY, ref currentWarp.WarioY);
+			Sector.LimitScroll(rom, currentCourseId, sector, currentWarp.CameraType, ref cameraX, ref cameraY, ref currentWarp.WarioY);
 
 			currentWarp.CameraX = cameraX;
 			currentWarp.CameraY = cameraY;
@@ -825,61 +830,6 @@ namespace WLEditor
 			SaveWarp();
 			LoadWarp();
 			SectorChanged(this, EventArgs.Empty);
-		}
-
-		void LimitScroll(int sector, ref int cameraX, ref int cameraY, ref int warioY)
-		{
-			int scrollData = Sector.GetScroll(rom, currentCourseId, sector);
-			bool allowLeft = (scrollData & 2) != 2;
-			bool allowRight = (scrollData & 1) != 1;
-			int sectorX = sector % 16;
-
-			if (!allowLeft)
-			{
-				cameraX = Math.Max(cameraX, sectorX * 32);
-			}
-			else
-			{
-				cameraX = Math.Max(cameraX, 0);
-			}
-
-			if (!allowRight)
-			{
-				cameraX = Math.Min(cameraX, sectorX * 32 + 10);
-			}
-			else
-			{
-				cameraX = Math.Min(cameraX, 15 * 32 + 10);
-			}
-
-			cameraY = Math.Max(cameraY, 0);  //top limit
-			cameraY = Math.Min(cameraY, 32 + 12); //bottom limit
-
-			if (currentWarp.CameraType == 0) //scroll X
-			{
-				if (cameraY < 16)
-				{
-					cameraY = 12;
-					warioY = Math.Max(warioY, 16);
-				}
-				else if (cameraY >= 16 && cameraY < 32)
-				{
-					cameraY = 28;
-				}
-				else
-				{
-					cameraY = 44;
-				}
-			}
-		}
-
-		void Panel3Paint(object sender, PaintEventArgs e)
-		{
-			//draw border
-			using (var pen = new Pen(SystemColors.ControlLight))
-			{
-				e.Graphics.DrawRectangle(pen, new Rectangle(0, 0, panel3.Width - 1, panel3.Height - 1));
-			}
 		}
 
 		#endregion

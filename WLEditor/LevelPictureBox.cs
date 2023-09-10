@@ -9,7 +9,7 @@ namespace WLEditor
 	public class LevelPictureBox : PictureBox
 	{
 		readonly bool[] invalidTiles = new bool[256 * 32];
-		DirectBitmap levelTiles = new DirectBitmap(4096, 512);
+		readonly DirectBitmap levelTiles = new DirectBitmap(4096, 512);
 		int zoom;
 
 		public bool ShowSectors = true;
@@ -28,7 +28,7 @@ namespace WLEditor
 		public event EventHandler<TileEventArgs> TileMouseMove;
 		public event EventHandler SectorChanged;
 
-		public static Brush[] TransparentBrushes =
+		public readonly static Brush[] TransparentBrushes =
 		{
 			new SolidBrush(Color.FromArgb(64, 128, 64, 0)),  //brown
 			new SolidBrush(Color.FromArgb(64, 0, 255, 0)),   //green
@@ -58,7 +58,7 @@ namespace WLEditor
 					format.Alignment = StringAlignment.Center;
 
 					//draw tiles to cache
-					DrawTiles(g, e.ClipRectangle, ShowColliders);
+					DrawTiles(g, ShowColliders);
 
 					//draw tiles from cache
 					e.Graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
@@ -68,7 +68,7 @@ namespace WLEditor
 					//sector objects (enemies, powerups)
 					if (ShowObjects)
 					{
-						DrawObjects(font, format, e, EnemyBrush);
+						DrawObjects(font, format, EnemyBrush);
 
 						//wario position
 						int index = Level.WarioRightFacing ? 0 : 1;
@@ -88,253 +88,252 @@ namespace WLEditor
 					//sectors
 					if (ShowSectors)
 					{
-						DrawSectors(e.Graphics, e.ClipRectangle, font, format);
-						DrawCamera(e.Graphics, e.ClipRectangle);
-						DrawSelectedSector(e.Graphics, e.ClipRectangle);
-						DrawScrollLines(e.Graphics);
+						DrawSectors(font, format);
+						DrawCamera();
+						DrawSelectedSector();
+						DrawScrollLines();
 					}
 
 					selection.DrawSelection(e.Graphics);
 				}
 			}
-		}
 
-		void DrawSectors(Graphics g, Rectangle clipRectangle, Font font, StringFormat format)
-		{
-			foreach (Point point in GetVisibleSectors(clipRectangle))
+			void DrawObjects(Font font, StringFormat format, Brush brush)
 			{
-				DrawScrollInfo(point.X, point.Y, g);
-				DrawSectorInfo(point.X, point.Y, g, font, format);
-			}
-
-			DrawSectorBorders(g, clipRectangle);
-		}
-
-		void DrawCamera(Graphics g, Rectangle clipRectangle)
-		{
-			if (Level.CameraPosition != -1)
-			{
-				Rectangle camera = new Rectangle((Level.CameraPosition % 4096) * zoom, (Level.CameraPosition / 4096) * zoom, 10 * 16 * zoom, 9 * 16 * zoom);
-				if (camera.IntersectsWith(clipRectangle))
+				for (int j = 0; j < 32; j++)
 				{
-					using (Brush red = new SolidBrush(Color.FromArgb(128, 0, 0, 255)))
+					for (int i = 0; i < 256; i++)
 					{
-						g.FillRectangle(red, camera);
-					}
-				}
-			}
-		}
-
-		void DrawSelectedSector(Graphics g, Rectangle clipRectangle)
-		{
-			if (CurrentSector != -1)
-			{
-				Rectangle sectorRect = new Rectangle((CurrentSector % 16) * 256 * zoom, (CurrentSector / 16) * 256 * zoom, 256 * zoom, 256 * zoom);
-				if (sectorRect.IntersectsWith(clipRectangle))
-				{
-					using (Brush blue = new SolidBrush(Color.FromArgb(64, 0, 0, 255)))
-					{
-						g.FillRectangle(blue, sectorRect);
-					}
-				}
-			}
-		}
-
-		void DrawTiles(Graphics g, Rectangle clipRectangle, bool viewColliders)
-		{
-			clipRectangle = GetClipRectangle(clipRectangle, 16 * zoom);
-
-			for (int j = clipRectangle.Top; j < clipRectangle.Bottom; j++)
-			{
-				for (int i = clipRectangle.Left; i < clipRectangle.Right; i++)
-				{
-					if (!invalidTiles[i + j * 256])
-					{
-						invalidTiles[i + j * 256] = true;
-						DrawTileToBitmap(i, j);
-
-						if (viewColliders)
+						byte data = Level.ObjectsData[i + j * 256];
+						if (data > 0)
 						{
-							byte tileIndex = Level.LevelData[i + j * 256 + 0x1000];
-							tileIndex = (byte)Level.SwitchTile(tileIndex, SwitchMode);
-
-							int specialTile = Level.IsSpecialTile(tileIndex);
-							if (specialTile != -1)
+							Rectangle destRect = new Rectangle(i * 16 * zoom, j * 16 * zoom, 16 * zoom, 16 * zoom);
+							if (destRect.IntersectsWith(e.ClipRectangle))
 							{
-								g.FillRectangle(TransparentBrushes[specialTile], new Rectangle(i * 16, j * 16, 16, 16));
-							}
-						}
-					}
-				}
-			}
-		}
+								e.Graphics.FillRectangle(brush, destRect);
 
-		void DrawTileToBitmap(int x, int y)
-		{
-			byte tileIndex = Level.LevelData[x + y * 256 + 0x1000];
-			Point dest = new Point(x * 16, y * 16);
-			Point src = new Point((tileIndex % 8) * 16, (tileIndex / 8) * 16);
-
-			for (int i = 0; i < 16; i++)
-			{
-				Array.Copy(Level.Tiles16x16.Bits, src.X + (src.Y + i) * Level.Tiles16x16.Width, levelTiles.Bits, dest.X + (dest.Y + i) * levelTiles.Width, 16);
-			}
-		}
-
-		void DrawObjects(Font font, StringFormat format, PaintEventArgs e, Brush brush)
-		{
-			for (int j = 0; j < 32; j++)
-			{
-				for (int i = 0; i < 256; i++)
-				{
-					byte data = Level.ObjectsData[i + j * 256];
-					if (data > 0)
-					{
-						Rectangle destRect = new Rectangle(i * 16 * zoom, j * 16 * zoom, 16 * zoom, 16 * zoom);
-						if (destRect.IntersectsWith(e.ClipRectangle))
-						{
-							e.Graphics.FillRectangle(brush, destRect);
-
-							//power up
-							if (data > 6)
-							{
-								e.Graphics.DrawImage(Sprite.TilesObjects.Bitmap, destRect, new Rectangle((data - 7) * 16, 0, 16, 16), GraphicsUnit.Pixel);
-							}
-						}
-
-						//enemy
-						if (data <= 6)
-						{
-							Rectangle enemyRect = Sprite.LoadedSprites[data - 1];
-							if (enemyRect != Rectangle.Empty)
-							{
-								Point enemyOffset = Sprite.LoadedOffsets[data - 1];
-
-								destRect = new Rectangle((i * 16 + enemyOffset.X) * zoom, (j * 16 + enemyOffset.Y) * zoom, enemyRect.Width * zoom, enemyRect.Height * zoom);
-								if (destRect.IntersectsWith(e.ClipRectangle))
+								//power up
+								if (data > 6)
 								{
-									e.Graphics.DrawImage(Sprite.TilesEnemies.Bitmap, destRect, enemyRect, GraphicsUnit.Pixel);
+									e.Graphics.DrawImage(Sprite.TilesObjects.Bitmap, destRect, new Rectangle((data - 7) * 16, 0, 16, 16), GraphicsUnit.Pixel);
 								}
 							}
-							else
+
+							//enemy
+							if (data <= 6)
 							{
-								e.Graphics.DrawString(data.ToString(), font, Brushes.White, (i * 16 + 8) * zoom, (j * 16 + 8) * zoom, format);
+								Rectangle enemyRect = Sprite.LoadedSprites[data - 1];
+								if (enemyRect != Rectangle.Empty)
+								{
+									Point enemyOffset = Sprite.LoadedOffsets[data - 1];
+
+									destRect = new Rectangle((i * 16 + enemyOffset.X) * zoom, (j * 16 + enemyOffset.Y) * zoom, enemyRect.Width * zoom, enemyRect.Height * zoom);
+									if (destRect.IntersectsWith(e.ClipRectangle))
+									{
+										e.Graphics.DrawImage(Sprite.TilesEnemies.Bitmap, destRect, enemyRect, GraphicsUnit.Pixel);
+									}
+								}
+								else
+								{
+									e.Graphics.DrawString(data.ToString(), font, Brushes.White, (i * 16 + 8) * zoom, (j * 16 + 8) * zoom, format);
+								}
 							}
 						}
 					}
 				}
 			}
-		}
 
-		void DrawScrollInfo(int x, int y, Graphics g)
-		{
-			int drawSector = x + y * 16;
-
-			byte scroll = Level.ScrollData[drawSector];
-			if ((scroll & 2) == 2)
+			void DrawTiles(Graphics g, bool viewColliders)
 			{
-				g.FillRectangle(Brushes.Yellow, x * 256 * zoom, y * 256 * zoom, 6 * zoom, 256 * zoom);
-			}
+				var clipRectangle = GetClipRectangle(e.ClipRectangle, 16 * zoom);
 
-			if ((scroll & 1) == 1)
-			{
-				g.FillRectangle(Brushes.Yellow, ((x + 1) * 256 - 6) * zoom, y * 256 * zoom, 6 * zoom, 256 * zoom);
-			}
-		}
-
-		void DrawScrollLines(Graphics g)
-		{
-			if (ScrollLines != 0)
-			{
-				int positionY = new[] { 23, 15, 7 }[ScrollLines - 1];
-				using (Pen pen = new Pen(Color.Yellow, 2.0f * zoom))
+				for (int j = clipRectangle.Top; j < clipRectangle.Bottom; j++)
 				{
-					pen.DashPattern = new[] { 5.0f, 1.0f };
-					g.DrawLine(pen, 0, positionY * 16 * zoom, 4096 * zoom, positionY * 16 * zoom);
-					g.DrawLine(pen, 0, (positionY + 9) * 16 * zoom, 4096 * zoom, (positionY + 9) * 16 * zoom);
-				}
-			}
-		}
-
-		void DrawSectorInfo(int x, int y, Graphics g, Font font, StringFormat format)
-		{
-			int drawSector = x + y * 16;
-
-			g.FillRectangle(Brushes.Blue, x * 256 * zoom, y * 256 * zoom, 16 * zoom, 16 * zoom);
-			g.DrawString(drawSector.ToString("D2"), font, Brushes.White, (x * 256 + 8) * zoom, (y * 256 + 8) * zoom, format);
-
-			int sectorTarget = Level.Warps[drawSector];
-			if (sectorTarget != 255)
-			{
-				string text = GetWarpName(sectorTarget);
-				var result = TextRenderer.MeasureText(text, font);
-
-				g.FillRectangle(Brushes.Blue, (x * 256 + 20) * zoom, y * 256 * zoom, result.Width, 16 * zoom);
-				g.DrawString(text, font, Brushes.White, (x * 256) * zoom + result.Width / 2 + 20 * zoom, (y * 256 + 8) * zoom, format);
-			}
-
-		}
-
-		void DrawSectorBorders(Graphics g, Rectangle clipRectangle)
-		{
-			//draw sector borders
-			using (Pen penBlue = new Pen(Color.Blue, 2.0f * zoom))
-			{
-				penBlue.DashPattern = new[] { 5.0f, 1.0f };
-
-				for (int i = 1; i < 16; i++)
-				{
-					int x = i * 256 * zoom;
-					Rectangle lineRect = new Rectangle(x - zoom, 0, 2 * zoom, 512 * zoom);
-					if (lineRect.IntersectsWith(clipRectangle))
+					for (int i = clipRectangle.Left; i < clipRectangle.Right; i++)
 					{
-						g.DrawLine(penBlue, x, 0, x, 512 * zoom);
+						if (!invalidTiles[i + j * 256])
+						{
+							invalidTiles[i + j * 256] = true;
+							DrawTileToBitmap(i, j);
+
+							if (viewColliders)
+							{
+								byte tileIndex = Level.LevelData[i + j * 256 + 0x1000];
+								tileIndex = (byte)Level.SwitchTile(tileIndex, SwitchMode);
+
+								int specialTile = Level.IsSpecialTile(tileIndex);
+								if (specialTile != -1)
+								{
+									g.FillRectangle(TransparentBrushes[specialTile], new Rectangle(i * 16, j * 16, 16, 16));
+								}
+							}
+						}
 					}
 				}
 
-				g.DrawLine(penBlue, 0, 256 * zoom, 4096 * zoom, 256 * zoom);
-			}
-		}
-
-		IEnumerable<Point> GetVisibleSectors(Rectangle clipRectangle)
-		{
-			clipRectangle = GetClipRectangle(clipRectangle, 256 * zoom);
-			for (int y = clipRectangle.Top; y < clipRectangle.Bottom; y++)
-			{
-				for (int x = clipRectangle.Left; x < clipRectangle.Right; x++)
+				void DrawTileToBitmap(int x, int y)
 				{
-					yield return new Point(x, y);
+					byte tileIndex = Level.LevelData[x + y * 256 + 0x1000];
+					Point dest = new Point(x * 16, y * 16);
+					Point src = new Point((tileIndex % 8) * 16, (tileIndex / 8) * 16);
+
+					for (int i = 0; i < 16; i++)
+					{
+						Array.Copy(Level.Tiles16x16.Bits, src.X + (src.Y + i) * Level.Tiles16x16.Width, levelTiles.Bits, dest.X + (dest.Y + i) * levelTiles.Width, 16);
+					}
 				}
 			}
-		}
 
-		Rectangle GetClipRectangle(Rectangle clipRectangle, int size)
-		{
-			Point start = new Point(clipRectangle.Left / size, clipRectangle.Top / size);
-			Point end = new Point((clipRectangle.Right - 1) / size + 1, (clipRectangle.Bottom - 1) / size + 1);
-			return new Rectangle(start.X, start.Y, end.X - start.X, end.Y - start.Y);
-		}
-
-		string GetWarpName(int sectorTarget)
-		{
-			string warpText;
-			switch (sectorTarget)
+			void DrawSectors(Font font, StringFormat format)
 			{
-				case 32:
-					warpText = "EXIT MAP";
-					break;
-				case 33:
-					warpText = "EXIT A";
-					break;
-				case 34:
-					warpText = "EXIT B";
-					break;
-				default:
-					warpText = "S" + sectorTarget.ToString("D2");
-					break;
+				foreach (Point point in GetVisibleSectors(e.ClipRectangle))
+				{
+					DrawScrollInfo(point.X, point.Y);
+					DrawSectorInfo(point.X, point.Y);
+				}
+
+				DrawSectorBorders();
+
+				void DrawScrollInfo(int x, int y)
+				{
+					int drawSector = x + y * 16;
+
+					byte scroll = Level.ScrollData[drawSector];
+					if ((scroll & 2) == 2)
+					{
+						e.Graphics.FillRectangle(Brushes.Yellow, x * 256 * zoom, y * 256 * zoom, 6 * zoom, 256 * zoom);
+					}
+
+					if ((scroll & 1) == 1)
+					{
+						e.Graphics.FillRectangle(Brushes.Yellow, ((x + 1) * 256 - 6) * zoom, y * 256 * zoom, 6 * zoom, 256 * zoom);
+					}
+				}
+
+				void DrawSectorInfo(int x, int y)
+				{
+					int drawSector = x + y * 16;
+
+					e.Graphics.FillRectangle(Brushes.Blue, x * 256 * zoom, y * 256 * zoom, 16 * zoom, 16 * zoom);
+					e.Graphics.DrawString(drawSector.ToString("D2"), font, Brushes.White, (x * 256 + 8) * zoom, (y * 256 + 8) * zoom, format);
+
+					int sectorTarget = Level.Warps[drawSector];
+					if (sectorTarget != 255)
+					{
+						string text = GetWarpName();
+						var result = TextRenderer.MeasureText(text, font);
+
+						e.Graphics.FillRectangle(Brushes.Blue, (x * 256 + 20) * zoom, y * 256 * zoom, result.Width, 16 * zoom);
+						e.Graphics.DrawString(text, font, Brushes.White, (x * 256) * zoom + result.Width / 2 + 20 * zoom, (y * 256 + 8) * zoom, format);
+					}
+
+					string GetWarpName()
+					{
+						string warpText;
+						switch (sectorTarget)
+						{
+							case 32:
+								warpText = "EXIT MAP";
+								break;
+							case 33:
+								warpText = "EXIT A";
+								break;
+							case 34:
+								warpText = "EXIT B";
+								break;
+							default:
+								warpText = "S" + sectorTarget.ToString("D2");
+								break;
+						}
+
+						return warpText;
+					}
+				}
+
+				void DrawSectorBorders()
+				{
+					//draw sector borders
+					using (Pen penBlue = new Pen(Color.Blue, 2.0f * zoom))
+					{
+						penBlue.DashPattern = new[] { 5.0f, 1.0f };
+
+						for (int i = 1; i < 16; i++)
+						{
+							int x = i * 256 * zoom;
+							Rectangle lineRect = new Rectangle(x - zoom, 0, 2 * zoom, 512 * zoom);
+							if (lineRect.IntersectsWith(e.ClipRectangle))
+							{
+								e.Graphics.DrawLine(penBlue, x, 0, x, 512 * zoom);
+							}
+						}
+
+						e.Graphics.DrawLine(penBlue, 0, 256 * zoom, 4096 * zoom, 256 * zoom);
+					}
+				}
+
+				IEnumerable<Point> GetVisibleSectors(Rectangle clipRectangle)
+				{
+					clipRectangle = GetClipRectangle(clipRectangle, 256 * zoom);
+					for (int y = clipRectangle.Top; y < clipRectangle.Bottom; y++)
+					{
+						for (int x = clipRectangle.Left; x < clipRectangle.Right; x++)
+						{
+							yield return new Point(x, y);
+						}
+					}
+				}
 			}
 
-			return warpText;
+			void DrawCamera()
+			{
+				if (Level.CameraPosition != -1)
+				{
+					Rectangle camera = new Rectangle((Level.CameraPosition % 4096) * zoom, (Level.CameraPosition / 4096) * zoom, 10 * 16 * zoom, 9 * 16 * zoom);
+					if (camera.IntersectsWith(e.ClipRectangle))
+					{
+						using (Brush red = new SolidBrush(Color.FromArgb(128, 0, 0, 255)))
+						{
+							e.Graphics.FillRectangle(red, camera);
+						}
+					}
+				}
+			}
+
+			void DrawSelectedSector()
+			{
+				if (CurrentSector != -1)
+				{
+					Rectangle sectorRect = new Rectangle((CurrentSector % 16) * 256 * zoom, (CurrentSector / 16) * 256 * zoom, 256 * zoom, 256 * zoom);
+					if (sectorRect.IntersectsWith(e.ClipRectangle))
+					{
+						using (Brush blue = new SolidBrush(Color.FromArgb(64, 0, 0, 255)))
+						{
+							e.Graphics.FillRectangle(blue, sectorRect);
+						}
+					}
+				}
+			}
+
+			void DrawScrollLines()
+			{
+				if (ScrollLines != 0)
+				{
+					int positionY = new[] { 23, 15, 7 }[ScrollLines - 1];
+					using (Pen pen = new Pen(Color.Yellow, 2.0f * zoom))
+					{
+						pen.DashPattern = new[] { 5.0f, 1.0f };
+						e.Graphics.DrawLine(pen, 0, positionY * 16 * zoom, 4096 * zoom, positionY * 16 * zoom);
+						e.Graphics.DrawLine(pen, 0, (positionY + 9) * 16 * zoom, 4096 * zoom, (positionY + 9) * 16 * zoom);
+					}
+				}
+			}
+
+			Rectangle GetClipRectangle(Rectangle clipRectangle, int size)
+			{
+				Point start = new Point(clipRectangle.Left / size, clipRectangle.Top / size);
+				Point end = new Point((clipRectangle.Right - 1) / size + 1, (clipRectangle.Bottom - 1) / size + 1);
+				return new Rectangle(start.X, start.Y, end.X - start.X, end.Y - start.Y);
+			}
 		}
 
 		public void InvalidateTile(int tileIndex)
@@ -364,27 +363,27 @@ namespace WLEditor
 			}
 		}
 
-		void AddEnemyRegion(Region region, int tileIndex, int enemyIndex)
-		{
-			if (enemyIndex >= 1 && enemyIndex <= 6)
-			{
-				Rectangle enemyRect = Sprite.LoadedSprites[enemyIndex - 1];
-				Point enemyOffset = Sprite.LoadedOffsets[enemyIndex - 1];
-
-				if (enemyRect != Rectangle.Empty)
-				{
-					region.Union(new Rectangle(((tileIndex % 256) * 16 + enemyOffset.X) * zoom, ((tileIndex / 256) * 16 + enemyOffset.Y) * zoom, enemyRect.Width * zoom, enemyRect.Height * zoom));
-				}
-			}
-		}
-
 		public void InvalidateObject(int tileIndex, int currentObject, int previousObject)
 		{
 			using (Region r = new Region(new Rectangle((tileIndex % 256) * 16 * zoom, (tileIndex / 256) * 16 * zoom, 16 * zoom, 16 * zoom)))
 			{
-				AddEnemyRegion(r, tileIndex, previousObject);
-				AddEnemyRegion(r, tileIndex, currentObject);
+				AddEnemyRegion(r, previousObject);
+				AddEnemyRegion(r, currentObject);
 				Invalidate(r);
+			}
+
+			void AddEnemyRegion(Region region, int enemyIndex)
+			{
+				if (enemyIndex >= 1 && enemyIndex <= 6)
+				{
+					Rectangle enemyRect = Sprite.LoadedSprites[enemyIndex - 1];
+					Point enemyOffset = Sprite.LoadedOffsets[enemyIndex - 1];
+
+					if (enemyRect != Rectangle.Empty)
+					{
+						region.Union(new Rectangle(((tileIndex % 256) * 16 + enemyOffset.X) * zoom, ((tileIndex / 256) * 16 + enemyOffset.Y) * zoom, enemyRect.Width * zoom, enemyRect.Height * zoom));
+					}
+				}
 			}
 		}
 
@@ -451,9 +450,9 @@ namespace WLEditor
 
 		public void RaiseTileMoveEvent()
 		{
-			if (TileMouseMove != null && lastTile != -1)
+			if (lastTile != -1)
 			{
-				TileMouseMove(this, new TileEventArgs(MouseButtons.None, TileEventStatus.MouseDown, lastTile % 256, lastTile / 256));
+				TileMouseMove?.Invoke(this, new TileEventArgs(MouseButtons.None, TileEventStatus.MouseDown, lastTile % 256, lastTile / 256));
 			}
 		}
 
