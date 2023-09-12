@@ -215,7 +215,7 @@ namespace WLEditor
 					return true;
 
 				case Keys.X:
-					if (currentDirection != null)
+					if (currentDirection != null && IsSpecialExit(currentDirection.Next))
 					{
 						SetExit();
 
