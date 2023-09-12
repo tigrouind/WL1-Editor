@@ -630,13 +630,13 @@ namespace WLEditor
 
 					WorldPathNextEnum next = currentDirection == null ? (WorldPathNextEnum)(-1) : currentDirection.Next;
 
-					foreach (var level in levels[currentWorld].OrderBy(x => x == currentLevel))
+					foreach (var level in levels[currentWorld].OrderBy(x => x == currentLevel || next == (WorldPathNextEnum)x))
 					{
 						var item = PathData[level];
 						int posX = item.X;
 						int posY = item.Y;
 
-						bool selected = currentPath == item;
+						bool selected = currentPath == item || next == (WorldPathNextEnum)level;
 
 						using (GraphicsPath path = RoundedRect(new Rectangle(posX * zoom, posY * zoom, 8 * zoom, 8 * zoom), zoom * 2))
 						{
@@ -667,10 +667,12 @@ namespace WLEditor
 						int exitY = Math.Max(0, Math.Min(nextY, CurrentMapY - 8));
 						WorldPathNextEnum[] flags = { WorldPathNextEnum.Overworld, WorldPathNextEnum.Sherbet, WorldPathNextEnum.Teapot, WorldPathNextEnum.TeapotOverworld };
 
+						bool selected = dir == currentDirection;
+
 						using (GraphicsPath path = RoundedRect(new Rectangle(exitX * zoom, exitY * zoom, 8 * zoom, 8 * zoom), zoom * 2))
 						{
 							g.DrawPath(penBorder, path);
-							g.FillPath(Brushes.MediumSeaGreen, path);
+							g.FillPath(selected ? Brushes.Lime : Brushes.MediumSeaGreen, path);
 						}
 
 						g.DrawString(new[] { "A", "B", "C", "C" }[Array.IndexOf(flags, dir.Next)], font, Brushes.Black, (exitX + 4) * zoom, (exitY + 4) * zoom, format);
