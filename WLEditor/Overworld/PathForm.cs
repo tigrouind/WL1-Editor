@@ -457,13 +457,13 @@ namespace WLEditor
 							if (dir.Next != nextLevel)
 							{
 								dir.Next = nextLevel;
-								CreateReversePath(dir);
+								CreateReversePath(dir, level);
 							}
 						}
 					}
 				}
 
-				void CreateReversePath(WorldPathDirection dir)
+				void CreateReversePath(WorldPathDirection dir, int next)
 				{
 					var reverseDir = GetReverseWorldPathDir(dir);
 					if (reverseDir != null && reverseDir != dir)
@@ -477,7 +477,7 @@ namespace WLEditor
 							})
 							.ToList();
 
-						reverseDir.Next = currentLevel;
+						reverseDir.Next = next;
 						reverseDir.Progress = dir.Progress;
 					}
 				}
