@@ -82,7 +82,7 @@ namespace WLEditor
 			new ComboboxItem<int[]>(new [] { 0x09, 0x4E13, 0x09, 0x7216, 393 }, "5 SS Tea Cup"),
 			new ComboboxItem<int[]>(new [] { 0x14, 0x6909, 0x14, 0x7813, 388 }, "6 Parsley Woods"),
 			new ComboboxItem<int[]>(new [] { 0x09, 0x5C6C, 0x09, 0x739F, 322 }, "7 Syrup Castle" ),
-			new ComboboxItem<int[]>(new [] { 0x14, 0x5AA0, 0x09, 0x6AA5, 787 }, "Overworld"),
+			new ComboboxItem<int[]>(new [] { 0x14, 0x5AA0, 0x09, 0x6AA5, 787 }, "8 Overworld"),
 		};
 
 		public void LoadRom(Rom rom)
@@ -449,6 +449,22 @@ namespace WLEditor
 					case Keys.M:
 						SetMusicTrack();
 						return true;
+				}
+
+				if (eventMode || pathMode)
+				{
+					switch (keyData & Keys.KeyCode)
+					{
+						case Keys.Home:
+						case Keys.End:
+						case Keys.PageDown:
+						case Keys.PageUp:
+						case Keys.Left:
+						case Keys.Right:
+						case Keys.Up:
+						case Keys.Down:
+							return true; //prevent dropdown change
+					}
 				}
 
 				return false;
