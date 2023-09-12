@@ -16,7 +16,7 @@ namespace WLEditor
 		WorldPathDirection currentDirection;
 		int currentLevel;
 
-		int pathMode;
+		PathModeEnum pathMode;
 		const int gridSnap = 4;
 
 		int zoom;
@@ -110,7 +110,7 @@ namespace WLEditor
 					int level = levels[currentWorld][startLevel];
 
 					var item = PathData[level];
-					var dir = item.Directions.FirstOrDefault(x => x.Path.Count > 0 && (x.Next == 0xFD || x.Next == 0xFA || x.Next == 0xF9 || x.Next == 0xF8));
+					var dir = item.Directions.FirstOrDefault(x => x.Path.Count > 0 && IsSpecialExit(x.Next));
 					if (dir != null)
 					{
 						GetPathPosition(item, dir, out posX, out posY);
@@ -122,7 +122,6 @@ namespace WLEditor
 					}
 				}
 			}
-
 		}
 
 		public void SetZoom(int zoomLevel)
@@ -208,11 +207,11 @@ namespace WLEditor
 					return true;
 
 				case Keys.I:
-					pathMode = pathMode == 1 ? 0 : 1;
+					pathMode = pathMode == PathModeEnum.Invisible ? PathModeEnum.None : PathModeEnum.Invisible;
 					return true;
 
 				case Keys.W:
-					pathMode = pathMode == 2 ? 0 : 2;
+					pathMode = pathMode == PathModeEnum.Water ? PathModeEnum.None : PathModeEnum.Water;
 					return true;
 
 				case Keys.X:
@@ -245,14 +244,14 @@ namespace WLEditor
 				//set direction if needed
 				if (currentDirection == null)
 				{
-					currentDirection = currentPath.Directions[GetDirection()];
+					currentDirection = currentPath.Directions[(int)GetDirection()];
 				}
 
 				UnbindPath(currentDirection);
 
 				//check previous step
-				int newDir = GetDirection();
-				int previousDir = currentDirection.Path.Count > 0 ? currentDirection.Path.Last().Direction : -1;
+				WorldPathDirectionEnum newDir = GetDirection();
+				WorldPathDirectionEnum previousDir = currentDirection.Path.Count > 0 ? currentDirection.Path.Last().Direction : (WorldPathDirectionEnum)(-1);
 
 				if (previousDir == newDir && GroupPath(currentDirection.Path.Last().Status) == pathMode && currentDirection.Path.Last().Steps < (256 - gridSnap))
 				{
@@ -271,12 +270,31 @@ namespace WLEditor
 				}
 				else
 				{
+					WorldPathStatusEnum status = GetStatus();
+
 					currentDirection.Path.Add(new WorldPathSegment
 					{
 						Direction = newDir,
-						Status = GetStatus(newDir, new[] { 0, 14, 12 }[pathMode]),
+						Status = this.GetStatus(newDir, status),
 						Steps = gridSnap
 					});
+				}
+
+				WorldPathStatusEnum GetStatus()
+				{
+					WorldPathStatusEnum status = WorldPathStatusEnum.None;
+					switch (pathMode)
+					{
+						case PathModeEnum.Invisible:
+							status = WorldPathStatusEnum.Invisible;
+							break;
+
+						case PathModeEnum.Water:
+							status = WorldPathStatusEnum.WaterFront;
+							break;
+					}
+
+					return status;
 				}
 			}
 
@@ -287,9 +305,9 @@ namespace WLEditor
 
 				if (currentDirection.Path.Count == 0)
 				{
-					currentDirection.Progress = 0xFD;
+					currentDirection.Progress = WorldPathProgressEnum.None;
 					currentDirection = null;
-					pathMode = 0;
+					pathMode = PathModeEnum.None;
 				}
 				else
 				{
@@ -303,16 +321,28 @@ namespace WLEditor
 				{
 					UnbindPath(dir);
 					dir.Path.Clear();
-					dir.Progress = 0xFD;
+					dir.Progress = WorldPathProgressEnum.None;
 				}
 
 				currentDirection = null;
-				pathMode = 0;
+				pathMode = PathModeEnum.None;
 			}
 
 			void SetProgress()
 			{
-				int[] flags = { 0xFD, 1, 2, 4, 8, 16, 32, 64, 128 };
+				WorldPathProgressEnum[] flags =
+				{
+					WorldPathProgressEnum.None,
+					WorldPathProgressEnum.Level1,
+					WorldPathProgressEnum.Level2,
+					WorldPathProgressEnum.Level3,
+					WorldPathProgressEnum.Level4,
+					WorldPathProgressEnum.Level5,
+					WorldPathProgressEnum.Level6,
+					WorldPathProgressEnum.Level7,
+					WorldPathProgressEnum.Level8
+				};
+
 				int progress = Array.IndexOf(flags, currentDirection.Progress);
 				currentDirection.Progress = flags[(progress + 1) % flags.Length];
 				var reverseDir = GetReverseWorldPathDir(currentDirection);
@@ -327,11 +357,11 @@ namespace WLEditor
 				RemoveReversePath(currentDirection);
 				if (currentWorld == 8)
 				{
-					currentDirection.Next = 0xF8;
+					currentDirection.Next = WorldPathNextEnum.TeapotOverworld;
 				}
 				else
 				{
-					int[] exits = { 0xFD, 0xFA, 0xF9 };
+					WorldPathNextEnum[] exits = { WorldPathNextEnum.Overworld, WorldPathNextEnum.Sherbet, WorldPathNextEnum.Teapot };
 					int next = Array.IndexOf(exits, currentDirection.Next);
 					currentDirection.Next = exits[(next + 1) % exits.Length];
 				}
@@ -383,7 +413,7 @@ namespace WLEditor
 				{
 					foreach (var dir in PathData[level].Directions)
 					{
-						if (dir.Next == currentLevel)
+						if (dir.Next == (WorldPathNextEnum)currentLevel)
 						{
 							UnbindPath(dir);
 						}
@@ -394,7 +424,7 @@ namespace WLEditor
 			void ChangeDirection()
 			{
 				var newDir = GetDirection();
-				currentDirection = currentPath.Directions[newDir];
+				currentDirection = currentPath.Directions[(int)newDir];
 
 				if (currentDirection.Path.Count > 0)
 				{
@@ -454,16 +484,16 @@ namespace WLEditor
 
 						if (levelPositions.TryGetValue(posX + posY * 256, out int nextLevel))
 						{
-							if (dir.Next != nextLevel)
+							if (dir.Next != (WorldPathNextEnum)nextLevel)
 							{
-								dir.Next = nextLevel;
-								CreateReversePath(dir, level);
+								dir.Next = (WorldPathNextEnum)nextLevel;
+								CreateReversePath(dir, (WorldPathNextEnum)level);
 							}
 						}
 					}
 				}
 
-				void CreateReversePath(WorldPathDirection dir, int next)
+				void CreateReversePath(WorldPathDirection dir, WorldPathNextEnum next)
 				{
 					var reverseDir = GetReverseWorldPathDir(dir);
 					if (reverseDir != null && reverseDir != dir)
@@ -485,58 +515,61 @@ namespace WLEditor
 
 			void UnbindPath(WorldPathDirection dir)
 			{
-				if (dir.Path.Count == 0 || (dir.Next != 0xFA && dir.Next != 0xF9 && dir.Next != 0xF8 && dir.Next != 0xFD))
+				if (dir.Path.Count == 0 || !IsSpecialExit(dir.Next))
 				{
 					RemoveReversePath(dir);
-					dir.Next = currentWorld == 8 ? 0xF8 : 0xFD;
+					dir.Next = currentWorld == 8 ? WorldPathNextEnum.TeapotOverworld : WorldPathNextEnum.Overworld;
 				}
 			}
 
-			int GetDirection()
+			WorldPathDirectionEnum GetDirection()
 			{
 				switch (keyCode)
 				{
 					case Keys.Right:
-						return 0;
+						return WorldPathDirectionEnum.Right;
 
 					case Keys.Left:
-						return 1;
+						return WorldPathDirectionEnum.Left;
 
 					case Keys.Up:
-						return 2;
+						return WorldPathDirectionEnum.Up;
 
 					case Keys.Down:
-						return 3;
+						return WorldPathDirectionEnum.Down;
 				}
 
-				return -1;
+				throw new InvalidOperationException();
 			}
 
 			#region Reverse
 
-			int GetReverseDir(int dir)
+			WorldPathDirectionEnum GetReverseDir(WorldPathDirectionEnum dir)
 			{
 				switch (dir)
 				{
-					case 0:
-						return 1;
-					case 1:
-						return 0;
-					case 2:
-						return 3;
-					case 3:
-						return 2;
+					case WorldPathDirectionEnum.Right:
+						return WorldPathDirectionEnum.Left;
+
+					case WorldPathDirectionEnum.Left:
+						return WorldPathDirectionEnum.Right;
+
+					case WorldPathDirectionEnum.Up:
+						return WorldPathDirectionEnum.Down;
+
+					case WorldPathDirectionEnum.Down:
+						return WorldPathDirectionEnum.Up;
 				}
 
-				return -1;
+				throw new InvalidOperationException();
 			}
 
 			WorldPathDirection GetReverseWorldPathDir(WorldPathDirection dir)
 			{
-				if (dir.Path.Count > 0 && dir.Next != 0xFA && dir.Next != 0xF9 && dir.Next != 0xF8 && dir.Next != 0xFD)
+				if (dir.Path.Count > 0 && !IsSpecialExit(dir.Next))
 				{
-					int reverseDir = GetReverseDir(dir.Path.Last().Direction);
-					return PathData[dir.Next].Directions[reverseDir];
+					WorldPathDirectionEnum reverseDir = GetReverseDir(dir.Path.Last().Direction);
+					return PathData[(int)dir.Next].Directions[(int)reverseDir];
 				}
 
 				return null;
@@ -554,23 +587,24 @@ namespace WLEditor
 			#endregion
 		}
 
-		int GetStatus(int newDir, int status)
+		WorldPathStatusEnum GetStatus(WorldPathDirectionEnum newDir, WorldPathStatusEnum status)
 		{
 			switch (status)
 			{
-				case 14: //invisible
-					return 14;
+				case WorldPathStatusEnum.Invisible:
+					return WorldPathStatusEnum.Invisible;
 
-				case 12: //water
-				case 13: //water
-					if (newDir == 2) //up
+				case WorldPathStatusEnum.WaterFront:
+				case WorldPathStatusEnum.WaterBack:
+					if (newDir == WorldPathDirectionEnum.Up)
 					{
-						return 13; //water back
+						return WorldPathStatusEnum.WaterBack;
 					}
-					return 12; //water front
+
+					return WorldPathStatusEnum.WaterFront;
 
 				default:
-					return newDir + 1;
+					return (WorldPathStatusEnum)newDir + 1;
 			}
 		}
 
@@ -594,7 +628,7 @@ namespace WLEditor
 					format.LineAlignment = StringAlignment.Center;
 					format.Alignment = StringAlignment.Center;
 
-					int next = currentDirection == null ? -1 : currentDirection.Next;
+					WorldPathNextEnum next = currentDirection == null ? (WorldPathNextEnum)(-1) : currentDirection.Next;
 
 					foreach (var level in levels[currentWorld].OrderBy(x => x == currentLevel))
 					{
@@ -624,14 +658,14 @@ namespace WLEditor
 					format.LineAlignment = StringAlignment.Center;
 					format.Alignment = StringAlignment.Center;
 
-					foreach (var dir in currentPath.Directions.Where(x => x.Path.Count > 0 && (x.Next == 0xFD || x.Next == 0xFA || x.Next == 0xF9 || x.Next == 0xF8))
+					foreach (var dir in currentPath.Directions.Where(x => x.Path.Count > 0 && IsSpecialExit(x.Next))
 							.OrderBy(x => x == currentDirection))
 					{
 						GetPathPosition(currentPath, dir, out int nextX, out int nextY);
 
 						int exitX = Math.Max(0, Math.Min(nextX, CurrentMapX - 8));
 						int exitY = Math.Max(0, Math.Min(nextY, CurrentMapY - 8));
-						int[] flags = { 0xFD, 0xFA, 0xF9, 0xF8 };
+						WorldPathNextEnum[] flags = { WorldPathNextEnum.Overworld, WorldPathNextEnum.Sherbet, WorldPathNextEnum.Teapot, WorldPathNextEnum.TeapotOverworld };
 
 						using (GraphicsPath path = RoundedRect(new Rectangle(exitX * zoom, exitY * zoom, 8 * zoom, 8 * zoom), zoom * 2))
 						{
@@ -661,7 +695,7 @@ namespace WLEditor
 						GetPathPosition(path, ref startX, ref startY);
 						points.Add(new Point((startX + 4) * zoom, (startY + 4) * zoom));
 
-						Color color = pathColors[GroupPath(path.Status) + (selected ? 0 : 3)];
+						Color color = pathColors[(int)GroupPath(path.Status) + (selected ? 0 : 3)];
 						colors.Add(color);
 					}
 
@@ -736,22 +770,35 @@ namespace WLEditor
 
 					int[,] offsets =
 					{
-					{  8,  0 },
-					{ -8,  0 },
-					{  0, -8 },
-					{  0,  8 }
-				};
+						{  8,  0 },
+						{ -8,  0 },
+						{  0, -8 },
+						{  0,  8 }
+					};
 
 					for (int dir = 0; dir < 4; dir++)
 					{
 						var dirs = currentPath.Directions[dir];
-						if (dirs.Path.Count > 0 && dirs.Progress != 0xFD)
+						if (dirs.Path.Count > 0)
 						{
-							int[] progressFlags = { 0, 1, 2, 4, 8, 16, 32, 64, 128 };
-							int progress = Array.IndexOf(progressFlags, dirs.Progress);
+							WorldPathProgressEnum[] flags =
+							{
+								WorldPathProgressEnum.Level1,
+								WorldPathProgressEnum.Level2,
+								WorldPathProgressEnum.Level3,
+								WorldPathProgressEnum.Level4,
+								WorldPathProgressEnum.Level5,
+								WorldPathProgressEnum.Level6,
+								WorldPathProgressEnum.Level7,
+								WorldPathProgressEnum.Level8
+							};
 
-							g.FillRectangle(Brushes.Gray, (currentPath.X + offsets[dir, 0]) * zoom, (currentPath.Y + offsets[dir, 1]) * zoom, 8 * zoom, 8 * zoom);
-							g.DrawString(progress.ToString(), font, Brushes.White, (currentPath.X + 4 + offsets[dir, 0]) * zoom, (currentPath.Y + 4 + offsets[dir, 1]) * zoom, format);
+							int progress = Array.IndexOf(flags, dirs.Progress);
+							if (progress != -1)
+							{
+								g.FillRectangle(Brushes.Gray, (currentPath.X + offsets[dir, 0]) * zoom, (currentPath.Y + offsets[dir, 1]) * zoom, 8 * zoom, 8 * zoom);
+								g.DrawString((progress + 1).ToString(), font, Brushes.White, (currentPath.X + 4 + offsets[dir, 0]) * zoom, (currentPath.Y + 4 + offsets[dir, 1]) * zoom, format);
+							}
 						}
 					}
 				}
@@ -763,34 +810,34 @@ namespace WLEditor
 
 				path.AddLines(new[]
 				{
-				new Point(bounds.Left + offset, bounds.Top),
-				new Point(bounds.Right - offset, bounds.Top),
-				new Point(bounds.Right, bounds.Top + offset),
-				new Point(bounds.Right, bounds.Bottom - offset),
-				new Point(bounds.Right - offset, bounds.Bottom),
-				new Point(bounds.Left + offset, bounds.Bottom),
-				new Point(bounds.Left, bounds.Bottom - offset),
-				new Point(bounds.Left, bounds.Top + offset)
-			});
+					new Point(bounds.Left + offset, bounds.Top),
+					new Point(bounds.Right - offset, bounds.Top),
+					new Point(bounds.Right, bounds.Top + offset),
+					new Point(bounds.Right, bounds.Bottom - offset),
+					new Point(bounds.Right - offset, bounds.Bottom),
+					new Point(bounds.Left + offset, bounds.Bottom),
+					new Point(bounds.Left, bounds.Bottom - offset),
+					new Point(bounds.Left, bounds.Top + offset)
+				});
 
 				path.CloseFigure();
 				return path;
 			}
 		}
 
-		int GroupPath(int status)
+		PathModeEnum GroupPath(WorldPathStatusEnum status)
 		{
 			switch (status)
 			{
-				case 14: //invisible
-					return 1;
+				case WorldPathStatusEnum.Invisible:
+					return PathModeEnum.Invisible;
 
-				case 12: //water front
-				case 13: //water back
-					return 2;
+				case WorldPathStatusEnum.WaterFront:
+				case WorldPathStatusEnum.WaterBack:
+					return PathModeEnum.Water;
 
 				default:
-					return 0;
+					return PathModeEnum.None;
 			}
 		}
 
@@ -811,21 +858,36 @@ namespace WLEditor
 		{
 			switch (path.Direction)
 			{
-				case 0:
+				case WorldPathDirectionEnum.Right:
 					posX += path.Steps;
 					break;
 
-				case 1:
+				case WorldPathDirectionEnum.Left:
 					posX -= path.Steps;
 					break;
 
-				case 2:
+				case WorldPathDirectionEnum.Up:
 					posY -= path.Steps;
 					break;
 
-				case 3:
+				case WorldPathDirectionEnum.Down:
 					posY += path.Steps;
 					break;
+			}
+		}
+
+		bool IsSpecialExit(WorldPathNextEnum next)
+		{
+			switch (next)
+			{
+				case WorldPathNextEnum.Overworld:
+				case WorldPathNextEnum.Sherbet:
+				case WorldPathNextEnum.Teapot:
+				case WorldPathNextEnum.TeapotOverworld:
+					return true;
+
+				default:
+					return false;
 			}
 		}
 

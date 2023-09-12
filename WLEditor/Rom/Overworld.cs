@@ -337,9 +337,9 @@ namespace WLEditor
 				{
 					var direction = new WorldPathDirection
 					{
-						Progress = 0xFD,
+						Progress = WorldPathProgressEnum.None,
 						Path = new List<WorldPathSegment>(),
-						Next = overWorld ? 0xF8 : 0xFD
+						Next = overWorld ? WorldPathNextEnum.TeapotOverworld : WorldPathNextEnum.Overworld
 					};
 
 					if ((dirFlag & (1 << (dir + 4))) != 0)
@@ -355,17 +355,17 @@ namespace WLEditor
 								int steps = rom.ReadByte(position + 1);
 								int status = rom.ReadByte(position + 2);
 
-								direction.Path.Add(new WorldPathSegment { Status = status, Direction = Array.IndexOf(directions, data), Steps = steps });
+								direction.Path.Add(new WorldPathSegment { Status = (WorldPathStatusEnum)status, Direction = (WorldPathDirectionEnum)Array.IndexOf(directions, data), Steps = steps });
 
 								position += 3;
 								data = rom.ReadByte(position);
 							}
 
 							int next = rom.ReadByte(position + 1);
-							direction.Next = next;
+							direction.Next = (WorldPathNextEnum)next;
 
 							int progress = rom.ReadWord((overWorld ? 0x6486 : 0x6496) + level * 2);
-							direction.Progress = rom.ReadByte(progress + 1 + dir * 2);
+							direction.Progress = (WorldPathProgressEnum)rom.ReadByte(progress + 1 + dir * 2);
 						}
 					}
 
@@ -496,7 +496,7 @@ namespace WLEditor
 
 							foreach (var path in direction.Path)
 							{
-								rom.WriteByte(positionPath++, (byte)directions[path.Direction]);
+								rom.WriteByte(positionPath++, (byte)directions[(int)path.Direction]);
 								rom.WriteByte(positionPath++, (byte)path.Steps);
 								rom.WriteByte(positionPath++, (byte)path.Status);
 							}
@@ -664,7 +664,7 @@ namespace WLEditor
 			{
 				for (int flag = 0; flag < 6; flag++)
 				{
-					var nextDir = SearchProgressNextDirection(1 << flag);
+					var nextDir = SearchProgressNextDirection((WorldPathProgressEnum)(1 << flag));
 					rom.WriteByte(overWorldNextDir[flag], nextDir);
 				}
 			}
@@ -672,12 +672,12 @@ namespace WLEditor
 			{
 				for (int flag = 0; flag < 8; flag++)
 				{
-					var nextDir = SearchProgressNextDirection(1 << flag);
+					var nextDir = SearchProgressNextDirection((WorldPathProgressEnum)(1 << flag));
 					rom.WriteByte(0x735D + 16 * world + flag + 8, nextDir);
 				}
 			}
 
-			byte SearchProgressNextDirection(int flag)
+			byte SearchProgressNextDirection(WorldPathProgressEnum flag)
 			{
 				foreach (int level in levels)
 				{

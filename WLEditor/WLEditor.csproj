@@ -58,6 +58,8 @@
     <Compile Include="ComboboxItem.cs" />
     <Compile Include="DirectBitmap.cs" />
     <Compile Include="Extensions.cs" />
+    <Compile Include="Overworld\PathModeEnum.cs" />
+    <Compile Include="Rom\WorldPath\Enum\WorldPathNextEnum.cs" />
     <Compile Include="Rom\Level.cs" />
     <Compile Include="LevelPictureBox.cs">
       <SubType>Component</SubType>
@@ -80,6 +82,8 @@
     <Compile Include="Overworld\PathForm.cs" />
     <Compile Include="Rom\WorldPath\WorldPath.cs" />
     <Compile Include="Rom\WorldPath\WorldPathDirection.cs" />
+    <Compile Include="Rom\WorldPath\Enum\WorldPathDirectionEnum.cs" />
+    <Compile Include="Rom\WorldPath\Enum\WorldPathProgressEnum.cs" />
     <Compile Include="Rom\WorldPath\WorldPathSegment.cs" />
     <Compile Include="PanelUnscrollable.cs">
       <SubType>Component</SubType>
@@ -88,6 +92,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Rom.cs" />
     <Compile Include="Rom\Sector.cs" />
+    <Compile Include="Rom\WorldPath\Enum\WorldPathStatusEnum.cs" />
     <Compile Include="Sector\EnemyInfo.cs" />
     <Compile Include="Sector\SectorForm.cs">
       <SubType>Form</SubType>

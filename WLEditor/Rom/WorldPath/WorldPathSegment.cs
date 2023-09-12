@@ -1,9 +1,9 @@
-﻿namespace WLEditor
+namespace WLEditor
 {
 	public class WorldPathSegment
 	{
 		public int Steps;
-		public int Direction;
-		public int Status;
+		public WorldPathDirectionEnum Direction;
+		public WorldPathStatusEnum Status;
 	}
 }
