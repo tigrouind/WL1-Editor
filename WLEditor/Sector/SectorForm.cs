@@ -801,35 +801,40 @@ namespace WLEditor
 		void CmdCalculatePosClick(object sender, EventArgs e)
 		{
 			int sector = currentWarp.WarioX / 32 + currentWarp.WarioY / 32 * 16;
+			string sectorTxt = sector.ToString();
 
-			string sectorTxt = Interaction.InputBox(string.Empty, "Enter sector number (0-31)", sector.ToString(), -1, -1);
-			if (!(int.TryParse(sectorTxt, out sector) && sector >= 0 && sector <= 31))
+			do
 			{
-				return;
+				sectorTxt = Interaction.InputBox(string.Empty, "Enter sector number (0-31)", sectorTxt, -1, -1);
+			}
+			while (!(sectorTxt == string.Empty || (int.TryParse(sectorTxt, out sector) && sector >= 0 && sector <= 31)));
+
+			if (sectorTxt != string.Empty)
+			{
+				currentWarp.WarioX = (sector % 16) * 32 + currentWarp.WarioX % 32;
+				currentWarp.WarioY = (sector / 16) * 32 + currentWarp.WarioY % 32;
+
+				if (Sector.FindDoorInSector(sector, currentWarp.WarioX % 32, currentWarp.WarioY % 32, out int doorX, out int doorY))
+				{
+					//player position
+					currentWarp.WarioX = (sector % 16) * 32 + Math.Min(doorX * 2 + 1, 31);
+					currentWarp.WarioY = (sector / 16) * 32 + Math.Min(doorY * 2 + 2, 31);
+				}
+
+				//camera position (scroll area: 10 x 9)
+				int cameraX = currentWarp.WarioX - 12;
+				int cameraY = currentWarp.WarioY - 16;
+
+				Sector.LimitScroll(rom, currentCourseId, sector, currentWarp.CameraType, ref cameraX, ref cameraY, ref currentWarp.WarioY);
+
+				currentWarp.CameraX = cameraX;
+				currentWarp.CameraY = cameraY;
+
+				SaveWarp();
+				LoadWarp();
+				SectorChanged(this, EventArgs.Empty);
 			}
 
-			currentWarp.WarioX = (sector % 16) * 32 + currentWarp.WarioX % 32;
-			currentWarp.WarioY = (sector / 16) * 32 + currentWarp.WarioY % 32;
-
-			if (Sector.FindDoorInSector(sector, currentWarp.WarioX % 32, currentWarp.WarioY % 32, out int doorX, out int doorY))
-			{
-				//player position
-				currentWarp.WarioX = (sector % 16) * 32 + Math.Min(doorX * 2 + 1, 31);
-				currentWarp.WarioY = (sector / 16) * 32 + Math.Min(doorY * 2 + 2, 31);
-			}
-
-			//camera position (scroll area: 10 x 9)
-			int cameraX = currentWarp.WarioX - 12;
-			int cameraY = currentWarp.WarioY - 16;
-
-			Sector.LimitScroll(rom, currentCourseId, sector, currentWarp.CameraType, ref cameraX, ref cameraY, ref currentWarp.WarioY);
-
-			currentWarp.CameraX = cameraX;
-			currentWarp.CameraY = cameraY;
-
-			SaveWarp();
-			LoadWarp();
-			SectorChanged(this, EventArgs.Empty);
 		}
 
 		#endregion

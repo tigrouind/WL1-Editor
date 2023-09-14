@@ -598,8 +598,15 @@ namespace WLEditor
 				void SetMusicTrack()
 				{
 					int musicTrack = Overworld.GetMusic(rom, currentWorld);
-					string musicTrackTxt = Interaction.InputBox(string.Empty, "Enter music track number (1-8)", musicTrack == -1 ? string.Empty : (musicTrack + 1).ToString(), -1, -1);
-					if ((int.TryParse(musicTrackTxt, out musicTrack) && musicTrack >= 1 && musicTrack <= 8))
+
+					string musicTrackTxt = musicTrack == -1 ? string.Empty : (musicTrack + 1).ToString();
+					do
+					{
+						musicTrackTxt = Interaction.InputBox(string.Empty, "Enter music track number (1-8)", musicTrackTxt, -1, -1);
+					}
+					while (!(musicTrackTxt == string.Empty || (int.TryParse(musicTrackTxt, out musicTrack) && musicTrack >= 1 && musicTrack <= 8)));
+
+					if (musicTrackTxt != string.Empty)
 					{
 						Overworld.SetMusic(rom, currentWorld, musicTrack - 1);
 						SetChanges(ChangeEnum.None);
