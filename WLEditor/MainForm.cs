@@ -400,7 +400,7 @@ namespace WLEditor
 
 		void AboutToolStripMenuItemClick(object sender, EventArgs e)
 		{
-			MessageBox.Show(Text + " v0.81\r\nDate : 25.05.2023\r\nContact me : tigrou.ind@gmail.com");
+			MessageBox.Show(Text + " v0.82\r\nDate : 17.09.2023\r\nContact me : tigrou.ind@gmail.com");
 		}
 
 		void ExitToolStripMenuItemClick(object sender, EventArgs e)
