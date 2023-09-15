@@ -1,6 +1,7 @@
 using Microsoft.VisualBasic;
 using System;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -21,6 +22,7 @@ namespace WLEditor
 		Warp currentWarp;
 		int currentSector;
 		int scroll;
+		int zoom;
 		bool ignoreEvents, isWarp;
 		bool formLoaded;
 
@@ -285,6 +287,10 @@ namespace WLEditor
 		{
 			if (e.Index >= 0 && !DesignMode)
 			{
+				e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
+				e.Graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
+				e.Graphics.PixelOffsetMode = PixelOffsetMode.Half;
+
 				var item = ((ComboboxItem<EnemyInfo>)ddlEnemies.Items[e.Index]).Value;
 				bool drawLegend = (e.State & DrawItemState.ComboBoxEdit) == 0;
 
@@ -300,11 +306,11 @@ namespace WLEditor
 					{
 						if (item.BossId >= 0)
 						{
-							e.Graphics.FillRectangle(Brushes.MistyRose, new Rectangle(e.Bounds.Left, e.Bounds.Top, 32, e.Bounds.Height));
+							e.Graphics.FillRectangle(Brushes.MistyRose, new Rectangle(e.Bounds.Left, e.Bounds.Top, 20, e.Bounds.Height));
 						}
 						else if (item.TreasureId >= 1 && item.TreasureId <= 15)
 						{
-							e.Graphics.FillRectangle(Brushes.Wheat, new Rectangle(e.Bounds.Left, e.Bounds.Top, 32, e.Bounds.Height));
+							e.Graphics.FillRectangle(Brushes.Wheat, new Rectangle(e.Bounds.Left, e.Bounds.Top, 20, e.Bounds.Height));
 						}
 					}
 				}
@@ -316,7 +322,7 @@ namespace WLEditor
 						var enemyRect = enemiesRects[item.Index * 6 + index];
 						if (enemyRect != Rectangle.Empty)
 						{
-							var destRect = new Rectangle(e.Bounds.Left + index * 32 + 32, e.Bounds.Top, 32, 32);
+							var destRect = new Rectangle(e.Bounds.Left + 20 + index * 32 * zoom, e.Bounds.Top, 32 * zoom, 32 * zoom);
 
 							if (item.ExitOpen && drawLegend && item.EnemyIds[index] == 15) //skull open
 							{
@@ -336,7 +342,7 @@ namespace WLEditor
 					{
 						format.Alignment = StringAlignment.Center;
 						format.LineAlignment = StringAlignment.Center;
-						var dest = new RectangleF(e.Bounds.Left + 16, e.Bounds.Top + 16.0f, 0.0f, 0.0f);
+						var dest = new Rectangle(10, e.Bounds.Top + 16 * zoom, 0, 0);
 
 						if (item.BossId >= 0)
 						{
@@ -352,15 +358,6 @@ namespace WLEditor
 						}
 					}
 				}
-			}
-		}
-
-		void Panel3Paint(object sender, PaintEventArgs e)
-		{
-			//draw border
-			using (var pen = new Pen(SystemColors.ControlLight))
-			{
-				e.Graphics.DrawRectangle(pen, new Rectangle(0, 0, panel3.Width - 1, panel3.Height - 1));
 			}
 		}
 
@@ -424,13 +421,13 @@ namespace WLEditor
 
 		void SetControlsVisibility()
 		{
-			tableLayoutPanel1.SuspendLayout();
+			flowLayoutPanel1.SuspendLayout();
 
-			panel1.Visible = isWarp;
-			panel2.Visible = !isWarp;
-			panel3.Visible = !isWarp || Sector.GetWarp(rom, currentCourseId, currentSector) >= 0x5B7A;
+			panelWarp.Visible = isWarp;
+			panelMusic.Visible = !isWarp;
+			grpTileset.Visible = grpCamera.Visible = !isWarp || Sector.GetWarp(rom, currentCourseId, currentSector) >= 0x5B7A;
 
-			tableLayoutPanel1.ResumeLayout();
+			flowLayoutPanel1.ResumeLayout();
 		}
 
 		#region Load
@@ -448,6 +445,14 @@ namespace WLEditor
 				InitForm();
 				LoadSector();
 			}
+		}
+
+		public void SetZoom(int zoomLevel)
+		{
+			zoom = Math.Min(2, zoomLevel);
+			ddlEnemies.DropDownWidth = 20 + zoom * 32 * 5 + SystemInformation.VerticalScrollBarWidth;
+			ddlEnemies.ItemHeight = zoom * 32;
+			labEnemies.Height = zoom * 32;
 		}
 
 		protected override bool ProcessCmdKey(ref Message msg, Keys keyData)

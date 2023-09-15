@@ -543,6 +543,7 @@ namespace WLEditor
 			levelPictureBox.SetZoom(zoomLevel);
 			toolboxForm.SetZoom(zoomLevel);
 			overworldForm.SetZoom(zoomLevel);
+			sectorForm.SetZoom(zoomLevel);
 		}
 
 		void Zoom100ToolStripMenuItemClick(object sender, EventArgs e)
