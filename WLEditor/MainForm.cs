@@ -100,15 +100,9 @@ namespace WLEditor
 
 			void ProcessSubFormCommand(object sender, KeyEventArgs e)
 			{
-				foreach (var toolStripMenuItem in new[] { toolboxToolStripMenuItem, sectorsToolStripMenuItem, overworldToolStripMenuItem })
+				if (e.KeyCode >= Keys.F1 && e.KeyCode <= Keys.F12 && DispatchCommandKey(e.KeyCode))
 				{
-					if (e.KeyCode == toolStripMenuItem.ShortcutKeys)
-					{
-						toolStripMenuItem.Checked = !toolStripMenuItem.Checked;
-						e.Handled = true;
-						Focus();
-						break;
-					}
+					e.Handled = true;
 				}
 			}
 
@@ -580,107 +574,108 @@ namespace WLEditor
 
 		protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
 		{
-			if (DispatchCommandKey())
+			if (DispatchCommandKey(keyData))
 			{
 				return true;
 			}
 
 			return base.ProcessCmdKey(ref msg, keyData);
+		}
 
-			bool DispatchCommandKey()
+
+		bool DispatchCommandKey(Keys keyData)
+		{
+			switch (keyData)
 			{
-				switch (keyData)
-				{
-					case Keys.Control | Keys.Add:
-					case Keys.Control | Keys.Oemplus:
-						zoomInToolStripMenuItem.PerformClick();
-						return true;
-
-					case Keys.Control | Keys.Subtract:
-					case Keys.Control | Keys.OemMinus:
-						zoomOutToolStripMenuItem.PerformClick();
-						return true;
-
-					case Keys.S:
-						levelPictureBox.ScrollLines = (levelPictureBox.ScrollLines + 1) % 4;
-						levelPictureBox.Invalidate();
-						break;
-
-					case Keys.B:
-						SetSwitchMode(GetNextSwitchMode(switchMode));
-						return true;
-
-					case Keys.Control | Keys.C:
-						levelPictureBox.CopySelection();
-						levelPictureBox.ClearSelection();
-						return true;
-
-					case Keys.Control | Keys.V:
-						if (levelPictureBox.PasteSelection())
-						{
-							SetChanges(true);
-						}
-
-						levelPictureBox.ClearSelection();
-						return true;
-
-					case Keys.Control | Keys.X:
-						if (levelPictureBox.CutSelection())
-						{
-							SetChanges(true);
-						}
-
-						levelPictureBox.ClearSelection();
-						return true;
-
-					case Keys.Delete:
-						if (levelPictureBox.DeleteSelection())
-						{
-							SetChanges(true);
-						}
-
-						levelPictureBox.ClearSelection();
-						return true;
-
-					case Keys.Control | Keys.Z:
-						if (levelPictureBox.Undo())
-						{
-							SetChanges(true);
-						}
-						return true;
-
-					case Keys.Control | Keys.Y:
-						if (levelPictureBox.Redo())
-						{
-							SetChanges(true);
-						}
-						return true;
-				}
-
-				ToolStripMenuItem toolStrip = menuStrip1.Items.GetAllMenuItems()
-					.FirstOrDefault(x => x.ShortcutKeys == keyData);
-
-				if (toolStrip != null)
-				{
-					toolStrip.PerformClick();
+				case Keys.Control | Keys.Add:
+				case Keys.Control | Keys.Oemplus:
+					zoomInToolStripMenuItem.PerformClick();
 					return true;
-				}
 
-				return false;
+				case Keys.Control | Keys.Subtract:
+				case Keys.Control | Keys.OemMinus:
+					zoomOutToolStripMenuItem.PerformClick();
+					return true;
 
-				int GetNextSwitchMode(int value)
-				{
-					int typeOfSwitch = Level.GetTypeOfSwitch();
-					int[] flags = { 0, 1, 2, 4 };
-					int nextMode = value;
+				case Keys.S:
+					levelPictureBox.ScrollLines = (levelPictureBox.ScrollLines + 1) % 4;
+					levelPictureBox.Invalidate();
+					break;
 
-					do
+				case Keys.B:
+					SetSwitchMode(GetNextSwitchMode(switchMode));
+					return true;
+
+				case Keys.Control | Keys.C:
+					levelPictureBox.CopySelection();
+					levelPictureBox.ClearSelection();
+					return true;
+
+				case Keys.Control | Keys.V:
+					if (levelPictureBox.PasteSelection())
 					{
-						nextMode = (nextMode + 1) % 4;
+						SetChanges(true);
 					}
-					while (nextMode != 0 && (flags[nextMode] & typeOfSwitch) == 0);
-					return nextMode;
+
+					levelPictureBox.ClearSelection();
+					return true;
+
+				case Keys.Control | Keys.X:
+					if (levelPictureBox.CutSelection())
+					{
+						SetChanges(true);
+					}
+
+					levelPictureBox.ClearSelection();
+					return true;
+
+				case Keys.Delete:
+					if (levelPictureBox.DeleteSelection())
+					{
+						SetChanges(true);
+					}
+
+					levelPictureBox.ClearSelection();
+					return true;
+
+				case Keys.Control | Keys.Z:
+					if (levelPictureBox.Undo())
+					{
+						SetChanges(true);
+					}
+					return true;
+
+				case Keys.Control | Keys.Y:
+					if (levelPictureBox.Redo())
+					{
+						SetChanges(true);
+					}
+					return true;
+			}
+
+			ToolStripMenuItem toolStrip = menuStrip1.Items.GetAllMenuItems()
+				.FirstOrDefault(x => x.ShortcutKeys == keyData);
+
+			if (toolStrip != null)
+			{
+				toolStrip.PerformClick();
+				return true;
+			}
+
+			return false;
+
+			int GetNextSwitchMode(int value)
+			{
+				int typeOfSwitch = Level.GetTypeOfSwitch();
+				int[] flags = { 0, 1, 2, 4 };
+				int nextMode = value;
+
+				do
+				{
+					nextMode = (nextMode + 1) % 4;
 				}
+				while (nextMode != 0 && (flags[nextMode] & typeOfSwitch) == 0);
+				return nextMode;
 			}
 		}
 
