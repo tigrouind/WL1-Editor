@@ -376,7 +376,9 @@ namespace WLEditor
 			}
 
 			if ((tileIndex & 64) != 64)
+			{
 				return 0;
+			}
 
 			return -1;
 		}
@@ -384,56 +386,57 @@ namespace WLEditor
 		//replace tiles when a (!) block is hit
 		public static int SwitchTile(int tileData, int switchMode)
 		{
-			if (switchMode == 1)
+			switch (switchMode)
 			{
-				switch (tileData)
-				{
-					case 0x7C:
-						return 0x27;
+				case 1:
+					switch (tileData)
+					{
+						case 0x7C:
+							return 0x27;
 
-					case 0x27:
-						return 0x7C;
+						case 0x27:
+							return 0x7C;
 
-					case 0x7A:
-						return 0x44;
+						case 0x7A:
+							return 0x44;
 
-					case 0x79:
-						return 0x45;
-				}
-			}
-			else if (switchMode == 2)
-			{
-				switch (tileData)
-				{
-					case 0x7C:
-						return 0x55;
+						case 0x79:
+							return 0x45;
+					}
+					break;
+				case 2:
+					switch (tileData)
+					{
+						case 0x7C:
+							return 0x55;
 
-					case 0x55:
-						return 0x7C;
+						case 0x55:
+							return 0x7C;
 
-					case 0x7A:
-						return 0x7B;
+						case 0x7A:
+							return 0x7B;
 
-					case 0x7B:
-						return 0x7A;
+						case 0x7B:
+							return 0x7A;
 
-					case 0x59:
-						return 0x5D;
+						case 0x59:
+							return 0x5D;
 
-					case 0x5D:
-						return 0x59;
-				}
+						case 0x5D:
+							return 0x59;
+					}
+					break;
 			}
 
 			return tileData;
 		}
 
-		public static int GetTypeOfSwitch()
+		public static int GetSwitchType()
 		{
 			int switchMode = 0;
 			for (int tileIndex = 0; tileIndex < 8192; tileIndex++)
 			{
-				byte data = Level.LevelData[tileIndex + 0x1000];
+				byte data = LevelData[tileIndex + 0x1000];
 				switch (data)
 				{
 					case 0x39:

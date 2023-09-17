@@ -83,8 +83,8 @@ namespace WLEditor
 
 			toolboxForm.MouseWheel += LevelPanelMouseWheel;
 			toolboxForm.FormClosing += ToolBoxFormClosing;
-			toolboxForm.Tile16x16MouseMove += ToolBoxTile16x16MouseMove;
-			toolboxForm.ObjectTileMouseMove += ToolBoxObjectMouseMove;
+			toolboxForm.Tiles16x16.TileMouseMove += ToolBoxTile16x16MouseMove;
+			toolboxForm.Objects.TileMouseMove += ToolBoxObjectMouseMove;
 			toolboxForm.ProcessCommandKey += ProcessSubFormCommand;
 
 			overworldForm.FormClosing += OverworldFormClosing;
@@ -203,8 +203,8 @@ namespace WLEditor
 					{
 						int tileIndex = e.TileX + e.TileY * 256;
 						int selectedPanelIndex = toolboxForm.SelectedPanelIndex;
-						int currentTile = toolboxForm.CurrentTile;
-						int currentObject = toolboxForm.CurrentObject;
+						int currentTile = toolboxForm.Tiles16x16.CurrentTile;
+						int currentObject = toolboxForm.Objects.CurrentObject;
 
 						if (e.Button == MouseButtons.Right)
 						{
@@ -413,7 +413,7 @@ namespace WLEditor
 			levelPictureBox.ShowColliders = showColliders;
 			levelPictureBox.ClearTileCache();
 			levelPictureBox.Invalidate();
-			toolboxForm.ShowColliders = showColliders;
+			toolboxForm.Tiles16x16.ShowColliders = showColliders;
 			toolboxForm.Invalidate(true);
 		}
 
@@ -423,7 +423,7 @@ namespace WLEditor
 			{
 				switchMode = value;
 				levelPictureBox.SwitchMode = value;
-				toolboxForm.SwitchMode = value;
+				toolboxForm.Tiles16x16.SwitchMode = value;
 				toolboxForm.Invalidate(true);
 
 				LoadLevel(false);
@@ -666,7 +666,7 @@ namespace WLEditor
 
 			int GetNextSwitchMode(int value)
 			{
-				int typeOfSwitch = Level.GetTypeOfSwitch();
+				int typeOfSwitch = Level.GetSwitchType();
 				int[] flags = { 0, 1, 2, 4 };
 				int nextMode = value;
 

@@ -66,22 +66,6 @@ namespace WLEditor
 			return base.ProcessCmdKey(ref msg, keyData);
 		}
 
-		public int CurrentObject
-		{
-			get
-			{
-				return objectsPictureBox.CurrentObject;
-			}
-		}
-
-		public int CurrentTile
-		{
-			get
-			{
-				return tiles16x16PictureBox.CurrentTile;
-			}
-		}
-
 		public int SelectedPanelIndex
 		{
 			get
@@ -90,45 +74,19 @@ namespace WLEditor
 			}
 		}
 
-		public bool ShowColliders
+		public Tiles16x16PictureBox Tiles16x16
 		{
-			set
+			get
 			{
-				tiles16x16PictureBox.ShowColliders = value;
+				return tiles16x16PictureBox;
 			}
 		}
 
-		public int SwitchMode
+		public ObjectsPictureBox Objects
 		{
-			set
+			get
 			{
-				tiles16x16PictureBox.SwitchMode = value;
-			}
-		}
-
-		public event EventHandler<TileEventArgs> Tile16x16MouseMove
-		{
-			add
-			{
-				tiles16x16PictureBox.TileMouseMove += value;
-			}
-
-			remove
-			{
-				tiles16x16PictureBox.TileMouseMove -= value;
-			}
-		}
-
-		public event EventHandler<TileEventArgs> ObjectTileMouseMove
-		{
-			add
-			{
-				objectsPictureBox.TileMouseMove += value;
-			}
-
-			remove
-			{
-				objectsPictureBox.TileMouseMove -= value;
+				return objectsPictureBox;
 			}
 		}
 	}
