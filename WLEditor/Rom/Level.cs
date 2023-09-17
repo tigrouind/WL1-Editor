@@ -322,8 +322,35 @@ namespace WLEditor
 			return courseIdToNo;
 		}
 
-		public static int IsSpecialTile(int tileIndex)
+		public static int IsSpecialTile(int tileIndex, int switchType)
 		{
+			if ((switchType & 1) != 0)
+			{
+				switch (tileIndex)
+				{
+					case 0x7C:
+					case 0x27:
+					case 0x7A:
+					case 0x79:
+						return 7; //switch block
+
+				}
+			}
+
+			if ((switchType & 2) != 0)
+			{
+				switch (tileIndex)
+				{
+					case 0x7C:
+					case 0x55:
+					case 0x7A:
+					case 0x7B:
+					case 0x59:
+					case 0x5D:
+						return 7; //switch block
+				}
+			}
+
 			switch (tileIndex)
 			{
 				case 0x2E:

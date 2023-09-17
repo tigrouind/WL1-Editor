@@ -9,6 +9,7 @@ namespace WLEditor
 	{
 		public int CurrentTile;
 		public bool ShowColliders = true;
+		public int SwitchType;
 		public int SwitchMode;
 		public event EventHandler<TileEventArgs> TileMouseMove;
 
@@ -56,7 +57,7 @@ namespace WLEditor
 
 									if (ShowColliders)
 									{
-										int specialTile = Level.IsSpecialTile(tileIndex);
+										int specialTile = Level.IsSpecialTile(tileIndex, SwitchType);
 										if (specialTile != -1)
 										{
 											g.FillRectangle(LevelPictureBox.TransparentBrushes[specialTile], destRect);

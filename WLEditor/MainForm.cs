@@ -63,7 +63,7 @@ namespace WLEditor
 
 		int currentCourseId = -1;
 		int currentWarp = -1;
-		int switchMode;
+		int switchMode, switchType;
 		int animatedTileIndex;
 		int timerTicks;
 		string romFilePath;
@@ -306,6 +306,7 @@ namespace WLEditor
 					currentCourseId = item.Value;
 					SetSwitchMode(0);
 					LoadLevel(true);
+					SetSwitchType(Level.GetSwitchType());
 					sectorForm.LoadSector(currentCourseId, -1);
 					levelPictureBox.ClearSelection();
 					levelPictureBox.ClearUndo();
@@ -417,17 +418,30 @@ namespace WLEditor
 			toolboxForm.Invalidate(true);
 		}
 
-		void SetSwitchMode(int value)
+		bool SetSwitchType(int value)
+		{
+			if (switchType != value)
+			{
+				switchType = value;
+				levelPictureBox.SwitchType = value;
+				toolboxForm.Tiles16x16.SwitchType = value;
+				return true;
+			}
+
+			return false;
+		}
+
+		bool SetSwitchMode(int value)
 		{
 			if (switchMode != value)
 			{
 				switchMode = value;
 				levelPictureBox.SwitchMode = value;
 				toolboxForm.Tiles16x16.SwitchMode = value;
-				toolboxForm.Invalidate(true);
-
-				LoadLevel(false);
+				return true;
 			}
+
+			return false;
 		}
 
 		#region Save
@@ -603,7 +617,12 @@ namespace WLEditor
 					break;
 
 				case Keys.B:
-					SetSwitchMode(GetNextSwitchMode(switchMode));
+					int typeOfSwitch = Level.GetSwitchType();
+					if (SetSwitchMode(GetNextSwitchMode(switchMode, typeOfSwitch)) | SetSwitchType(typeOfSwitch))
+					{
+						toolboxForm.Invalidate(true);
+						LoadLevel(false);
+					}
 					return true;
 
 				case Keys.Control | Keys.C:
@@ -664,9 +683,8 @@ namespace WLEditor
 
 			return false;
 
-			int GetNextSwitchMode(int value)
+			int GetNextSwitchMode(int value, int typeOfSwitch)
 			{
-				int typeOfSwitch = Level.GetSwitchType();
 				int[] flags = { 0, 1, 2, 4 };
 				int nextMode = value;
 

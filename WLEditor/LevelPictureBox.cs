@@ -16,6 +16,7 @@ namespace WLEditor
 		public bool ShowObjects = true;
 		public bool ShowColliders = true;
 		public int SwitchMode;
+		public int SwitchType;
 		public int CurrentSector = -1;
 		int currentTileIndex = -1;
 		int lastTile = -1;
@@ -37,6 +38,7 @@ namespace WLEditor
 			new SolidBrush(Color.FromArgb(64, 0, 0, 255)),   //blue
 			new SolidBrush(Color.FromArgb(64, 255, 0, 0)),   //red
 			new SolidBrush(Color.FromArgb(128, 0, 128, 0)),  //dark green
+			new SolidBrush(Color.FromArgb(128, 128, 64, 128)),  //purple
 		};
 
 		public static Brush EnemyBrush = new SolidBrush(Color.FromArgb(255, 50, 50, 155));
@@ -161,7 +163,7 @@ namespace WLEditor
 								byte tileIndex = Level.LevelData[i + j * 256 + 0x1000];
 								tileIndex = (byte)Level.SwitchTile(tileIndex, SwitchMode);
 
-								int specialTile = Level.IsSpecialTile(tileIndex);
+								int specialTile = Level.IsSpecialTile(tileIndex, SwitchType);
 								if (specialTile != -1)
 								{
 									g.FillRectangle(TransparentBrushes[specialTile], new Rectangle(i * 16, j * 16, 16, 16));
