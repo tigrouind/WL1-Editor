@@ -378,13 +378,14 @@ namespace WLEditor
 				case 0x5F:
 					return 5; //damage
 
+				case 0x33:
 				case 0x3A:
 				case 0x3B:
 				case 0x40:
 				case 0x41:
 				case 0x42:
 				case 0x43:
-					return 1; //plateform
+					return 1; //platform
 
 				case 0x4A:
 				case 0x4C:
@@ -400,6 +401,11 @@ namespace WLEditor
 				case 0x58:
 				case 0x5B:
 					return 2; //water
+
+				case 0x34:
+				case 0x35:
+				case 0x36:
+					return 2; //ice
 			}
 
 			if ((tileIndex & 64) != 64)
