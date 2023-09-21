@@ -373,9 +373,9 @@ namespace WLEditor
 				levelComboBox.Items.Clear();
 
 				var items = new List<ComboboxItem<int>>();
-				foreach (var levelInfo in Level.GetCourseIds(rom).OrderBy(x => x.Item2))
+				foreach (var (courseId, courseNo) in Level.GetCourseIds(rom).OrderBy(x => x.CourseNo))
 				{
-					var item = new ComboboxItem<int>(levelInfo.Item1, string.Format("{0:D2} {1}", levelInfo.Item2, LevelNames[levelInfo.Item1]));
+					var item = new ComboboxItem<int>(courseId, string.Format("{0:D2} {1}", courseNo, LevelNames[courseId]));
 					items.Add(item);
 				}
 

@@ -7,8 +7,8 @@ namespace WLEditor
 {
 	public class EventForm
 	{
-		List<Tuple<int, byte>>[] worldEvents;
-		List<Tuple<int, byte>> worldEvent;
+		List<(int Position, byte Index)>[] worldEvents;
+		List<(int Position, byte Index)> worldEvent;
 		int eventStep;
 
 		int zoom;
@@ -258,16 +258,16 @@ namespace WLEditor
 				int index;
 				if (selected)
 				{
-					index = worldEv.FindIndex(0, eventStep, x => x.Item1 == tilePos);
+					index = worldEv.FindIndex(0, eventStep, x => x.Position == tilePos);
 				}
 				else
 				{
-					index = worldEv.FindIndex(x => x.Item1 == tilePos);
+					index = worldEv.FindIndex(x => x.Position == tilePos);
 				}
 
 				if (index != -1)
 				{
-					return worldEv[index].Item2;
+					return worldEv[index].Index;
 				}
 
 				if (selected)
@@ -281,14 +281,14 @@ namespace WLEditor
 
 		public int FindEvent(int tilePos)
 		{
-			return worldEvent.FindIndex(x => x.Item1 == tilePos);
+			return worldEvent.FindIndex(x => x.Position == tilePos);
 		}
 
 		public int GetEvent(int index)
 		{
 			if (index != -1)
 			{
-				return worldEvent[index].Item2;
+				return worldEvent[index].Index;
 			}
 
 			return -1;
@@ -296,15 +296,15 @@ namespace WLEditor
 
 		public void AddEvent(byte tileData, int tilePos)
 		{
-			int index = worldEvent.FindIndex(x => x.Item1 == tilePos);
+			int index = worldEvent.FindIndex(x => x.Position == tilePos);
 			if (index == -1)
 			{
-				worldEvent.Insert(eventStep, new Tuple<int, byte>(tilePos, tileData));
+				worldEvent.Insert(eventStep, (tilePos, tileData));
 				eventStep++;
 			}
 			else
 			{
-				worldEvent[index] = new Tuple<int, byte>(tilePos, tileData);
+				worldEvent[index] = (tilePos, tileData);
 			}
 
 			pictureBox.Invalidate();
@@ -313,7 +313,7 @@ namespace WLEditor
 
 		public void RemoveEvent(int tilePos)
 		{
-			int index = worldEvent.FindIndex(x => x.Item1 == tilePos);
+			int index = worldEvent.FindIndex(x => x.Position == tilePos);
 			if (index >= 0)
 			{
 				worldEvent.RemoveAt(index);
@@ -345,10 +345,10 @@ namespace WLEditor
 					for (int i = 0; i < worldEv.Count; i++)
 					{
 						var item = worldEv[i];
-						int position = item.Item1;
+						int position = item.Position;
 						int x = position % 32;
 						int y = position / 32;
-						byte tileIndex = item.Item2;
+						byte tileIndex = item.Index;
 
 						if (i >= eventStep && selected)
 						{

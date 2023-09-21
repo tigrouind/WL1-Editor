@@ -307,16 +307,16 @@ namespace WLEditor
 			}
 		}
 
-		public static List<Tuple<int, int>> GetCourseIds(Rom rom)
+		public static List<(int CourseId, int CourseNo)> GetCourseIds(Rom rom)
 		{
 			//convert course id => course no using data in ROM
 			rom.SetBank(0);
-			var courseIdToNo = new List<Tuple<int, int>>();
+			var courseIdToNo = new List<(int, int)>();
 			for (int i = 0; i <= 0x2A; i++)
 			{
 				int levelpointer = rom.ReadWord(0x0534 + i * 2);
 				int courseNo = (levelpointer - 0x0587) / 3;
-				courseIdToNo.Add(new Tuple<int, int>(i, courseNo));
+				courseIdToNo.Add((i, courseNo));
 			}
 
 			return courseIdToNo;
