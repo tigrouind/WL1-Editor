@@ -84,7 +84,7 @@ namespace WLEditor
 			{
 				foreach (var pos in startPositionData[currentWorld])
 				{
-					FindExitPosition(pos[2], out int posX, out int posY);
+					var (posX, posY) = FindExitPosition(pos[2]);
 					Overworld.SaveStartPosition(rom, posX, posY, FindClosestSide(posX, posY), pos[0], pos[1]);
 				}
 
@@ -105,7 +105,7 @@ namespace WLEditor
 					return bestSide;
 				}
 
-				void FindExitPosition(int startLevel, out int posX, out int posY)
+				(int posX, int posY) FindExitPosition(int startLevel)
 				{
 					int level = levels[currentWorld][startLevel];
 
@@ -113,12 +113,11 @@ namespace WLEditor
 					var dir = item.Directions.FirstOrDefault(x => x.Path.Count > 0 && IsSpecialExit(x.Next));
 					if (dir != null)
 					{
-						GetPathPosition(item, dir, out posX, out posY);
+						return GetPathPosition(item, dir);
 					}
 					else
 					{
-						posX = item.X;
-						posY = item.Y;
+						return (item.X, item.Y);
 					}
 				}
 			}
@@ -480,7 +479,7 @@ namespace WLEditor
 					var item = PathData[level];
 					foreach (var dir in item.Directions.Where(x => x.Path.Count > 0))
 					{
-						GetPathPosition(item, dir, out int posX, out int posY);
+						var (posX, posY) = GetPathPosition(item, dir);
 
 						if (levelPositions.TryGetValue(posX + posY * 256, out int nextLevel))
 						{
@@ -661,7 +660,7 @@ namespace WLEditor
 					foreach (var dir in currentPath.Directions.Where(x => x.Path.Count > 0 && IsSpecialExit(x.Next))
 							.OrderBy(x => x == currentDirection))
 					{
-						GetPathPosition(currentPath, dir, out int nextX, out int nextY);
+						var (nextX, nextY) = GetPathPosition(currentPath, dir);
 
 						int exitX = Math.Max(0, Math.Min(nextX, CurrentMapX - 8));
 						int exitY = Math.Max(0, Math.Min(nextY, CurrentMapY - 8));
@@ -845,15 +844,17 @@ namespace WLEditor
 
 		#endregion
 
-		void GetPathPosition(WorldPath level, WorldPathDirection direction, out int posX, out int posY)
+		(int posX, int posY) GetPathPosition(WorldPath level, WorldPathDirection direction)
 		{
-			posX = level.X;
-			posY = level.Y;
+			int posX = level.X;
+			int posY = level.Y;
 
 			foreach (var path in direction.Path)
 			{
 				GetPathPosition(path, ref posX, ref posY);
 			}
+
+			return (posX, posY);
 		}
 
 		void GetPathPosition(WorldPathSegment path, ref int posX, ref int posY)

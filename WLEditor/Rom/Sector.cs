@@ -169,14 +169,14 @@ namespace WLEditor
 			}
 		}
 
-		public static bool FindDoorInSector(int sector, int warioX, int warioY, out int posX, out int posY)
+		public static (int posX, int posY) FindDoorInSector(int sector, int warioX, int warioY)
 		{
 			int startX = (sector % 16) * 16;
 			int startY = (sector / 16) * 16;
 			int distance = int.MaxValue;
 
-			posX = -1;
-			posY = -1;
+			int posX = -1;
+			int posY = -1;
 
 			for (int y = 0; y < 16; y++)
 			{
@@ -203,7 +203,7 @@ namespace WLEditor
 				}
 			}
 
-			return posX != -1 && posY != -1;
+			return (posX, posY);
 		}
 
 		public static void LimitScroll(Rom rom, int currentCourseId, int sector, int cameraType, ref int cameraX, ref int cameraY, ref int warioY)

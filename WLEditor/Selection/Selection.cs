@@ -41,15 +41,16 @@ namespace WLEditor
 			}
 		}
 
-		void GetSelection(out Point start, out Point end)
+		(Point start, Point end) GetSelection()
 		{
 			int startX = Math.Min(selectionStart.X, selectionEnd.X);
 			int startY = Math.Min(selectionStart.Y, selectionEnd.Y);
 			int endX = Math.Max(selectionStart.X, selectionEnd.X);
 			int endY = Math.Max(selectionStart.Y, selectionEnd.Y);
 
-			start = new Point(startX, startY);
-			end = new Point(endX, endY);
+			var start = new Point(startX, startY);
+			var end = new Point(endX, endY);
+			return (start, end);
 		}
 
 		void Invalidate()
@@ -59,8 +60,7 @@ namespace WLEditor
 
 		Rectangle GetSelectionRectangle()
 		{
-			Point start, end;
-			GetSelection(out start, out end);
+			var (start, end) = GetSelection();
 			return new Rectangle(
 				start.X * tileSize * zoom,
 				start.Y * tileSize * zoom,
@@ -72,8 +72,7 @@ namespace WLEditor
 		{
 			if (selection)
 			{
-				Point start, end;
-				GetSelection(out start, out end);
+				var (start, end) = GetSelection();
 
 				using (var memoryStream = new MemoryStream())
 				using (var writer = new BinaryWriter(memoryStream))
@@ -107,8 +106,7 @@ namespace WLEditor
 			{
 				var changes = new List<SelectionChange>();
 
-				Point start, end;
-				GetSelection(out start, out end);
+				var (start, end) = GetSelection();
 
 				for (int y = start.Y; y <= end.Y; y++)
 				{
@@ -161,8 +159,7 @@ namespace WLEditor
 					bool invertX = selectionStart.X > selectionEnd.X;
 					bool invertY = selectionStart.Y > selectionEnd.Y;
 
-					Point start, end;
-					GetSelection(out start, out end);
+					var (start, end) = GetSelection();
 
 					for (int ty = start.Y; ty <= end.Y; ty += selectionHeight)
 						for (int tx = start.X; tx <= end.X; tx += selectionWidth)
