@@ -346,15 +346,15 @@ namespace WLEditor
 
 						if (item.BossId >= 0)
 						{
-							e.Graphics.DrawString(string.Format("B{0}", item.BossId + 1), e.Font, Brushes.Black, dest, format);
+							e.Graphics.DrawString(string.Format($"B{item.BossId + 1}"), e.Font, Brushes.Black, dest, format);
 						}
 						else if (item.TreasureId >= 1 && item.TreasureId <= 15)
 						{
-							e.Graphics.DrawString(string.Format("{0}", treasureNames[item.TreasureId - 1]), e.Font, Brushes.Black, dest, format);
+							e.Graphics.DrawString(string.Format($"{treasureNames[item.TreasureId - 1]}"), e.Font, Brushes.Black, dest, format);
 						}
 						else
 						{
-							e.Graphics.DrawString(string.Format("{0:D2}", e.Index), e.Font, Brushes.Black, dest, format);
+							e.Graphics.DrawString(string.Format($"{e.Index:D2}"), e.Font, Brushes.Black, dest, format);
 						}
 					}
 				}

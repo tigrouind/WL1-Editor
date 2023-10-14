@@ -647,11 +647,11 @@ namespace WLEditor
 							tileIndex = worldTiles[lastTile];
 						}
 
-						items.Add(string.Format("{0:X2} {1}:{2}", tileIndex, lastTile % 32, lastTile / 32));
+						items.Add(string.Format($"{tileIndex:X2} {lastTile % 32}:{lastTile / 32}"));
 					}
 					else
 					{
-						items.Add(string.Format("{0:X2}", lastTile ^ 0x80));
+						items.Add(string.Format($"{lastTile ^ 0x80:X2}"));
 					}
 				}
 

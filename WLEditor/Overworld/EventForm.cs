@@ -131,7 +131,7 @@ namespace WLEditor
 		public string GetTitle()
 		{
 			int eventId = Array.IndexOf(worldEvents, worldEvent);
-			return string.Format(eventStep == 0 ? "Event {0}" : "Event {0} / Step {1}", eventId + 1, eventStep);
+			return string.Format(eventStep == 0 ? $"Event {eventId + 1}" : $"Event {eventId + 1} / Step {eventStep}");
 		}
 
 		#region Commands

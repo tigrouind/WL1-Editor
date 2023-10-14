@@ -618,7 +618,7 @@ namespace WLEditor
 				int objectSize = enemyData.Sum(x => RLECompressObjects(x).Count());
 				if (objectSize > maxSize)
 				{
-					message = string.Format("Object data is too big to fit in ROM.\r\nPlease remove some objects to free at least {0} byte(s).", objectSize - maxSize);
+					message = string.Format($"Object data is too big to fit in ROM.\r\nPlease remove some objects to free at least {objectSize - maxSize} byte(s).");
 					return false;
 				}
 

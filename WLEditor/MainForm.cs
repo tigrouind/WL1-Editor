@@ -187,7 +187,7 @@ namespace WLEditor
 					data = Level.LevelData[e.TileX + e.TileY * 256 + 0x1000];
 				}
 
-				toolStripStatusLabel1.Text = string.Format("{0:X2} {1}:{2}", data, e.TileX, e.TileY);
+				toolStripStatusLabel1.Text = string.Format($"{data:X2} {e.TileX}:{e.TileY}");
 			}
 
 			void LevelPictureBoxTileMouseDown(object sender, TileEventArgs e)
@@ -268,12 +268,12 @@ namespace WLEditor
 
 			void ToolBoxTile16x16MouseMove(object sender, TileEventArgs e)
 			{
-				toolStripStatusLabel1.Text = string.Format("{0:X2}", e.TileX + e.TileY * 8);
+				toolStripStatusLabel1.Text = string.Format($"{e.TileX + e.TileY * 8:X2}");
 			}
 
 			void ToolBoxObjectMouseMove(object sender, TileEventArgs e)
 			{
-				toolStripStatusLabel1.Text = string.Format("{0:X2}", e.TileX + e.TileY * 4);
+				toolStripStatusLabel1.Text = string.Format($"{e.TileX + e.TileY * 4:X2}");
 			}
 
 			#endregion
@@ -375,7 +375,7 @@ namespace WLEditor
 				var items = new List<ComboboxItem<int>>();
 				foreach (var (courseId, courseNo) in Level.GetCourseIds(rom).OrderBy(x => x.CourseNo))
 				{
-					var item = new ComboboxItem<int>(courseId, string.Format("{0:D2} {1}", courseNo, LevelNames[courseId]));
+					var item = new ComboboxItem<int>(courseId, string.Format($"{courseNo:D2} {LevelNames[courseId]}"));
 					items.Add(item);
 				}
 
