@@ -23,6 +23,138 @@ namespace WLEditor
 		public readonly static DirectBitmap Tiles8x8 = new DirectBitmap(16 * 8, 8 * 8);
 		public readonly static DirectBitmap Tiles16x16 = new DirectBitmap(16 * 8, 16 * 16);
 
+		readonly static (int, string)[] tileInfo = new (int, string)[]
+		{
+			(0, ""),
+			(0, ""),
+			(0, ""),
+			(0, ""),
+			(0, ""),
+			(0, ""),
+			(0, ""),
+			(0, ""),
+			(0, ""),
+			(0, ""),
+			(0, ""),
+			(0, ""),
+			(0, ""),
+			(0, ""),
+			(0, ""),
+			(0, ""),
+			(0, ""),
+			(0, ""),
+			(0, ""),
+			(0, ""),
+			(0, ""),
+			(0, ""),
+			(0, ""),
+			(0, ""),
+			(0, ""),
+			(0, ""),
+			(0, ""),
+			(0, ""),
+			(0, ""),
+			(0, ""),
+			(0, ""),
+			(0, ""),
+			(0, ""),
+			(0, ""),
+			(0, ""),
+			(0, ""),
+			(0, ""),
+			(0, ""),
+			(0, ""),
+			(0, ""),
+			(0, "Bonus"),
+			(0, "Block"),
+			(0, "Block"),
+			(0, "Block"),
+			(0, "Block"),
+			(0, "Block with top door"),
+			(6, "Block with bottom door"),
+			(0, "Jump"),
+			(1, "Conveyor belt (backward)"),
+			(1, "Conveyor belt (forward)"),
+			(0, "[!] block"),
+			(1, "Falling platform"),
+			(2, "Ice"),
+			(2, "Ice"),
+			(2, "Ice"),
+			(3, "Hidden bonus (platform)"),
+			(0, "[!] block (unused)"),
+			(0, "[!] block"),
+			(1, "Disappearing platform"),
+			(1, "Disappearing platform"),
+			(0, ""),
+			(0, ""),
+			(3, "Falling sand"),
+			(5, "Damage"),
+			(1, "Platform"),
+			(1, "Platform"),
+			(1, "Platform"),
+			(1, "Platform"),
+			(4, "Ladder"),
+			(4, "Ladder"),
+			(3, "Coin"),
+			(3, "Coin"),
+			(6, "Bottom door"),
+			(3, "Hidden bonus (fall through)"),
+			(3, "Hidden bonus (fall through) (water)"),
+			(6, "Bottom door (water)"),
+			(2, "Water current (north)"),
+			(2, "Water current (south)"),
+			(2, "Water current (east)"),
+			(2, "Water current (west)"),
+			(2, "Block (water)"),
+			(2, "Block (water)"),
+			(2, "Block with top door (water)"),
+			(2, "Coin (water)"),
+			(6, "Block with bottom door (water)"),
+			(2, "Water"),
+			(2, "Water"),
+			(2, "Water"),
+			(2, "Water"),
+			(5, "Damage (water)"),
+			(5, "Damage (water)"),
+			(2, "Top door (water)"),
+			(5, "Death"),
+			(5, "Damage"),
+			(5, "Damage"),
+			(5, "Damage"),
+			(-1, ""),
+			(-1, ""),
+			(-1, ""),
+			(-1, ""),
+			(-1, ""),
+			(-1, ""),
+			(-1, ""),
+			(-1, ""),
+			(-1, ""),
+			(-1, ""),
+			(-1, ""),
+			(-1, ""),
+			(-1, ""),
+			(-1, ""),
+			(-1, ""),
+			(-1, ""),
+			(-1, ""),
+			(-1, ""),
+			(-1, ""),
+			(-1, ""),
+			(-1, ""),
+			(-1, ""),
+			(-1, ""),
+			(-1, ""),
+			(-1, ""),
+			(-1, ""),
+			(-1, ""),
+			(-1, ""),
+			(-1, ""),
+			(-1, ""),
+			(-1, ""),
+			(-1, "")
+		};
+
 		public static void DumpLevel(Rom rom, int course, int warp, bool reloadAll, int switchMode, int animatedTileIndex, bool reloadAnimatedTilesOnly)
 		{
 			int tilebank;
@@ -322,7 +454,7 @@ namespace WLEditor
 			return courseIdToNo;
 		}
 
-		public static int IsSpecialTile(int tileIndex, int switchType)
+		public static (int Type, string Text) GetTileInfo(int tileIndex, int switchType)
 		{
 			if ((switchType & 1) != 0)
 			{
@@ -332,7 +464,7 @@ namespace WLEditor
 					case 0x27:
 					case 0x7A:
 					case 0x79:
-						return 7; //switch block
+						return (7, "Switchable block");
 
 				}
 			}
@@ -347,73 +479,11 @@ namespace WLEditor
 					case 0x7B:
 					case 0x59:
 					case 0x5D:
-						return 7; //switch block
+						return (7, "Switchable block");
 				}
 			}
 
-			switch (tileIndex)
-			{
-				case 0x2E:
-				case 0x48:
-				case 0x4B:
-				case 0x54:
-					return 6; //door
-
-				case 0x44:
-				case 0x45:
-					return 4; //ladder
-
-				case 0x47:
-				case 0x46:
-				case 0x53:
-				case 0x3E:
-				case 0x49:
-					return 3; //coins or sand or hidden block
-
-				case 0x59:
-				case 0x5A:
-				case 0x5C:
-				case 0x5D:
-				case 0x5E:
-				case 0x5F:
-					return 5; //damage
-
-				case 0x33:
-				case 0x3A:
-				case 0x3B:
-				case 0x40:
-				case 0x41:
-				case 0x42:
-				case 0x43:
-					return 1; //platform
-
-				case 0x4A:
-				case 0x4C:
-				case 0x4D:
-				case 0x4E:
-				case 0x4F:
-				case 0x50:
-				case 0x51:
-				case 0x52:
-				case 0x55:
-				case 0x56:
-				case 0x57:
-				case 0x58:
-				case 0x5B:
-					return 2; //water
-
-				case 0x34:
-				case 0x35:
-				case 0x36:
-					return 2; //ice
-			}
-
-			if ((tileIndex & 64) != 64)
-			{
-				return 0;
-			}
-
-			return -1;
+			return tileInfo[tileIndex];
 		}
 
 		//replace tiles when a (!) block is hit

@@ -2,6 +2,7 @@
 {
 	public enum TileEventStatus
 	{
+		None,
 		MouseDown,
 		MouseMove,
 		MouseUp

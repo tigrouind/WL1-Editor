@@ -36,7 +36,7 @@ namespace WLEditor
 			new SolidBrush(Color.FromArgb(64, 0, 255, 255)), //light blue
 			new SolidBrush(Color.FromArgb(64, 255, 255, 0)), //yellow
 			new SolidBrush(Color.FromArgb(64, 0, 0, 255)),   //blue
-			new SolidBrush(Color.FromArgb(64, 255, 0, 0)),   //red
+			new SolidBrush(Color.FromArgb(64, 255, 128, 0)),   //amber
 			new SolidBrush(Color.FromArgb(128, 0, 128, 0)),  //dark green
 			new SolidBrush(Color.FromArgb(128, 128, 64, 128)),  //purple
 		};
@@ -163,7 +163,7 @@ namespace WLEditor
 								byte tileIndex = Level.LevelData[i + j * 256 + 0x1000];
 								tileIndex = (byte)Level.SwitchTile(tileIndex, SwitchMode);
 
-								int specialTile = Level.IsSpecialTile(tileIndex, SwitchType);
+								int specialTile = Level.GetTileInfo(tileIndex, SwitchType).Type;
 								if (specialTile != -1)
 								{
 									g.FillRectangle(TransparentBrushes[specialTile], new Rectangle(i * 16, j * 16, 16, 16));
@@ -454,7 +454,7 @@ namespace WLEditor
 		{
 			if (lastTile != -1)
 			{
-				TileMouseMove?.Invoke(this, new TileEventArgs(MouseButtons.None, TileEventStatus.MouseDown, lastTile % 256, lastTile / 256));
+				TileMouseMove?.Invoke(this, new TileEventArgs(MouseButtons.None, TileEventStatus.None, lastTile % 256, lastTile / 256));
 			}
 		}
 

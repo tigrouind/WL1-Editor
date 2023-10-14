@@ -11,6 +11,9 @@ namespace WLEditor
 		public ToolboxForm()
 		{
 			InitializeComponent();
+
+			tiles16x16PictureBox.TileMouseMove += ToolBoxTile16x16MouseMove;
+			tiles16x16PictureBox.TileMouseLeave += ToolBoxTile16x16MouseLeave;
 		}
 
 		public void SetZoom(int zoom)
@@ -88,6 +91,19 @@ namespace WLEditor
 			{
 				return objectsPictureBox;
 			}
+		}
+
+		void ToolBoxTile16x16MouseMove(object sender, TileEventArgs e)
+		{
+			int tileIndex = e.TileX + e.TileY * 8;
+			var tileInfo = Level.GetTileInfo(tileIndex, tiles16x16PictureBox.SwitchType);
+			toolStripStatusLabel1.Text = string.Format($"{tileIndex:X2} {tileInfo.Text}");
+			statusStrip1.Visible = true;
+		}
+
+		void ToolBoxTile16x16MouseLeave(object sender, EventArgs e)
+		{
+			statusStrip1.Visible = false;
 		}
 	}
 }

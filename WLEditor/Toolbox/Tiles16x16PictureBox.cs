@@ -12,6 +12,7 @@ namespace WLEditor
 		public int SwitchType;
 		public int SwitchMode;
 		public event EventHandler<TileEventArgs> TileMouseMove;
+		public event EventHandler TileMouseLeave;
 
 		int lastTile;
 		readonly DirectBitmap tiles = new DirectBitmap(128, 256);
@@ -57,7 +58,7 @@ namespace WLEditor
 
 									if (ShowColliders)
 									{
-										int specialTile = Level.IsSpecialTile(tileIndex, SwitchType);
+										int specialTile = Level.GetTileInfo(tileIndex, SwitchType).Type;
 										if (specialTile != -1)
 										{
 											g.FillRectangle(LevelPictureBox.TransparentBrushes[specialTile], destRect);
@@ -86,20 +87,32 @@ namespace WLEditor
 
 		protected override void OnMouseMove(MouseEventArgs e)
 		{
-			int tilePosX = e.Location.X / 16 / zoom;
-			int tilePosY = e.Location.Y / 16 / zoom;
-			int tilePos = tilePosX + tilePosY * 8;
-
-			if (tilePos != lastTile)
+			if (ClientRectangle.Contains(e.Location))
 			{
-				lastTile = tilePos;
-				RaiseTileMouseMoveEvent();
+				int tilePosX = e.Location.X / 16 / zoom;
+				int tilePosY = e.Location.Y / 16 / zoom;
+				int tilePos = tilePosX + tilePosY * 8;
+
+				if (tilePos != lastTile)
+				{
+					lastTile = tilePos;
+					RaiseTileMouseMoveEvent();
+				}
+			}
+		}
+
+		protected override void OnMouseLeave(EventArgs e)
+		{
+			if (lastTile != -1)
+			{
+				lastTile = -1;
+				TileMouseLeave?.Invoke(this, EventArgs.Empty);
 			}
 		}
 
 		void RaiseTileMouseMoveEvent()
 		{
-			TileMouseMove?.Invoke(this, new TileEventArgs(MouseButtons.None, TileEventStatus.MouseDown, lastTile % 8, lastTile / 8));
+			TileMouseMove?.Invoke(this, new TileEventArgs(MouseButtons.None, TileEventStatus.None, lastTile % 8, lastTile / 8));
 		}
 	}
 }

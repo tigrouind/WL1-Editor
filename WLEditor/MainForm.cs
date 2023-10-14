@@ -83,8 +83,6 @@ namespace WLEditor
 
 			toolboxForm.MouseWheel += LevelPanelMouseWheel;
 			toolboxForm.FormClosing += ToolBoxFormClosing;
-			toolboxForm.Tiles16x16.TileMouseMove += ToolBoxTile16x16MouseMove;
-			toolboxForm.Objects.TileMouseMove += ToolBoxObjectMouseMove;
 			toolboxForm.ProcessCommandKey += ProcessSubFormCommand;
 
 			overworldForm.FormClosing += OverworldFormClosing;
@@ -187,7 +185,9 @@ namespace WLEditor
 					data = Level.LevelData[e.TileX + e.TileY * 256 + 0x1000];
 				}
 
-				toolStripStatusLabel1.Text = string.Format($"{data:X2} {e.TileX}:{e.TileY}");
+				int tileIndex = Level.LevelData[e.TileX + e.TileY * 256 + 0x1000];
+				var tileInfo = Level.GetTileInfo(tileIndex, switchType);
+				toolStripStatusLabel1.Text = string.Format($"{e.TileX}:{e.TileY} - {data:X2} {tileInfo.Text}");
 			}
 
 			void LevelPictureBoxTileMouseDown(object sender, TileEventArgs e)
@@ -264,16 +264,6 @@ namespace WLEditor
 						SetChanges(true);
 					}
 				}
-			}
-
-			void ToolBoxTile16x16MouseMove(object sender, TileEventArgs e)
-			{
-				toolStripStatusLabel1.Text = string.Format($"{e.TileX + e.TileY * 8:X2}");
-			}
-
-			void ToolBoxObjectMouseMove(object sender, TileEventArgs e)
-			{
-				toolStripStatusLabel1.Text = string.Format($"{e.TileX + e.TileY * 4:X2}");
 			}
 
 			#endregion

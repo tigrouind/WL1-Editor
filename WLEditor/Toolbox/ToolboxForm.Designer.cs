@@ -40,11 +40,14 @@ namespace WLEditor
 			this.objectsPictureBox = new WLEditor.ObjectsPictureBox();
 			this.tiles16x16PictureBox = new WLEditor.Tiles16x16PictureBox();
 			this.tiles8x8PictureBox = new WLEditor.Tiles8x8PictureBox();
+			this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+			this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
 			this.tableLayoutPanel1.SuspendLayout();
 			this.panel1.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.objectsPictureBox)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.tiles16x16PictureBox)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.tiles8x8PictureBox)).BeginInit();
+			this.statusStrip1.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// tableLayoutPanel1
@@ -55,15 +58,15 @@ namespace WLEditor
 			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
 			this.tableLayoutPanel1.Controls.Add(this.comboBox1, 0, 0);
 			this.tableLayoutPanel1.Controls.Add(this.panel1, 0, 1);
+			this.tableLayoutPanel1.Controls.Add(this.statusStrip1, 0, 2);
 			this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
 			this.tableLayoutPanel1.Margin = new System.Windows.Forms.Padding(0);
 			this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-			this.tableLayoutPanel1.RowCount = 2;
+			this.tableLayoutPanel1.RowCount = 3;
 			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.tableLayoutPanel1.Size = new System.Drawing.Size(96, 195);
+			this.tableLayoutPanel1.Size = new System.Drawing.Size(96, 217);
 			this.tableLayoutPanel1.TabIndex = 1;
 			// 
 			// comboBox1
@@ -118,6 +121,23 @@ namespace WLEditor
 			this.tiles8x8PictureBox.TabIndex = 0;
 			this.tiles8x8PictureBox.TabStop = false;
 			// 
+			// statusStrip1
+			// 
+			this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripStatusLabel1});
+			this.statusStrip1.Location = new System.Drawing.Point(0, 195);
+			this.statusStrip1.Name = "statusStrip1";
+			this.statusStrip1.Size = new System.Drawing.Size(96, 22);
+			this.statusStrip1.SizingGrip = false;
+			this.statusStrip1.TabIndex = 3;
+			this.statusStrip1.Visible = false;
+			this.statusStrip1.Text = "statusStrip1";
+			// 
+			// toolStripStatusLabel1
+			// 
+			this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
+			this.toolStripStatusLabel1.Size = new System.Drawing.Size(0, 15);
+			// 
 			// ToolboxForm
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -140,9 +160,14 @@ namespace WLEditor
 			((System.ComponentModel.ISupportInitialize)(this.objectsPictureBox)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.tiles16x16PictureBox)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.tiles8x8PictureBox)).EndInit();
+			this.statusStrip1.ResumeLayout(false);
+			this.statusStrip1.PerformLayout();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
 		}
+
+		private System.Windows.Forms.StatusStrip statusStrip1;
+		private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
 	}
 }
