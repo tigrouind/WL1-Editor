@@ -71,18 +71,18 @@ namespace WLEditor
 			}
 		}
 
-		readonly ComboboxItem<int[]>[] worldData =
+		readonly ComboboxItemCollection<int[]> worldData = new ComboboxItemCollection<int[]>
 		{
 			//bank - 8x8 tiles / bank - map tiles / max tiles size
-			new ComboboxItem<int[]>(new [] { 0x09, 0x407A, 0x09, 0x6DBE, 373 }, "1 Rice Beach"),
-			new ComboboxItem<int[]>(new [] { 0x09, 0x407A, 0x09, 0x74E1, 346 }, "1 Rice Beach - FLOODED"),
-			new ComboboxItem<int[]>(new [] { 0x09, 0x407A, 0x09, 0x6F33, 368 }, "2 Mt. Teapot"),
-			new ComboboxItem<int[]>(new [] { 0x14, 0x6909, 0x14, 0x76D2, 321 }, "3 Sherbet Land"),
-			new ComboboxItem<int[]>(new [] { 0x09, 0x4E13, 0x09, 0x70A3, 371 }, "4 Stove Canyon"),
-			new ComboboxItem<int[]>(new [] { 0x09, 0x4E13, 0x09, 0x7216, 393 }, "5 SS Tea Cup"),
-			new ComboboxItem<int[]>(new [] { 0x14, 0x6909, 0x14, 0x7813, 388 }, "6 Parsley Woods"),
-			new ComboboxItem<int[]>(new [] { 0x09, 0x5C6C, 0x09, 0x739F, 322 }, "7 Syrup Castle" ),
-			new ComboboxItem<int[]>(new [] { 0x14, 0x5AA0, 0x09, 0x6AA5, 787 }, "8 Overworld"),
+			{ new [] { 0x09, 0x407A, 0x09, 0x6DBE, 373 }, "1 Rice Beach" },
+			{ new [] { 0x09, 0x407A, 0x09, 0x74E1, 346 }, "1 Rice Beach - FLOODED" },
+			{ new [] { 0x09, 0x407A, 0x09, 0x6F33, 368 }, "2 Mt. Teapot" },
+			{ new [] { 0x14, 0x6909, 0x14, 0x76D2, 321 }, "3 Sherbet Land" },
+			{ new [] { 0x09, 0x4E13, 0x09, 0x70A3, 371 }, "4 Stove Canyon" },
+			{ new [] { 0x09, 0x4E13, 0x09, 0x7216, 393 }, "5 SS Tea Cup" },
+			{ new [] { 0x14, 0x6909, 0x14, 0x7813, 388 }, "6 Parsley Woods" },
+			{ new [] { 0x09, 0x5C6C, 0x09, 0x739F, 322 }, "7 Syrup Castle" },
+			{ new [] { 0x14, 0x5AA0, 0x09, 0x6AA5, 787 }, "8 Overworld" }
 		};
 
 		public void LoadRom(Rom rom)
@@ -125,10 +125,7 @@ namespace WLEditor
 			void LoadWorldCombobox()
 			{
 				WorldComboBox.Items.Clear();
-				for (int i = 0; i < worldData.Length; i++)
-				{
-					WorldComboBox.Items.Add(worldData[i]);
-				}
+				WorldComboBox.Items.AddRange(worldData.ToArray());
 			}
 		}
 

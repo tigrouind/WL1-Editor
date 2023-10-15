@@ -362,12 +362,10 @@ namespace WLEditor
 				levelComboBox.SelectedItem = null;
 				levelComboBox.Items.Clear();
 
-				var items = new List<ComboboxItem<int>>();
-				foreach (var (courseId, courseNo) in Level.GetCourseIds(rom).OrderBy(x => x.CourseNo))
-				{
-					var item = new ComboboxItem<int>(courseId, string.Format($"{courseNo:D2} {LevelNames[courseId]}"));
-					items.Add(item);
-				}
+				var items = Level.GetCourseIds(rom)
+					.OrderBy(x => x.CourseNo)
+					.Select(x => new ComboboxItem<int>(x.CourseId, string.Format($"{x.CourseNo:D2} {LevelNames[x.CourseId]}")))
+					.ToList();
 
 				levelComboBox.Items.AddRange(items.ToArray());
 			}

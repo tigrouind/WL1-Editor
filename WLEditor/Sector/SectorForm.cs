@@ -33,38 +33,38 @@ namespace WLEditor
 
 		#region Dropdown data
 
-		readonly ComboboxItem<int[]>[] tileSets =
+		readonly ComboboxItemCollection<int[]> tileSets = new ComboboxItemCollection<int[]>
 		{
 			//bank, tileSetB, tileSetA, blockIndex, palette
-			new ComboboxItem<int[]>(new[] { 0x03, 0x5200, 0x5400, 0x460A, 0xE1 }, "00   Beach 1"),
-			new ComboboxItem<int[]>(new[] { 0x0E, 0x4600, 0x5400, 0x4E0A, 0xE1 }, "01   Beach 2"),
-			new ComboboxItem<int[]>(new[] { 0x06, 0x6E69, 0x5600, 0x640A, 0xE1 }, "02   Beach 3"),
-			new ComboboxItem<int[]>(new[] { 0x05, 0x5A29, 0x5000, 0x5C0A, 0xE1 }, "03   Stone 1"),
-			new ComboboxItem<int[]>(new[] { 0x05, 0x5A29, 0x5400, 0x5C0A, 0xE1 }, "04   Stone 2"),
-			new ComboboxItem<int[]>(new[] { 0x05, 0x5A29, 0x5600, 0x5C0A, 0xE1 }, "05   Stone 3"),
-			new ComboboxItem<int[]>(new[] { 0x06, 0x6869, 0x5000, 0x620A, 0xE1 }, "06   Ice"),
-			new ComboboxItem<int[]>(new[] { 0x03, 0x4000, 0x5400, 0x420A, 0xE1 }, "07   Cave 1"),
-			new ComboboxItem<int[]>(new[] { 0x03, 0x4000, 0x5400, 0x4C0A, 0xE1 }, "08   Cave 2"),
-			new ComboboxItem<int[]>(new[] { 0x0E, 0x4C00, 0x5400, 0x500A, 0xE1 }, "09   Cave 3"),
-			new ComboboxItem<int[]>(new[] { 0x0E, 0x4000, 0x5400, 0x4A0A, 0xE1 }, "10   Cave 4"),
-			new ComboboxItem<int[]>(new[] { 0x0E, 0x4000, 0x5600, 0x4A0A, 0xE1 }, "11   Cave 5"),
-			new ComboboxItem<int[]>(new[] { 0x0E, 0x6A00, 0x5800, 0x5A0A, 0xE4 }, "12   Lava"),
-			new ComboboxItem<int[]>(new[] { 0x0E, 0x5200, 0x5400, 0x520A, 0xE1 }, "13   Train"),
-			new ComboboxItem<int[]>(new[] { 0x03, 0x4600, 0x5000, 0x400A, 0xE1 }, "14   Woods 1"),
-			new ComboboxItem<int[]>(new[] { 0x0E, 0x5800, 0x5000, 0x540A, 0xE1 }, "15   Woods 2"),
-			new ComboboxItem<int[]>(new[] { 0x0E, 0x5E00, 0x5E00, 0x560A, 0x63 }, "16   Treasure"),
-			new ComboboxItem<int[]>(new[] { 0x0E, 0x6400, 0x5000, 0x580A, 0xE1 }, "17   Ship"),
-			new ComboboxItem<int[]>(new[] { 0x03, 0x4C00, 0x5A00, 0x440A, 0xE1 }, "18   Castle 1"),
-			new ComboboxItem<int[]>(new[] { 0x0E, 0x7000, 0x5000, 0x660A, 0xE1 }, "19   Castle 2"),
-			new ComboboxItem<int[]>(new[] { 0x0E, 0x7000, 0x5000, 0x680A, 0xE1 }, "20   Castle 3"),
-			new ComboboxItem<int[]>(new[] { 0x0E, 0x7600, 0x5200, 0x6C0A, 0xE1 }, "21   Castle 4"),
-			new ComboboxItem<int[]>(new[] { 0x1D, 0x5200, 0x6600, 0x5E0A, 0xE1 }, "22   Boss 1"),
-			new ComboboxItem<int[]>(new[] { 0x1D, 0x4600, 0x6200, 0x5E0A, 0xE1 }, "23   Boss 2"),
-			new ComboboxItem<int[]>(new[] { 0x1D, 0x4C00, 0x6400, 0x5E0A, 0xE1 }, "24   Boss 3"),
-			new ComboboxItem<int[]>(new[] { 0x1D, 0x5E00, 0x6A00, 0x600A, 0xD2 }, "25   Boss 4"),
-			new ComboboxItem<int[]>(new[] { 0x1D, 0x6400, 0x6C00, 0x600A, 0xE4 }, "26   Boss 5"),
-			new ComboboxItem<int[]>(new[] { 0x1D, 0x5800, 0x6800, 0x600A, 0xE1 }, "27   Boss 6"),
-			new ComboboxItem<int[]>(new[] { 0x1D, 0x6A00, 0x6E00, 0x6A0A, 0xE1 }, "28   Boss 7")
+			{ new[] { 0x03, 0x5200, 0x5400, 0x460A, 0xE1 }, "00   Beach 1" },
+			{ new[] { 0x0E, 0x4600, 0x5400, 0x4E0A, 0xE1 }, "01   Beach 2" },
+			{ new[] { 0x06, 0x6E69, 0x5600, 0x640A, 0xE1 }, "02   Beach 3" },
+			{ new[] { 0x05, 0x5A29, 0x5000, 0x5C0A, 0xE1 }, "03   Stone 1" },
+			{ new[] { 0x05, 0x5A29, 0x5400, 0x5C0A, 0xE1 }, "04   Stone 2" },
+			{ new[] { 0x05, 0x5A29, 0x5600, 0x5C0A, 0xE1 }, "05   Stone 3" },
+			{ new[] { 0x06, 0x6869, 0x5000, 0x620A, 0xE1 }, "06   Ice" },
+			{ new[] { 0x03, 0x4000, 0x5400, 0x420A, 0xE1 }, "07   Cave 1" },
+			{ new[] { 0x03, 0x4000, 0x5400, 0x4C0A, 0xE1 }, "08   Cave 2" },
+			{ new[] { 0x0E, 0x4C00, 0x5400, 0x500A, 0xE1 }, "09   Cave 3" },
+			{ new[] { 0x0E, 0x4000, 0x5400, 0x4A0A, 0xE1 }, "10   Cave 4" },
+			{ new[] { 0x0E, 0x4000, 0x5600, 0x4A0A, 0xE1 }, "11   Cave 5" },
+			{ new[] { 0x0E, 0x6A00, 0x5800, 0x5A0A, 0xE4 }, "12   Lava" },
+			{ new[] { 0x0E, 0x5200, 0x5400, 0x520A, 0xE1 }, "13   Train" },
+			{ new[] { 0x03, 0x4600, 0x5000, 0x400A, 0xE1 }, "14   Woods 1" },
+			{ new[] { 0x0E, 0x5800, 0x5000, 0x540A, 0xE1 }, "15   Woods 2" },
+			{ new[] { 0x0E, 0x5E00, 0x5E00, 0x560A, 0x63 }, "16   Treasure" },
+			{ new[] { 0x0E, 0x6400, 0x5000, 0x580A, 0xE1 }, "17   Ship" },
+			{ new[] { 0x03, 0x4C00, 0x5A00, 0x440A, 0xE1 }, "18   Castle 1" },
+			{ new[] { 0x0E, 0x7000, 0x5000, 0x660A, 0xE1 }, "19   Castle 2" },
+			{ new[] { 0x0E, 0x7000, 0x5000, 0x680A, 0xE1 }, "20   Castle 3" },
+			{ new[] { 0x0E, 0x7600, 0x5200, 0x6C0A, 0xE1 }, "21   Castle 4" },
+			{ new[] { 0x1D, 0x5200, 0x6600, 0x5E0A, 0xE1 }, "22   Boss 1" },
+			{ new[] { 0x1D, 0x4600, 0x6200, 0x5E0A, 0xE1 }, "23   Boss 2" },
+			{ new[] { 0x1D, 0x4C00, 0x6400, 0x5E0A, 0xE1 }, "24   Boss 3" },
+			{ new[] { 0x1D, 0x5E00, 0x6A00, 0x600A, 0xD2 }, "25   Boss 4" },
+			{ new[] { 0x1D, 0x6400, 0x6C00, 0x600A, 0xE4 }, "26   Boss 5" },
+			{ new[] { 0x1D, 0x5800, 0x6800, 0x600A, 0xE1 }, "27   Boss 6" },
+			{ new[] { 0x1D, 0x6A00, 0x6E00, 0x6A0A, 0xE1 }, "28   Boss 7" }
 		};
 
 		readonly int[][] enemyPointer =
@@ -219,68 +219,68 @@ namespace WLEditor
 			new [] { 0x52F6 }
 		};
 
-		readonly ComboboxItem<int>[] tilesAnimation =
+		readonly ComboboxItemCollection<int> tilesAnimation = new ComboboxItemCollection<int>
 		{
-			new ComboboxItem<int>(0x4000, "00   Platform"),
-			new ComboboxItem<int>(0x4100, "01   Sand / plant"),
-			new ComboboxItem<int>(0x4800, "02   Water"),
-			new ComboboxItem<int>(0x4A00, "03   Water / plant"),
-			new ComboboxItem<int>(0x4400, "04   Waterfall"),
-			new ComboboxItem<int>(0x4600, "05   Water flow"),
-			new ComboboxItem<int>(0x4E00, "06   Treasure room"),
-			new ComboboxItem<int>(0x4500, "07   Lava 1"),
-			new ComboboxItem<int>(0x4900, "08   Lava 2"),
-			new ComboboxItem<int>(0x4200, "09   Lava 3"),
-			new ComboboxItem<int>(0x4C00, "10   Piranha"),
-			new ComboboxItem<int>(0x4700, "11   Train left"),
-			new ComboboxItem<int>(0x4F00, "13   Train right"),
-			new ComboboxItem<int>(0x4B00, "14   Conveyor belt"),
-			new ComboboxItem<int>(0x4D00, "15   Castle")
+			{ 0x4000, "00   Platform" },
+			{ 0x4100, "01   Sand / plant" },
+			{ 0x4800, "02   Water" },
+			{ 0x4A00, "03   Water / plant" },
+			{ 0x4400, "04   Waterfall" },
+			{ 0x4600, "05   Water flow" },
+			{ 0x4E00, "06   Treasure room" },
+			{ 0x4500, "07   Lava 1" },
+			{ 0x4900, "08   Lava 2" },
+			{ 0x4200, "09   Lava 3" },
+			{ 0x4C00, "10   Piranha" },
+			{ 0x4700, "11   Train left" },
+			{ 0x4F00, "13   Train right" },
+			{ 0x4B00, "14   Conveyor belt" },
+			{ 0x4D00, "15   Castle" }
 		};
 
-		readonly ComboboxItem<int>[] music =
+		readonly ComboboxItemCollection<int> music = new ComboboxItemCollection<int>
 		{
-			new ComboboxItem<int>(0x7ED5, "00   Beach 1"),
-			new ComboboxItem<int>(0x7F29, "01   Beach 2"),
-			new ComboboxItem<int>(0x7EE1, "02   Cave 1"),
-			new ComboboxItem<int>(0x7EED, "03   Cave 2"),
-			new ComboboxItem<int>(0x7F11, "04   Cave 3"),
-			new ComboboxItem<int>(0x7F1D, "05   Cave 4"),
-			new ComboboxItem<int>(0x7F35, "06   Cave 5"),
-			new ComboboxItem<int>(0x7F4D, "07   Cave 6"),
-			new ComboboxItem<int>(0x7EC9, "08   Lake"),
-			new ComboboxItem<int>(0x7EF9, "09   Train"),
-			new ComboboxItem<int>(0x7F05, "10   Boss Level"),
-			new ComboboxItem<int>(0x7F41, "11   Syrup Castle"),
-			new ComboboxItem<int>(0x7F59, "12   Sherbet Land")
+			{ 0x7ED5, "00   Beach 1" },
+			{ 0x7F29, "01   Beach 2" },
+			{ 0x7EE1, "02   Cave 1" },
+			{ 0x7EED, "03   Cave 2" },
+			{ 0x7F11, "04   Cave 3" },
+			{ 0x7F1D, "05   Cave 4" },
+			{ 0x7F35, "06   Cave 5" },
+			{ 0x7F4D, "07   Cave 6" },
+			{ 0x7EC9, "08   Lake" },
+			{ 0x7EF9, "09   Train" },
+			{ 0x7F05, "10   Boss Level" },
+			{ 0x7F41, "11   Syrup Castle" },
+			{ 0x7F59, "12   Sherbet Land" }
 		};
 
-		readonly ComboboxItem<int>[] animationSpeed =
+		readonly ComboboxItemCollection<int> animationSpeed = new ComboboxItemCollection<int>
 		{
-			new ComboboxItem<int>(0x00, "None"),
-			new ComboboxItem<int>(0x1F, "Slow"),
-			new ComboboxItem<int>(0x0F, "Normal"),
-			new ComboboxItem<int>(0x07, "Fast"),
-			new ComboboxItem<int>(0x03, "Fastest")
+			{ 0x00, "None" },
+			{ 0x1F, "Slow" },
+			{ 0x0F, "Normal" },
+			{ 0x07, "Fast" },
+			{ 0x03, "Fastest" }
 		};
 
-		readonly ComboboxItem<int>[] cameraTypes =
+		readonly ComboboxItemCollection<int> cameraTypes = new ComboboxItemCollection<int>
 		{
-			new ComboboxItem<int>(0x00, "X scroll"),
-			new ComboboxItem<int>(0x10, "X/Y scroll"),
-			new ComboboxItem<int>(0x01, "Train bumps"),
-			new ComboboxItem<int>(0x30, "Train auto-scroll right"),
-			new ComboboxItem<int>(0x31, "Train auto-scroll left"),
-			new ComboboxItem<int>(0xFF, "No scroll (boss fight)")
+			{ 0x00, "X scroll" },
+			{ 0x10, "X/Y scroll" },
+			{ 0x01, "Train bumps" },
+			{ 0x30, "Train auto-scroll right" },
+			{ 0x31, "Train auto-scroll left" },
+			{ 0xFF, "No scroll (boss fight)" }
 		};
 
-		readonly ComboboxItem<int>[] warps =
+		readonly ComboboxItemCollection<int> warps = new ComboboxItemCollection<int>
 		{
-			new ComboboxItem<int>(0x5B76, "None"),
-			new ComboboxItem<int>(0x5B77, "Exit map"),
-			new ComboboxItem<int>(0x5B78, "Exit A"),
-			new ComboboxItem<int>(0x5B79, "Exit B"),
-			new ComboboxItem<int>(0x5B7A, "Sector")
+			{ 0x5B76, "None" },
+			{ 0x5B77, "Exit map" },
+			{ 0x5B78, "Exit A" },
+			{ 0x5B79, "Exit B" },
+			{ 0x5B7A, "Sector" }
 		};
 
 		void DdlEnemiesDrawItem(object sender, DrawItemEventArgs e)
@@ -367,22 +367,22 @@ namespace WLEditor
 			{
 				formLoaded = true;
 				ddlAnimationSpeed.Items.Clear();
-				ddlAnimationSpeed.Items.AddRange(animationSpeed);
+				ddlAnimationSpeed.Items.AddRange(animationSpeed.ToArray());
 
 				ddlCameraType.Items.Clear();
-				ddlCameraType.Items.AddRange(cameraTypes);
+				ddlCameraType.Items.AddRange(cameraTypes.ToArray());
 
 				ddlMusic.Items.Clear();
-				ddlMusic.Items.AddRange(music);
+				ddlMusic.Items.AddRange(music.ToArray());
 
 				ddlWarp.Items.Clear();
-				ddlWarp.Items.AddRange(warps);
+				ddlWarp.Items.AddRange(warps.ToArray());
 
 				ddlTileSet.Items.Clear();
-				ddlTileSet.Items.AddRange(tileSets);
+				ddlTileSet.Items.AddRange(tileSets.ToArray());
 
 				ddlAnimation.Items.Clear();
-				ddlAnimation.Items.AddRange(tilesAnimation);
+				ddlAnimation.Items.AddRange(tilesAnimation.ToArray());
 
 				Array.Clear(TilesEnemies.Bits, 0, TilesEnemies.Bits.Length);
 				ddlEnemies.Items.Clear();
