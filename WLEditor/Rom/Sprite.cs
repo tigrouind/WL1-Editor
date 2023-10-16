@@ -300,10 +300,10 @@ namespace WLEditor
 			}
 		}
 
-		public static void DumpEnemiesSprites(Rom rom, int enemiesIdsPointer, int tilesDataAddress,
-			DirectBitmap bitmap, int destY, Rectangle[] spriteRects, Point[] offsets, int index, int width, out int[] enemyIds)
+		public static int[] DumpEnemiesSprites(Rom rom, int enemiesIdsPointer, int tilesDataAddress,
+			DirectBitmap bitmap, int destY, Rectangle[] spriteRects, Point[] offsets, int index, int width)
 		{
-			enemyIds = GetEnemyIds().ToArray();
+			var enemyIds = GetEnemyIds().ToArray();
 			var enemyTileInfo = LoadEnemiesTiles().ToArray();
 
 			for (int i = 0; i < enemyTileInfo.Length; i++)
@@ -323,6 +323,8 @@ namespace WLEditor
 					}
 				}
 			}
+
+			return enemyIds;
 
 			void LoadEnemiesTilesInternal(int spriteDataAddress, int tilesBank, int tilesCount, int tilesAddress)
 			{

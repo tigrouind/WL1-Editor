@@ -403,7 +403,7 @@ namespace WLEditor
 				int[] enemyPointers = enemyPointer[index];
 
 				var (enemiesIdsPointer, tilesPointer, treasureId, _, exitOpen) = Sprite.FindEnemiesData(rom, enemyPointers[0]);
-				Sprite.DumpEnemiesSprites(rom, enemiesIdsPointer, tilesPointer, TilesEnemies, index * 32, enemiesRects, enemiesOffsets, index * 6, 32, out int[] enemyIds);
+				var enemyIds = Sprite.DumpEnemiesSprites(rom, enemiesIdsPointer, tilesPointer, TilesEnemies, index * 32, enemiesRects, enemiesOffsets, index * 6, 32);
 
 				return new EnemyInfo
 				{
