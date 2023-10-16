@@ -292,7 +292,6 @@ namespace WLEditor
 				e.Graphics.PixelOffsetMode = PixelOffsetMode.Half;
 
 				var item = ((ComboboxItem<EnemyInfo>)ddlEnemies.Items[e.Index]).Value;
-				bool drawLegend = (e.State & DrawItemState.ComboBoxEdit) == 0;
 
 				DrawBackground();
 				DrawSprites();
@@ -302,16 +301,13 @@ namespace WLEditor
 				{
 					e.DrawBackground();
 
-					if (drawLegend)
+					if (item.BossId >= 0)
 					{
-						if (item.BossId >= 0)
-						{
-							e.Graphics.FillRectangle(Brushes.MistyRose, new Rectangle(e.Bounds.Left, e.Bounds.Top, 20, e.Bounds.Height));
-						}
-						else if (item.TreasureId >= 1 && item.TreasureId <= 15)
-						{
-							e.Graphics.FillRectangle(Brushes.Wheat, new Rectangle(e.Bounds.Left, e.Bounds.Top, 20, e.Bounds.Height));
-						}
+						e.Graphics.FillRectangle(Brushes.MistyRose, new Rectangle(e.Bounds.Left, e.Bounds.Top, 20, e.Bounds.Height));
+					}
+					else if (item.TreasureId >= 1 && item.TreasureId <= 15)
+					{
+						e.Graphics.FillRectangle(Brushes.Wheat, new Rectangle(e.Bounds.Left, e.Bounds.Top, 20, e.Bounds.Height));
 					}
 				}
 
@@ -324,7 +320,9 @@ namespace WLEditor
 						{
 							var destRect = new Rectangle(e.Bounds.Left + 20 + index * 32 * zoom, e.Bounds.Top, 32 * zoom, 32 * zoom);
 
-							if (item.ExitOpen && drawLegend && item.EnemyIds[index] == 15) //skull open
+							if ((item.ExitOpen && item.EnemyIds[index] == 15) //skull open
+								|| item.EnemyIds[index] == 10 //moving pouncer
+								|| item.EnemyIds[index] == 71) //guragura with coin
 							{
 								e.Graphics.FillRectangle(Brushes.DarkSeaGreen, destRect);
 							}
