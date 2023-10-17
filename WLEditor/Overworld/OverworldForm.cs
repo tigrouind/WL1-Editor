@@ -90,6 +90,7 @@ namespace WLEditor
 			this.rom = rom;
 			formLoaded = false;
 			changesFlag = ChangeEnum.None;
+			selection.ClearSelection();
 
 			if (Visible)
 			{
