@@ -600,7 +600,7 @@ namespace WLEditor
 					return true;
 
 				case Keys.S:
-					levelPictureBox.ScrollLines = (levelPictureBox.ScrollLines + 1) % 4;
+					levelPictureBox.ScrollLines = (levelPictureBox.ScrollLines + 1) % 5;
 					levelPictureBox.Invalidate();
 					break;
 
