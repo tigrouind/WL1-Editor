@@ -55,6 +55,7 @@ namespace WLEditor
 
 			pathForm = new PathForm(pictureBox1);
 			pathForm.PathChanged += (s, e) => SetChanges(ChangeEnum.Path);
+			pathForm.GetAnimationIndex = () => animationIndex;
 
 			selection.InvalidateSelection += InvalidateSelection;
 

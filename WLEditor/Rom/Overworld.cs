@@ -9,15 +9,15 @@ namespace WLEditor
 		static readonly uint[] paletteColors = { 0xFFFFFFFF, 0xFFAAAAAA, 0xFF555555, 0xFF000000 };
 		static readonly int[] directions = { 0xF0, 0xFE, 0xE0, 0xEE };
 
-		static readonly int[,] flagsPosition =
+		static readonly (int X, int Y)[] flagsPosition =
 		{
-			{ 0x56F5, 0x56E8 },
-			{ 0x5719, 0x570C },
-			{ 0x5738, 0x572B },
-			{ 0x575C, 0x574F },
-			{ 0x5780, 0x5773 },
-			{ 0x57A4, 0x5797 },
-			{ 0x57C3, 0x57B6 },
+			( 0x56F6, 0x56E9 ),
+			( 0x571A, 0x570D ),
+			( 0x5739, 0x572C ),
+			( 0x5781, 0x5774 ),
+			( 0x575D, 0x5750 ),
+			( 0x57A5, 0x5798 ),
+			( 0x57C4, 0x57B7 ),
 		};
 
 		static readonly int[] music =
@@ -145,6 +145,14 @@ namespace WLEditor
 			}
 
 			yield return 0;
+		}
+
+		public static void DumpFlags(Rom rom, DirectBitmap bitmap)
+		{
+			rom.SetBank(0x14);
+			byte[] data = new byte[12 * 16];
+			rom.ReadBytes(0x7B97, data.Length, data);
+			Level.Dump8x8Tiles(data, bitmap, 12, 0, 0x1E, paletteColors, true);
 		}
 
 		public static void Dump8x8Tiles(Rom rom, int bank, int tileAddress, DirectBitmap bitmap)
@@ -392,8 +400,8 @@ namespace WLEditor
 				for (int level = 0; level < flagsPosition.GetLength(0); level++)
 				{
 					var item = pathData[level];
-					item.FlagX = rom.ReadByte(flagsPosition[level, 0] + 1) - 12;
-					item.FlagY = rom.ReadByte(flagsPosition[level, 1] + 1) - 20;
+					item.FlagX = rom.ReadByte(flagsPosition[level].X) - 16;
+					item.FlagY = rom.ReadByte(flagsPosition[level].Y) - 32;
 				}
 			}
 
@@ -549,8 +557,8 @@ namespace WLEditor
 				for (int level = 0; level < flagsPosition.GetLength(0); level++)
 				{
 					var item = pathData[level];
-					rom.WriteByte(flagsPosition[level, 0] + 1, (byte)Math.Max(0, Math.Min(255, item.FlagX + 12)));
-					rom.WriteByte(flagsPosition[level, 1] + 1, (byte)Math.Max(0, Math.Min(255, item.FlagY + 20)));
+					rom.WriteByte(flagsPosition[level].X, (byte)Math.Max(0, Math.Min(255, item.FlagX + 16)));
+					rom.WriteByte(flagsPosition[level].Y, (byte)Math.Max(0, Math.Min(255, item.FlagY + 32)));
 				}
 			}
 

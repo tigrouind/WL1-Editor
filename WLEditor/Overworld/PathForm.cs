@@ -22,6 +22,8 @@ namespace WLEditor
 		int zoom;
 		int currentWorld;
 		readonly PictureBox pictureBox;
+		readonly DirectBitmap tilesFlag = new DirectBitmap(16 * 8, 1 * 8);
+		public Func<int> GetAnimationIndex;
 
 		readonly int[][] levels =
 		{
@@ -132,6 +134,7 @@ namespace WLEditor
 		{
 			worldData = Overworld.LoadPaths(rom, false);
 			overWorldData = Overworld.LoadPaths(rom, true);
+			Overworld.DumpFlags(rom, tilesFlag);
 		}
 
 		public void LoadWorld(int world)
@@ -192,6 +195,19 @@ namespace WLEditor
 
 					pictureBox.Invalidate();
 					SetChanges();
+					return true;
+
+				case Keys.Up | Keys.Alt:
+				case Keys.Down | Keys.Alt:
+				case Keys.Left | Keys.Alt:
+				case Keys.Right | Keys.Alt:
+					if (currentWorld == 8 && currentLevel != 7)
+					{
+						MoveFlag();
+
+						pictureBox.Invalidate();
+						SetChanges();
+					}
 					return true;
 
 				case Keys.Up | Keys.Shift:
@@ -366,6 +382,31 @@ namespace WLEditor
 				}
 			}
 
+			void MoveFlag()
+			{
+				int posX = currentPath.FlagX / gridSnap * gridSnap;
+				int posY = currentPath.FlagY / gridSnap * gridSnap;
+
+				switch (keyCode)
+				{
+					case Keys.Up:
+						currentPath.FlagY = Math.Max(posY - gridSnap, 0);
+						break;
+
+					case Keys.Down:
+						currentPath.FlagY = Math.Min(posY + gridSnap, CurrentMapY - 16);
+						break;
+
+					case Keys.Left:
+						currentPath.FlagX = Math.Max(posX - gridSnap, 0);
+						break;
+
+					case Keys.Right:
+						currentPath.FlagX = Math.Min(posX + gridSnap, CurrentMapX - 16);
+						break;
+				}
+			}
+
 			void MoveLevel()
 			{
 				//align on grid
@@ -391,12 +432,7 @@ namespace WLEditor
 						break;
 				}
 
-				if (currentWorld == 8)
-				{
-					currentPath.FlagX = currentPath.X + 20;
-					currentPath.FlagY = currentPath.Y;
-				}
-				else
+				if (currentWorld != 8)
 				{
 					currentPath.TreasureX = currentPath.X + 4;
 					currentPath.TreasureY = currentPath.Y + 4;
@@ -617,6 +653,7 @@ namespace WLEditor
 			DrawProgress();
 			DrawLevels();
 			DrawExits();
+			DrawFlag();
 
 			void DrawLevels()
 			{
@@ -644,6 +681,21 @@ namespace WLEditor
 						}
 
 						g.DrawString((Array.IndexOf(levels[currentWorld], level) + 1).ToString(), font, Brushes.Black, (posX + 4) * zoom, (posY + 4) * zoom, format);
+					}
+				}
+			}
+
+			void DrawFlag()
+			{
+				if (currentWorld == 8 && currentLevel != 7)
+				{
+					var item = PathData[currentLevel];
+					int animationIndex = GetAnimationIndex();
+					for (int n = 0; n < 4; n++)
+					{
+						var src = new Rectangle((n + animationIndex % 3 * 4) * 8, 0, 8, 8);
+						var dest = new Rectangle((item.FlagX + n % 2 * 8) * zoom, (item.FlagY + n / 2 * 8) * zoom, 8 * zoom, 8 * zoom);
+						g.DrawImage(tilesFlag.Bitmap, dest, src, GraphicsUnit.Pixel);
 					}
 				}
 			}
