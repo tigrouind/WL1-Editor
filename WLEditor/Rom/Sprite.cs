@@ -9,10 +9,8 @@ namespace WLEditor
 	{
 		readonly static uint[] enemyPalette = { 0xFFFFFFFF, 0xFF9DC9FD, 0xFFFF00FF, 0xFF000029 };
 
-		public readonly static Rectangle[] PlayerRectangles = new Rectangle[2];
-		public readonly static Point[] PlayerOffsets = new Point[2];
-		public readonly static Rectangle[] LoadedSprites = new Rectangle[6];
-		public readonly static Point[] LoadedOffsets = new Point[6];
+		public readonly static (Rectangle Rectangle, Point Offsets)[] PlayerRects = new (Rectangle, Point)[2];
+		public readonly static (Rectangle Rectangle, Point Offsets)[] LoadedSprites = new (Rectangle, Point)[6];
 
 		public readonly static DirectBitmap TilesObjects = new DirectBitmap(16 * 9, 16);
 		public readonly static DirectBitmap TilesEnemies = new DirectBitmap(40 * 6, 40);
@@ -82,16 +80,11 @@ namespace WLEditor
 
 			rom.SetBank(0x5);
 			Level.Dump8x8Tiles(rom, Tiles8x8, 0x42F1, 64, 0, 0x1E, enemyPalette, true);
-			var info0 = DumpSpritePlayer(rom, 0, 0, 0x603B, false);
-			var info1 = DumpSpritePlayer(rom, 0, 32, 0x603B, true);
-
-			PlayerRectangles[0] = info0.rect;
-			PlayerRectangles[1] = info1.rect;
-			PlayerOffsets[0] = info0.offset;
-			PlayerOffsets[1] = info1.offset;
+			PlayerRects[0] = DumpSpritePlayer(rom, 0, 0, 0x603B, false);
+			PlayerRects[1] = DumpSpritePlayer(rom, 0, 32, 0x603B, true);
 		}
 
-		static (Rectangle rect, Point offset) DumpSpritePlayer(Rom rom, int posx, int posy, int spriteAddress, bool horizontalFlip)
+		static (Rectangle Rect, Point Offset) DumpSpritePlayer(Rom rom, int posx, int posy, int spriteAddress, bool horizontalFlip)
 		{
 			Rectangle rectangle = Rectangle.Empty;
 			foreach (var sprite in GetPlayerInfo())
@@ -301,7 +294,7 @@ namespace WLEditor
 		}
 
 		public static int[] DumpEnemiesSprites(Rom rom, int enemiesIdsPointer, int tilesDataAddress,
-			DirectBitmap bitmap, int destY, Rectangle[] spriteRects, Point[] offsets, int index, int width)
+			DirectBitmap bitmap, int destY, (Rectangle Rectangle, Point Offset)[] sprites, int index, int width)
 		{
 			var enemyIds = GetEnemyIds().ToArray();
 			var enemyTileInfo = LoadEnemiesTiles().ToArray();
@@ -318,8 +311,7 @@ namespace WLEditor
 						LoadEnemiesTilesInternal(spriteDataAddress, tileBank, tileCount, tileAddress);
 
 						var (rect, offset) = DumpSprite(rom, i * width, destY, spriteDataAddress, bitmap, width);
-						spriteRects[index + i] = rect;
-						offsets[index + i] = offset;
+						sprites[index + i] = (rect, offset);
 					}
 				}
 			}

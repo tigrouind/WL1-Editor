@@ -53,7 +53,7 @@ namespace WLEditor
 					}
 					if (index >= 1 && index <= 6) //enemy
 					{
-						Rectangle enemyRect = Sprite.LoadedSprites[index - 1];
+						Rectangle enemyRect = Sprite.LoadedSprites[index - 1].Rectangle;
 						if (enemyRect != Rectangle.Empty)
 						{
 							var imgRect = new Rectangle((index - 1) * 40 + 4, 4, 32, 32);

@@ -12,8 +12,7 @@ namespace WLEditor
 		public event EventHandler<KeyEventArgs> ProcessCommandKey;
 		public event EventHandler SectorChanged;
 		public readonly DirectBitmap TilesEnemies = new DirectBitmap(32 * 6, 32 * 147);
-		public readonly Rectangle[] enemiesRects = new Rectangle[6 * 147];
-		public readonly Point[] enemiesOffsets = new Point[6 * 147];
+		public readonly (Rectangle rectangle, Point point)[] enemiesRects = new (Rectangle, Point)[6 * 147];
 		readonly char[] treasureNames = { 'C', 'I', 'F', 'O', 'A', 'N', 'H', 'M', 'L', 'K', 'B', 'D', 'G', 'J', 'E' };
 		readonly int[] boss = { 0x4CA9, 0x460D, 0x4C0C, 0x4E34, 0x4B06, 0x4D1A, 0x527D };
 
@@ -316,7 +315,7 @@ namespace WLEditor
 					for (int index = 0; index < 6; index++)
 					{
 						var enemyRect = enemiesRects[item.Index * 6 + index];
-						if (enemyRect != Rectangle.Empty)
+						if (enemyRect != default)
 						{
 							var destRect = new Rectangle(e.Bounds.Left + 20 + index * 32 * zoom, e.Bounds.Top, 32 * zoom, 32 * zoom);
 
@@ -401,7 +400,7 @@ namespace WLEditor
 				int[] enemyPointers = enemyPointer[index];
 
 				var (enemiesIdsPointer, tilesPointer, treasureId, _, exitOpen) = Sprite.FindEnemiesData(rom, enemyPointers[0]);
-				var enemyIds = Sprite.DumpEnemiesSprites(rom, enemiesIdsPointer, tilesPointer, TilesEnemies, index * 32, enemiesRects, enemiesOffsets, index * 6, 32);
+				var enemyIds = Sprite.DumpEnemiesSprites(rom, enemiesIdsPointer, tilesPointer, TilesEnemies, index * 32, enemiesRects, index * 6, 32);
 
 				return new EnemyInfo
 				{

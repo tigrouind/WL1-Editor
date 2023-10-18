@@ -74,8 +74,8 @@ namespace WLEditor
 
 						//wario position
 						int index = Level.WarioRightFacing ? 0 : 1;
-						Rectangle playerRectangle = Sprite.PlayerRectangles[index];
-						Point playerOffset = Sprite.PlayerOffsets[index];
+						Rectangle playerRectangle = Sprite.PlayerRects[index].Rectangle;
+						Point playerOffset = Sprite.PlayerRects[index].Offsets;
 
 						Rectangle destRect = new Rectangle(
 							(Level.WarioPosition % 4096 + playerOffset.X) * zoom,
@@ -124,10 +124,10 @@ namespace WLEditor
 							//enemy
 							if (data <= 6)
 							{
-								Rectangle enemyRect = Sprite.LoadedSprites[data - 1];
+								Rectangle enemyRect = Sprite.LoadedSprites[data - 1].Rectangle;
 								if (enemyRect != Rectangle.Empty)
 								{
-									Point enemyOffset = Sprite.LoadedOffsets[data - 1];
+									Point enemyOffset = Sprite.LoadedSprites[data - 1].Offsets;
 
 									destRect = new Rectangle((i * 16 + enemyOffset.X) * zoom, (j * 16 + enemyOffset.Y) * zoom, enemyRect.Width * zoom, enemyRect.Height * zoom);
 									if (destRect.IntersectsWith(e.ClipRectangle))
@@ -378,9 +378,7 @@ namespace WLEditor
 			{
 				if (enemyIndex >= 1 && enemyIndex <= 6)
 				{
-					Rectangle enemyRect = Sprite.LoadedSprites[enemyIndex - 1];
-					Point enemyOffset = Sprite.LoadedOffsets[enemyIndex - 1];
-
+					var (enemyRect, enemyOffset) = Sprite.LoadedSprites[enemyIndex - 1];
 					if (enemyRect != Rectangle.Empty)
 					{
 						region.Union(new Rectangle(((tileIndex % 256) * 16 + enemyOffset.X) * zoom, ((tileIndex / 256) * 16 + enemyOffset.Y) * zoom, enemyRect.Width * zoom, enemyRect.Height * zoom));
