@@ -99,9 +99,10 @@ namespace WLEditor
 
 			void ProcessSubFormCommand(object sender, KeyEventArgs e)
 			{
-				if (e.KeyCode >= Keys.F1 && e.KeyCode <= Keys.F12 && DispatchCommandKey(e.KeyCode))
+				if (DispatchShortcut(e.KeyData))
 				{
 					e.Handled = true;
+					Focus(); //prevent main window disapearing
 				}
 			}
 
@@ -661,16 +662,7 @@ namespace WLEditor
 					return true;
 			}
 
-			ToolStripMenuItem toolStrip = menuStrip1.Items.GetAllMenuItems()
-				.FirstOrDefault(x => x.ShortcutKeys == keyData);
-
-			if (toolStrip != null)
-			{
-				toolStrip.PerformClick();
-				return true;
-			}
-
-			return false;
+			return DispatchShortcut(keyData);
 
 			int GetNextSwitchMode(int value, int typeOfSwitch)
 			{
@@ -684,6 +676,20 @@ namespace WLEditor
 				while (nextMode != 0 && (flags[nextMode] & typeOfSwitch) == 0);
 				return nextMode;
 			}
+		}
+
+		bool DispatchShortcut(Keys keyData)
+		{
+			ToolStripMenuItem toolStrip = menuStrip1.Items.GetAllMenuItems()
+				.FirstOrDefault(x => x.ShortcutKeys == keyData);
+
+			if (toolStrip != null)
+			{
+				toolStrip.PerformClick();
+				return true;
+			}
+
+			return false;
 		}
 
 		#region Subforms
