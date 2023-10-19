@@ -398,10 +398,7 @@ namespace WLEditor
 				if (tileIndex != currentTileIndex)
 				{
 					currentTileIndex = tileIndex;
-					if (TileMouseDown != null)
-					{
-						TileMouseDown(this, new TileEventArgs(e.Button, status, tilePosX, tilePosY));
-					}
+					TileMouseDown?.Invoke(this, new TileEventArgs(e.Button, status, tilePosX, tilePosY));
 				}
 			}
 			else if (e.Button == MouseButtons.Middle)
@@ -430,10 +427,7 @@ namespace WLEditor
 				if (sector != CurrentSector)
 				{
 					CurrentSector = sector;
-					if (SectorChanged != null)
-					{
-						SectorChanged(this, EventArgs.Empty);
-					}
+					SectorChanged?.Invoke(this, EventArgs.Empty);
 				}
 			}
 
