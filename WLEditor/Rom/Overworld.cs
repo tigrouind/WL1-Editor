@@ -444,19 +444,19 @@ namespace WLEditor
 			}
 
 			//check size
-			int levelCount = pathData.Count(x => x != null);
-			int dirCount = pathData.Where(x => x != null).Sum(x => x.Directions.Count(d => d.Path.Count > 0));
+			int levelCount = pathData.Count(x => x != null) * 5;
+			int dirCount = pathData.Where(x => x != null).Sum(x => x.Directions.Count(d => d.Path.Count > 0)) * 2;
 			int pathCount = pathData.Where(x => x != null).Sum(x => x.Directions.Where(d => d.Path.Count > 0).Sum(d => d.Path.Count * 3 + 2));
 
-			int bytesToFree;
-			if (overWorld)
+			(int Level, int Dir, int Path) maxSize = new[]
 			{
-				bytesToFree = Math.Max(levelCount * 5 - 40, 0) + Math.Max(dirCount * 2 - 30, 0) + Math.Max(pathCount - 382, 0);
-			}
-			else
-			{
-				bytesToFree = Math.Max(levelCount * 5 - 210, 0) + Math.Max(dirCount * 2 - 168, 0) + Math.Max(pathCount - 610, 0);
-			}
+				(40, 30, 382),
+				(210, 168, 610)
+			}[overWorld ? 0 : 1];
+
+			int bytesToFree = Math.Max(levelCount - maxSize.Level, 0)
+					+ Math.Max(dirCount - maxSize.Dir, 0)
+					+ Math.Max(pathCount - maxSize.Path, 0);
 
 			if (bytesToFree > 0)
 			{
