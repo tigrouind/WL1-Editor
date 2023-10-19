@@ -72,6 +72,22 @@ namespace WLEditor
 			return -1;
 		}
 
+		public static int GetSourceSector(Rom rom, int course, int sector)
+		{
+			//search sector that target current sector
+			rom.SetBank(0xC);
+			for (int i = 0; i < 32; i++)
+			{
+				int warp = rom.ReadWord(0x4F30 + course * 64 + i * 2);
+				if (warp >= 0x5B7A && rom.ReadByte(warp) == sector)
+				{
+					return i;
+				}
+			}
+
+			return sector;
+		}
+
 		public static int GetWarp(Rom rom, int course, int sector)
 		{
 			rom.SetBank(0xC);

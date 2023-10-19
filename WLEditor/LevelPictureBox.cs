@@ -28,6 +28,7 @@ namespace WLEditor
 		public event EventHandler<TileEventArgs> TileMouseDown;
 		public event EventHandler<TileEventArgs> TileMouseMove;
 		public event EventHandler SectorChanged;
+		public Func<int, int> GetSourceSector;
 
 		public readonly static Brush[] TransparentBrushes =
 		{
@@ -405,6 +406,11 @@ namespace WLEditor
 			{
 				Point coordinates = e.Location;
 				int sector = e.Location.X / 256 / zoom + (e.Location.Y / 256 / zoom) * 16;
+
+				if (ModifierKeys.HasFlag(Keys.Shift) || ModifierKeys.HasFlag(Keys.Control))
+				{
+					sector = GetSourceSector(sector);
+				}
 
 				switch (status)
 				{

@@ -80,6 +80,7 @@ namespace WLEditor
 			levelPictureBox.TileMouseMove += LevelPictureBoxTileMouseMove;
 			levelPictureBox.TileMouseDown += LevelPictureBoxTileMouseDown;
 			levelPictureBox.SectorChanged += LevelPictureBoxSectorChanged;
+			levelPictureBox.GetSourceSector = x => Sector.GetSourceSector(rom, currentCourseId, x);
 
 			toolboxForm.MouseWheel += LevelPanelMouseWheel;
 			toolboxForm.FormClosing += ToolBoxFormClosing;
