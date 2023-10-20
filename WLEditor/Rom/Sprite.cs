@@ -44,11 +44,6 @@ namespace WLEditor
 			0xEA, 0x82, 0xA3 // ld (A382), a
 		};
 
-		readonly static byte[] treasureCheckPattern =
-		{
-			0xCD, 0x6A, 0x42 //call 426A
-		};
-
 		readonly static byte[] exitPattern =
 		{
 			0x3E, 0x02,      // ld a, 02
@@ -221,10 +216,10 @@ namespace WLEditor
 
 		#region Enemies
 
-		public static (int enemyId, int tilesPointer, int treasureID, bool treasureCheck, bool exitOpen) FindEnemiesData(Rom rom, int enemiesPointer)
+		public static (int enemyId, int tilesPointer, int treasureID, bool exitOpen) FindEnemiesData(Rom rom, int enemiesPointer)
 		{
 			int treasureID;
-			bool treasureCheck, exitOpen;
+			bool exitOpen;
 
 			rom.SetBank(0x7);
 			int position = enemiesPointer;
@@ -237,7 +232,7 @@ namespace WLEditor
 
 					position += enemyCodePattern.Length;
 					CheckExtraCode();
-					return (enemyId, tilesPointer, treasureID, treasureCheck, exitOpen);
+					return (enemyId, tilesPointer, treasureID, exitOpen);
 				}
 
 				position++;
@@ -247,7 +242,6 @@ namespace WLEditor
 
 			void CheckExtraCode()
 			{
-				treasureCheck = false;
 				exitOpen = false;
 				treasureID = -1;
 
@@ -257,12 +251,6 @@ namespace WLEditor
 					{
 						treasureID = rom.ReadByte(position + 1);
 						position += treasurePattern.Length;
-
-						if (MatchPattern(treasureCheckPattern))
-						{
-							treasureCheck = true;
-							position += treasureCheckPattern.Length;
-						}
 					}
 					else if (MatchPattern(exitPattern))
 					{
