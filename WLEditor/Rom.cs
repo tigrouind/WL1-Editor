@@ -132,12 +132,21 @@ namespace WLEditor
 
 		public void ExpandTo1MB()
 		{
-			WriteByte(0x0147, 0x13); //MBC3+RAM+BATTERY
-			WriteByte(0x0148, 0x05); //1MB
-
-			if (data.Length == 512 * 1024)
+			if (data.Length < (1024 * 1024))
 			{
+				WriteByte(0x0147, 0x13); //MBC3+RAM+BATTERY
+				WriteByte(0x0148, 0x05); //1MB
 				Array.Resize(ref data, 1024 * 1024);
+			}
+		}
+
+		public void ExpandTo2MB()
+		{
+			if (data.Length < (2048 * 1024))
+			{
+				WriteByte(0x0147, 0x13); //MBC3+RAM+BATTERY
+				WriteByte(0x0148, 0x06); //2MB
+				Array.Resize(ref data, 2048 * 1024);
 			}
 		}
 

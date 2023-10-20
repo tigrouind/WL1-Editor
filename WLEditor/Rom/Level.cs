@@ -583,9 +583,6 @@ namespace WLEditor
 
 		public static bool SaveChanges(Rom rom, int course, out string errorMessage)
 		{
-			//rom expansion give new banks for level data
-			rom.ExpandTo1MB();
-
 			SaveBlocksToRom();
 			if (!SaveObjectsToRom(out errorMessage))
 			{
@@ -596,23 +593,10 @@ namespace WLEditor
 
 			void SaveBlocksToRom()
 			{
-				//grab all levels data at once
-				byte[][] allTiles = new byte[0x2B][];
+				var allTiles = GetAllTiles();
 
-				for (int i = 0; i < 0x2B; i++)
-				{
-					rom.SetBank(0xC);
-					int headerposition = rom.ReadWord(0x4560 + i * 2);
-					int tilebank = rom.ReadByte(headerposition + 9);
-					int tilesubbank = rom.ReadByte(headerposition + 10);
-
-					rom.SetBank(tilebank);
-					int tilePosition = rom.ReadWord(0x4000 + tilesubbank * 2);
-					allTiles[i] = new byte[0x3000];
-					RLEDecompressTiles(rom, tilePosition, allTiles[i]);
-				}
-
-				Array.Copy(LevelData, allTiles[course], 0x3000);
+				//rom expansion give new banks for level data
+				rom.ExpandTo1MB();
 
 				//write them back to ROM
 				byte bank = 0x20;
@@ -627,6 +611,11 @@ namespace WLEditor
 						bank++;
 						subbank = 0;
 						writePosition = 0x4040;
+
+						if (bank == 0x40)
+						{
+							rom.ExpandTo2MB();
+						}
 					}
 
 					//write data to bank
@@ -642,6 +631,28 @@ namespace WLEditor
 
 					subbank++;
 					writePosition += tileData.Length;
+				}
+
+				byte[][] GetAllTiles()
+				{
+					//grab all levels data at once
+					byte[][] result = new byte[0x2B][];
+
+					for (int i = 0; i < 0x2B; i++)
+					{
+						rom.SetBank(0xC);
+						int headerposition = rom.ReadWord(0x4560 + i * 2);
+						int tilebank = rom.ReadByte(headerposition + 9);
+						int tilesubbank = rom.ReadByte(headerposition + 10);
+
+						rom.SetBank(tilebank);
+						int tilePosition = rom.ReadWord(0x4000 + tilesubbank * 2);
+						result[i] = new byte[0x3000];
+						RLEDecompressTiles(rom, tilePosition, result[i]);
+					}
+
+					Array.Copy(LevelData, result[course], 0x3000); //copy current level
+					return result;
 				}
 
 				IEnumerable<byte> RLECompressTiles(byte[] tilesdata)
