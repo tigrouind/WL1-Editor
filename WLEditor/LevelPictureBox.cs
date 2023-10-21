@@ -15,6 +15,7 @@ namespace WLEditor
 		public bool ShowSectors = true;
 		public bool ShowObjects = true;
 		public bool ShowColliders = true;
+		public bool ShowCollectibles = true;
 		public int SwitchMode;
 		public int SwitchType;
 		public int CurrentSector = -1;
@@ -162,7 +163,7 @@ namespace WLEditor
 							if (viewColliders)
 							{
 								byte tileIndex = Level.LevelData[i + j * 256 + 0x1000];
-								tileIndex = (byte)Level.SwitchTile(tileIndex, SwitchMode);
+								tileIndex = Level.ReplaceTile(tileIndex, 0, ShowCollectibles);
 
 								int specialTile = Level.GetTileInfo(tileIndex, SwitchType).Type;
 								if (specialTile != -1)
@@ -354,8 +355,10 @@ namespace WLEditor
 			{
 				for (int tileIndex = 0; tileIndex < 8192; tileIndex++)
 				{
-					byte data = Level.LevelData[tileIndex + 0x1000];
-					if (Level.Animated16x16Tiles[data])
+					byte tileData = Level.LevelData[tileIndex + 0x1000];
+					tileData = Level.ReplaceTile(tileData, SwitchMode, ShowCollectibles);
+
+					if (Level.Animated16x16Tiles[tileData])
 					{
 						r.Union(new Rectangle((tileIndex % 256) * 16 * zoom, (tileIndex / 256) * 16 * zoom, 16 * zoom, 16 * zoom));
 						invalidTiles[tileIndex] = false;

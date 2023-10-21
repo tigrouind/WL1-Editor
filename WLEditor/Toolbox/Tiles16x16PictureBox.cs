@@ -9,6 +9,7 @@ namespace WLEditor
 	{
 		public int CurrentTile;
 		public bool ShowColliders = true;
+		public bool ShowCollectibles = true;
 		public int SwitchType;
 		public int SwitchMode;
 		public event EventHandler<TileEventArgs> TileMouseMove;
@@ -53,8 +54,8 @@ namespace WLEditor
 
 								if (destRect.IntersectsWith(clipRectangle))
 								{
-									int tileIndex = i + j * 8;
-									tileIndex = Level.SwitchTile(tileIndex, SwitchMode);
+									byte tileIndex = (byte)(i + j * 8);
+									tileIndex = Level.ReplaceTile(tileIndex, 0, ShowCollectibles);
 
 									if (ShowColliders)
 									{

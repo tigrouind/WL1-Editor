@@ -155,7 +155,7 @@ namespace WLEditor
 			(-1, "")
 		};
 
-		public static void DumpLevel(Rom rom, int course, int warp, bool reloadAll, int switchMode, int animatedTileIndex, bool reloadAnimatedTilesOnly)
+		public static void DumpLevel(Rom rom, int course, int warp, bool reloadAll, int switchMode, int animatedTileIndex, bool reloadAnimatedTilesOnly, bool showCollectible)
 		{
 			int tilebank;
 			int tileaddressB;
@@ -305,8 +305,8 @@ namespace WLEditor
 				{
 					for (int i = 0; i < 8; i++)
 					{
-						int tileIndex = i + n * 8;
-						int newTileIndex = SwitchTile(tileIndex, switchMode);
+						byte tileIndex = (byte)(i + n * 8);
+						byte newTileIndex = ReplaceTile(tileIndex, switchMode, showCollectible);
 
 						bool isAnimatedTile = false;
 						for (int k = 0; k < 2; k++)
@@ -486,8 +486,20 @@ namespace WLEditor
 			return tileInfo[tileIndex];
 		}
 
+		public static byte ReplaceTile(byte tileData, int switchMode, bool showCollectible)
+		{
+			if (!showCollectible)
+			{
+				tileData = RemoveCollectible(tileData);
+			}
+
+			tileData = SwitchTile(tileData, switchMode);
+
+			return tileData;
+		}
+
 		//replace tiles when a (!) block is hit
-		public static int SwitchTile(int tileData, int switchMode)
+		static byte SwitchTile(byte tileData, int switchMode)
 		{
 			switch (switchMode)
 			{
@@ -532,6 +544,48 @@ namespace WLEditor
 			}
 
 			return tileData;
+		}
+
+		static byte RemoveCollectible(byte tileIndex)
+		{
+			switch (tileIndex)
+			{
+				case 0x29: //block
+				case 0x2A: //block
+				case 0x46: //coin
+					case 0x33: //platform
+					return 0x7F;
+
+				case 0x2B: //block
+				case 0x2C: //block
+				case 0x47: //coin
+					return 0x7E;
+
+				case 0x2E: //block with door
+					return 0x48;
+
+				case 0x2D: //block with door
+					return 0x7D;
+
+				case 0x37: //bonus
+				case 0x49: //bonus (hidden)
+				case 0x28: //bonus (hidden)
+					case 0x4A: //bonus (hidden water)
+					return 0x3C;
+
+				case 0x51: //block (water)
+				case 0x50: //block (water)
+				case 0x53: //coin (water)
+					return 0x58;
+
+				case 0x52: //block with door (water)
+					return 0x5B;
+
+				case 0x54: //block with door (water)
+					return 0x4B;
+			}
+
+			return tileIndex;
 		}
 
 		public static int GetSwitchType()

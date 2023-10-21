@@ -54,16 +54,17 @@ namespace WLEditor
 			this.zoomOutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-			this.LevelPanel = new WLEditor.PanelUnScrollable();
-			this.levelPictureBox = new WLEditor.LevelPictureBox();
 			this.timer = new System.Windows.Forms.Timer(this.components);
 			this.statusStrip1 = new System.Windows.Forms.StatusStrip();
 			this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
+			this.collectiblesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.LevelPanel = new WLEditor.PanelUnScrollable();
+			this.levelPictureBox = new WLEditor.LevelPictureBox();
 			this.menuStrip1.SuspendLayout();
 			this.tableLayoutPanel1.SuspendLayout();
+			this.statusStrip1.SuspendLayout();
 			this.LevelPanel.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.levelPictureBox)).BeginInit();
-			this.statusStrip1.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// levelComboBox
@@ -142,6 +143,7 @@ namespace WLEditor
             this.regionsToolStripMenuItem,
             this.objectsToolStripMenuItem,
             this.collidersToolStripMenuItem,
+            this.collectiblesToolStripMenuItem,
             this.sectorsToolStripMenuItem,
             this.overworldToolStripMenuItem,
             this.animationToolStripMenuItem,
@@ -198,7 +200,7 @@ namespace WLEditor
 			this.sectorsToolStripMenuItem.CheckOnClick = true;
 			this.sectorsToolStripMenuItem.Enabled = false;
 			this.sectorsToolStripMenuItem.Name = "sectorsToolStripMenuItem";
-			this.sectorsToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F6;
+			this.sectorsToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F7;
 			this.sectorsToolStripMenuItem.Size = new System.Drawing.Size(198, 22);
 			this.sectorsToolStripMenuItem.Text = "Warp / Level header";
 			this.sectorsToolStripMenuItem.CheckedChanged += new System.EventHandler(this.SectorsToolStripMenuItemCheckedChanged);
@@ -208,7 +210,7 @@ namespace WLEditor
 			this.overworldToolStripMenuItem.CheckOnClick = true;
 			this.overworldToolStripMenuItem.Enabled = false;
 			this.overworldToolStripMenuItem.Name = "overworldToolStripMenuItem";
-			this.overworldToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F7;
+			this.overworldToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F8;
 			this.overworldToolStripMenuItem.Size = new System.Drawing.Size(198, 22);
 			this.overworldToolStripMenuItem.Text = "Overworld";
 			this.overworldToolStripMenuItem.CheckedChanged += new System.EventHandler(this.OverworldToolStripMenuItemCheckedChanged);
@@ -308,27 +310,8 @@ namespace WLEditor
 			this.tableLayoutPanel1.RowCount = 2;
 			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-			this.tableLayoutPanel1.Size = new System.Drawing.Size(1209, 619);
+			this.tableLayoutPanel1.Size = new System.Drawing.Size(1209, 597);
 			this.tableLayoutPanel1.TabIndex = 8;
-			// 
-			// LevelPanel
-			// 
-			this.LevelPanel.AutoScroll = true;
-			this.LevelPanel.Controls.Add(this.levelPictureBox);
-			this.LevelPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.LevelPanel.Location = new System.Drawing.Point(3, 30);
-			this.LevelPanel.Name = "LevelPanel";
-			this.LevelPanel.Size = new System.Drawing.Size(1203, 586);
-			this.LevelPanel.TabIndex = 5;
-			this.LevelPanel.Visible = false;
-			// 
-			// levelPictureBox
-			// 
-			this.levelPictureBox.Location = new System.Drawing.Point(0, 0);
-			this.levelPictureBox.Name = "levelPictureBox";
-			this.levelPictureBox.Size = new System.Drawing.Size(4096, 512);
-			this.levelPictureBox.TabIndex = 2;
-			this.levelPictureBox.TabStop = false;
 			// 
 			// timer
 			// 
@@ -340,16 +323,46 @@ namespace WLEditor
 			// 
 			this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripStatusLabel1});
-			this.statusStrip1.Location = new System.Drawing.Point(0, 540);
+			this.statusStrip1.Location = new System.Drawing.Point(0, 621);
 			this.statusStrip1.Name = "statusStrip1";
-			this.statusStrip1.Size = new System.Drawing.Size(4096, 25);
+			this.statusStrip1.Size = new System.Drawing.Size(1209, 22);
 			this.statusStrip1.TabIndex = 3;
 			this.statusStrip1.Text = "statusStrip1";
 			// 
 			// toolStripStatusLabel1
 			// 
 			this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
-			this.toolStripStatusLabel1.Size = new System.Drawing.Size(151, 20);
+			this.toolStripStatusLabel1.Size = new System.Drawing.Size(0, 17);
+			// 
+			// collectiblesToolStripMenuItem
+			// 
+			this.collectiblesToolStripMenuItem.Checked = true;
+			this.collectiblesToolStripMenuItem.CheckOnClick = true;
+			this.collectiblesToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
+			this.collectiblesToolStripMenuItem.Name = "collectiblesToolStripMenuItem";
+			this.collectiblesToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F6;
+			this.collectiblesToolStripMenuItem.Size = new System.Drawing.Size(198, 22);
+			this.collectiblesToolStripMenuItem.Text = "Collectibles";
+			this.collectiblesToolStripMenuItem.Click += new System.EventHandler(this.CollectiblesToolStripMenuItem_Click);
+			// 
+			// LevelPanel
+			// 
+			this.LevelPanel.AutoScroll = true;
+			this.LevelPanel.Controls.Add(this.levelPictureBox);
+			this.LevelPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.LevelPanel.Location = new System.Drawing.Point(3, 30);
+			this.LevelPanel.Name = "LevelPanel";
+			this.LevelPanel.Size = new System.Drawing.Size(1203, 564);
+			this.LevelPanel.TabIndex = 5;
+			this.LevelPanel.Visible = false;
+			// 
+			// levelPictureBox
+			// 
+			this.levelPictureBox.Location = new System.Drawing.Point(0, 0);
+			this.levelPictureBox.Name = "levelPictureBox";
+			this.levelPictureBox.Size = new System.Drawing.Size(4096, 512);
+			this.levelPictureBox.TabIndex = 2;
+			this.levelPictureBox.TabStop = false;
 			// 
 			// MainForm
 			// 
@@ -365,10 +378,10 @@ namespace WLEditor
 			this.menuStrip1.ResumeLayout(false);
 			this.menuStrip1.PerformLayout();
 			this.tableLayoutPanel1.ResumeLayout(false);
-			this.LevelPanel.ResumeLayout(false);
-			((System.ComponentModel.ISupportInitialize)(this.levelPictureBox)).EndInit();
 			this.statusStrip1.ResumeLayout(false);
 			this.statusStrip1.PerformLayout();
+			this.LevelPanel.ResumeLayout(false);
+			((System.ComponentModel.ISupportInitialize)(this.levelPictureBox)).EndInit();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -403,9 +416,6 @@ namespace WLEditor
 		private System.Windows.Forms.ToolStripMenuItem sectorsToolStripMenuItem;
 		private System.Windows.Forms.StatusStrip statusStrip1;
 		private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
-
-
-
-
+		private System.Windows.Forms.ToolStripMenuItem collectiblesToolStripMenuItem;
 	}
 }

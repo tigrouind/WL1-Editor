@@ -277,7 +277,7 @@ namespace WLEditor
 		{
 			if (rom.IsLoaded && levelComboBox.SelectedItem != null)
 			{
-				Level.DumpLevel(rom, currentCourseId, currentWarp, reloadAll, switchMode, animatedTileIndex, false);
+				Level.DumpLevel(rom, currentCourseId, currentWarp, reloadAll, switchMode, animatedTileIndex, false, levelPictureBox.ShowCollectibles);
 
 				levelPictureBox.ClearTileCache();
 				levelPictureBox.Invalidate();
@@ -406,6 +406,14 @@ namespace WLEditor
 			levelPictureBox.Invalidate();
 			toolboxForm.Tiles16x16.ShowColliders = showColliders;
 			toolboxForm.Invalidate(true);
+		}
+
+		void CollectiblesToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			bool value = collectiblesToolStripMenuItem.Checked;
+			levelPictureBox.ShowCollectibles = value;
+			toolboxForm.Tiles16x16.ShowCollectibles = value;
+			LoadLevel(false);
 		}
 
 		bool SetSwitchType(int value)
@@ -750,7 +758,7 @@ namespace WLEditor
 
 			void RefreshAnimatedTiles()
 			{
-				Level.DumpLevel(rom, currentCourseId, currentWarp, false, switchMode, animatedTileIndex, true);
+				Level.DumpLevel(rom, currentCourseId, currentWarp, false, switchMode, animatedTileIndex, true, levelPictureBox.ShowCollectibles);
 
 				//redraw
 				levelPictureBox.InvalidateAnimatedTiles();
