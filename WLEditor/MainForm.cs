@@ -63,7 +63,6 @@ namespace WLEditor
 
 		int currentCourseId = -1;
 		int currentWarp = -1;
-		int switchMode, switchType;
 		int animatedTileIndex;
 		int timerTicks;
 		string romFilePath;
@@ -188,7 +187,7 @@ namespace WLEditor
 				}
 
 				int tileIndex = Level.LevelData[e.TileX + e.TileY * 256 + 0x1000];
-				var tileInfo = Level.GetTileInfo(tileIndex, switchType);
+				var tileInfo = Level.GetTileInfo(tileIndex, levelPictureBox.SwitchType);
 				toolStripStatusLabel1.Text = string.Format($"{e.TileX}:{e.TileY} - {data:X2} {tileInfo.Text}");
 			}
 
@@ -277,7 +276,7 @@ namespace WLEditor
 		{
 			if (rom.IsLoaded && levelComboBox.SelectedItem != null)
 			{
-				Level.DumpLevel(rom, currentCourseId, currentWarp, reloadAll, switchMode, animatedTileIndex, false, levelPictureBox.ShowCollectibles);
+				Level.DumpLevel(rom, currentCourseId, currentWarp, reloadAll, levelPictureBox.SwitchMode, animatedTileIndex, false, levelPictureBox.ShowCollectibles);
 
 				levelPictureBox.ClearTileCache();
 				levelPictureBox.Invalidate();
@@ -418,9 +417,8 @@ namespace WLEditor
 
 		bool SetSwitchType(int value)
 		{
-			if (switchType != value)
+			if (levelPictureBox.SwitchType != value)
 			{
-				switchType = value;
 				levelPictureBox.SwitchType = value;
 				toolboxForm.Tiles16x16.SwitchType = value;
 				return true;
@@ -431,9 +429,8 @@ namespace WLEditor
 
 		bool SetSwitchMode(int value)
 		{
-			if (switchMode != value)
+			if (levelPictureBox.SwitchMode != value)
 			{
-				switchMode = value;
 				levelPictureBox.SwitchMode = value;
 				toolboxForm.Tiles16x16.SwitchMode = value;
 				return true;
@@ -616,9 +613,8 @@ namespace WLEditor
 
 				case Keys.B:
 					int typeOfSwitch = Level.GetSwitchType();
-					if (SetSwitchMode(GetNextSwitchMode(switchMode, typeOfSwitch)) | SetSwitchType(typeOfSwitch))
+					if (SetSwitchMode(GetNextSwitchMode(levelPictureBox.SwitchMode, typeOfSwitch)) | SetSwitchType(typeOfSwitch))
 					{
-						toolboxForm.Invalidate(true);
 						LoadLevel(false);
 					}
 					return true;
@@ -758,7 +754,7 @@ namespace WLEditor
 
 			void RefreshAnimatedTiles()
 			{
-				Level.DumpLevel(rom, currentCourseId, currentWarp, false, switchMode, animatedTileIndex, true, levelPictureBox.ShowCollectibles);
+				Level.DumpLevel(rom, currentCourseId, currentWarp, false, levelPictureBox.SwitchMode, animatedTileIndex, true, levelPictureBox.ShowCollectibles);
 
 				//redraw
 				levelPictureBox.InvalidateAnimatedTiles();

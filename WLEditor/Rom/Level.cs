@@ -274,7 +274,6 @@ namespace WLEditor
 				RLEDecompressObjects(rom, objectsPosition, ObjectsData);
 			}
 
-
 			void DumpAnimated16x16Tiles(uint defaultColor)
 			{
 				int m = 0;
