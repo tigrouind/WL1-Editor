@@ -23,6 +23,7 @@ namespace WLEditor
 				CameraY = rom.ReadWordSwap(header + 19) / 8,
 				CameraX = rom.ReadWordSwap(header + 21) / 8,
 				CameraType = rom.ReadByte(header + 24),
+				WarioStatus = rom.ReadByte(header + 25),
 				AnimationSpeed = rom.ReadByte(header + 26),
 				Palette = rom.ReadByte(header + 27),
 				Enemy = rom.ReadWord(header + 28),
@@ -51,6 +52,7 @@ namespace WLEditor
 			rom.WriteWordSwap(header + 21, (ushort)(warp.CameraX * 8));
 			rom.WriteByte(header + 23, (byte)scroll);
 			rom.WriteByte(header + 24, (byte)warp.CameraType);
+			rom.WriteByte(header + 25, (byte)warp.WarioStatus);
 			rom.WriteByte(header + 26, (byte)warp.AnimationSpeed);
 			rom.WriteByte(header + 27, (byte)warp.Palette);
 			rom.WriteWord(header + 28, (ushort)warp.Enemy);

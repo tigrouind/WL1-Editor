@@ -75,8 +75,11 @@ namespace WLEditor
 			this.labMusic = new System.Windows.Forms.Label();
 			this.ddlMusic = new System.Windows.Forms.ComboBox();
 			this.grpCamera = new System.Windows.Forms.GroupBox();
+			this.labWarioStatus = new System.Windows.Forms.Label();
+			this.ddlWarioStatus = new System.Windows.Forms.ComboBox();
 			this.grpTileset = new System.Windows.Forms.GroupBox();
 			this.panelMusic = new System.Windows.Forms.Panel();
+			this.ddlWarioAttributes = new System.Windows.Forms.ComboBox();
 			this.panelWarp = new System.Windows.Forms.Panel();
 			this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
 			((System.ComponentModel.ISupportInitialize)(this.txbCameraX)).BeginInit();
@@ -93,7 +96,7 @@ namespace WLEditor
 			// labWarp
 			// 
 			this.labWarp.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.labWarp.Location = new System.Drawing.Point(28, 30);
+			this.labWarp.Location = new System.Drawing.Point(28, 28);
 			this.labWarp.Name = "labWarp";
 			this.labWarp.Size = new System.Drawing.Size(48, 20);
 			this.labWarp.TabIndex = 4;
@@ -343,13 +346,32 @@ namespace WLEditor
 			this.grpCamera.Controls.Add(this.txbWarioX);
 			this.grpCamera.Controls.Add(this.ddlCameraType);
 			this.grpCamera.Controls.Add(this.cmdCalculatePos);
-			this.grpCamera.Location = new System.Drawing.Point(0, 215);
+			this.grpCamera.Location = new System.Drawing.Point(0, 243);
 			this.grpCamera.Margin = new System.Windows.Forms.Padding(0);
 			this.grpCamera.Name = "grpCamera";
 			this.grpCamera.Padding = new System.Windows.Forms.Padding(0);
 			this.grpCamera.Size = new System.Drawing.Size(383, 106);
 			this.grpCamera.TabIndex = 3;
 			this.grpCamera.TabStop = false;
+			// 
+			// labWarioStatus
+			// 
+			this.labWarioStatus.Location = new System.Drawing.Point(11, 33);
+			this.labWarioStatus.Name = "labWarioStatus";
+			this.labWarioStatus.Size = new System.Drawing.Size(66, 18);
+			this.labWarioStatus.TabIndex = 30;
+			this.labWarioStatus.Text = "Wario status";
+			this.labWarioStatus.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// ddlWarioStatus
+			// 
+			this.ddlWarioStatus.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.ddlWarioStatus.FormattingEnabled = true;
+			this.ddlWarioStatus.Location = new System.Drawing.Point(82, 32);
+			this.ddlWarioStatus.Name = "ddlWarioStatus";
+			this.ddlWarioStatus.Size = new System.Drawing.Size(144, 21);
+			this.ddlWarioStatus.TabIndex = 29;
+			this.ddlWarioStatus.SelectedIndexChanged += new System.EventHandler(this.DdlWarioStatus_SelectedIndexChanged);
 			// 
 			// grpTileset
 			// 
@@ -362,7 +384,7 @@ namespace WLEditor
 			this.grpTileset.Controls.Add(this.labAnimation);
 			this.grpTileset.Controls.Add(this.ddlEnemies);
 			this.grpTileset.Controls.Add(this.ddlAnimationSpeed);
-			this.grpTileset.Location = new System.Drawing.Point(0, 93);
+			this.grpTileset.Location = new System.Drawing.Point(0, 121);
 			this.grpTileset.Margin = new System.Windows.Forms.Padding(0);
 			this.grpTileset.Name = "grpTileset";
 			this.grpTileset.Padding = new System.Windows.Forms.Padding(0);
@@ -374,12 +396,25 @@ namespace WLEditor
 			// 
 			this.panelMusic.AutoSize = true;
 			this.panelMusic.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			this.panelMusic.Controls.Add(this.ddlWarioAttributes);
+			this.panelMusic.Controls.Add(this.labWarioStatus);
 			this.panelMusic.Controls.Add(this.ddlMusic);
+			this.panelMusic.Controls.Add(this.ddlWarioStatus);
 			this.panelMusic.Controls.Add(this.labMusic);
 			this.panelMusic.Location = new System.Drawing.Point(3, 3);
 			this.panelMusic.Name = "panelMusic";
-			this.panelMusic.Size = new System.Drawing.Size(380, 28);
+			this.panelMusic.Size = new System.Drawing.Size(380, 56);
 			this.panelMusic.TabIndex = 0;
+			// 
+			// ddlWarioAttributes
+			// 
+			this.ddlWarioAttributes.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.ddlWarioAttributes.FormattingEnabled = true;
+			this.ddlWarioAttributes.Location = new System.Drawing.Point(232, 32);
+			this.ddlWarioAttributes.Name = "ddlWarioAttributes";
+			this.ddlWarioAttributes.Size = new System.Drawing.Size(145, 21);
+			this.ddlWarioAttributes.TabIndex = 31;
+			this.ddlWarioAttributes.SelectedIndexChanged += new System.EventHandler(this.DdlWarioAttributes_SelectedIndexChanged);
 			// 
 			// panelWarp
 			// 
@@ -390,7 +425,7 @@ namespace WLEditor
 			this.panelWarp.Controls.Add(this.checkBoxRight);
 			this.panelWarp.Controls.Add(this.labWarp);
 			this.panelWarp.Controls.Add(this.ddlWarp);
-			this.panelWarp.Location = new System.Drawing.Point(3, 37);
+			this.panelWarp.Location = new System.Drawing.Point(3, 65);
 			this.panelWarp.Name = "panelWarp";
 			this.panelWarp.Size = new System.Drawing.Size(380, 53);
 			this.panelWarp.TabIndex = 1;
@@ -406,7 +441,7 @@ namespace WLEditor
 			this.flowLayoutPanel1.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
 			this.flowLayoutPanel1.Location = new System.Drawing.Point(8, 8);
 			this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-			this.flowLayoutPanel1.Size = new System.Drawing.Size(386, 321);
+			this.flowLayoutPanel1.Size = new System.Drawing.Size(386, 349);
 			this.flowLayoutPanel1.TabIndex = 46;
 			// 
 			// SectorForm
@@ -415,7 +450,7 @@ namespace WLEditor
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.AutoSize = true;
 			this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.ClientSize = new System.Drawing.Size(409, 347);
+			this.ClientSize = new System.Drawing.Size(409, 404);
 			this.Controls.Add(this.flowLayoutPanel1);
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
 			this.MaximizeBox = false;
@@ -447,5 +482,8 @@ namespace WLEditor
 		private System.Windows.Forms.Panel panelMusic;
 		private System.Windows.Forms.Panel panelWarp;
 		private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
+		private System.Windows.Forms.Label labWarioStatus;
+		private System.Windows.Forms.ComboBox ddlWarioStatus;
+		private System.Windows.Forms.ComboBox ddlWarioAttributes;
 	}
 }

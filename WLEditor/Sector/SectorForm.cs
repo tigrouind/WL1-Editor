@@ -273,6 +273,19 @@ namespace WLEditor
 			{ 0xFF, "No scroll (boss fight)" }
 		};
 
+		readonly ComboboxItemCollection<int> warioStatus = new ComboboxItemCollection<int>
+		{
+			{ 0x00, "Standing" },
+			{ 0x01, "Swimming" },
+		};
+
+		readonly ComboboxItemCollection<int> warioAttributes = new ComboboxItemCollection<int>
+		{
+			{ 0x00, "Left facing" },
+			{ 0x20, "Right facing" },
+			{ 0xA0, "Behind background" },
+		};
+
 		readonly ComboboxItemCollection<int> warps = new ComboboxItemCollection<int>
 		{
 			{ 0x5B76, "None" },
@@ -368,6 +381,12 @@ namespace WLEditor
 
 				ddlCameraType.Items.Clear();
 				ddlCameraType.Items.AddRange(cameraTypes.ToArray());
+
+				ddlWarioStatus.Items.Clear();
+				ddlWarioStatus.Items.AddRange(warioStatus.ToArray());
+
+				ddlWarioAttributes.Items.Clear();
+				ddlWarioAttributes.Items.AddRange(warioAttributes.ToArray());
 
 				ddlMusic.Items.Clear();
 				ddlMusic.Items.AddRange(music.ToArray());
@@ -556,6 +575,8 @@ namespace WLEditor
 			if (!isWarp)
 			{
 				LoadDropdown(ddlMusic, currentWarp.Music);
+				LoadDropdown(ddlWarioStatus, currentWarp.WarioStatus);
+				LoadDropdown(ddlWarioAttributes, currentWarp.WarioSpriteAttributes);
 			}
 
 			void LoadNumericUpDown(NumericUpDown numericUpDown, int value)
@@ -573,17 +594,17 @@ namespace WLEditor
 			}
 		}
 
-		void LoadDropdown(ComboBox combo, int value)
+		void LoadDropdown<T>(ComboBox combo, T value)
 		{
 			ignoreEvents = true;
-			combo.SelectedIndex = combo.Items.Cast<ComboboxItem<int>>().FindIndex(x => x.Value == value);
+			combo.SelectedIndex = combo.Items.Cast<ComboboxItem<T>>().FindIndex(x => x.Value.Equals(value));
 			ignoreEvents = false;
 		}
 
-		void LoadDropdown(ComboBox combo, int[] value)
+		void LoadDropdown<T>(ComboBox combo, T[] value)
 		{
 			ignoreEvents = true;
-			combo.SelectedIndex = combo.Items.Cast<ComboboxItem<int[]>>().FindIndex(x => x.Value.SequenceEqual(value));
+			combo.SelectedIndex = combo.Items.Cast<ComboboxItem<T[]>>().FindIndex(x => x.Value.SequenceEqual(value));
 			ignoreEvents = false;
 		}
 
@@ -773,6 +794,30 @@ namespace WLEditor
 			{
 				var item = (ComboboxItem<int>)ddlMusic.SelectedItem;
 				currentWarp.Music = item.Value;
+
+				SaveWarp();
+				OnSectorChanged();
+			}
+		}
+
+		void DdlWarioStatus_SelectedIndexChanged(object sender, EventArgs e)
+		{
+			if (!ignoreEvents)
+			{
+				var item = (ComboboxItem<int>)ddlWarioStatus.SelectedItem;
+				currentWarp.WarioStatus = item.Value;
+
+				SaveWarp();
+				OnSectorChanged();
+			}
+		}
+
+		void DdlWarioAttributes_SelectedIndexChanged(object sender, EventArgs e)
+		{
+			if (!ignoreEvents)
+			{
+				var item = (ComboboxItem<int>)ddlWarioAttributes.SelectedItem;
+				currentWarp.WarioSpriteAttributes = item.Value;
 
 				SaveWarp();
 				OnSectorChanged();

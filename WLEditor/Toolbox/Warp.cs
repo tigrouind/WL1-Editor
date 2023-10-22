@@ -13,6 +13,7 @@
 		public int WarioX;
 		public int WarioY;
 		public int WarioSpriteAttributes;
+		public int WarioStatus;
 		public int CameraX;
 		public int CameraY;
 		public int CameraType;
