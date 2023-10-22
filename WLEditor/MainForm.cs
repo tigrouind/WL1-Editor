@@ -746,8 +746,11 @@ namespace WLEditor
 					switch (toolboxForm.SelectedPanelIndex)
 					{
 						case 0: //16x16 tiles
+							toolboxForm.Tiles16x16.Invalidate();
+							break;
+
 						case 1: //8x8 tiles
-							toolboxForm.Invalidate(true);
+							toolboxForm.Tiles8x8.Invalidate();
 							break;
 					}
 				}

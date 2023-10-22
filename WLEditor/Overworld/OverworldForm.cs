@@ -759,7 +759,7 @@ namespace WLEditor
 				if (previousTile != newTile)
 				{
 					changes.Add(new SelectionChange { X = x, Y = y, Data = previousTile });
-					pictureBox1.Invalidate();
+					pictureBox1.Invalidate(new Rectangle(x * 8 * zoom, y * 8 * zoom, 8 * zoom, 8 * zoom));
 					SetChanges(eventMode ? ChangeEnum.Event : ChangeEnum.Tile);
 				}
 			}
@@ -823,21 +823,12 @@ namespace WLEditor
 			{
 				if (e.Status == TileEventStatus.MouseDown)
 				{
-					InvalidateCurrentTile();
 					selectedTile = e.TileX + e.TileY * 16;
-					InvalidateCurrentTile();
+					pictureBox2.Invalidate();
 				}
 			}
 
 			UpdateSelection(e, false);
-
-			void InvalidateCurrentTile()
-			{
-				if (selectedTile != -1)
-				{
-					pictureBox2.Invalidate(new Rectangle((selectedTile % 16) * 8 * zoom, (selectedTile / 16) * 8 * zoom, 8 * zoom, 8 * zoom));
-				}
-			}
 		}
 
 		void PictureBox2MouseMove(object sender, MouseEventArgs e)

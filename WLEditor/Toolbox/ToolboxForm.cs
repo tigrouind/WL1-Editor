@@ -85,6 +85,14 @@ namespace WLEditor
 			}
 		}
 
+		public Tiles8x8PictureBox Tiles8x8
+		{
+			get
+			{
+				return tiles8x8PictureBox;
+			}
+		}
+
 		public ObjectsPictureBox Objects
 		{
 			get
