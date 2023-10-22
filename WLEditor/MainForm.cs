@@ -175,20 +175,9 @@ namespace WLEditor
 
 			void LevelPictureBoxTileMouseMove(object sender, TileEventArgs e)
 			{
-				int data = 0;
-				if (levelPictureBox.ShowObjects)
-				{
-					data = Level.ObjectsData[e.TileX + e.TileY * 256];
-				}
-
-				if (data == 0)
-				{
-					data = Level.LevelData[e.TileX + e.TileY * 256 + 0x1000];
-				}
-
 				byte tileIndex = Level.LevelData[e.TileX + e.TileY * 256 + 0x1000];
 				var tileInfo = Level.GetTileInfo(tileIndex, levelPictureBox.SwitchType);
-				toolStripStatusLabel1.Text = string.Format($"{e.TileX}:{e.TileY} - {data:X2} {tileInfo.Text}");
+				toolStripStatusLabel1.Text = string.Format($"{e.TileX}:{e.TileY} - {tileIndex:X2} {tileInfo.Text}");
 			}
 
 			void LevelPictureBoxTileMouseDown(object sender, TileEventArgs e)
@@ -383,7 +372,6 @@ namespace WLEditor
 		void ObjectsToolStripMenuItemClick(object sender, EventArgs e)
 		{
 			levelPictureBox.ShowObjects = objectsToolStripMenuItem.Checked;
-			levelPictureBox.RaiseTileMoveEvent(); //refresh status bar
 			levelPictureBox.Invalidate();
 		}
 
