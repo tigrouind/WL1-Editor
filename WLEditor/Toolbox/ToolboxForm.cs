@@ -7,7 +7,6 @@ namespace WLEditor
 	public partial class ToolboxForm : Form
 	{
 		public event EventHandler<KeyEventArgs> ProcessCommandKey;
-		public int SwitchType;
 
 		public ToolboxForm()
 		{
@@ -97,7 +96,7 @@ namespace WLEditor
 		void ToolBoxTile16x16MouseMove(object sender, TileEventArgs e)
 		{
 			byte tileIndex = (byte)(e.TileX + e.TileY * 8);
-			var tileInfo = Level.GetTileInfo(tileIndex, SwitchType);
+			var tileInfo = Level.GetTileInfo(tileIndex);
 			toolStripStatusLabel1.Text = string.Format($"{tileIndex:X2} {tileInfo.Text}");
 			statusStrip1.Visible = true;
 		}

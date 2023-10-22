@@ -20,6 +20,11 @@ namespace WLEditor
 		public static int AnimatedTilesMask;
 		public static bool WarioRightFacing;
 
+		public static bool ShowColliders = true;
+		public static bool ShowCollectibles = true;
+		public static int SwitchMode;
+		public static int SwitchType;
+
 		public readonly static DirectBitmap Tiles8x8 = new DirectBitmap(16 * 8, 8 * 8);
 		public readonly static DirectBitmap Tiles16x16 = new DirectBitmap(16 * 8, 16 * 16);
 
@@ -175,8 +180,7 @@ namespace WLEditor
 			RLEDecompressObjects(rom, objectsPosition, ObjectsData);
 		}
 
-		public static void DumpLevel(Rom rom, int course, int warp, int switchMode, int animatedTileIndex,
-			bool reloadAnimatedTilesOnly, bool showCollectible, bool showColliders, int switchType)
+		public static void DumpLevel(Rom rom, int course, int warp, int animatedTileIndex,bool reloadAnimatedTilesOnly)
 		{
 			int tilebank;
 			int tileaddressB;
@@ -287,7 +291,7 @@ namespace WLEditor
 						for (int x = 0; x < 8; x++)
 						{
 							byte tileIndex = (byte)(x + y * 8);
-							tileIndex = ReplaceTile(tileIndex, switchMode, showCollectible);
+							tileIndex = ReplaceTile(tileIndex);
 							DumpAnimated16x16Tile(x, y, tileIndex);
 						}
 					}
@@ -304,9 +308,9 @@ namespace WLEditor
 									Point dest = new Point(j * 8 + x * 16, k * 8 + y * 16);
 									Dump8x8Tile(dest, subTileIndex, defaultColor);
 
-									if (showColliders)
+									if (ShowColliders)
 									{
-										int specialTile = GetTileInfo(tileIndex, switchType).Type;
+										int specialTile = GetTileInfo(tileIndex).Type;
 										if (specialTile != -1)
 										{
 											g.FillRectangle(LevelPictureBox.TransparentBrushes[specialTile], new Rectangle(dest, new Size(8, 8)));
@@ -328,7 +332,7 @@ namespace WLEditor
 						for (int x = 0; x < 8; x++)
 						{
 							byte tileIndex = (byte)(x + y * 8);
-							byte newTileIndex = ReplaceTile(tileIndex, switchMode, showCollectible);
+							byte newTileIndex = ReplaceTile(tileIndex);
 
 							bool isAnimatedTile = Dump16x16Tile(x, y, newTileIndex);
 							Animated16x16Tiles[tileIndex] = isAnimatedTile;
@@ -344,9 +348,9 @@ namespace WLEditor
 							{
 								byte subTileIndex = rom.ReadByte(tileindexaddress + tileIndex * 4 + k * 2 + j);
 
-								if ((switchMode == 2 && tileIndex == 0x32)
-									|| (switchMode == 1 && tileIndex == 0x39)
-									|| (switchMode == 3 && tileIndex == 0x38)) //[!] block
+								if ((SwitchMode == 2 && tileIndex == 0x32)
+									|| (SwitchMode == 1 && tileIndex == 0x39)
+									|| (SwitchMode == 3 && tileIndex == 0x38)) //[!] block
 								{
 									subTileIndex = (byte)(4 + k * 2 + j);
 								}
@@ -360,9 +364,9 @@ namespace WLEditor
 							}
 						}
 
-						if (showColliders)
+						if (ShowColliders)
 						{
-							int specialTile = GetTileInfo(tileIndex, switchType).Type;
+							int specialTile = GetTileInfo(tileIndex).Type;
 							if (specialTile != -1)
 							{
 								g.FillRectangle(LevelPictureBox.TransparentBrushes[specialTile], new Rectangle(x * 16, y * 16, 16, 16));
@@ -495,9 +499,9 @@ namespace WLEditor
 			return courseIdToNo;
 		}
 
-		public static (int Type, string Text) GetTileInfo(byte tileIndex, int switchType)
+		public static (int Type, string Text) GetTileInfo(byte tileIndex)
 		{
-			if ((switchType & 1) != 0)
+			if ((SwitchType & 1) != 0)
 			{
 				switch (tileIndex)
 				{
@@ -510,7 +514,7 @@ namespace WLEditor
 				}
 			}
 
-			if ((switchType & 2) != 0)
+			if ((SwitchType & 2) != 0)
 			{
 				switch (tileIndex)
 				{
@@ -527,131 +531,131 @@ namespace WLEditor
 			return tileInfo[tileIndex];
 		}
 
-		public static byte ReplaceTile(byte tileData, int switchMode, bool showCollectible)
+		static byte ReplaceTile(byte tileIndex)
 		{
-			if (!showCollectible)
+			if (!ShowCollectibles)
 			{
-				tileData = RemoveCollectible(tileData);
+				tileIndex = RemoveCollectible();
 			}
 
-			tileData = SwitchTile(tileData, switchMode);
-
-			return tileData;
-		}
-
-		//replace tiles when a (!) block is hit
-		static byte SwitchTile(byte tileData, int switchMode)
-		{
-			switch (switchMode)
-			{
-				case 1:
-					switch (tileData)
-					{
-						case 0x7C:
-							return 0x27;
-
-						case 0x27:
-							return 0x7C;
-
-						case 0x7A:
-							return 0x44;
-
-						case 0x79:
-							return 0x45;
-					}
-					break;
-				case 2:
-					switch (tileData)
-					{
-						case 0x7C:
-							return 0x55;
-
-						case 0x55:
-							return 0x7C;
-
-						case 0x7A:
-							return 0x7B;
-
-						case 0x7B:
-							return 0x7A;
-
-						case 0x59:
-							return 0x5D;
-
-						case 0x5D:
-							return 0x59;
-					}
-					break;
-			}
-
-			return tileData;
-		}
-
-		static byte RemoveCollectible(byte tileIndex)
-		{
-			switch (tileIndex)
-			{
-				case 0x29: //block
-				case 0x2A: //block
-				case 0x46: //coin
-					case 0x33: //platform
-					return 0x7F;
-
-				case 0x2B: //block
-				case 0x2C: //block
-				case 0x47: //coin
-					return 0x7E;
-
-				case 0x2E: //block with door
-					return 0x48;
-
-				case 0x2D: //block with door
-					return 0x7D;
-
-				case 0x37: //bonus
-				case 0x49: //bonus (hidden)
-				case 0x28: //bonus (hidden)
-					case 0x4A: //bonus (hidden water)
-					return 0x3C;
-
-				case 0x51: //block (water)
-				case 0x50: //block (water)
-				case 0x53: //coin (water)
-					return 0x58;
-
-				case 0x52: //block with door (water)
-					return 0x5B;
-
-				case 0x54: //block with door (water)
-					return 0x4B;
-			}
+			tileIndex = SwitchTile();
 
 			return tileIndex;
+
+			//replace tiles when a (!) block is hit
+			byte SwitchTile()
+			{
+				switch (SwitchMode)
+				{
+					case 1:
+						switch (tileIndex)
+						{
+							case 0x7C:
+								return 0x27;
+
+							case 0x27:
+								return 0x7C;
+
+							case 0x7A:
+								return 0x44;
+
+							case 0x79:
+								return 0x45;
+						}
+						break;
+					case 2:
+						switch (tileIndex)
+						{
+							case 0x7C:
+								return 0x55;
+
+							case 0x55:
+								return 0x7C;
+
+							case 0x7A:
+								return 0x7B;
+
+							case 0x7B:
+								return 0x7A;
+
+							case 0x59:
+								return 0x5D;
+
+							case 0x5D:
+								return 0x59;
+						}
+						break;
+				}
+
+				return tileIndex;
+			}
+
+			byte RemoveCollectible()
+			{
+				switch (tileIndex)
+				{
+					case 0x29: //block
+					case 0x2A: //block
+					case 0x46: //coin
+					case 0x33: //platform
+						return 0x7F;
+
+					case 0x2B: //block
+					case 0x2C: //block
+					case 0x47: //coin
+						return 0x7E;
+
+					case 0x2E: //block with door
+						return 0x48;
+
+					case 0x2D: //block with door
+						return 0x7D;
+
+					case 0x37: //bonus
+					case 0x49: //bonus (hidden)
+					case 0x28: //bonus (hidden)
+					case 0x4A: //bonus (hidden water)
+						return 0x3C;
+
+					case 0x51: //block (water)
+					case 0x50: //block (water)
+					case 0x53: //coin (water)
+						return 0x58;
+
+					case 0x52: //block with door (water)
+						return 0x5B;
+
+					case 0x54: //block with door (water)
+						return 0x4B;
+				}
+
+				return tileIndex;
+			}
 		}
 
 		public static int GetSwitchType()
 		{
-			int switchMode = 0;
+			int result = 0;
 			for (int tileIndex = 0; tileIndex < 8192; tileIndex++)
 			{
 				byte data = LevelData[tileIndex + 0x1000];
 				switch (data)
 				{
 					case 0x39:
-						switchMode |= 1;
+						result |= 1;
 						break;
 
 					case 0x32:
-						switchMode |= 2;
+						result |= 2;
 						break;
 
 					case 0x38:
-						switchMode |= 4;
+						result |= 4;
 						break;
 				}
 			}
 
-			return switchMode;
+			return result;
 		}
 
 		public static int GetEmptyTile(uint[] bitmap, int tileSize, int tileWidth)

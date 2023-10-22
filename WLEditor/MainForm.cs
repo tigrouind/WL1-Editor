@@ -176,7 +176,7 @@ namespace WLEditor
 			void LevelPictureBoxTileMouseMove(object sender, TileEventArgs e)
 			{
 				byte tileIndex = Level.LevelData[e.TileX + e.TileY * 256 + 0x1000];
-				var tileInfo = Level.GetTileInfo(tileIndex, levelPictureBox.SwitchType);
+				var tileInfo = Level.GetTileInfo(tileIndex);
 				toolStripStatusLabel1.Text = string.Format($"{e.TileX}:{e.TileY} - {tileIndex:X2} {tileInfo.Text}");
 			}
 
@@ -265,8 +265,7 @@ namespace WLEditor
 		{
 			if (rom.IsLoaded && levelComboBox.SelectedItem != null)
 			{
-				Level.DumpLevel(rom, currentCourseId, currentWarp, levelPictureBox.SwitchMode, animatedTileIndex, false,
-					levelPictureBox.ShowCollectibles, levelPictureBox.ShowColliders, levelPictureBox.SwitchType);
+				Level.DumpLevel(rom, currentCourseId, currentWarp, animatedTileIndex, false);
 
 				levelPictureBox.ClearTileCache();
 				levelPictureBox.Invalidate();
@@ -390,23 +389,22 @@ namespace WLEditor
 		void CollidersToolStripMenuItemClick(object sender, EventArgs e)
 		{
 			bool value = collidersToolStripMenuItem.Checked;
-			levelPictureBox.ShowColliders = value;
+			Level.ShowColliders = value;
 			LoadLevel();
 		}
 
 		void CollectiblesToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			bool value = collectiblesToolStripMenuItem.Checked;
-			levelPictureBox.ShowCollectibles = value;
+			Level.ShowCollectibles = value;
 			LoadLevel();
 		}
 
 		bool SetSwitchType(int value)
 		{
-			if (levelPictureBox.SwitchType != value)
+			if (Level.SwitchType != value)
 			{
-				levelPictureBox.SwitchType = value;
-				toolboxForm.SwitchType = value;
+				Level.SwitchType = value;
 				return true;
 			}
 
@@ -415,9 +413,9 @@ namespace WLEditor
 
 		bool SetSwitchMode(int value)
 		{
-			if (levelPictureBox.SwitchMode != value)
+			if (Level.SwitchMode != value)
 			{
-				levelPictureBox.SwitchMode = value;
+				Level.SwitchMode = value;
 				return true;
 			}
 
@@ -598,7 +596,7 @@ namespace WLEditor
 
 				case Keys.B:
 					int typeOfSwitch = Level.GetSwitchType();
-					if (SetSwitchMode(GetNextSwitchMode(levelPictureBox.SwitchMode, typeOfSwitch)) | SetSwitchType(typeOfSwitch))
+					if (SetSwitchMode(GetNextSwitchMode(Level.SwitchMode, typeOfSwitch)) | SetSwitchType(typeOfSwitch))
 					{
 						LoadLevel();
 					}
@@ -739,8 +737,7 @@ namespace WLEditor
 
 			void RefreshAnimatedTiles()
 			{
-				Level.DumpLevel(rom, currentCourseId, currentWarp, levelPictureBox.SwitchMode, animatedTileIndex, true,
-					levelPictureBox.ShowCollectibles, levelPictureBox.ShowColliders, levelPictureBox.SwitchType);
+				Level.DumpLevel(rom, currentCourseId, currentWarp, animatedTileIndex, true);
 
 				//redraw
 				levelPictureBox.InvalidateAnimatedTiles();
