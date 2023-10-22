@@ -186,7 +186,7 @@ namespace WLEditor
 					data = Level.LevelData[e.TileX + e.TileY * 256 + 0x1000];
 				}
 
-				int tileIndex = Level.LevelData[e.TileX + e.TileY * 256 + 0x1000];
+				byte tileIndex = Level.LevelData[e.TileX + e.TileY * 256 + 0x1000];
 				var tileInfo = Level.GetTileInfo(tileIndex, levelPictureBox.SwitchType);
 				toolStripStatusLabel1.Text = string.Format($"{e.TileX}:{e.TileY} - {data:X2} {tileInfo.Text}");
 			}
@@ -399,12 +399,10 @@ namespace WLEditor
 
 		void CollidersToolStripMenuItemClick(object sender, EventArgs e)
 		{
-			bool showColliders = collidersToolStripMenuItem.Checked;
-			levelPictureBox.ShowColliders = showColliders;
-			levelPictureBox.ClearTileCache();
-			levelPictureBox.Invalidate();
-			toolboxForm.Tiles16x16.ShowColliders = showColliders;
-			toolboxForm.Invalidate(true);
+			bool value = collidersToolStripMenuItem.Checked;
+			levelPictureBox.ShowColliders = value;
+			toolboxForm.Tiles16x16.ShowColliders = value;
+			LoadLevel(false);
 		}
 
 		void CollectiblesToolStripMenuItem_Click(object sender, EventArgs e)

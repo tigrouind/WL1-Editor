@@ -453,7 +453,7 @@ namespace WLEditor
 			return courseIdToNo;
 		}
 
-		public static (int Type, string Text) GetTileInfo(int tileIndex, int switchType)
+		public static (int Type, string Text) GetTileInfo(byte tileIndex, int switchType)
 		{
 			if ((switchType & 1) != 0)
 			{
