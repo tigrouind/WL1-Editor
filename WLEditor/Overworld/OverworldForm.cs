@@ -912,35 +912,35 @@ namespace WLEditor
 
 		#region Animation
 
-		readonly int[,] animationSea =
+		readonly (int Address, int Position)[] animationSea =
 		{
-			{ 0x5B18, 208 },
-			{ 0x5B49, 209 },
-			{ 0x5B7A, 224 },
-			{ 0x5BAB, 225 },
-			{ 0x5BDC, 226 },
-			{ 0x5C0D, 240 },
-			{ 0x5C3E, 241 },
-			{ 0x5C6F, 242 },
-			{ 0x5CA0, 243 },
-			{ 0x5CD1, 244 }
+			( 0x5B18, 208 ),
+			( 0x5B49, 209 ),
+			( 0x5B7A, 224 ),
+			( 0x5BAB, 225 ),
+			( 0x5BDC, 226 ),
+			( 0x5C0D, 240 ),
+			( 0x5C3E, 241 ),
+			( 0x5C6F, 242 ),
+			( 0x5CA0, 243 ),
+			( 0x5CD1, 244 )
 		};
 
-		readonly int[,,] animationLava =
+		readonly (int Address, int Position)[,] animationLava =
 		{
-			{ { 0x5222, 218 }, { 0x5242, 202 }, { 0x5252, 203 }, { 0x5232, 219 } },
-			{ { 0x5232, 218 }, { 0x5252, 202 }, { 0x5242, 203 }, { 0x5222, 219 } },
+			{ ( 0x5222, 218 ), ( 0x5242, 202 ), ( 0x5252, 203 ), ( 0x5232, 219 ) },
+			{ ( 0x5232, 218 ), ( 0x5252, 202 ), ( 0x5242, 203 ), ( 0x5222, 219 ) },
 		};
 
-		readonly int[,,] animationWater =
+		readonly (int Address, int Position)[,] animationWater =
 		{
-			{ { 0x518D, 53 }, { 0x519D, 54 } },
-			{ { 0x519D, 53 }, { 0x518D, 54 } },
+			{ ( 0x518D, 53 ), ( 0x519D, 54 ) },
+			{ ( 0x519D, 53 ), ( 0x518D, 54 ) },
 		};
 
-		readonly int[,] animationOverworld =
+		readonly (int Address, int Position)[] animationOverworld =
 		{
-			{ 0x46F6, 42 }
+			( 0x46F6, 42 )
 		};
 
 		public void TimerTick()
@@ -1011,8 +1011,8 @@ namespace WLEditor
 				case 1:
 					for (int i = 0; i < animationSea.GetLength(0); i++)
 					{
-						Overworld.DumpAnimatedTilesA(rom, animationSea[i, 0], animationSea[i, 1], tilesWorld8x8, animationIndex % 6, 6);
-						invalidTiles[animationSea[i, 1]] = true;
+						Overworld.DumpAnimatedTilesA(rom, animationSea[i].Address, animationSea[i].Position, tilesWorld8x8, animationIndex % 6, 6);
+						invalidTiles[animationSea[i].Position] = true;
 					}
 					break;
 
@@ -1021,8 +1021,8 @@ namespace WLEditor
 						int index = animationIndex % 2;
 						for (int i = 0; i < animationLava.GetLength(1); i++)
 						{
-							Overworld.DumpAnimatedTilesB(rom, animationLava[index, i, 0], animationLava[index, i, 1], tilesWorld8x8);
-							invalidTiles[animationLava[index, i, 1]] = true;
+							Overworld.DumpAnimatedTilesB(rom, animationLava[index, i].Address, animationLava[index, i].Position, tilesWorld8x8);
+							invalidTiles[animationLava[index, i].Position] = true;
 						}
 						break;
 					}
@@ -1032,15 +1032,15 @@ namespace WLEditor
 						int index = animationIndex % 2;
 						for (int i = 0; i < animationWater.GetLength(1); i++)
 						{
-							Overworld.DumpAnimatedTilesB(rom, animationWater[index, i, 0], animationWater[index, i, 1], tilesWorld8x8);
-							invalidTiles[animationWater[index, i, 1]] = true;
+							Overworld.DumpAnimatedTilesB(rom, animationWater[index, i].Address, animationWater[index, i].Position, tilesWorld8x8);
+							invalidTiles[animationWater[index, i].Position] = true;
 						}
 						break;
 					}
 
 				case 8:
-					Overworld.DumpAnimatedTilesA(rom, animationOverworld[0, 0], animationOverworld[0, 1], tilesWorld8x8, animationIndex % 8, 8);
-					invalidTiles[animationOverworld[0, 1]] = true;
+					Overworld.DumpAnimatedTilesA(rom, animationOverworld[0].Address, animationOverworld[0].Position, tilesWorld8x8, animationIndex % 8, 8);
+					invalidTiles[animationOverworld[0].Position] = true;
 					break;
 			}
 		}
