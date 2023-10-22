@@ -62,7 +62,7 @@ namespace WLEditor
 					format.Alignment = StringAlignment.Center;
 
 					//draw tiles to cache
-					DrawTiles(g);
+					DrawTiles();
 
 					//draw tiles from cache
 					e.Graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
@@ -147,7 +147,7 @@ namespace WLEditor
 				}
 			}
 
-			void DrawTiles(Graphics g)
+			void DrawTiles()
 			{
 				var clipRectangle = GetClipRectangle(e.ClipRectangle, 16 * zoom);
 
@@ -159,18 +159,6 @@ namespace WLEditor
 						{
 							invalidTiles[i + j * 256] = true;
 							DrawTileToBitmap(i, j);
-
-							if (ShowColliders)
-							{
-								byte tileIndex = Level.LevelData[i + j * 256 + 0x1000];
-								tileIndex = Level.ReplaceTile(tileIndex, 0, ShowCollectibles);
-
-								int specialTile = Level.GetTileInfo(tileIndex, SwitchType).Type;
-								if (specialTile != -1)
-								{
-									g.FillRectangle(TransparentBrushes[specialTile], new Rectangle(i * 16, j * 16, 16, 16));
-								}
-							}
 						}
 					}
 				}

@@ -8,67 +8,23 @@ namespace WLEditor
 	public class Tiles16x16PictureBox : PictureBox
 	{
 		public int CurrentTile;
-		public bool ShowColliders = true;
-		public bool ShowCollectibles = true;
-		public int SwitchType;
-		public int SwitchMode;
 		public event EventHandler<TileEventArgs> TileMouseMove;
 		public event EventHandler TileMouseLeave;
 
 		int lastTile;
-		readonly DirectBitmap tiles = new DirectBitmap(128, 256);
 		int zoom;
 
 		protected override void OnPaint(PaintEventArgs e)
 		{
 			if (Level.LevelData != null && !DesignMode)
 			{
-				using (Graphics g = Graphics.FromImage(tiles.Bitmap))
-				{
-					g.DrawImage(Level.Tiles16x16.Bitmap, 0, 0, 128, 256);
-
-					if (ShowColliders)
-					{
-						DrawTiles(g, e.ClipRectangle);
-					}
-
-					e.Graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
-					e.Graphics.PixelOffsetMode = PixelOffsetMode.Half;
-					e.Graphics.DrawImage(tiles.Bitmap, 0, 0, 128 * zoom, 256 * zoom);
-				}
+				e.Graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
+				e.Graphics.PixelOffsetMode = PixelOffsetMode.Half;
+				e.Graphics.DrawImage(Level.Tiles16x16.Bitmap, 0, 0, 128 * zoom, 256 * zoom);
 
 				using (Brush brush = new SolidBrush(Color.FromArgb(128, 255, 0, 0)))
 				{
 					e.Graphics.FillRectangle(brush, (CurrentTile % 8) * 16 * zoom, (CurrentTile / 8) * 16 * zoom, 16 * zoom, 16 * zoom);
-				}
-
-				void DrawTiles(Graphics g, Rectangle clipRectangle)
-				{
-					using (Brush brush = new SolidBrush(Color.FromArgb(64, 0, 0, 0)))
-					{
-						for (int j = 0; j < 16; j++)
-						{
-							for (int i = 0; i < 8; i++)
-							{
-								Rectangle destRect = new Rectangle(i * 16, j * 16, 16, 16);
-
-								if (destRect.IntersectsWith(clipRectangle))
-								{
-									byte tileIndex = (byte)(i + j * 8);
-									tileIndex = Level.ReplaceTile(tileIndex, 0, ShowCollectibles);
-
-									if (ShowColliders)
-									{
-										int specialTile = Level.GetTileInfo(tileIndex, SwitchType).Type;
-										if (specialTile != -1)
-										{
-											g.FillRectangle(LevelPictureBox.TransparentBrushes[specialTile], destRect);
-										}
-									}
-								}
-							}
-						}
-					}
 				}
 			}
 		}

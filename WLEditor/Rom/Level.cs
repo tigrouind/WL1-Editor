@@ -155,7 +155,28 @@ namespace WLEditor
 			(-1, "")
 		};
 
-		public static void DumpLevel(Rom rom, int course, int warp, bool reloadAll, int switchMode, int animatedTileIndex, bool reloadAnimatedTilesOnly, bool showCollectible)
+		public static void DumpBlocks(Rom rom, int course)
+		{
+			rom.SetBank(0xC);
+			int header = rom.ReadWord(0x4560 + course * 2);
+
+			//dump 16x16 blocks
+			rom.SetBank(0xC);
+			int blockbank = rom.ReadByte(header + 9);
+			int blockubbank = rom.ReadByte(header + 10);
+
+			rom.SetBank(blockbank);
+			int tilesdata = rom.ReadWord(0x4000 + blockubbank * 2);
+			RLEDecompressTiles(rom, tilesdata, LevelData);
+
+			//dump objects
+			rom.SetBank(0x7);
+			int objectsPosition = rom.ReadWord(0x4199 + course * 2);
+			RLEDecompressObjects(rom, objectsPosition, ObjectsData);
+		}
+
+		public static void DumpLevel(Rom rom, int course, int warp, int switchMode, int animatedTileIndex,
+			bool reloadAnimatedTilesOnly, bool showCollectible, bool showColliders, int switchType)
 		{
 			int tilebank;
 			int tileaddressB;
@@ -257,39 +278,40 @@ namespace WLEditor
 				Dump16x16Tiles(blockindex, paletteColors[0]);
 			}
 
-			if (reloadAll)
-			{
-				//dump 16x16 blocks
-				rom.SetBank(0xC);
-				int blockbank = rom.ReadByte(header + 9);
-				int blockubbank = rom.ReadByte(header + 10);
-
-				rom.SetBank(blockbank);
-				int tilesdata = rom.ReadWord(0x4000 + blockubbank * 2);
-				RLEDecompressTiles(rom, tilesdata, LevelData);
-
-				//dump objects
-				rom.SetBank(0x7);
-				int objectsPosition = rom.ReadWord(0x4199 + course * 2);
-				RLEDecompressObjects(rom, objectsPosition, ObjectsData);
-			}
-
 			void DumpAnimated16x16Tiles(uint defaultColor)
 			{
-				int m = 0;
-				for (int n = 0; n < 16; n++)
+				using (Graphics g = Graphics.FromImage(Tiles16x16.Bitmap))
 				{
-					for (int i = 0; i < 8; i++)
+					for (int y = 0; y < 16; y++)
+					{
+						for (int x = 0; x < 8; x++)
+						{
+							byte tileIndex = (byte)(x + y * 8);
+							tileIndex = ReplaceTile(tileIndex, switchMode, showCollectible);
+							DumpAnimated16x16Tile(x, y, tileIndex);
+						}
+					}
+
+					void DumpAnimated16x16Tile(int x, int y, byte tileIndex)
 					{
 						for (int k = 0; k < 2; k++)
 						{
 							for (int j = 0; j < 2; j++)
 							{
-								int subTileIndex = animated8x8Tiles[m++];
+								int subTileIndex = animated8x8Tiles[(x + y * 8) * 4 + k * 2 + j];
 								if (subTileIndex != -1)
 								{
-									Point dest = new Point(j * 8 + i * 16, k * 8 + n * 16);
+									Point dest = new Point(j * 8 + x * 16, k * 8 + y * 16);
 									Dump8x8Tile(dest, subTileIndex, defaultColor);
+
+									if (showColliders)
+									{
+										int specialTile = GetTileInfo(tileIndex, switchType).Type;
+										if (specialTile != -1)
+										{
+											g.FillRectangle(LevelPictureBox.TransparentBrushes[specialTile], new Rectangle(dest, new Size(8, 8)));
+										}
+									}
 								}
 							}
 						}
@@ -299,35 +321,55 @@ namespace WLEditor
 
 			void Dump16x16Tiles(int tileindexaddress, uint defaultColor)
 			{
-				int m = 0;
-				for (int n = 0; n < 16; n++)
+				using (Graphics g = Graphics.FromImage(Tiles16x16.Bitmap))
 				{
-					for (int i = 0; i < 8; i++)
+					for (int y = 0; y < 16; y++)
 					{
-						byte tileIndex = (byte)(i + n * 8);
-						byte newTileIndex = ReplaceTile(tileIndex, switchMode, showCollectible);
+						for (int x = 0; x < 8; x++)
+						{
+							byte tileIndex = (byte)(x + y * 8);
+							byte newTileIndex = ReplaceTile(tileIndex, switchMode, showCollectible);
 
+							bool isAnimatedTile = Dump16x16Tile(x, y, newTileIndex);
+							Animated16x16Tiles[tileIndex] = isAnimatedTile;
+						}
+					}
+
+					bool Dump16x16Tile(int x, int y, byte tileIndex)
+					{
 						bool isAnimatedTile = false;
 						for (int k = 0; k < 2; k++)
 						{
 							for (int j = 0; j < 2; j++)
 							{
-								byte subTileIndex = rom.ReadByte(tileindexaddress + newTileIndex * 4 + k * 2 + j);
-								if ((switchMode == 2 && newTileIndex == 0x32) || (switchMode == 1 && newTileIndex == 0x39) || (switchMode == 3 && newTileIndex == 0x38))
+								byte subTileIndex = rom.ReadByte(tileindexaddress + tileIndex * 4 + k * 2 + j);
+
+								if ((switchMode == 2 && tileIndex == 0x32)
+									|| (switchMode == 1 && tileIndex == 0x39)
+									|| (switchMode == 3 && tileIndex == 0x38)) //[!] block
 								{
 									subTileIndex = (byte)(4 + k * 2 + j);
 								}
 
 								bool isAnimated = subTileIndex >= (2 * 16) && subTileIndex < (2 * 16 + 4);
 								isAnimatedTile |= isAnimated;
-								animated8x8Tiles[m++] = isAnimated ? subTileIndex : -1;
+								animated8x8Tiles[(x + y * 8) * 4 + k * 2 + j] = isAnimated ? subTileIndex : -1;
 
-								Point dest = new Point(j * 8 + i * 16, k * 8 + n * 16);
+								Point dest = new Point(j * 8 + x * 16, k * 8 + y * 16);
 								Dump8x8Tile(dest, subTileIndex, defaultColor);
 							}
 						}
 
-						Animated16x16Tiles[tileIndex] = isAnimatedTile;
+						if (showColliders)
+						{
+							int specialTile = GetTileInfo(tileIndex, switchType).Type;
+							if (specialTile != -1)
+							{
+								g.FillRectangle(LevelPictureBox.TransparentBrushes[specialTile], new Rectangle(x * 16, y * 16, 16, 16));
+							}
+						}
+
+						return isAnimatedTile;
 					}
 				}
 			}
