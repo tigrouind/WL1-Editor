@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace WLEditor
 {
@@ -22,24 +23,27 @@ namespace WLEditor
 				WarioSpriteAttributes = rom.ReadByte(header + 18),
 				CameraY = rom.ReadWordSwap(header + 19) / 8,
 				CameraX = rom.ReadWordSwap(header + 21) / 8,
+				Scroll = rom.ReadByte(header + 23),
 				CameraType = rom.ReadByte(header + 24),
 				WarioStatus = rom.ReadByte(header + 25),
 				AnimationSpeed = rom.ReadByte(header + 26),
 				Palette = rom.ReadByte(header + 27),
-				Enemy = rom.ReadWord(header + 28),
-				Music = rom.ReadWord(0x7E73 + course * 2)
+				Enemy = rom.ReadWord(header + 28)
 			};
 
 			return warp;
+		}
+
+		public static int GetMusic(Rom rom, int course)
+		{
+			rom.SetBank(0xC);
+			return rom.ReadWord(0x7E73 + course * 2);
 		}
 
 		public static void SaveLevelHeader(Rom rom, int course, Warp warp)
 		{
 			rom.SetBank(0xC);
 			int header = rom.ReadWord(0x4560 + course * 2);
-			int warioSector = warp.WarioX / 32 + warp.WarioY / 32 * 16;
-			int scroll = GetScroll(rom, course, warioSector);
-
 			rom.WriteByte(header + 0, (byte)warp.Bank);
 			rom.WriteWord(header + 1, (ushort)warp.TileSetB);
 			rom.WriteWord(header + 3, (ushort)warp.TileSetA);
@@ -50,21 +54,30 @@ namespace WLEditor
 			rom.WriteByte(header + 18, (byte)warp.WarioSpriteAttributes);
 			rom.WriteWordSwap(header + 19, (ushort)(warp.CameraY * 8));
 			rom.WriteWordSwap(header + 21, (ushort)(warp.CameraX * 8));
-			rom.WriteByte(header + 23, (byte)scroll);
+			rom.WriteByte(header + 23, (byte)warp.Scroll);
 			rom.WriteByte(header + 24, (byte)warp.CameraType);
 			rom.WriteByte(header + 25, (byte)warp.WarioStatus);
 			rom.WriteByte(header + 26, (byte)warp.AnimationSpeed);
 			rom.WriteByte(header + 27, (byte)warp.Palette);
 			rom.WriteWord(header + 28, (ushort)warp.Enemy);
-			rom.WriteWord(0x7E73 + course * 2, (ushort)warp.Music);
 		}
 
-		public static int SearchWarp(Rom rom, int course, int sector)
+		public static void SaveMusic(Rom rom, int course, int music)
 		{
+			rom.SetBank(0xC);
+			rom.WriteWord(0x7E73 + course * 2, (ushort)music);
+		}
+
+		public static int SearchWarp(Rom rom, int course, int sector, int treasureId)
+		{
+			if (treasureId != -1)
+			{
+				return GetTreasureWarp(rom, treasureId);
+			}
+
 			if (sector != -1)
 			{
-				rom.SetBank(0xC);
-				int warp = rom.ReadWord(0x4F30 + course * 64 + sector * 2);
+				int warp = GetWarp(rom, course, sector);
 				if (warp >= 0x5B7A)
 				{
 					return warp;
@@ -77,10 +90,9 @@ namespace WLEditor
 		public static int GetSourceSector(Rom rom, int course, int sector)
 		{
 			//search sector that target current sector
-			rom.SetBank(0xC);
 			for (int i = 0; i < 32; i++)
 			{
-				int warp = rom.ReadWord(0x4F30 + course * 64 + i * 2);
+				int warp = GetWarp(rom, course, i);
 				if (warp >= 0x5B7A && rom.ReadByte(warp) == sector)
 				{
 					return i;
@@ -96,13 +108,40 @@ namespace WLEditor
 			return rom.ReadWord(0x4F30 + course * 64 + sector * 2);
 		}
 
+		public static int GetTreasureWarp(Rom rom, int treasureId)
+		{
+			rom.SetBank(0xC);
+			return rom.ReadWord(0x59F0 + treasureId * 2);
+		}
+
+		public static int GetTreasureId(Rom rom, int course, int sector)
+		{
+			int warp = GetWarp(rom, course, sector);
+			if (warp >= 0x5B7A)
+			{
+				int enemyPointer = rom.ReadWord(warp + 22);
+				var enemyInfo = Sprite.FindEnemiesData(rom, enemyPointer);
+
+				if (enemyInfo.treasureID >= 1 && enemyInfo.treasureID <= 15) //treasure opening
+				{
+					var enemyIds = Sprite.GetEnemyIds(rom, enemyInfo.enemyId).ToArray();
+					if (enemyIds.Contains(24))
+					{
+						return enemyInfo.treasureID - 1;
+					}
+				}
+			}
+
+			return -1;
+		}
+
 		public static Warp GetWarp(Rom rom, int warp)
 		{
 			rom.SetBank(0xC);
 
 			Warp warpInfo = new Warp();
 
-			if (warp >= 0x5B7A)
+			if (warp <= 0x5B5E || warp >= 0x5B7A)
 			{
 				int warioSector = rom.ReadByte(warp);
 				int cameraSector = rom.ReadByte(warp + 4);
@@ -131,10 +170,9 @@ namespace WLEditor
 			rom.WriteWord(0x4F30 + course * 64 + sector * 2, (ushort)warp);
 		}
 
-		public static void SaveWarp(Rom rom, int course, int sector, Warp warpInfo)
+		public static void SaveWarp(Rom rom, int warp, Warp warpInfo)
 		{
 			rom.SetBank(0xC);
-			int warp = rom.ReadWord(0x4F30 + course * 64 + sector * 2);
 			rom.WriteByte(warp, (byte)(warpInfo.WarioX / 32 + (warpInfo.WarioY / 32) * 16));
 			rom.WriteByte(warp + 1, (byte)((warpInfo.WarioY % 32) * 8));
 			rom.WriteByte(warp + 2, (byte)((warpInfo.WarioX % 32) * 8));
@@ -178,7 +216,11 @@ namespace WLEditor
 		{
 			rom.SetBank(0xC);
 			rom.WriteByte(0x4000 + course * 32 + sector, (byte)scroll);
+		}
 
+		public static void SaveLevelScroll(Rom rom, int course, int sector, int scroll)
+		{
+			rom.SetBank(0xC);
 			int header = rom.ReadWord(0x4560 + course * 2);
 			int warioSector = rom.ReadWordSwap(header + 15) / 256 + rom.ReadWordSwap(header + 13) / 256 * 16;
 			if (sector == warioSector)
@@ -187,7 +229,36 @@ namespace WLEditor
 			}
 		}
 
-		public static (int posX, int posY) FindDoorInSector(int sector, int warioX, int warioY)
+		public static (int posX, int posY) FindDoor(int sector, int warioX, int warioY)
+		{
+			return FindClosest(sector, warioX, warioY, (px, py) =>
+			{
+				int block = Level.LevelData[px + py * 256 + 0x1000];
+				switch (block)
+				{
+					case 0x2E:
+					case 0x48:
+					case 0x4B:
+					case 0x54:
+						return true;
+
+					default:
+						return false;
+				}
+			});
+		}
+
+		public static (int posX, int posY) FindTreasure(int sector, int warioX, int warioY)
+		{
+			var (posX, posY) = FindClosest(sector, warioX, warioY, (px, py) =>
+			{
+				return Level.ObjectsData[px + py * 256] == 1; //treasure opening
+			});
+
+			return (posX - 1, posY);
+		}
+
+		static (int posX, int posY) FindClosest(int sector, int warioX, int warioY, Func<int, int, bool> predicate)
 		{
 			int startX = (sector % 16) * 16;
 			int startY = (sector / 16) * 16;
@@ -200,23 +271,17 @@ namespace WLEditor
 			{
 				for (int x = 0; x < 16; x++)
 				{
-					int block = Level.LevelData[(x + startX) + (y + startY) * 256 + 0x1000];
-					switch (block)
+					if (predicate(x + startX, y + startY))
 					{
-						case 0x2E:
-						case 0x48:
-						case 0x4B:
-						case 0x54:
-							int dx = (x * 2 - (warioX - 1));
-							int dy = (y * 2 - (warioY - 2));
-							int length = dx * dx + dy * dy;
-							if (length < distance)
-							{
-								distance = length;
-								posX = x;
-								posY = y;
-							}
-							break;
+						int dx = (x * 2 - (warioX - 1));
+						int dy = (y * 2 - (warioY - 2));
+						int length = dx * dx + dy * dy;
+						if (length < distance)
+						{
+							distance = length;
+							posX = x;
+							posY = y;
+						}
 					}
 				}
 			}

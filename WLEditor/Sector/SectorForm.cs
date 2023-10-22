@@ -20,6 +20,7 @@ namespace WLEditor
 		int currentCourseId;
 		Warp currentWarp;
 		int currentSector;
+		int currentTreasureId;
 		int scroll;
 		int zoom;
 		bool ignoreEvents, isWarp;
@@ -439,11 +440,30 @@ namespace WLEditor
 		{
 			flowLayoutPanel1.SuspendLayout();
 
-			panelWarp.Visible = isWarp;
+			panelWarp.Visible = isWarp && currentTreasureId == -1;
 			panelMusic.Visible = !isWarp;
-			grpTileset.Visible = grpCamera.Visible = !isWarp || Sector.GetWarp(rom, currentCourseId, currentSector) >= 0x5B7A;
+			grpTileset.Visible = grpCamera.Visible = !isWarp || Sector.GetWarp(rom, currentCourseId, currentSector) >= 0x5B7A || currentTreasureId != -1;
 
 			flowLayoutPanel1.ResumeLayout();
+		}
+
+		void UpdateTitle()
+		{
+			if (isWarp)
+			{
+				if (currentTreasureId != -1)
+				{
+					Text = string.Format($"Treasure {treasureNames[currentTreasureId]} warp");
+				}
+				else
+				{
+					Text = string.Format($"Sector {currentSector:D2}");
+				}
+			}
+			else
+			{
+				Text = "Level header";
+			}
 		}
 
 		#region Load
@@ -493,10 +513,11 @@ namespace WLEditor
 			}
 		}
 
-		public void LoadSector(int course, int sector)
+		public void LoadSector(int course, int sector, int treasureId)
 		{
 			currentCourseId = course;
 			currentSector = sector;
+			currentTreasureId = treasureId;
 
 			if (Visible)
 			{
@@ -507,7 +528,13 @@ namespace WLEditor
 
 		void LoadSector()
 		{
-			if (currentCourseId != -1 && currentSector != -1)
+			if (currentTreasureId != -1)
+			{
+				int warp = Sector.GetTreasureWarp(rom, currentTreasureId);
+				LoadWarp(warp);
+				LoadScroll();
+			}
+			else if (currentCourseId != -1 && currentSector != -1)
 			{
 				int warp = Sector.GetWarp(rom, currentCourseId, currentSector);
 				LoadWarp(warp);
@@ -516,9 +543,11 @@ namespace WLEditor
 			else if (currentCourseId != -1)
 			{
 				LoadLevel();
+				LoadDropdown(ddlMusic, Sector.GetMusic(rom, currentCourseId));
 			}
 
 			SetControlsVisibility();
+			UpdateTitle();
 
 			void LoadLevel()
 			{
@@ -574,7 +603,6 @@ namespace WLEditor
 
 			if (!isWarp)
 			{
-				LoadDropdown(ddlMusic, currentWarp.Music);
 				LoadDropdown(ddlWarioStatus, currentWarp.WarioStatus);
 				LoadDropdown(ddlWarioAttributes, currentWarp.WarioSpriteAttributes);
 			}
@@ -612,6 +640,7 @@ namespace WLEditor
 				scroll = (scroll & ~0x2) | (checkBoxLeft.Checked ? 0x2 : 0);
 
 				Sector.SaveScroll(rom, currentCourseId, currentSector, scroll);
+				Sector.SaveLevelScroll(rom, currentCourseId, currentSector, scroll);
 				OnSectorChanged();
 			}
 		}
@@ -623,6 +652,7 @@ namespace WLEditor
 				scroll = (scroll & ~0x1) | (checkBoxRight.Checked ? 0x1 : 0);
 
 				Sector.SaveScroll(rom, currentCourseId, currentSector, scroll);
+				Sector.SaveLevelScroll(rom, currentCourseId, currentSector, scroll);
 				OnSectorChanged();
 			}
 		}
@@ -658,6 +688,7 @@ namespace WLEditor
 
 				OnSectorChanged();
 				SetControlsVisibility();
+				UpdateTitle();
 			}
 
 			int GetFreeWarp()
@@ -786,10 +817,7 @@ namespace WLEditor
 			if (!ignoreEvents)
 			{
 				var item = (ComboboxItem<int>)ddlMusic.SelectedItem;
-				currentWarp.Music = item.Value;
-
-				SaveWarp();
-				OnSectorChanged();
+				Sector.SaveMusic(rom, currentCourseId, item.Value);
 			}
 		}
 
@@ -826,10 +854,23 @@ namespace WLEditor
 		{
 			if (isWarp)
 			{
-				Sector.SaveWarp(rom, currentCourseId, currentSector, currentWarp);
+				int warp;
+				if (currentTreasureId != -1)
+				{
+					warp = Sector.GetTreasureWarp(rom, currentTreasureId);
+				}
+				else
+				{
+					warp = Sector.GetWarp(rom, currentCourseId, currentSector);
+				}
+
+				Sector.SaveWarp(rom, warp, currentWarp);
 			}
 			else
 			{
+				int warioSector = currentWarp.WarioX / 32 + currentWarp.WarioY / 32 * 16;
+				currentWarp.Scroll = Sector.GetScroll(rom, currentCourseId, warioSector);
+
 				Sector.SaveLevelHeader(rom, currentCourseId, currentWarp);
 			}
 		}
@@ -854,7 +895,16 @@ namespace WLEditor
 				currentWarp.WarioX = (sector % 16) * 32 + currentWarp.WarioX % 32;
 				currentWarp.WarioY = (sector / 16) * 32 + currentWarp.WarioY % 32;
 
-				var (doorX, doorY) = Sector.FindDoorInSector(sector, currentWarp.WarioX % 32, currentWarp.WarioY % 32);
+				int doorX, doorY;
+				if (currentTreasureId != -1)
+				{
+					(doorX, doorY) = Sector.FindTreasure(sector, currentWarp.WarioX % 32, currentWarp.WarioY % 32);
+				}
+				else
+				{
+					(doorX, doorY) = Sector.FindDoor(sector, currentWarp.WarioX % 32, currentWarp.WarioY % 32);
+				}
+
 				if (doorX != -1 && doorY != -1)
 				{
 					//player position
@@ -871,7 +921,7 @@ namespace WLEditor
 
 				SaveWarp();
 				LoadWarp();
-				SectorChanged(this, EventArgs.Empty);
+				OnSectorChanged();
 			}
 
 		}

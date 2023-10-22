@@ -63,6 +63,7 @@ namespace WLEditor
 
 		int currentCourseId = -1;
 		int currentWarp = -1;
+		int treasureId = -1;
 		int animatedTileIndex;
 		int timerTicks;
 		string romFilePath;
@@ -98,6 +99,14 @@ namespace WLEditor
 
 			void ProcessSubFormCommand(object sender, KeyEventArgs e)
 			{
+				switch (e.KeyData)
+				{
+					case Keys.T: //treasure warp
+						DispatchCommandKey(e.KeyData);
+						e.Handled = true;
+						break;
+				}
+
 				if (DispatchShortcut(e.KeyData))
 				{
 					e.Handled = true;
@@ -109,7 +118,7 @@ namespace WLEditor
 
 			void SectorChanged(object sender, EventArgs e)
 			{
-				currentWarp = Sector.SearchWarp(rom, currentCourseId, levelPictureBox.CurrentSector);
+				currentWarp = Sector.SearchWarp(rom, currentCourseId, levelPictureBox.CurrentSector, treasureId);
 				LoadLevel();
 				SetChanges(true);
 			}
@@ -159,7 +168,8 @@ namespace WLEditor
 
 			void LevelPictureBoxSectorChanged(object sender, EventArgs e)
 			{
-				int warpTarget = Sector.SearchWarp(rom, currentCourseId, levelPictureBox.CurrentSector);
+				treasureId = -1;
+				int warpTarget = Sector.SearchWarp(rom, currentCourseId, levelPictureBox.CurrentSector, treasureId);
 				if (warpTarget != currentWarp)
 				{
 					currentWarp = warpTarget;
@@ -169,7 +179,7 @@ namespace WLEditor
 				{
 					levelPictureBox.Invalidate();
 				}
-				sectorForm.LoadSector(currentCourseId, levelPictureBox.CurrentSector);
+				sectorForm.LoadSector(currentCourseId, levelPictureBox.CurrentSector, treasureId);
 				levelPictureBox.ClearSelection();
 			}
 
@@ -280,6 +290,7 @@ namespace WLEditor
 			{
 				if (SaveChanges(false))
 				{
+					treasureId = -1;
 					currentWarp = -1;
 					levelPictureBox.CurrentSector = -1;
 					var item = (ComboboxItem<int>)levelComboBox.SelectedItem;
@@ -288,7 +299,7 @@ namespace WLEditor
 					SetSwitchMode(0);
 					SetSwitchType(Level.GetSwitchType());
 					LoadLevel();
-					sectorForm.LoadSector(currentCourseId, -1);
+					sectorForm.LoadSector(currentCourseId, -1, -1);
 					levelPictureBox.ClearSelection();
 					levelPictureBox.ClearUndo();
 				}
@@ -602,6 +613,10 @@ namespace WLEditor
 					}
 					return true;
 
+				case Keys.T:
+					ToggleTreasureWarp();
+					return true;
+
 				case Keys.Control | Keys.C:
 					levelPictureBox.CopySelection();
 					levelPictureBox.ClearSelection();
@@ -663,6 +678,26 @@ namespace WLEditor
 				while (nextMode != 0 && (flags[nextMode] & typeOfSwitch) == 0);
 				return nextMode;
 			}
+
+			void ToggleTreasureWarp()
+			{
+				if (treasureId == -1)
+				{
+					if (levelPictureBox.CurrentSector != -1)
+					{
+						treasureId = Sector.GetTreasureId(rom, currentCourseId, levelPictureBox.CurrentSector);
+					}
+				}
+				else
+				{
+					treasureId = -1;
+				}
+
+				currentWarp = Sector.SearchWarp(rom, currentCourseId, levelPictureBox.CurrentSector, treasureId);
+				LoadLevel();
+				sectorForm.LoadSector(currentCourseId, levelPictureBox.CurrentSector, treasureId);
+			}
+
 		}
 
 		bool DispatchShortcut(Keys keyData)

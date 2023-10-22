@@ -281,10 +281,21 @@ namespace WLEditor
 			}
 		}
 
+		public static IEnumerable<int> GetEnemyIds(Rom rom, int enemiesIdsPointer)
+		{
+			rom.SetBank(0x7);
+			for (int i = 0; i < 6; i++)
+			{
+				int enemyId = rom.ReadWord(enemiesIdsPointer + (i + 1) * 2);
+				enemyId = (enemyId - 0x530F) / 4;
+				yield return enemyId;
+			}
+		}
+
 		public static int[] DumpEnemiesSprites(Rom rom, int enemiesIdsPointer, int tilesDataAddress,
 			DirectBitmap bitmap, int destY, (Rectangle Rectangle, Point Offset)[] sprites, int index, int width)
 		{
-			var enemyIds = GetEnemyIds().ToArray();
+			var enemyIds = GetEnemyIds(rom, enemiesIdsPointer).ToArray();
 			var enemyTileInfo = LoadEnemiesTiles().ToArray();
 
 			for (int i = 0; i < enemyTileInfo.Length; i++)
@@ -315,17 +326,6 @@ namespace WLEditor
 
 				Array.Clear(Tiles8x8.Bits, 0, Tiles8x8.Bits.Length);
 				Level.Dump8x8Tiles(rom, Tiles8x8, tilesAddress, tilesCount, 0, (byte)palette, enemyPalette, true);
-			}
-
-			IEnumerable<int> GetEnemyIds()
-			{
-				rom.SetBank(0x7);
-				for (int i = 0; i < 6; i++)
-				{
-					int enemyId = rom.ReadWord(enemiesIdsPointer + (i + 1) * 2);
-					enemyId = (enemyId - 0x530F) / 4;
-					yield return enemyId;
-				}
 			}
 
 			IEnumerable<(int Bank, int Address, int Count)> LoadEnemiesTiles()

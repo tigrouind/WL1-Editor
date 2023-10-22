@@ -17,6 +17,6 @@
 		public int CameraX;
 		public int CameraY;
 		public int CameraType;
-		public int Music;
+		public int Scroll;
 	}
 }
