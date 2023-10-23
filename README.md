@@ -19,7 +19,7 @@ Some sectors will warp player to another sector (or the exit) once a door is use
 
 In the editor, near the sector number, a label <kbd>S..</kbd> indicate if sector will warp player to another sector.
 
-<kbd>Middle-click</kbd> on a sector to select it. If that sector is associated with a warp (usually there is a door in it), it will load related tiles and enemies.
+<kbd>Middle-click</kbd> on a sector to select it. If that sector is associated with a warp (usually there is a door in it), it will load related tiles and enemies. If you hold <kbd>Shift</kbd> or <kbd>Control</kbd> during click, it will select the first sector that targets the sector under mouse.
 
 ### Editing level tiles
 - Open <kbd>View</kbd> > <kbd>Toolbox</kbd> and select <kbd>16x16 Tiles</kbd> view.
@@ -37,6 +37,7 @@ Available enemies depends of current sector / warp.
 | :-: | - |
 | <kbd>S</kbd> | Display scroll lines.
 | <kbd>B</kbd> | Toggle <kbd>!</kbd> blocks (if any).
+| <kbd>T</kbd> | Toggle [treasure warps](#treasure-rooms) (if possible).
 | <kbd>Ctrl</kbd> + <kbd>Mouse wheel</kbd> | Zoom in / out.
 | <kbd>Ctrl</kbd> + <kbd>C</kbd> <br> <kbd>Ctrl</kbd> + <kbd>V</kbd> | [Copy / paste](#copy--paste) tiles and enemies.
 | <kbd>Ctrl</kbd> + <kbd>Z</kbd> <br> <kbd>Ctrl</kbd> + <kbd>Y</kbd> | Undo / redo changes.
@@ -45,7 +46,7 @@ Available enemies depends of current sector / warp.
 ## Copy / paste 
 This is a powerful feature. Here is an overview of possibilities: 
 - Copy / move a block of tiles from one place to another.
-- Fill / erase a given block with a single tile.
+- Fill / erase a given block.
 - Repeat a pattern.
 
 How to :
@@ -60,7 +61,7 @@ Tips :
 - You can undo or redo changes with <kbd>Ctrl-Z</kbd> / <kbd>Ctrl-Y</kbd>.
 
 ## Warp / level header
-- Open <kbd>View</kbd> > <kbd>Warp / level header</kbd>
+- Open <kbd>View</kbd> > <kbd>Warp / Level header</kbd>
 - <kbd>Middle-click</kbd> on a sector to highlight it.
 If you click on a sector already selected, it will unselected sector and show level header (which has similar properties to warps).
 
@@ -68,11 +69,21 @@ Enemy sets specify which enemies will be loaded for a given warp (up to 6 enemie
 
 Tips : 
 - Red items are boss enemies sets.
-- Yellow items are related to treasure rooms. Warps that lead to a sector with a treasure key or a skull door should always use the related treasure enemy set. This will automatically open skull door and remove key if treasure has already been collected.
-- Green :
-  - Skull already open (no need to use coins)
-  - Guragura with coin sequence
-  - Pouncer that follow player
+- Yellow items are related to treasure rooms. 
+- Green items :
+  - Exit skull already open (no need to use coins)
+  - Guragura with coin sequence (as in 1st level ending)
+  - Pouncer that follows player (will try go right, then down, then up)
+
+### Treasure rooms
+
+Treasure rooms have their own dedicated warps (one for each treasure, 15 in total).
+These warps are used during the transition between treasure totals screen and treasure room.
+Press <kbd>T</kbd> when treasure room is loaded to load the related treasure warp.
+
+Warps that lead to an area with a key (or a skull) must use the enemy set with the letter corresponding to that treasure.
+Eg: if a warp leads to an area where there is a key for treasure J, an enemy set with the letter J must be used.
+When such a warp is loaded, if the treasure has already been collected, the game will automatically open the skull and remove the key.
 
 ## Overworld / world maps
 - Open <kbd>View</kbd> > <kbd>Overworld</kbd>
