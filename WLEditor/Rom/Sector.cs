@@ -224,7 +224,7 @@ namespace WLEditor
 			return (posX, posY);
 		}
 
-		public static void LimitScroll(Rom rom, int currentCourseId, int sector, int cameraType, ref int cameraX, ref int cameraY, ref int warioY)
+		public static int LimitCameraX(Rom rom, int currentCourseId, int sector, int cameraX)
 		{
 			int scrollData = GetScroll(rom, currentCourseId, sector);
 			bool allowLeft = (scrollData & 2) != 2;
@@ -249,6 +249,11 @@ namespace WLEditor
 				cameraX = Math.Min(cameraX, 15 * 32 + 10);
 			}
 
+			return cameraX;
+		}
+
+		public static (int CameraY, int WarioY) LimitCameraY(int cameraType, int cameraY, int warioY)
+		{
 			cameraY = Math.Max(cameraY, 0);  //top limit
 			cameraY = Math.Min(cameraY, 32 + 12); //bottom limit
 
@@ -268,6 +273,8 @@ namespace WLEditor
 					cameraY = 44;
 				}
 			}
+
+			return (cameraY, warioY);
 		}
 	}
 }

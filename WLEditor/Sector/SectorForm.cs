@@ -32,38 +32,38 @@ namespace WLEditor
 
 		#region Dropdown data
 
-		readonly ComboboxItemCollection<int[]> tileSets = new ComboboxItemCollection<int[]>
+		readonly ComboboxItemCollection<(int Bank, int TileSetB, int TileSetA, int BlockIndex, int Palette)> tileSets = new ComboboxItemCollection<(int, int, int, int, int)>
 		{
-			//bank, tileSetB, tileSetA, blockIndex, palette
-			{ new[] { 0x03, 0x5200, 0x5400, 0x460A, 0xE1 }, "00   Beach 1" },
-			{ new[] { 0x0E, 0x4600, 0x5400, 0x4E0A, 0xE1 }, "01   Beach 2" },
-			{ new[] { 0x06, 0x6E69, 0x5600, 0x640A, 0xE1 }, "02   Beach 3" },
-			{ new[] { 0x05, 0x5A29, 0x5000, 0x5C0A, 0xE1 }, "03   Stone 1" },
-			{ new[] { 0x05, 0x5A29, 0x5400, 0x5C0A, 0xE1 }, "04   Stone 2" },
-			{ new[] { 0x05, 0x5A29, 0x5600, 0x5C0A, 0xE1 }, "05   Stone 3" },
-			{ new[] { 0x06, 0x6869, 0x5000, 0x620A, 0xE1 }, "06   Ice" },
-			{ new[] { 0x03, 0x4000, 0x5400, 0x420A, 0xE1 }, "07   Cave 1" },
-			{ new[] { 0x03, 0x4000, 0x5400, 0x4C0A, 0xE1 }, "08   Cave 2" },
-			{ new[] { 0x0E, 0x4C00, 0x5400, 0x500A, 0xE1 }, "09   Cave 3" },
-			{ new[] { 0x0E, 0x4000, 0x5400, 0x4A0A, 0xE1 }, "10   Cave 4" },
-			{ new[] { 0x0E, 0x4000, 0x5600, 0x4A0A, 0xE1 }, "11   Cave 5" },
-			{ new[] { 0x0E, 0x6A00, 0x5800, 0x5A0A, 0xE4 }, "12   Lava" },
-			{ new[] { 0x0E, 0x5200, 0x5400, 0x520A, 0xE1 }, "13   Train" },
-			{ new[] { 0x03, 0x4600, 0x5000, 0x400A, 0xE1 }, "14   Woods 1" },
-			{ new[] { 0x0E, 0x5800, 0x5000, 0x540A, 0xE1 }, "15   Woods 2" },
-			{ new[] { 0x0E, 0x5E00, 0x5E00, 0x560A, 0x63 }, "16   Treasure" },
-			{ new[] { 0x0E, 0x6400, 0x5000, 0x580A, 0xE1 }, "17   Ship" },
-			{ new[] { 0x03, 0x4C00, 0x5A00, 0x440A, 0xE1 }, "18   Castle 1" },
-			{ new[] { 0x0E, 0x7000, 0x5000, 0x660A, 0xE1 }, "19   Castle 2" },
-			{ new[] { 0x0E, 0x7000, 0x5000, 0x680A, 0xE1 }, "20   Castle 3" },
-			{ new[] { 0x0E, 0x7600, 0x5200, 0x6C0A, 0xE1 }, "21   Castle 4" },
-			{ new[] { 0x1D, 0x5200, 0x6600, 0x5E0A, 0xE1 }, "22   Boss 1" },
-			{ new[] { 0x1D, 0x4600, 0x6200, 0x5E0A, 0xE1 }, "23   Boss 2" },
-			{ new[] { 0x1D, 0x4C00, 0x6400, 0x5E0A, 0xE1 }, "24   Boss 3" },
-			{ new[] { 0x1D, 0x5E00, 0x6A00, 0x600A, 0xD2 }, "25   Boss 4" },
-			{ new[] { 0x1D, 0x6400, 0x6C00, 0x600A, 0xE4 }, "26   Boss 5" },
-			{ new[] { 0x1D, 0x5800, 0x6800, 0x600A, 0xE1 }, "27   Boss 6" },
-			{ new[] { 0x1D, 0x6A00, 0x6E00, 0x6A0A, 0xE1 }, "28   Boss 7" }
+			//
+			{ ( 0x03, 0x5200, 0x5400, 0x460A, 0xE1 ), "00   Beach 1" },
+			{ ( 0x0E, 0x4600, 0x5400, 0x4E0A, 0xE1 ), "01   Beach 2" },
+			{ ( 0x06, 0x6E69, 0x5600, 0x640A, 0xE1 ), "02   Beach 3" },
+			{ ( 0x05, 0x5A29, 0x5000, 0x5C0A, 0xE1 ), "03   Stone 1" },
+			{ ( 0x05, 0x5A29, 0x5400, 0x5C0A, 0xE1 ), "04   Stone 2" },
+			{ ( 0x05, 0x5A29, 0x5600, 0x5C0A, 0xE1 ), "05   Stone 3" },
+			{ ( 0x06, 0x6869, 0x5000, 0x620A, 0xE1 ), "06   Ice" },
+			{ ( 0x03, 0x4000, 0x5400, 0x420A, 0xE1 ), "07   Cave 1" },
+			{ ( 0x03, 0x4000, 0x5400, 0x4C0A, 0xE1 ), "08   Cave 2" },
+			{ ( 0x0E, 0x4C00, 0x5400, 0x500A, 0xE1 ), "09   Cave 3" },
+			{ ( 0x0E, 0x4000, 0x5400, 0x4A0A, 0xE1 ), "10   Cave 4" },
+			{ ( 0x0E, 0x4000, 0x5600, 0x4A0A, 0xE1 ), "11   Cave 5" },
+			{ ( 0x0E, 0x6A00, 0x5800, 0x5A0A, 0xE4 ), "12   Lava" },
+			{ ( 0x0E, 0x5200, 0x5400, 0x520A, 0xE1 ), "13   Train" },
+			{ ( 0x03, 0x4600, 0x5000, 0x400A, 0xE1 ), "14   Woods 1" },
+			{ ( 0x0E, 0x5800, 0x5000, 0x540A, 0xE1 ), "15   Woods 2" },
+			{ ( 0x0E, 0x5E00, 0x5E00, 0x560A, 0x63 ), "16   Treasure" },
+			{ ( 0x0E, 0x6400, 0x5000, 0x580A, 0xE1 ), "17   Ship" },
+			{ ( 0x03, 0x4C00, 0x5A00, 0x440A, 0xE1 ), "18   Castle 1" },
+			{ ( 0x0E, 0x7000, 0x5000, 0x660A, 0xE1 ), "19   Castle 2" },
+			{ ( 0x0E, 0x7000, 0x5000, 0x680A, 0xE1 ), "20   Castle 3" },
+			{ ( 0x0E, 0x7600, 0x5200, 0x6C0A, 0xE1 ), "21   Castle 4" },
+			{ ( 0x1D, 0x5200, 0x6600, 0x5E0A, 0xE1 ), "22   Boss 1" },
+			{ ( 0x1D, 0x4600, 0x6200, 0x5E0A, 0xE1 ), "23   Boss 2" },
+			{ ( 0x1D, 0x4C00, 0x6400, 0x5E0A, 0xE1 ), "24   Boss 3" },
+			{ ( 0x1D, 0x5E00, 0x6A00, 0x600A, 0xD2 ), "25   Boss 4" },
+			{ ( 0x1D, 0x6400, 0x6C00, 0x600A, 0xE4 ), "26   Boss 5" },
+			{ ( 0x1D, 0x5800, 0x6800, 0x600A, 0xE1 ), "27   Boss 6" },
+			{ ( 0x1D, 0x6A00, 0x6E00, 0x6A0A, 0xE1 ), "28   Boss 7" }
 		};
 
 		readonly int[][] enemyPointer =
@@ -553,14 +553,14 @@ namespace WLEditor
 
 		void LoadWarp()
 		{
-			LoadDropdown(ddlTileSet, new[]
-			{
+			LoadDropdown(ddlTileSet,
+			(
 				currentWarp.Bank,
 				currentWarp.TileSetB,
 				currentWarp.TileSetA,
 				currentWarp.BlockIndex,
 				currentWarp.Palette
-			});
+			));
 			LoadDropdown(ddlAnimation, currentWarp.TileAnimation);
 			LoadDropdown(ddlAnimationSpeed, currentWarp.AnimationSpeed);
 			LoadDropdownAny<EnemyInfo>(ddlEnemies, currentWarp.Enemy, x => x.EnemyPointers);
@@ -598,13 +598,6 @@ namespace WLEditor
 		{
 			ignoreEvents = true;
 			combo.SelectedIndex = combo.Items.Cast<ComboboxItem<T>>().FindIndex(x => x.Value.Equals(value));
-			ignoreEvents = false;
-		}
-
-		void LoadDropdown<T>(ComboBox combo, T[] value)
-		{
-			ignoreEvents = true;
-			combo.SelectedIndex = combo.Items.Cast<ComboboxItem<T[]>>().FindIndex(x => x.Value.SequenceEqual(value));
 			ignoreEvents = false;
 		}
 
@@ -684,12 +677,12 @@ namespace WLEditor
 		{
 			if (!ignoreEvents)
 			{
-				var item = (ComboboxItem<int[]>)ddlTileSet.SelectedItem;
-				currentWarp.Bank = item.Value[0];
-				currentWarp.TileSetB = item.Value[1];
-				currentWarp.TileSetA = item.Value[2];
-				currentWarp.BlockIndex = item.Value[3];
-				currentWarp.Palette = item.Value[4];
+				var item = (ComboboxItem<(int Bank, int TileSetB, int TileSetA, int BlockIndex, int Palette)>)ddlTileSet.SelectedItem;
+				currentWarp.Bank = item.Value.Bank;
+				currentWarp.TileSetB = item.Value.TileSetB;
+				currentWarp.TileSetA = item.Value.TileSetA;
+				currentWarp.BlockIndex = item.Value.BlockIndex;
+				currentWarp.Palette = item.Value.Palette;
 
 				SaveWarp();
 				OnSectorChanged();
@@ -873,10 +866,8 @@ namespace WLEditor
 				int cameraX = currentWarp.WarioX - 12;
 				int cameraY = currentWarp.WarioY - 16;
 
-				Sector.LimitScroll(rom, currentCourseId, sector, currentWarp.CameraType, ref cameraX, ref cameraY, ref currentWarp.WarioY);
-
-				currentWarp.CameraX = cameraX;
-				currentWarp.CameraY = cameraY;
+				currentWarp.CameraX = Sector.LimitCameraX(rom, currentCourseId, sector, cameraX);
+				(currentWarp.CameraY, currentWarp.WarioY) = Sector.LimitCameraY(currentWarp.CameraType, cameraY, currentWarp.WarioY);
 
 				SaveWarp();
 				LoadWarp();
