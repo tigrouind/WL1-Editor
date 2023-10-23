@@ -42,7 +42,6 @@ Available enemies depends of current sector / warp.
 | <kbd>Ctrl</kbd> + <kbd>Z</kbd> <br> <kbd>Ctrl</kbd> + <kbd>Y</kbd> | Undo / redo changes.
 | <kbd>Delete</kbd> | Clear what is currently under selection.
 
-
 ## Copy / paste 
 This is a powerful feature. Here is an overview of possibilities: 
 - Copy / move a block of tiles from one place to another.
@@ -70,7 +69,10 @@ Enemy sets specify which enemies will be loaded for a given warp (up to 6 enemie
 Tips : 
 - Red items are boss enemies sets.
 - Yellow items are related to treasure rooms. Warps that lead to a sector with a treasure key or a skull door should always use the related treasure enemy set. This will automatically open skull door and remove key if treasure has already been collected.
-- Skulls in green will be already open (no need to use coins)
+- Green :
+  - Skull already open (no need to use coins)
+  - Guragura with coin sequence
+  - Pouncer that follow player
 
 ## Overworld / world maps
 - Open <kbd>View</kbd> > <kbd>Overworld</kbd>
@@ -116,6 +118,7 @@ Tips :
 | <kbd>Ctrl</kbd> + <kbd>↑<br>← ↓ →</kbd> | Move current level. Position will be aligned on a 4 x 4 grid.
 | <kbd>↑<br>← ↓ →</kbd> | Select a direction (N/S/E/W). Path in current direction is highlighted.
 | <kbd>Shift</kbd> +  <kbd>↑<br>← ↓ →</kbd> | Add a new path segment in that direction. 
+| <kbd>Alt</kbd> + <kbd>↑<br>← ↓ →</kbd> | Move overworld completion flag.
 | <kbd>Delete</kbd> | Delete last path segment.
 | <kbd>Shift</kbd> + <kbd>Delete</kbd> | Delete all paths in all directions.
 | <kbd>I</kbd> | Enable / disable hidden path mode. This will only be set for new paths.<br>Player won't be visible when walking on such paths. This is shown in red.

@@ -388,7 +388,7 @@ namespace WLEditor
 
 		void AboutToolStripMenuItemClick(object sender, EventArgs e)
 		{
-			MessageBox.Show(Text + " v0.82\r\nDate : 17.09.2023\r\nContact me : tigrou.ind@gmail.com");
+			MessageBox.Show(Text + " v0.83\r\nDate : 17.10.2023\r\nContact me : tigrou.ind@gmail.com");
 		}
 
 		void ExitToolStripMenuItemClick(object sender, EventArgs e)
