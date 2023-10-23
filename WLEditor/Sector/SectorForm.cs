@@ -892,24 +892,26 @@ namespace WLEditor
 
 			if (sectorTxt != string.Empty)
 			{
-				currentWarp.WarioX = (sector % 16) * 32 + currentWarp.WarioX % 32;
-				currentWarp.WarioY = (sector / 16) * 32 + currentWarp.WarioY % 32;
-
 				int doorX, doorY;
 				if (currentTreasureId != -1)
 				{
-					(doorX, doorY) = Sector.FindTreasure(sector, currentWarp.WarioX % 32, currentWarp.WarioY % 32);
+					(doorX, doorY) = Sector.FindTreasure(sector, currentWarp.WarioX, currentWarp.WarioY);
 				}
 				else
 				{
-					(doorX, doorY) = Sector.FindDoor(sector, currentWarp.WarioX % 32, currentWarp.WarioY % 32);
+					(doorX, doorY) = Sector.FindDoor(sector, currentWarp.WarioX, currentWarp.WarioY);
 				}
 
+				//player position
 				if (doorX != -1 && doorY != -1)
 				{
-					//player position
 					currentWarp.WarioX = (sector % 16) * 32 + Math.Min(doorX * 2 + 1, 31);
 					currentWarp.WarioY = (sector / 16) * 32 + Math.Min(doorY * 2 + 2, 31);
+				}
+				else
+				{
+					currentWarp.WarioX = (sector % 16) * 32 + currentWarp.WarioX % 32;
+					currentWarp.WarioY = (sector / 16) * 32 + currentWarp.WarioY % 32;
 				}
 
 				//camera position (scroll area: 10 x 9)

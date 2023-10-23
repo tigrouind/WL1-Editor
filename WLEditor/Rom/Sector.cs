@@ -273,8 +273,8 @@ namespace WLEditor
 				{
 					if (predicate(x + startX, y + startY))
 					{
-						int dx = (x * 2 - (warioX - 1));
-						int dy = (y * 2 - (warioY - 2));
+						int dx = (x + startX) * 2 - (warioX - 1);
+						int dy = (y + startY) * 2 - (warioY - 2);
 						int length = dx * dx + dy * dy;
 						if (length < distance)
 						{
