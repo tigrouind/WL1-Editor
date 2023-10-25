@@ -6,10 +6,10 @@ namespace WLEditor
 {
 	public static class Sector
 	{
-		public static Warp GetLevelHeader(Rom rom, int course)
+		public static Warp GetLevelHeader(Rom rom, int course, bool checkPoint)
 		{
 			rom.SetBank(0xC);
-			int header = rom.ReadWord(0x4560 + course * 2);
+			int header = rom.ReadWord((checkPoint ? 0x45B6 : 0x4560) + course * 2);
 
 			Warp warp = new Warp
 			{
@@ -40,10 +40,10 @@ namespace WLEditor
 			return rom.ReadWord(0x7E73 + course * 2);
 		}
 
-		public static void SaveLevelHeader(Rom rom, int course, Warp warp)
+		public static void SaveLevelHeader(Rom rom, int course, bool checkPoint, Warp warp)
 		{
 			rom.SetBank(0xC);
-			int header = rom.ReadWord(0x4560 + course * 2);
+			int header = rom.ReadWord((checkPoint ? 0x45B6 : 0x4560) + course * 2);
 			rom.WriteByte(header + 0, (byte)warp.Bank);
 			rom.WriteWord(header + 1, (ushort)warp.TileSetB);
 			rom.WriteWord(header + 3, (ushort)warp.TileSetA);
@@ -124,7 +124,7 @@ namespace WLEditor
 
 				if (enemyInfo.treasureID >= 1 && enemyInfo.treasureID <= 15) //treasure opening
 				{
-					var enemyIds = Sprite.GetEnemyIds(rom, enemyInfo.enemyId).ToArray();
+					var enemyIds = Sprite.GetEnemyIds(rom, enemyInfo.enemyIdPointer).ToArray();
 					if (enemyIds.Contains(24))
 					{
 						return enemyInfo.treasureID - 1;
@@ -206,6 +206,12 @@ namespace WLEditor
 			}
 		}
 
+		public static bool HasCheckPoint(Rom rom, int course)
+		{
+			rom.SetBank(0xC);
+			return rom.ReadWord(0x4560 + course * 2) != rom.ReadWord(0x45B6 + course * 2);
+		}
+
 		public static int GetScroll(Rom rom, int course, int sector)
 		{
 			rom.SetBank(0xC);
@@ -218,10 +224,10 @@ namespace WLEditor
 			rom.WriteByte(0x4000 + course * 32 + sector, (byte)scroll);
 		}
 
-		public static void SaveLevelScroll(Rom rom, int course, int sector, int scroll)
+		public static void SaveLevelScroll(Rom rom, int course, bool checkPoint, int sector, int scroll)
 		{
 			rom.SetBank(0xC);
-			int header = rom.ReadWord(0x4560 + course * 2);
+			int header = rom.ReadWord((checkPoint ? 0x45B6 : 0x4560) + course * 2);
 			int warioSector = rom.ReadWordSwap(header + 15) / 256 + rom.ReadWordSwap(header + 13) / 256 * 16;
 			if (sector == warioSector)
 			{
@@ -248,14 +254,18 @@ namespace WLEditor
 			});
 		}
 
-		public static (int posX, int posY) FindTreasure(int sector, int warioX, int warioY)
+		public static (int posX, int posY) FindObject(int sector, int warioX, int warioY, int[] objectsIds, int objectId)
 		{
-			var (posX, posY) = FindClosest(sector, warioX, warioY, (px, py) =>
+			int index = Array.IndexOf(objectsIds, objectId);
+			if (index != -1)
 			{
-				return Level.ObjectsData[px + py * 256] == 1; //treasure opening
-			});
+				return FindClosest(sector, warioX, warioY, (px, py) =>
+				{
+					return Level.ObjectsData[px + py * 256] == index + 1;
+				});
+			}
 
-			return (posX - 1, posY);
+			return (-1, -1);
 		}
 
 		static (int posX, int posY) FindClosest(int sector, int warioX, int warioY, Func<int, int, bool> predicate)
@@ -289,9 +299,9 @@ namespace WLEditor
 			return (posX, posY);
 		}
 
-		public static int LimitCameraX(Rom rom, int currentCourseId, int sector, int cameraX)
+		public static int LimitCameraX(Rom rom, int course, int sector, int cameraX)
 		{
-			int scrollData = GetScroll(rom, currentCourseId, sector);
+			int scrollData = GetScroll(rom, course, sector);
 			bool allowLeft = (scrollData & 2) != 2;
 			bool allowRight = (scrollData & 1) != 1;
 			int sectorX = sector % 16;

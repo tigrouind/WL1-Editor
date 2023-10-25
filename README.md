@@ -37,6 +37,7 @@ Available enemies depends of current sector / warp.
 | :-: | - |
 | <kbd>S</kbd> | Display scroll lines.
 | <kbd>B</kbd> | Toggle <kbd>!</kbd> blocks (if any).
+| <kbd>C</kbd> | Toggle checkpoint header (if possible).
 | <kbd>T</kbd> | Toggle [treasure warps](#treasure-rooms) (if possible).
 | <kbd>Ctrl</kbd> + <kbd>Mouse wheel</kbd> | Zoom in / out.
 | <kbd>Ctrl</kbd> + <kbd>C</kbd> <br> <kbd>Ctrl</kbd> + <kbd>V</kbd> | [Copy / paste](#copy--paste) tiles and enemies.

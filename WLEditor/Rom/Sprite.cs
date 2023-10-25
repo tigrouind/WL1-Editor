@@ -216,7 +216,7 @@ namespace WLEditor
 
 		#region Enemies
 
-		public static (int enemyId, int tilesPointer, int treasureID, bool exitOpen) FindEnemiesData(Rom rom, int enemiesPointer)
+		public static (int enemyIdPointer, int tilesPointer, int treasureID, bool exitOpen) FindEnemiesData(Rom rom, int enemiesPointer)
 		{
 			int treasureID;
 			bool exitOpen;
@@ -227,12 +227,12 @@ namespace WLEditor
 			{
 				if (MatchPattern(enemyCodePattern))
 				{
-					int enemyId = rom.ReadByte(position + 6) << 8 | rom.ReadByte(position + 1);
+					int enemyIdPointer = rom.ReadByte(position + 6) << 8 | rom.ReadByte(position + 1);
 					int tilesPointer = rom.ReadWord(position + 11);
 
 					position += enemyCodePattern.Length;
 					CheckExtraCode();
-					return (enemyId, tilesPointer, treasureID, exitOpen);
+					return (enemyIdPointer, tilesPointer, treasureID, exitOpen);
 				}
 
 				position++;

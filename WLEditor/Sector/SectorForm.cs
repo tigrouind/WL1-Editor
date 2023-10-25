@@ -21,6 +21,7 @@ namespace WLEditor
 		Warp currentWarp;
 		int currentSector;
 		int currentTreasureId;
+		bool currentCheckPoint;
 		int scroll;
 		int zoom;
 		bool ignoreEvents, isWarp;
@@ -441,7 +442,8 @@ namespace WLEditor
 			flowLayoutPanel1.SuspendLayout();
 
 			panelWarp.Visible = isWarp && currentTreasureId == -1;
-			panelMusic.Visible = !isWarp;
+			panelMusic.Visible = !isWarp && !currentCheckPoint;
+			panelStatus.Visible = !isWarp;
 			grpTileset.Visible = grpCamera.Visible = !isWarp || Sector.GetWarp(rom, currentCourseId, currentSector) >= 0x5B7A || currentTreasureId != -1;
 
 			flowLayoutPanel1.ResumeLayout();
@@ -462,7 +464,14 @@ namespace WLEditor
 			}
 			else
 			{
-				Text = "Level header";
+				if (currentCheckPoint)
+				{
+					Text = "Checkpoint header";
+				}
+				else
+				{
+					Text = "Level header";
+				}
 			}
 		}
 
@@ -513,11 +522,12 @@ namespace WLEditor
 			}
 		}
 
-		public void LoadSector(int course, int sector, int treasureId)
+		public void LoadSector(int course, int sector, int treasureId, bool checkPoint)
 		{
 			currentCourseId = course;
 			currentSector = sector;
 			currentTreasureId = treasureId;
+			currentCheckPoint = checkPoint;
 
 			if (Visible)
 			{
@@ -551,7 +561,7 @@ namespace WLEditor
 
 			void LoadLevel()
 			{
-				currentWarp = Sector.GetLevelHeader(rom, currentCourseId);
+				currentWarp = Sector.GetLevelHeader(rom, currentCourseId, currentCheckPoint);
 				isWarp = false;
 				LoadWarp();
 			}
@@ -638,9 +648,7 @@ namespace WLEditor
 			if (!ignoreEvents)
 			{
 				scroll = (scroll & ~0x2) | (checkBoxLeft.Checked ? 0x2 : 0);
-
-				Sector.SaveScroll(rom, currentCourseId, currentSector, scroll);
-				Sector.SaveLevelScroll(rom, currentCourseId, currentSector, scroll);
+				SaveScroll();
 				OnSectorChanged();
 			}
 		}
@@ -650,11 +658,16 @@ namespace WLEditor
 			if (!ignoreEvents)
 			{
 				scroll = (scroll & ~0x1) | (checkBoxRight.Checked ? 0x1 : 0);
-
-				Sector.SaveScroll(rom, currentCourseId, currentSector, scroll);
-				Sector.SaveLevelScroll(rom, currentCourseId, currentSector, scroll);
+				SaveScroll();
 				OnSectorChanged();
 			}
+		}
+
+		void SaveScroll()
+		{
+			Sector.SaveScroll(rom, currentCourseId, currentSector, scroll);
+			Sector.SaveLevelScroll(rom, currentCourseId, false, currentSector, scroll);
+			Sector.SaveLevelScroll(rom, currentCourseId, true, currentSector, scroll);
 		}
 
 		void DdlWarpSelectedIndexChanged(object sender, EventArgs e)
@@ -871,7 +884,7 @@ namespace WLEditor
 				int warioSector = currentWarp.WarioX / 32 + currentWarp.WarioY / 32 * 16;
 				currentWarp.Scroll = Sector.GetScroll(rom, currentCourseId, warioSector);
 
-				Sector.SaveLevelHeader(rom, currentCourseId, currentWarp);
+				Sector.SaveLevelHeader(rom, currentCourseId, currentCheckPoint, currentWarp);
 			}
 		}
 
@@ -895,7 +908,21 @@ namespace WLEditor
 				int doorX, doorY;
 				if (currentTreasureId != -1)
 				{
-					(doorX, doorY) = Sector.FindTreasure(sector, currentWarp.WarioX, currentWarp.WarioY);
+					var item = (ComboboxItem<EnemyInfo>)ddlEnemies.SelectedItem;
+					(doorX, doorY) = Sector.FindObject(sector, currentWarp.WarioX, currentWarp.WarioY, item.Value.EnemyIds, 22); //treasure opening
+					if ((doorX, doorY) != (-1, -1))
+					{
+						doorX--;
+					}
+				}
+				else if (currentCheckPoint)
+				{
+					var item = (ComboboxItem<EnemyInfo>)ddlEnemies.SelectedItem;
+					(doorX, doorY) = Sector.FindObject(sector, currentWarp.WarioX, currentWarp.WarioY, item.Value.EnemyIds, 21); //checkpoint
+					if ((doorX, doorY) != (-1, -1))
+					{
+						doorY--;
+					}
 				}
 				else
 				{
@@ -903,7 +930,7 @@ namespace WLEditor
 				}
 
 				//player position
-				if (doorX != -1 && doorY != -1)
+				if ((doorX, doorY) != (-1, -1))
 				{
 					currentWarp.WarioX = (sector % 16) * 32 + Math.Min(doorX * 2 + 1, 31);
 					currentWarp.WarioY = (sector / 16) * 32 + Math.Min(doorY * 2 + 2, 31);

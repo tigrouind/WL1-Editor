@@ -180,7 +180,7 @@ namespace WLEditor
 			RLEDecompressObjects(rom, objectsPosition, ObjectsData);
 		}
 
-		public static void DumpLevel(Rom rom, int course, int warp, int animatedTileIndex,bool reloadAnimatedTilesOnly)
+		public static void DumpLevel(Rom rom, int course, int warp, bool checkPoint, int animatedTileIndex, bool reloadAnimatedTilesOnly)
 		{
 			int tilebank;
 			int tileaddressB;
@@ -191,7 +191,7 @@ namespace WLEditor
 			int enemiesData;
 
 			rom.SetBank(0xC);
-			int header = rom.ReadWord(0x4560 + course * 2);
+			int header = rom.ReadWord((checkPoint ? 0x45B6 : 0x4560) + course * 2);
 
 			if (warp != -1)
 			{
@@ -725,6 +725,10 @@ namespace WLEditor
 					//update level header
 					rom.SetBank(0xC);
 					int headerposition = rom.ReadWord(0x4560 + i * 2);
+					rom.WriteByte(headerposition + 9, bank);
+					rom.WriteByte(headerposition + 10, subbank);
+
+					headerposition = rom.ReadWord(0x45B6 + i * 2);
 					rom.WriteByte(headerposition + 9, bank);
 					rom.WriteByte(headerposition + 10, subbank);
 

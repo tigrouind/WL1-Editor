@@ -64,6 +64,7 @@ namespace WLEditor
 		int currentCourseId = -1;
 		int currentWarp = -1;
 		int treasureId = -1;
+		bool checkPoint;
 		int animatedTileIndex;
 		int timerTicks;
 		string romFilePath;
@@ -101,6 +102,7 @@ namespace WLEditor
 			{
 				switch (e.KeyData)
 				{
+					case Keys.C: //check point
 					case Keys.T: //treasure warp
 						DispatchCommandKey(e.KeyData);
 						e.Handled = true;
@@ -170,8 +172,9 @@ namespace WLEditor
 			{
 				treasureId = -1;
 				int warpTarget = Sector.SearchWarp(rom, currentCourseId, levelPictureBox.CurrentSector, treasureId);
-				if (warpTarget != currentWarp)
+				if (warpTarget != currentWarp || checkPoint)
 				{
+					checkPoint = false;
 					currentWarp = warpTarget;
 					LoadLevel();
 				}
@@ -179,7 +182,8 @@ namespace WLEditor
 				{
 					levelPictureBox.Invalidate();
 				}
-				sectorForm.LoadSector(currentCourseId, levelPictureBox.CurrentSector, treasureId);
+
+				sectorForm.LoadSector(currentCourseId, levelPictureBox.CurrentSector, treasureId, checkPoint);
 				levelPictureBox.ClearSelection();
 			}
 
@@ -275,7 +279,7 @@ namespace WLEditor
 		{
 			if (rom.IsLoaded && levelComboBox.SelectedItem != null)
 			{
-				Level.DumpLevel(rom, currentCourseId, currentWarp, animatedTileIndex, false);
+				Level.DumpLevel(rom, currentCourseId, currentWarp, checkPoint, animatedTileIndex, false);
 
 				levelPictureBox.ClearTileCache();
 				levelPictureBox.Invalidate();
@@ -292,6 +296,7 @@ namespace WLEditor
 				{
 					treasureId = -1;
 					currentWarp = -1;
+					checkPoint = false;
 					levelPictureBox.CurrentSector = -1;
 					var item = (ComboboxItem<int>)levelComboBox.SelectedItem;
 					currentCourseId = item.Value;
@@ -299,7 +304,7 @@ namespace WLEditor
 					SetSwitchMode(0);
 					SetSwitchType(Level.GetSwitchType());
 					LoadLevel();
-					sectorForm.LoadSector(currentCourseId, -1, -1);
+					sectorForm.LoadSector(currentCourseId, levelPictureBox.CurrentSector, treasureId, checkPoint);
 					levelPictureBox.ClearSelection();
 					levelPictureBox.ClearUndo();
 				}
@@ -613,8 +618,21 @@ namespace WLEditor
 					}
 					return true;
 
+				case Keys.C:
+					if (ToggleCheckpoint())
+					{
+						LoadLevel();
+						sectorForm.LoadSector(currentCourseId, levelPictureBox.CurrentSector, treasureId, checkPoint);
+					}
+					break;
+
 				case Keys.T:
-					ToggleTreasureWarp();
+					if (ToggleTreasureWarp())
+					{
+						currentWarp = Sector.SearchWarp(rom, currentCourseId, levelPictureBox.CurrentSector, treasureId);
+						LoadLevel();
+						sectorForm.LoadSector(currentCourseId, levelPictureBox.CurrentSector, treasureId, checkPoint);
+					}
 					return true;
 
 				case Keys.Control | Keys.C:
@@ -679,25 +697,50 @@ namespace WLEditor
 				return nextMode;
 			}
 
-			void ToggleTreasureWarp()
+			bool ToggleTreasureWarp()
 			{
 				if (treasureId == -1)
 				{
 					if (levelPictureBox.CurrentSector != -1)
 					{
 						treasureId = Sector.GetTreasureId(rom, currentCourseId, levelPictureBox.CurrentSector);
+						if (treasureId != -1)
+						{
+							checkPoint = false;
+							return true;
+						}
 					}
 				}
 				else
 				{
 					treasureId = -1;
+					return true;
 				}
 
-				currentWarp = Sector.SearchWarp(rom, currentCourseId, levelPictureBox.CurrentSector, treasureId);
-				LoadLevel();
-				sectorForm.LoadSector(currentCourseId, levelPictureBox.CurrentSector, treasureId);
+				return false;
 			}
 
+			bool ToggleCheckpoint()
+			{
+				if (!checkPoint)
+				{
+					checkPoint = Sector.HasCheckPoint(rom, currentCourseId);
+					if (checkPoint)
+					{
+						levelPictureBox.CurrentSector = -1;
+						currentWarp = -1;
+						treasureId = -1;
+						return true;
+					}
+				}
+				else
+				{
+					checkPoint = false;
+					return true;
+				}
+
+				return false;
+			}
 		}
 
 		bool DispatchShortcut(Keys keyData)
@@ -772,7 +815,7 @@ namespace WLEditor
 
 			void RefreshAnimatedTiles()
 			{
-				Level.DumpLevel(rom, currentCourseId, currentWarp, animatedTileIndex, true);
+				Level.DumpLevel(rom, currentCourseId, currentWarp, checkPoint, animatedTileIndex, true);
 
 				//redraw
 				levelPictureBox.InvalidateAnimatedTiles();
