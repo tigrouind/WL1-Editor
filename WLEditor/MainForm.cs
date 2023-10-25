@@ -100,19 +100,14 @@ namespace WLEditor
 
 			void ProcessSubFormCommand(object sender, KeyEventArgs e)
 			{
-				switch (e.KeyData)
-				{
-					case Keys.C: //check point
-					case Keys.T: //treasure warp
-						DispatchCommandKey(e.KeyData);
-						e.Handled = true;
-						break;
-				}
-
 				if (DispatchShortcut(e.KeyData))
 				{
 					e.Handled = true;
-					Focus(); //prevent main window disapearing
+					Focus(); //prevent main window disappearing
+				}
+				else if (sender != overworldForm)
+				{
+					DispatchCommandKey(e.KeyData);
 				}
 			}
 
@@ -567,7 +562,6 @@ namespace WLEditor
 
 			return base.ProcessCmdKey(ref msg, keyData);
 		}
-
 
 		bool DispatchCommandKey(Keys keyData)
 		{
