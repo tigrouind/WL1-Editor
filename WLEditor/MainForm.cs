@@ -686,15 +686,7 @@ namespace WLEditor
 
 			int GetNextSwitchMode(int value, int typeOfSwitch)
 			{
-				int[] flags = { 0, 1, 2, 4 };
-				int nextMode = value;
-
-				do
-				{
-					nextMode = (nextMode + 1) % 4;
-				}
-				while (nextMode != 0 && (flags[nextMode] & typeOfSwitch) == 0);
-				return nextMode;
+				return value == 0 ? typeOfSwitch : 0;
 			}
 
 			bool ToggleTreasureWarp()

@@ -348,9 +348,9 @@ namespace WLEditor
 							{
 								byte subTileIndex = rom.ReadByte(tileindexaddress + tileIndex * 4 + k * 2 + j);
 
-								if ((SwitchMode == 2 && tileIndex == 0x32)
-									|| (SwitchMode == 1 && tileIndex == 0x39)
-									|| (SwitchMode == 3 && tileIndex == 0x38)) //[!] block
+								if (((SwitchMode & 2) != 0 && tileIndex == 0x32)
+									|| ((SwitchMode & 1) != 0 && tileIndex == 0x39)
+									|| ((SwitchMode & 4) != 0 && tileIndex == 0x38)) //[!] block
 								{
 									subTileIndex = (byte)(4 + k * 2 + j);
 								}
@@ -545,46 +545,46 @@ namespace WLEditor
 			//replace tiles when a (!) block is hit
 			byte SwitchTile()
 			{
-				switch (SwitchMode)
+				if ((SwitchMode & 1) != 0)
 				{
-					case 1:
-						switch (tileIndex)
-						{
-							case 0x7C:
-								return 0x27;
+					switch (tileIndex)
+					{
+						case 0x7C:
+							return 0x27;
 
-							case 0x27:
-								return 0x7C;
+						case 0x27:
+							return 0x7C;
 
-							case 0x7A:
-								return 0x44;
+						case 0x7A:
+							return 0x44;
 
-							case 0x79:
-								return 0x45;
-						}
-						break;
-					case 2:
-						switch (tileIndex)
-						{
-							case 0x7C:
-								return 0x55;
+						case 0x79:
+							return 0x45;
+					}
+				}
 
-							case 0x55:
-								return 0x7C;
+				if ((SwitchMode & 2) != 0)
+				{
+					switch (tileIndex)
+					{
+						case 0x7C:
+							return 0x55;
 
-							case 0x7A:
-								return 0x7B;
+						case 0x55:
+							return 0x7C;
 
-							case 0x7B:
-								return 0x7A;
+						case 0x7A:
+							return 0x7B;
 
-							case 0x59:
-								return 0x5D;
+						case 0x7B:
+							return 0x7A;
 
-							case 0x5D:
-								return 0x59;
-						}
-						break;
+						case 0x59:
+							return 0x5D;
+
+						case 0x5D:
+							return 0x59;
+					}
 				}
 
 				return tileIndex;
