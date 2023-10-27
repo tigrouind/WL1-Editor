@@ -7,7 +7,7 @@ namespace WLEditor
 {
 	public class EventForm
 	{
-		List<(int Position, byte Index)>[] worldEvents;
+		List<(int Position, byte Index)>[] worldEvents = new List<(int Position, byte Index)>[0];
 		List<(int Position, byte Index)> worldEvent;
 		int eventStep;
 

@@ -485,7 +485,7 @@ namespace WLEditor
 
 		void SectorFormVisibleChanged(object sender, EventArgs e)
 		{
-			if (Visible)
+			if (Visible && rom != null)
 			{
 				InitForm();
 				LoadSector();

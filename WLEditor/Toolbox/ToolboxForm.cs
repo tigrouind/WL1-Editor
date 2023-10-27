@@ -7,11 +7,13 @@ namespace WLEditor
 	public partial class ToolboxForm : Form
 	{
 		public event EventHandler<KeyEventArgs> ProcessCommandKey;
+		readonly Control[] controls;
 
 		public ToolboxForm()
 		{
 			InitializeComponent();
 
+			controls = new Control[] { tiles16x16PictureBox, objectsPictureBox, tiles8x8PictureBox };
 			tiles16x16PictureBox.TileMouseMove += ToolBoxTile16x16MouseMove;
 			tiles16x16PictureBox.TileMouseLeave += ToolBoxTile16x16MouseLeave;
 		}
@@ -27,7 +29,7 @@ namespace WLEditor
 		{
 			SuspendLayout();
 
-			Control controlToShow = new Control[] { tiles16x16PictureBox, tiles8x8PictureBox, objectsPictureBox }[comboBox1.SelectedIndex];
+			Control controlToShow = controls[comboBox1.SelectedIndex];
 			controlToShow.Visible = true;
 			controlToShow.Location = new Point(controlToShow.Margin.Left, controlToShow.Margin.Top);
 
@@ -69,13 +71,7 @@ namespace WLEditor
 			return base.ProcessCmdKey(ref msg, keyData);
 		}
 
-		public int SelectedPanelIndex
-		{
-			get
-			{
-				return comboBox1.SelectedIndex;
-			}
-		}
+		public Control SelectedPanel => controls[comboBox1.SelectedIndex];
 
 		public Tiles16x16PictureBox Tiles16x16
 		{

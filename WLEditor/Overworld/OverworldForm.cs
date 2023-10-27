@@ -109,7 +109,7 @@ namespace WLEditor
 
 		void InitForm()
 		{
-			if (!formLoaded)
+			if (!formLoaded && rom != null)
 			{
 				formLoaded = true;
 				LoadWorldCombobox();
@@ -408,19 +408,6 @@ namespace WLEditor
 
 				switch (keyData)
 				{
-					case Keys.E:
-					case Keys.P:
-						eventMode = keyData == Keys.E && !eventMode;
-						pathMode = keyData == Keys.P && !pathMode;
-
-						UpdateTitle();
-						pictureBox1.Invalidate();
-						pictureBox2.Visible = !pathMode;
-						UpdateBounds();
-						selection.ClearUndo();
-						selection.ClearSelection();
-						return true;
-
 					case Keys.Control | Keys.C:
 						CopySelection();
 						return true;
@@ -444,10 +431,6 @@ namespace WLEditor
 					case Keys.Control | Keys.Y:
 						Redo();
 						return true;
-
-					case Keys.M:
-						SetMusicTrack();
-						return true;
 				}
 
 				if (eventMode || pathMode)
@@ -464,6 +447,11 @@ namespace WLEditor
 						case Keys.Down:
 							return true; //prevent dropdown change
 					}
+				}
+
+				if (DispatchShortcut())
+				{
+					return true;
 				}
 
 				return false;
@@ -594,22 +582,18 @@ namespace WLEditor
 
 				#endregion
 
-				void SetMusicTrack()
+				bool DispatchShortcut()
 				{
-					int musicTrack = Overworld.GetMusic(rom, currentWorld);
+					ToolStripMenuItem toolStrip = menuStrip1.Items.GetAllMenuItems()
+						.FirstOrDefault(x => x.ShortcutKeys == keyData);
 
-					string musicTrackTxt = musicTrack == -1 ? string.Empty : (musicTrack + 1).ToString();
-					do
+					if (toolStrip != null)
 					{
-						musicTrackTxt = Interaction.InputBox(string.Empty, "Enter music track number (1-8)", musicTrackTxt, -1, -1);
+						toolStrip.PerformClick();
+						return true;
 					}
-					while (!(musicTrackTxt == string.Empty || (int.TryParse(musicTrackTxt, out musicTrack) && musicTrack >= 1 && musicTrack <= 8)));
 
-					if (musicTrackTxt != string.Empty)
-					{
-						Overworld.SetMusic(rom, currentWorld, musicTrack - 1);
-						SetChanges(ChangeEnum.None);
-					}
+					return false;
 				}
 			}
 		}
@@ -1037,5 +1021,60 @@ namespace WLEditor
 		}
 
 		#endregion
+
+		private void TileModeToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			ChangeEditMode(0);
+		}
+
+		private void EventModeToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			ChangeEditMode(1);
+		}
+
+		private void PathModeToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			ChangeEditMode(2);
+		}
+
+		void ChangeEditMode(int mode)
+		{
+			if (!ignoreEvents && mode != (eventMode ? 1 : (pathMode ? 2 : 0)))
+			{
+				eventMode = mode == 1;
+				pathMode = mode == 2;
+
+				UpdateTitle();
+				pictureBox1.Invalidate();
+				pictureBox2.Visible = !pathMode;
+				UpdateBounds();
+				selection.ClearUndo();
+				selection.ClearSelection();
+
+				ignoreEvents = true;
+				tileModeToolStripMenuItem.Checked = mode == 0;
+				eventModeToolStripMenuItem.Checked = mode == 1;
+				pathModeToolStripMenuItem.Checked = mode == 2;
+				ignoreEvents = false;
+			}
+		}
+
+		private void MusicToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			int musicTrack = Overworld.GetMusic(rom, currentWorld);
+
+			string musicTrackTxt = musicTrack == -1 ? string.Empty : (musicTrack + 1).ToString();
+			do
+			{
+				musicTrackTxt = Interaction.InputBox(string.Empty, "Enter music track number (1-8)", musicTrackTxt, -1, -1);
+			}
+			while (!(musicTrackTxt == string.Empty || (int.TryParse(musicTrackTxt, out musicTrack) && musicTrack >= 1 && musicTrack <= 8)));
+
+			if (musicTrackTxt != string.Empty)
+			{
+				Overworld.SetMusic(rom, currentWorld, musicTrack - 1);
+				SetChanges(ChangeEnum.None);
+			}
+		}
 	}
 }

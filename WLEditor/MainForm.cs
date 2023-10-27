@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Media;
 using System.Reflection;
 using System.Windows.Forms;
 
@@ -166,6 +167,12 @@ namespace WLEditor
 			void LevelPictureBoxSectorChanged(object sender, EventArgs e)
 			{
 				treasureId = -1;
+
+				ignoreEvents = true;
+				checkpointModeToolStripMenuItem.Checked = false;
+				treasureModeToolStripMenuItem.Checked = false;
+				ignoreEvents = false;
+
 				int warpTarget = Sector.SearchWarp(rom, currentCourseId, levelPictureBox.CurrentSector, treasureId);
 				if (warpTarget != currentWarp || checkPoint)
 				{
@@ -201,17 +208,17 @@ namespace WLEditor
 					if ((e.Status == TileEventStatus.MouseMove || e.Status == TileEventStatus.MouseDown) && !levelPictureBox.HasSelection)
 					{
 						int tileIndex = e.TileX + e.TileY * 256;
-						int selectedPanelIndex = toolboxForm.SelectedPanelIndex;
+						var control = toolboxForm.SelectedPanel;
 						int currentTile = toolboxForm.Tiles16x16.CurrentTile;
 						int currentObject = toolboxForm.Objects.CurrentObject;
 
 						if (e.Button == MouseButtons.Right)
 						{
-							if (selectedPanelIndex == 0)
+							if (control == toolboxForm.Tiles16x16)
 							{
 								UpdateTile(tileIndex, currentTile);
 							}
-							else if (levelPictureBox.ShowObjects && selectedPanelIndex == 2)
+							else if (levelPictureBox.ShowObjects && control == toolboxForm.Objects)
 							{
 								UpdateObject(tileIndex, currentObject);
 							}
@@ -296,8 +303,13 @@ namespace WLEditor
 					var item = (ComboboxItem<int>)levelComboBox.SelectedItem;
 					currentCourseId = item.Value;
 					Level.DumpBlocks(rom, currentCourseId);
-					Level.SwitchMode = 0;
 					Level.SwitchType = Level.GetSwitchType();
+					Level.SwitchMode = 0;
+					ignoreEvents = true;
+					switchBlockToolStripMenuItem.Checked = false;
+					checkpointModeToolStripMenuItem.Checked = false;
+					treasureModeToolStripMenuItem.Checked = false;
+					ignoreEvents = false;
 					LoadLevel();
 					sectorForm.LoadSector(currentCourseId, levelPictureBox.CurrentSector, treasureId, checkPoint);
 					levelPictureBox.ClearSelection();
@@ -409,6 +421,114 @@ namespace WLEditor
 			bool value = collectiblesToolStripMenuItem.Checked;
 			Level.ShowCollectibles = value;
 			LoadLevel();
+		}
+
+		private void SwitchBlockToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			if (!ignoreEvents)
+			{
+				int switchType = Level.GetSwitchType();
+				if (switchType == 0 && !switchBlockToolStripMenuItem.Checked)
+				{
+					SystemSounds.Beep.Play();
+				}
+
+				switchBlockToolStripMenuItem.Checked = switchType != 0 && !switchBlockToolStripMenuItem.Checked;
+				int switchMode = switchBlockToolStripMenuItem.Checked ? switchType : 0;
+
+				if (Level.SwitchMode != switchMode || Level.SwitchType != switchType)
+				{
+					Level.SwitchMode = switchMode;
+					Level.SwitchType = switchType;
+					LoadLevel();
+				}
+			}
+		}
+
+		private void TreasureModeToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			if (!ignoreEvents)
+			{
+				if (rom.IsLoaded && ToggleTreasureWarp())
+				{
+					currentWarp = Sector.SearchWarp(rom, currentCourseId, levelPictureBox.CurrentSector, treasureId);
+					LoadLevel();
+					sectorForm.LoadSector(currentCourseId, levelPictureBox.CurrentSector, treasureId, checkPoint);
+				}
+				else
+				{
+					SystemSounds.Beep.Play();
+				}
+
+				ignoreEvents = true;
+				checkpointModeToolStripMenuItem.Checked = checkPoint;
+				treasureModeToolStripMenuItem.Checked = treasureId != -1;
+				ignoreEvents = false;
+			}
+		}
+
+		private void CheckpointModeToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			if (!ignoreEvents)
+			{
+				if (rom.IsLoaded && ToggleCheckpoint())
+				{
+					LoadLevel();
+					sectorForm.LoadSector(currentCourseId, levelPictureBox.CurrentSector, treasureId, checkPoint);
+				}
+				else
+				{
+					SystemSounds.Beep.Play();
+				}
+
+				ignoreEvents = true;
+				checkpointModeToolStripMenuItem.Checked = checkPoint;
+				treasureModeToolStripMenuItem.Checked = treasureId != -1;
+				ignoreEvents = false;
+			}
+		}
+
+		bool ToggleTreasureWarp()
+		{
+			if (treasureId == -1)
+			{
+				treasureId = Sector.GetTreasureId(rom, currentCourseId);
+				if (treasureId != -1)
+				{
+					levelPictureBox.CurrentSector = -1;
+					checkPoint = false;
+					return true;
+				}
+			}
+			else
+			{
+				treasureId = -1;
+				return true;
+			}
+
+			return false;
+		}
+
+		bool ToggleCheckpoint()
+		{
+			if (!checkPoint)
+			{
+				checkPoint = Sector.HasCheckPoint(rom, currentCourseId);
+				if (checkPoint)
+				{
+					levelPictureBox.CurrentSector = -1;
+					currentWarp = -1;
+					treasureId = -1;
+					return true;
+				}
+			}
+			else
+			{
+				checkPoint = false;
+				return true;
+			}
+
+			return false;
 		}
 
 		#region Save
@@ -582,35 +702,6 @@ namespace WLEditor
 					levelPictureBox.Invalidate();
 					break;
 
-				case Keys.B:
-					int switchType = Level.GetSwitchType();
-					int switchMode = Level.SwitchMode == 0 ? switchType : 0;
-
-					if (Level.SwitchMode != switchMode || Level.SwitchType != switchType)
-					{
-						Level.SwitchMode = switchMode;
-						Level.SwitchType = switchType;
-						LoadLevel();
-					}
-					return true;
-
-				case Keys.C:
-					if (ToggleCheckpoint())
-					{
-						LoadLevel();
-						sectorForm.LoadSector(currentCourseId, levelPictureBox.CurrentSector, treasureId, checkPoint);
-					}
-					break;
-
-				case Keys.T:
-					if (ToggleTreasureWarp())
-					{
-						currentWarp = Sector.SearchWarp(rom, currentCourseId, levelPictureBox.CurrentSector, treasureId);
-						LoadLevel();
-						sectorForm.LoadSector(currentCourseId, levelPictureBox.CurrentSector, treasureId, checkPoint);
-					}
-					return true;
-
 				case Keys.Control | Keys.C:
 					levelPictureBox.CopySelection();
 					levelPictureBox.ClearSelection();
@@ -659,51 +750,6 @@ namespace WLEditor
 			}
 
 			return DispatchShortcut(keyData);
-
-			bool ToggleTreasureWarp()
-			{
-				if (treasureId == -1)
-				{
-					if (levelPictureBox.CurrentSector != -1)
-					{
-						treasureId = Sector.GetTreasureId(rom, currentCourseId, levelPictureBox.CurrentSector);
-						if (treasureId != -1)
-						{
-							checkPoint = false;
-							return true;
-						}
-					}
-				}
-				else
-				{
-					treasureId = -1;
-					return true;
-				}
-
-				return false;
-			}
-
-			bool ToggleCheckpoint()
-			{
-				if (!checkPoint)
-				{
-					checkPoint = Sector.HasCheckPoint(rom, currentCourseId);
-					if (checkPoint)
-					{
-						levelPictureBox.CurrentSector = -1;
-						currentWarp = -1;
-						treasureId = -1;
-						return true;
-					}
-				}
-				else
-				{
-					checkPoint = false;
-					return true;
-				}
-
-				return false;
-			}
 		}
 
 		bool DispatchShortcut(Keys keyData)
@@ -722,17 +768,17 @@ namespace WLEditor
 
 		#region Subforms
 
-		void ToolboxToolStripMenuItemCheckedChanged(object sender, EventArgs e)
+		void ToolboxToolStripMenuItemClick(object sender, EventArgs e)
 		{
 			ToggleForm(toolboxForm, toolboxToolStripMenuItem.Checked);
 		}
 
-		void OverworldToolStripMenuItemCheckedChanged(object sender, EventArgs e)
+		void OverworldToolStripMenuItemClick(object sender, EventArgs e)
 		{
 			ToggleForm(overworldForm, overworldToolStripMenuItem.Checked);
 		}
 
-		void SectorsToolStripMenuItemCheckedChanged(object sender, EventArgs e)
+		void SectorsToolStripMenuItemClick(object sender, EventArgs e)
 		{
 			ToggleForm(sectorForm, sectorsToolStripMenuItem.Checked);
 		}
@@ -784,15 +830,14 @@ namespace WLEditor
 				levelPictureBox.InvalidateAnimatedTiles();
 				if (toolboxForm.Visible)
 				{
-					switch (toolboxForm.SelectedPanelIndex)
+					var control = toolboxForm.SelectedPanel;
+					if (control == toolboxForm.Tiles16x16)
 					{
-						case 0: //16x16 tiles
-							toolboxForm.Tiles16x16.Invalidate();
-							break;
-
-						case 1: //8x8 tiles
-							toolboxForm.Tiles8x8.Invalidate();
-							break;
+						toolboxForm.Tiles16x16.Invalidate();
+					}
+					else if (control == toolboxForm.Tiles8x8)
+					{
+						toolboxForm.Tiles8x8.Invalidate();
 					}
 				}
 			}
