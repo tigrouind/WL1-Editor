@@ -73,29 +73,11 @@ namespace WLEditor
 
 		public Control SelectedPanel => controls[comboBox1.SelectedIndex];
 
-		public Tiles16x16PictureBox Tiles16x16
-		{
-			get
-			{
-				return tiles16x16PictureBox;
-			}
-		}
+		public Tiles16x16PictureBox Tiles16x16 => tiles16x16PictureBox;
 
-		public Tiles8x8PictureBox Tiles8x8
-		{
-			get
-			{
-				return tiles8x8PictureBox;
-			}
-		}
+		public Tiles8x8PictureBox Tiles8x8 => tiles8x8PictureBox;
 
-		public ObjectsPictureBox Objects
-		{
-			get
-			{
-				return objectsPictureBox;
-			}
-		}
+		public ObjectsPictureBox Objects => objectsPictureBox;
 
 		void ToolBoxTile16x16MouseMove(object sender, TileEventArgs e)
 		{

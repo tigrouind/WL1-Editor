@@ -232,13 +232,7 @@ namespace WLEditor
 			}
 		}
 
-		public bool HasSelection
-		{
-			get
-			{
-				return selection;
-			}
-		}
+		public bool HasSelection => selection;
 
 		#region Undo
 

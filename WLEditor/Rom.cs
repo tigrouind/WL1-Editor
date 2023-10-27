@@ -168,12 +168,6 @@ namespace WLEditor
 			bank = rombank;
 		}
 
-		public bool IsLoaded
-		{
-			get
-			{
-				return data != null;
-			}
-		}
+		public bool IsLoaded => data != null;
 	}
 }

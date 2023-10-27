@@ -644,21 +644,9 @@ namespace WLEditor
 			statusStrip1.Visible = eventMode || !pathMode;
 		}
 
-		int CurrentMapX
-		{
-			get
-			{
-				return currentWorld == 8 ? 32 : 20;
-			}
-		}
+		int CurrentMapX => currentWorld == 8 ? 32 : 20;
 
-		int CurrentMapY
-		{
-			get
-			{
-				return currentWorld == 8 ? 32 : 18;
-			}
-		}
+		int CurrentMapY => currentWorld == 8 ? 32 : 18;
 
 		#region Mouse
 

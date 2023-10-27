@@ -535,13 +535,7 @@ namespace WLEditor
 			selection.SetSelection(x, y);
 		}
 
-		public bool HasSelection
-		{
-			get
-			{
-				return selection.HasSelection;
-			}
-		}
+		public bool HasSelection => selection.HasSelection;
 
 		int PasteTileAt(int x, int y, int data)
 		{
