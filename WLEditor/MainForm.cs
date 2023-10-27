@@ -301,8 +301,8 @@ namespace WLEditor
 					var item = (ComboboxItem<int>)levelComboBox.SelectedItem;
 					currentCourseId = item.Value;
 					Level.DumpBlocks(rom, currentCourseId);
-					SetSwitchMode(0);
-					SetSwitchType(Level.GetSwitchType());
+					Level.SwitchMode = 0;
+					Level.SwitchType = Level.GetSwitchType();
 					LoadLevel();
 					sectorForm.LoadSector(currentCourseId, levelPictureBox.CurrentSector, treasureId, checkPoint);
 					levelPictureBox.ClearSelection();
@@ -414,28 +414,6 @@ namespace WLEditor
 			bool value = collectiblesToolStripMenuItem.Checked;
 			Level.ShowCollectibles = value;
 			LoadLevel();
-		}
-
-		bool SetSwitchType(int value)
-		{
-			if (Level.SwitchType != value)
-			{
-				Level.SwitchType = value;
-				return true;
-			}
-
-			return false;
-		}
-
-		bool SetSwitchMode(int value)
-		{
-			if (Level.SwitchMode != value)
-			{
-				Level.SwitchMode = value;
-				return true;
-			}
-
-			return false;
 		}
 
 		#region Save
@@ -611,9 +589,13 @@ namespace WLEditor
 					break;
 
 				case Keys.B:
-					int typeOfSwitch = Level.GetSwitchType();
-					if (SetSwitchMode(GetNextSwitchMode(Level.SwitchMode, typeOfSwitch)) | SetSwitchType(typeOfSwitch))
+					int switchType = Level.GetSwitchType();
+					int switchMode = Level.SwitchMode == 0 ? switchType : 0;
+
+					if (Level.SwitchMode != switchMode || Level.SwitchType != switchType)
 					{
+						Level.SwitchMode = switchMode;
+						Level.SwitchType = switchType;
 						LoadLevel();
 					}
 					return true;
@@ -683,11 +665,6 @@ namespace WLEditor
 			}
 
 			return DispatchShortcut(keyData);
-
-			int GetNextSwitchMode(int value, int typeOfSwitch)
-			{
-				return value == 0 ? typeOfSwitch : 0;
-			}
 
 			bool ToggleTreasureWarp()
 			{
