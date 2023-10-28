@@ -16,6 +16,7 @@ namespace WLEditor
 				Bank = rom.ReadByte(header + 0),
 				TileSetB = rom.ReadWord(header + 1),
 				TileSetA = rom.ReadWord(header + 3),
+				GUI = rom.ReadWord(header + 5),
 				TileAnimation = rom.ReadWord(header + 7),
 				BlockIndex = rom.ReadWord(header + 11),
 				WarioY = rom.ReadWordSwap(header + 13) / 8,
@@ -47,6 +48,7 @@ namespace WLEditor
 			rom.WriteByte(header + 0, (byte)warp.Bank);
 			rom.WriteWord(header + 1, (ushort)warp.TileSetB);
 			rom.WriteWord(header + 3, (ushort)warp.TileSetA);
+			rom.WriteWord(header + 5, (ushort)warp.GUI);
 			rom.WriteWord(header + 7, (ushort)warp.TileAnimation);
 			rom.WriteWord(header + 11, (ushort)warp.BlockIndex);
 			rom.WriteWordSwap(header + 13, (ushort)(warp.WarioY * 8));
@@ -135,6 +137,7 @@ namespace WLEditor
 				warpInfo.Bank = rom.ReadByte(warp + 11);
 				warpInfo.TileSetB = rom.ReadWord(warp + 12);
 				warpInfo.TileSetA = rom.ReadWord(warp + 14);
+				warpInfo.GUI = rom.ReadWord(warp + 16);
 				warpInfo.TileAnimation = rom.ReadWord(warp + 18);
 				warpInfo.BlockIndex = rom.ReadWord(warp + 20);
 				warpInfo.Enemy = rom.ReadWord(warp + 22);
@@ -164,6 +167,7 @@ namespace WLEditor
 			rom.WriteByte(warp + 11, (byte)warpInfo.Bank);
 			rom.WriteWord(warp + 12, (ushort)warpInfo.TileSetB);
 			rom.WriteWord(warp + 14, (ushort)warpInfo.TileSetA);
+			rom.WriteWord(warp + 16, (ushort)warpInfo.GUI);
 			rom.WriteWord(warp + 18, (ushort)warpInfo.TileAnimation);
 			rom.WriteWord(warp + 20, (ushort)warpInfo.BlockIndex);
 			rom.WriteWord(warp + 22, (ushort)warpInfo.Enemy);

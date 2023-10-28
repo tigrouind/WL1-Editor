@@ -5,6 +5,7 @@
 		public int Bank;
 		public int TileSetB;
 		public int TileSetA;
+		public int GUI;
 		public int TileAnimation;
 		public int AnimationSpeed;
 		public int BlockIndex;
