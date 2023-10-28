@@ -432,12 +432,6 @@ namespace WLEditor
 						break;
 				}
 
-				if (currentWorld != 8)
-				{
-					currentPath.TreasureX = currentPath.X + 4;
-					currentPath.TreasureY = currentPath.Y + 4;
-				}
-
 				foreach (var dir in currentPath.Directions)
 				{
 					UnbindPath(dir);

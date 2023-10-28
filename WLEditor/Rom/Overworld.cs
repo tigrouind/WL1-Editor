@@ -387,10 +387,6 @@ namespace WLEditor
 			{
 				LoadFlags();
 			}
-			else
-			{
-				LoadTreasures();
-			}
 
 			return pathData;
 
@@ -404,34 +400,16 @@ namespace WLEditor
 					item.FlagY = rom.ReadByte(flagsPosition[level].Y) - 32;
 				}
 			}
-
-			void LoadTreasures()
-			{
-				rom.SetBank(0x14);
-				for (int level = 0; level < pathData.Length; level++)
-				{
-					var item = pathData[level];
-
-					int pointer = rom.ReadByte(0x5A38 + level);
-					if (pointer != 0xFF)
-					{
-						pointer = rom.ReadWord(0x5A63 + pointer * 2);
-						item.TreasureX = rom.ReadByte(pointer + 1) - 12;
-						item.TreasureY = rom.ReadByte(pointer + 0) - 20;
-					}
-				}
-			}
-
 		}
 
 		public static bool SavePaths(Rom rom, WorldPath[] pathData, bool overWorld, out string errorMessage)
 		{
-			int[][] duplicates =
+			(int, int)[] duplicates =
 			{
-				new [] { 7, 23 },  // rice beach 1 / flooded
-				new [] { 14, 36 }, // rice beach 3 / flooded
-				new [] { 5, 10 },  // mt teapot 4 / crushed
-				new [] { 38, 42 }, // parsley woods 1 / flooded
+				( 7, 23 ),  // rice beach 1 / flooded
+				( 14, 36 ), // rice beach 3 / flooded
+				( 5, 10 ),  // mt teapot 4 / crushed
+				( 38, 42 ), // parsley woods 1 / flooded
 			};
 
 			if (!overWorld)
@@ -439,7 +417,7 @@ namespace WLEditor
 				//will be stored using shared pointers
 				foreach (var dup in duplicates)
 				{
-					pathData[dup[1]] = null;
+					pathData[dup.Item2] = null;
 				}
 			}
 
@@ -525,14 +503,14 @@ namespace WLEditor
 				//duplicates (shared pointers)
 				foreach (var dup in duplicates)
 				{
-					var position = rom.ReadWord(0x5629 + dup[0] * 2);
-					rom.WriteWord(0x5629 + dup[1] * 2, position);
+					var position = rom.ReadWord(0x5629 + dup.Item1 * 2);
+					rom.WriteWord(0x5629 + dup.Item2 * 2, position);
 				}
 
 				//should only be done after path are written (shared pointers)
 				foreach (var dup in duplicates)
 				{
-					pathData[dup[1]] = pathData[dup[0]];
+					pathData[dup.Item2] = pathData[dup.Item1];
 				}
 			}
 
@@ -564,17 +542,107 @@ namespace WLEditor
 
 			void SaveTreasures()
 			{
-				rom.SetBank(0x14);
-				for (int level = 0; level < pathData.Length; level++)
-				{
-					var item = pathData[level];
+				var treasureLevelPairs = Enumerable.Range(0, 43)
+					.Select(x => new { TreasureId = Sector.GetTreasureId(rom, x), Level = x })
+					.Where(x => x.TreasureId != -1)
+					.GroupBy(x => x.TreasureId)
+					.Select(x => x.First())
+					.ToArray();
 
-					int pointer = rom.ReadByte(0x5A38 + level);
-					if (pointer != 0xFF)
+				var levelsWithTreasure = treasureLevelPairs
+					.Select(x => x.Level)
+					.ToHashSet();
+
+				var overworldTreasureList = new int[43];
+				SaveTreasureOverworldLists();
+				SaveTreasureLevelBinding();
+				SaveTreasurePositionPerLevel();
+
+				void SaveTreasureOverworldLists()
+				{
+					var overworldListOffsets = new int[]
 					{
-						pointer = rom.ReadWord(0x5A63 + pointer * 2);
-						rom.WriteByte(pointer + 1, (byte)Math.Max(0, Math.Min(255, item.TreasureX + 12)));
-						rom.WriteByte(pointer + 0, (byte)Math.Max(0, Math.Min(255, item.TreasureY + 20)));
+						0x5D15,
+						0x78F0,
+						0x7DE1,
+						0x79B1,
+						0x7C2D,
+						0x7B9D,
+						0x7AE7
+					};
+
+					int[][] levelsPerOverworld =
+					{
+						new [] { 7, 23, 15, 14, 36, 12, 25, 41 },
+						new [] { 6, 16, 13, 5, 10, 17, 9 },
+						new [] { 33, 2, 4, 8, 32, 24 },
+						new [] { 3, 21, 22, 39, 27, 28 },
+						new [] { 0, 30, 31, 11, 20 },
+						new [] { 38, 42, 29, 1, 19, 18, 26 },
+						new [] { 37, 34, 35, 40 }
+					};
+
+					rom.SetBank(0x8);
+					int position = rom.ReadWord(overworldListOffsets[0] + 1);
+					for (int i = 0; i < 7; i++)
+					{
+						rom.WriteWord(overworldListOffsets[i] + 1, (ushort)position); //ld hl, XXXX
+						foreach (var level in levelsPerOverworld[i])
+						{
+							overworldTreasureList[level] = position;
+						}
+
+						int treasureCount = levelsPerOverworld[i].Count(x => levelsWithTreasure.Contains(x));
+						position += treasureCount;
+						position++; //0xFF marker
+					}
+				}
+
+				void SaveTreasureLevelBinding()
+				{
+					var treasureToLevel = treasureLevelPairs
+						.ToDictionary(x => x.TreasureId, x => x.Level);
+
+					rom.SetBank(0x1);
+					int position = 0x586B;
+
+					for (int treasureId = 0; treasureId < 15; treasureId++)
+					{
+						if (!treasureToLevel.TryGetValue(treasureId, out int level))
+						{
+							level = 0xFF;
+						}
+
+						rom.WriteWord(position + 1, (ushort)overworldTreasureList[level]); //ld hl, XXXX
+						rom.WriteByte(position + 4, (byte)level); //ld b, XX
+						position += 7;
+					}
+				}
+
+				void SaveTreasurePositionPerLevel()
+				{
+					rom.SetBank(0x14);
+					int position = 0;
+
+					//group levels at same position (usually duplicates)
+					foreach (var levels in pathData
+						.Select((x, i) => new { Index = i, Item = x })
+						.GroupBy(x => (x.Item.X, x.Item.Y)))
+					{
+						int index = 0xFF;
+						if (levels.Any(x => levelsWithTreasure.Contains(x.Index)))
+						{
+							index = position++;
+							int pointer = rom.ReadWord(0x5A63 + index * 2);
+							rom.WriteByte(pointer + 0, (byte)Math.Max(0, Math.Min(255, levels.Key.Y + 24)));
+							rom.WriteByte(pointer + 1, (byte)Math.Max(0, Math.Min(255, levels.Key.X + 16)));
+						}
+
+						foreach (var level in levels)
+						{
+							//map level to a treasure position index (or 0xFF)
+							rom.WriteByte(0x5A38 + level.Index, (byte)index);
+						}
 					}
 				}
 			}

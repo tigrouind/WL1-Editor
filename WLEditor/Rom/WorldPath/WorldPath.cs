@@ -8,7 +8,5 @@ namespace WLEditor
 
 		public int FlagX;
 		public int FlagY;
-		public int TreasureX;
-		public int TreasureY;
 	}
 }

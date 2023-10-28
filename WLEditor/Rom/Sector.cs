@@ -239,6 +239,30 @@ namespace WLEditor
 			}
 		}
 
+		public static int GetTreasureId(Rom rom, int course)
+		{
+			for (int sector = 0; sector < 32; sector++)
+			{
+				int warp = GetWarp(rom, course, sector);
+				if (warp >= 0x5B7A)
+				{
+					int enemyPointer = rom.ReadWord(warp + 22);
+					var enemyInfo = Sprite.FindEnemiesData(rom, enemyPointer);
+
+					if (enemyInfo.treasureID >= 1 && enemyInfo.treasureID <= 15)
+					{
+						var enemyIds = Sprite.GetEnemyIds(rom, enemyInfo.enemyIdPointer).ToArray();
+						if (enemyIds.Contains(24))
+						{
+							return enemyInfo.treasureID - 1;
+						}
+					}
+				}
+			}
+
+			return -1;
+		}
+
 		public static (int posX, int posY) FindDoor(int sector, int warioX, int warioY)
 		{
 			return FindClosest(sector, warioX, warioY, (px, py) =>
