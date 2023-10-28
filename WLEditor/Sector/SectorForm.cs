@@ -15,6 +15,8 @@ namespace WLEditor
 		public readonly (Rectangle rectangle, Point point)[] enemiesRects = new (Rectangle, Point)[6 * 147];
 		readonly char[] treasureNames = { 'C', 'I', 'F', 'O', 'A', 'N', 'H', 'M', 'L', 'K', 'B', 'D', 'G', 'J', 'E' };
 		readonly int[] boss = { 0x4CA9, 0x460D, 0x4C0C, 0x4E34, 0x4B06, 0x4D1A, 0x527D };
+		public event EventHandler LoadCheckPoint;
+		public event EventHandler<int> LoadTreasure;
 
 		Rom rom;
 		int currentCourseId;
@@ -497,6 +499,7 @@ namespace WLEditor
 			zoom = Math.Min(2, zoomLevel);
 			ddlEnemies.DropDownWidth = 20 + zoom * 32 * 5 + SystemInformation.VerticalScrollBarWidth;
 			ddlEnemies.ItemHeight = zoom * 32;
+			cmdTreasure.Top = ddlEnemies.Bottom + ddlEnemies.Margin.Bottom;
 			labEnemies.Height = zoom * 32;
 		}
 
@@ -554,7 +557,7 @@ namespace WLEditor
 			{
 				LoadLevel();
 				LoadDropdown(ddlMusic, Sector.GetMusic(rom, currentCourseId));
-				LoadCheckBox(checkBoxCheckpoint, Sector.GetLevelHeader(rom, currentCourseId) != Sector.GetCheckpoint(rom, currentCourseId));
+				LoadCheckpoint();
 			}
 
 			SetControlsVisibility();
@@ -572,6 +575,13 @@ namespace WLEditor
 				scroll = Sector.GetScroll(rom, currentCourseId, currentSector);
 				LoadCheckBox(checkBoxLeft, (scroll & 2) == 2);
 				LoadCheckBox(checkBoxRight, (scroll & 1) == 1);
+			}
+
+			void LoadCheckpoint()
+			{
+				bool hasCheckpoint = Sector.GetLevelHeader(rom, currentCourseId) != Sector.GetCheckpoint(rom, currentCourseId);
+				LoadCheckBox(checkBoxCheckpoint, hasCheckpoint);
+				cmdCheckpoint.Visible = hasCheckpoint;
 			}
 		}
 
@@ -597,6 +607,9 @@ namespace WLEditor
 			LoadDropdown(ddlAnimation, currentWarp.TileAnimation);
 			LoadDropdown(ddlAnimationSpeed, currentWarp.AnimationSpeed);
 			LoadDropdownAny<EnemyInfo>(ddlEnemies, currentWarp.Enemy, x => x.EnemyPointers);
+
+			cmdTreasure.Visible = currentTreasureId == -1 && ddlEnemies.SelectedItem != null
+				&& (ddlEnemies.SelectedItem as ComboboxItem<EnemyInfo>).Value.TreasureId != -1;
 
 			LoadDropdown(ddlCameraType, currentWarp.CameraType);
 			LoadNumericUpDown(txbCameraX, currentWarp.CameraX);
@@ -738,6 +751,8 @@ namespace WLEditor
 				{
 					Sector.SaveCheckpoint(rom, currentCourseId, Sector.GetLevelHeader(rom, currentCourseId));
 				}
+
+				cmdCheckpoint.Visible = checkBoxCheckpoint.Checked;
 			}
 
 			int GetFreeLevelHeader()
@@ -801,6 +816,7 @@ namespace WLEditor
 			{
 				var item = (ComboboxItem<EnemyInfo>)ddlEnemies.SelectedItem;
 				currentWarp.Enemy = item.Value.EnemyPointers[0];
+				cmdTreasure.Visible = currentTreasureId == -1 && item.Value.TreasureId != -1;
 
 				SaveWarp();
 				OnSectorChanged();
@@ -924,6 +940,17 @@ namespace WLEditor
 
 				Sector.SaveLevelHeader(rom, currentCourseId, currentCheckPoint, currentWarp);
 			}
+		}
+
+		void CmdCheckpoint_Click(object sender, EventArgs e)
+		{
+			LoadCheckPoint(sender, e);
+		}
+
+		private void CmdTreasure_Click(object sender, EventArgs e)
+		{
+			var item = (ComboboxItem<EnemyInfo>)ddlEnemies.SelectedItem;
+			LoadTreasure(sender, item.Value.TreasureId - 1);
 		}
 
 		#endregion

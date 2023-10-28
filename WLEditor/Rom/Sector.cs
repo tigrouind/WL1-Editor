@@ -114,30 +114,6 @@ namespace WLEditor
 			return rom.ReadWord(0x59F0 + treasureId * 2);
 		}
 
-		public static int GetTreasureId(Rom rom, int course)
-		{
-			for (int sector = 0; sector < 32; sector++)
-			{
-				int warp = GetWarp(rom, course, sector);
-				if (warp >= 0x5B7A)
-				{
-					int enemyPointer = rom.ReadWord(warp + 22);
-					var enemyInfo = Sprite.FindEnemiesData(rom, enemyPointer);
-
-					if (enemyInfo.treasureID >= 1 && enemyInfo.treasureID <= 15) //treasure opening
-					{
-						var enemyIds = Sprite.GetEnemyIds(rom, enemyInfo.enemyIdPointer).ToArray();
-						if (enemyIds.Contains(24))
-						{
-							return enemyInfo.treasureID - 1;
-						}
-					}
-				}
-			}
-
-			return -1;
-		}
-
 		public static Warp GetWarp(Rom rom, int warp)
 		{
 			rom.SetBank(0xC);

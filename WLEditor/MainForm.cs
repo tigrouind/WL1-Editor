@@ -96,6 +96,8 @@ namespace WLEditor
 			sectorForm.FormClosing += SectorFormClosing;
 			sectorForm.ProcessCommandKey += ProcessSubFormCommand;
 			sectorForm.SectorChanged += SectorChanged;
+			sectorForm.LoadCheckPoint += LoadCheckpoint;
+			sectorForm.LoadTreasure += LoadTreasureWarp;
 
 			SetZoomLevel(2);
 
@@ -167,11 +169,6 @@ namespace WLEditor
 			void LevelPictureBoxSectorChanged(object sender, EventArgs e)
 			{
 				treasureId = -1;
-
-				ignoreEvents = true;
-				checkpointModeToolStripMenuItem.Checked = false;
-				treasureModeToolStripMenuItem.Checked = false;
-				ignoreEvents = false;
 
 				int warpTarget = Sector.SearchWarp(rom, currentCourseId, levelPictureBox.CurrentSector, treasureId);
 				if (warpTarget != currentWarp || checkPoint)
@@ -307,8 +304,6 @@ namespace WLEditor
 					Level.SwitchMode = 0;
 					ignoreEvents = true;
 					switchBlockToolStripMenuItem.Checked = false;
-					checkpointModeToolStripMenuItem.Checked = false;
-					treasureModeToolStripMenuItem.Checked = false;
 					ignoreEvents = false;
 					LoadLevel();
 					sectorForm.LoadSector(currentCourseId, levelPictureBox.CurrentSector, treasureId, checkPoint);
@@ -445,90 +440,26 @@ namespace WLEditor
 			}
 		}
 
-		private void TreasureModeToolStripMenuItem_Click(object sender, EventArgs e)
+		void LoadTreasureWarp(object sender, int warpId)
 		{
-			if (!ignoreEvents)
-			{
-				if (rom.IsLoaded && ToggleTreasureWarp())
-				{
-					currentWarp = Sector.SearchWarp(rom, currentCourseId, levelPictureBox.CurrentSector, treasureId);
-					LoadLevel();
-					sectorForm.LoadSector(currentCourseId, levelPictureBox.CurrentSector, treasureId, checkPoint);
-				}
-				else
-				{
-					SystemSounds.Beep.Play();
-				}
+			treasureId = warpId;
+			levelPictureBox.CurrentSector = -1;
+			checkPoint = false;
+			currentWarp = Sector.SearchWarp(rom, currentCourseId, levelPictureBox.CurrentSector, treasureId);
 
-				ignoreEvents = true;
-				checkpointModeToolStripMenuItem.Checked = checkPoint;
-				treasureModeToolStripMenuItem.Checked = treasureId != -1;
-				ignoreEvents = false;
-			}
+			LoadLevel();
+			sectorForm.LoadSector(currentCourseId, levelPictureBox.CurrentSector, treasureId, checkPoint);
 		}
 
-		private void CheckpointModeToolStripMenuItem_Click(object sender, EventArgs e)
+		void LoadCheckpoint(object sender, EventArgs e)
 		{
-			if (!ignoreEvents)
-			{
-				if (rom.IsLoaded && ToggleCheckpoint())
-				{
-					LoadLevel();
-					sectorForm.LoadSector(currentCourseId, levelPictureBox.CurrentSector, treasureId, checkPoint);
-				}
-				else
-				{
-					SystemSounds.Beep.Play();
-				}
+			checkPoint = true;
+			levelPictureBox.CurrentSector = -1;
+			currentWarp = -1;
+			treasureId = -1;
 
-				ignoreEvents = true;
-				checkpointModeToolStripMenuItem.Checked = checkPoint;
-				treasureModeToolStripMenuItem.Checked = treasureId != -1;
-				ignoreEvents = false;
-			}
-		}
-
-		bool ToggleTreasureWarp()
-		{
-			if (treasureId == -1)
-			{
-				treasureId = Sector.GetTreasureId(rom, currentCourseId);
-				if (treasureId != -1)
-				{
-					levelPictureBox.CurrentSector = -1;
-					checkPoint = false;
-					return true;
-				}
-			}
-			else
-			{
-				treasureId = -1;
-				return true;
-			}
-
-			return false;
-		}
-
-		bool ToggleCheckpoint()
-		{
-			if (!checkPoint)
-			{
-				checkPoint = Sector.GetLevelHeader(rom, currentCourseId) != Sector.GetCheckpoint(rom, currentCourseId);
-				if (checkPoint)
-				{
-					levelPictureBox.CurrentSector = -1;
-					currentWarp = -1;
-					treasureId = -1;
-					return true;
-				}
-			}
-			else
-			{
-				checkPoint = false;
-				return true;
-			}
-
-			return false;
+			LoadLevel();
+			sectorForm.LoadSector(currentCourseId, levelPictureBox.CurrentSector, treasureId, checkPoint);
 		}
 
 		#region Save
