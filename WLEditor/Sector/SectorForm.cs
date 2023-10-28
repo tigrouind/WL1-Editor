@@ -554,6 +554,7 @@ namespace WLEditor
 			{
 				LoadLevel();
 				LoadDropdown(ddlMusic, Sector.GetMusic(rom, currentCourseId));
+				LoadCheckBox(checkBoxCheckpoint, Sector.GetLevelHeader(rom, currentCourseId) != Sector.GetCheckpoint(rom, currentCourseId));
 			}
 
 			SetControlsVisibility();
@@ -571,13 +572,6 @@ namespace WLEditor
 				scroll = Sector.GetScroll(rom, currentCourseId, currentSector);
 				LoadCheckBox(checkBoxLeft, (scroll & 2) == 2);
 				LoadCheckBox(checkBoxRight, (scroll & 1) == 1);
-
-				void LoadCheckBox(CheckBox checkBox, bool value)
-				{
-					ignoreEvents = true;
-					checkBox.Checked = value;
-					ignoreEvents = false;
-				}
 			}
 		}
 
@@ -636,6 +630,13 @@ namespace WLEditor
 		{
 			ignoreEvents = true;
 			combo.SelectedIndex = combo.Items.Cast<ComboboxItem<T>>().FindIndex(x => x.Value.Equals(value));
+			ignoreEvents = false;
+		}
+
+		void LoadCheckBox(CheckBox checkBox, bool value)
+		{
+			ignoreEvents = true;
+			checkBox.Checked = value;
 			ignoreEvents = false;
 		}
 
@@ -712,6 +713,43 @@ namespace WLEditor
 
 				return all
 					.Except(used)
+					.DefaultIfEmpty(-1)
+					.First();
+			}
+		}
+
+		void CheckBoxCheckpoint_CheckedChanged(object sender, EventArgs e)
+		{
+			if (!ignoreEvents)
+			{
+				if (checkBoxCheckpoint.Checked)
+				{
+					int header = GetFreeLevelHeader();
+					if (header == -1)
+					{
+						MessageBox.Show("No more checkpoint headers.\r\nPlease free a checkpoint in another level", Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+						LoadCheckBox(checkBoxCheckpoint, false);
+						return;
+					}
+
+					Sector.SaveCheckpoint(rom, currentCourseId, header);
+				}
+				else
+				{
+					Sector.SaveCheckpoint(rom, currentCourseId, Sector.GetLevelHeader(rom, currentCourseId));
+				}
+			}
+
+			int GetFreeLevelHeader()
+			{
+				int header = Sector.GetLevelHeader(rom, currentCourseId);
+				var used = Sector.GetLevelHeaderUsage(rom);
+				var all = Enumerable.Range(0, 77)
+					.Select(x => 0x460C + x * 30);
+
+				return all
+					.Except(used)
+					.OrderByDescending(x => x == (header + 30))
 					.DefaultIfEmpty(-1)
 					.First();
 			}

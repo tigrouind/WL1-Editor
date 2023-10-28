@@ -209,10 +209,31 @@ namespace WLEditor
 			}
 		}
 
-		public static bool HasCheckPoint(Rom rom, int course)
+		public static IEnumerable<int> GetLevelHeaderUsage(Rom rom)
 		{
 			rom.SetBank(0xC);
-			return rom.ReadWord(0x4560 + course * 2) != rom.ReadWord(0x45B6 + course * 2);
+			for (int i = 0; i < 43; i++)
+			{
+				yield return rom.ReadWord(0x45B6 + i * 2);
+				yield return rom.ReadWord(0x4560 + i * 2);
+			}
+		}
+
+		public static int GetLevelHeader(Rom rom, int course)
+		{
+			rom.SetBank(0xC);
+			return rom.ReadWord(0x4560 + course * 2);
+		}
+
+		public static int GetCheckpoint(Rom rom, int course)
+		{
+			rom.SetBank(0xC);
+			return rom.ReadWord(0x45B6 + course * 2);
+		}
+
+		public static void SaveCheckpoint(Rom rom, int course, int header)
+		{
+			rom.WriteWord(0x45B6 + course * 2, (ushort)header);
 		}
 
 		public static int GetScroll(Rom rom, int course, int sector)

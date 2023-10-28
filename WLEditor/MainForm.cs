@@ -513,7 +513,7 @@ namespace WLEditor
 		{
 			if (!checkPoint)
 			{
-				checkPoint = Sector.HasCheckPoint(rom, currentCourseId);
+				checkPoint = Sector.GetLevelHeader(rom, currentCourseId) != Sector.GetCheckpoint(rom, currentCourseId);
 				if (checkPoint)
 				{
 					levelPictureBox.CurrentSector = -1;
