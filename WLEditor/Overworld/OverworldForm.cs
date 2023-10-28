@@ -72,18 +72,17 @@ namespace WLEditor
 			}
 		}
 
-		readonly ComboboxItemCollection<int[]> worldData = new ComboboxItemCollection<int[]>
+		readonly ComboboxItemCollection<(int BankA, int TileAddressA, int BankB, int TileAddressB, int MaxLength)> worldData = new ComboboxItemCollection<(int, int, int, int, int)>
 		{
-			//bank - 8x8 tiles / bank - map tiles / max tiles size
-			{ new [] { 0x09, 0x407A, 0x09, 0x6DBE, 373 }, "1 Rice Beach" },
-			{ new [] { 0x09, 0x407A, 0x09, 0x74E1, 346 }, "1 Rice Beach - FLOODED" },
-			{ new [] { 0x09, 0x407A, 0x09, 0x6F33, 368 }, "2 Mt. Teapot" },
-			{ new [] { 0x14, 0x6909, 0x14, 0x76D2, 321 }, "3 Sherbet Land" },
-			{ new [] { 0x09, 0x4E13, 0x09, 0x70A3, 371 }, "4 Stove Canyon" },
-			{ new [] { 0x09, 0x4E13, 0x09, 0x7216, 393 }, "5 SS Tea Cup" },
-			{ new [] { 0x14, 0x6909, 0x14, 0x7813, 388 }, "6 Parsley Woods" },
-			{ new [] { 0x09, 0x5C6C, 0x09, 0x739F, 322 }, "7 Syrup Castle" },
-			{ new [] { 0x14, 0x5AA0, 0x09, 0x6AA5, 787 }, "8 Overworld" }
+			{ ( 0x09, 0x407A, 0x09, 0x6DBE, 373 ), "1 Rice Beach" },
+			{ ( 0x09, 0x407A, 0x09, 0x74E1, 346 ), "1 Rice Beach - FLOODED" },
+			{ ( 0x09, 0x407A, 0x09, 0x6F33, 368 ), "2 Mt. Teapot" },
+			{ ( 0x14, 0x6909, 0x14, 0x76D2, 321 ), "3 Sherbet Land" },
+			{ ( 0x09, 0x4E13, 0x09, 0x70A3, 371 ), "4 Stove Canyon" },
+			{ ( 0x09, 0x4E13, 0x09, 0x7216, 393 ), "5 SS Tea Cup" },
+			{ ( 0x14, 0x6909, 0x14, 0x7813, 388 ), "6 Parsley Woods" },
+			{ ( 0x09, 0x5C6C, 0x09, 0x739F, 322 ), "7 Syrup Castle" },
+			{ ( 0x14, 0x5AA0, 0x09, 0x6AA5, 787 ), "8 Overworld" }
 		};
 
 		public void LoadRom(Rom rom)
@@ -134,13 +133,13 @@ namespace WLEditor
 		void LoadWorld()
 		{
 			var data = worldData[currentWorld].Value;
-			Overworld.Dump8x8Tiles(rom, data[0], data[1], tilesWorld8x8);
+			Overworld.Dump8x8Tiles(rom, data.BankA, data.TileAddressA, tilesWorld8x8);
 			if (timerTicks != 0)
 			{
 				DumpAnimatedTiles();
 			}
 
-			Overworld.LoadTiles(rom, data[2], data[3], worldTiles);
+			Overworld.LoadTiles(rom, data.BankB, data.TileAddressB, worldTiles);
 
 			eventForm.LoadWorld(rom, currentWorld);
 			pathForm.LoadWorld(currentWorld);
@@ -195,8 +194,8 @@ namespace WLEditor
 				}
 
 				var worldInfo = worldData[currentWorld].Value;
-				if (!Overworld.SaveTiles(rom, worldInfo[2], worldInfo[3],
-								currentWorld == 8 ? worldTiles : worldTiles.Take(564).ToArray(), worldInfo[4], out message))
+				if (!Overworld.SaveTiles(rom, worldInfo.BankB, worldInfo.TileAddressB,
+								currentWorld == 8 ? worldTiles : worldTiles.Take(564).ToArray(), worldInfo.MaxLength, out message))
 				{
 					MessageBox.Show(message, Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
 					return false;
