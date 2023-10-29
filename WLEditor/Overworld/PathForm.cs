@@ -610,6 +610,7 @@ namespace WLEditor
 				if (reverseDir != null && reverseDir != dir && dir == GetReverseWorldPathDir(reverseDir))
 				{
 					reverseDir.Path.Clear();
+					reverseDir.Progress = WorldPathProgressEnum.None;
 				}
 			}
 
