@@ -396,7 +396,10 @@ namespace WLEditor
 
 		void AboutToolStripMenuItemClick(object sender, EventArgs e)
 		{
-			MessageBox.Show(Text + " v0.84\r\nDate : 25.10.2023\r\nContact me : tigrou.ind@gmail.com");
+			var version = Assembly.GetEntryAssembly().GetName().Version;
+			var buildDateTime = new DateTime(2000, 1, 1).Add(new TimeSpan(TimeSpan.TicksPerDay * version.Build));
+
+			MessageBox.Show($"{Text} v{version.Major}.{version.Minor}\r\nDate : {buildDateTime:d}\r\nContact me : tigrou.ind@gmail.com");
 		}
 
 		void ExitToolStripMenuItemClick(object sender, EventArgs e)
