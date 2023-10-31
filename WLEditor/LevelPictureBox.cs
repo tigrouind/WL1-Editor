@@ -68,7 +68,7 @@ namespace WLEditor
 					//sector objects (enemies, powerups)
 					if (ShowObjects)
 					{
-						DrawObjects(font, format, EnemyBrush);
+						DrawObjects(font, format);
 
 						//wario position
 						int index = Level.WarioRightFacing ? 0 : 1;
@@ -98,7 +98,7 @@ namespace WLEditor
 				}
 			}
 
-			void DrawObjects(Font font, StringFormat format, Brush brush)
+			void DrawObjects(Font font, StringFormat format)
 			{
 				for (int j = 0; j < 32; j++)
 				{
@@ -110,7 +110,7 @@ namespace WLEditor
 							Rectangle destRect = new Rectangle(i * 16 * zoom, j * 16 * zoom, 16 * zoom, 16 * zoom);
 							if (destRect.IntersectsWith(e.ClipRectangle))
 							{
-								e.Graphics.FillRectangle(brush, destRect);
+								e.Graphics.FillRectangle(EnemyBrush, destRect);
 
 								//power up
 								if (data > 6)
@@ -122,11 +122,9 @@ namespace WLEditor
 							//enemy
 							if (data <= 6)
 							{
-								Rectangle enemyRect = Sprite.LoadedSprites[data - 1].Rectangle;
-								if (enemyRect != Rectangle.Empty)
+								var (enemyRect, enemyOffset) = Sprite.LoadedSprites[data - 1];
+								if (enemyRect != default)
 								{
-									Point enemyOffset = Sprite.LoadedSprites[data - 1].Offsets;
-
 									destRect = new Rectangle((i * 16 + enemyOffset.X) * zoom, (j * 16 + enemyOffset.Y) * zoom, enemyRect.Width * zoom, enemyRect.Height * zoom);
 									if (destRect.IntersectsWith(e.ClipRectangle))
 									{

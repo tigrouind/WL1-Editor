@@ -12,7 +12,7 @@ namespace WLEditor
 		public event EventHandler<KeyEventArgs> ProcessCommandKey;
 		public event EventHandler SectorChanged;
 		public readonly DirectBitmap TilesEnemies = new DirectBitmap(32 * 6, 32 * 147);
-		public readonly (Rectangle rectangle, Point point)[] enemiesRects = new (Rectangle, Point)[6 * 147];
+		public readonly (Rectangle Rectangle, Point Point)[] enemiesRects = new (Rectangle, Point)[6 * 147];
 		readonly char[] treasureNames = { 'C', 'I', 'F', 'O', 'A', 'N', 'H', 'M', 'L', 'K', 'B', 'D', 'G', 'J', 'E' };
 		readonly int[] boss = { 0x4CA9, 0x460D, 0x4C0C, 0x4E34, 0x4B06, 0x4D1A, 0x527D };
 		public event EventHandler LoadCheckPoint;
