@@ -78,15 +78,14 @@ namespace WLEditor
 			this.labWarioStatus = new System.Windows.Forms.Label();
 			this.ddlWarioStatus = new System.Windows.Forms.ComboBox();
 			this.grpTileset = new System.Windows.Forms.GroupBox();
-			this.cmdTreasure = new System.Windows.Forms.Button();
 			this.panelMusic = new System.Windows.Forms.Panel();
-			this.cmdCheckpoint = new System.Windows.Forms.Button();
 			this.labCheckpoint = new System.Windows.Forms.Label();
 			this.checkBoxCheckpoint = new System.Windows.Forms.CheckBox();
 			this.panelStatus = new System.Windows.Forms.Panel();
 			this.ddlWarioAttributes = new System.Windows.Forms.ComboBox();
 			this.panelWarp = new System.Windows.Forms.Panel();
 			this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
+			this.ddlWarpType = new System.Windows.Forms.ComboBox();
 			((System.ComponentModel.ISupportInitialize)(this.txbCameraX)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.txbCameraY)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.txbWarioY)).BeginInit();
@@ -102,11 +101,11 @@ namespace WLEditor
 			// labWarp
 			// 
 			this.labWarp.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.labWarp.Location = new System.Drawing.Point(28, 28);
+			this.labWarp.Location = new System.Drawing.Point(9, 28);
 			this.labWarp.Name = "labWarp";
-			this.labWarp.Size = new System.Drawing.Size(48, 20);
+			this.labWarp.Size = new System.Drawing.Size(67, 20);
 			this.labWarp.TabIndex = 4;
-			this.labWarp.Text = "Warp";
+			this.labWarp.Text = "Target";
 			this.labWarp.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// ddlWarp
@@ -352,7 +351,7 @@ namespace WLEditor
 			this.grpCamera.Controls.Add(this.txbWarioX);
 			this.grpCamera.Controls.Add(this.ddlCameraType);
 			this.grpCamera.Controls.Add(this.cmdCalculatePos);
-			this.grpCamera.Location = new System.Drawing.Point(0, 281);
+			this.grpCamera.Location = new System.Drawing.Point(0, 283);
 			this.grpCamera.Margin = new System.Windows.Forms.Padding(0);
 			this.grpCamera.Name = "grpCamera";
 			this.grpCamera.Padding = new System.Windows.Forms.Padding(0);
@@ -383,7 +382,6 @@ namespace WLEditor
 			// 
 			this.grpTileset.AutoSize = true;
 			this.grpTileset.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.grpTileset.Controls.Add(this.cmdTreasure);
 			this.grpTileset.Controls.Add(this.ddlTileSet);
 			this.grpTileset.Controls.Add(this.labTileSet);
 			this.grpTileset.Controls.Add(this.ddlAnimation);
@@ -391,49 +389,27 @@ namespace WLEditor
 			this.grpTileset.Controls.Add(this.labAnimation);
 			this.grpTileset.Controls.Add(this.ddlEnemies);
 			this.grpTileset.Controls.Add(this.ddlAnimationSpeed);
-			this.grpTileset.Location = new System.Drawing.Point(0, 134);
+			this.grpTileset.Location = new System.Drawing.Point(0, 161);
 			this.grpTileset.Margin = new System.Windows.Forms.Padding(0);
 			this.grpTileset.Name = "grpTileset";
 			this.grpTileset.Padding = new System.Windows.Forms.Padding(0);
-			this.grpTileset.Size = new System.Drawing.Size(383, 147);
+			this.grpTileset.Size = new System.Drawing.Size(383, 122);
 			this.grpTileset.TabIndex = 2;
 			this.grpTileset.TabStop = false;
-			// 
-			// cmdTreasure
-			// 
-			this.cmdTreasure.Anchor = System.Windows.Forms.AnchorStyles.Top;
-			this.cmdTreasure.Location = new System.Drawing.Point(85, 109);
-			this.cmdTreasure.Name = "cmdTreasure";
-			this.cmdTreasure.Size = new System.Drawing.Size(295, 22);
-			this.cmdTreasure.TabIndex = 42;
-			this.cmdTreasure.Text = "Load treasure warp";
-			this.cmdTreasure.UseVisualStyleBackColor = true;
-			this.cmdTreasure.Click += new System.EventHandler(this.CmdTreasure_Click);
 			// 
 			// panelMusic
 			// 
 			this.panelMusic.AutoSize = true;
 			this.panelMusic.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.panelMusic.Controls.Add(this.cmdCheckpoint);
 			this.panelMusic.Controls.Add(this.labCheckpoint);
 			this.panelMusic.Controls.Add(this.checkBoxCheckpoint);
 			this.panelMusic.Controls.Add(this.ddlMusic);
 			this.panelMusic.Controls.Add(this.labMusic);
-			this.panelMusic.Location = new System.Drawing.Point(0, 27);
+			this.panelMusic.Location = new System.Drawing.Point(0, 54);
 			this.panelMusic.Margin = new System.Windows.Forms.Padding(0);
 			this.panelMusic.Name = "panelMusic";
 			this.panelMusic.Size = new System.Drawing.Size(383, 54);
 			this.panelMusic.TabIndex = 0;
-			// 
-			// cmdCheckpoint
-			// 
-			this.cmdCheckpoint.Location = new System.Drawing.Point(109, 29);
-			this.cmdCheckpoint.Name = "cmdCheckpoint";
-			this.cmdCheckpoint.Size = new System.Drawing.Size(117, 22);
-			this.cmdCheckpoint.TabIndex = 17;
-			this.cmdCheckpoint.Text = "Load checkpoint";
-			this.cmdCheckpoint.UseVisualStyleBackColor = true;
-			this.cmdCheckpoint.Click += new System.EventHandler(this.CmdCheckpoint_Click);
 			// 
 			// labCheckpoint
 			// 
@@ -461,7 +437,7 @@ namespace WLEditor
 			this.panelStatus.Controls.Add(this.ddlWarioAttributes);
 			this.panelStatus.Controls.Add(this.labWarioStatus);
 			this.panelStatus.Controls.Add(this.ddlWarioStatus);
-			this.panelStatus.Location = new System.Drawing.Point(0, 0);
+			this.panelStatus.Location = new System.Drawing.Point(0, 27);
 			this.panelStatus.Margin = new System.Windows.Forms.Padding(0);
 			this.panelStatus.Name = "panelStatus";
 			this.panelStatus.Size = new System.Drawing.Size(383, 27);
@@ -486,7 +462,7 @@ namespace WLEditor
 			this.panelWarp.Controls.Add(this.checkBoxRight);
 			this.panelWarp.Controls.Add(this.labWarp);
 			this.panelWarp.Controls.Add(this.ddlWarp);
-			this.panelWarp.Location = new System.Drawing.Point(0, 81);
+			this.panelWarp.Location = new System.Drawing.Point(0, 108);
 			this.panelWarp.Margin = new System.Windows.Forms.Padding(0);
 			this.panelWarp.Name = "panelWarp";
 			this.panelWarp.Size = new System.Drawing.Size(383, 53);
@@ -496,6 +472,7 @@ namespace WLEditor
 			// 
 			this.flowLayoutPanel1.AutoSize = true;
 			this.flowLayoutPanel1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			this.flowLayoutPanel1.Controls.Add(this.ddlWarpType);
 			this.flowLayoutPanel1.Controls.Add(this.panelStatus);
 			this.flowLayoutPanel1.Controls.Add(this.panelMusic);
 			this.flowLayoutPanel1.Controls.Add(this.panelWarp);
@@ -504,8 +481,69 @@ namespace WLEditor
 			this.flowLayoutPanel1.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
 			this.flowLayoutPanel1.Location = new System.Drawing.Point(8, 8);
 			this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-			this.flowLayoutPanel1.Size = new System.Drawing.Size(383, 387);
+			this.flowLayoutPanel1.Size = new System.Drawing.Size(383, 389);
 			this.flowLayoutPanel1.TabIndex = 46;
+			// 
+			// ddlWarpType
+			// 
+			this.ddlWarpType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.ddlWarpType.FormattingEnabled = true;
+			this.ddlWarpType.ImeMode = System.Windows.Forms.ImeMode.On;
+			this.ddlWarpType.Items.AddRange(new object[] {
+            "Level header",
+            "Checkpoint",
+            "Sector 00",
+            "Sector 01",
+            "Sector 02",
+            "Sector 03",
+            "Sector 04",
+            "Sector 05",
+            "Sector 06",
+            "Sector 07",
+            "Sector 08",
+            "Sector 09",
+            "Sector 10",
+            "Sector 11",
+            "Sector 12",
+            "Sector 13",
+            "Sector 14",
+            "Sector 15",
+            "Sector 16",
+            "Sector 17",
+            "Sector 18",
+            "Sector 19",
+            "Sector 20",
+            "Sector 21",
+            "Sector 22",
+            "Sector 23",
+            "Sector 24",
+            "Sector 25",
+            "Sector 26",
+            "Sector 27",
+            "Sector 28",
+            "Sector 29",
+            "Sector 30",
+            "Sector 31",
+            "Treasure A",
+            "Treasure B",
+            "Treasure C",
+            "Treasure D",
+            "Treasure E",
+            "Treasure F",
+            "Treasure G",
+            "Treasure H",
+            "Treasure I",
+            "Treasure J",
+            "Treasure K",
+            "Treasure L",
+            "Treasure M",
+            "Treasure N",
+            "Treasure O"});
+			this.ddlWarpType.Location = new System.Drawing.Point(3, 3);
+			this.ddlWarpType.Name = "ddlWarpType";
+			this.ddlWarpType.Size = new System.Drawing.Size(377, 21);
+			this.ddlWarpType.TabIndex = 47;
+			this.ddlWarpType.SelectedIndexChanged += new System.EventHandler(this.DdlWarpType_SelectedIndexChanged);
 			// 
 			// SectorForm
 			// 
@@ -513,7 +551,7 @@ namespace WLEditor
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.AutoSize = true;
 			this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.ClientSize = new System.Drawing.Size(409, 404);
+			this.ClientSize = new System.Drawing.Size(409, 412);
 			this.Controls.Add(this.flowLayoutPanel1);
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
 			this.MaximizeBox = false;
@@ -552,7 +590,6 @@ namespace WLEditor
 		private System.Windows.Forms.ComboBox ddlWarioAttributes;
 		private System.Windows.Forms.Label labCheckpoint;
 		private System.Windows.Forms.CheckBox checkBoxCheckpoint;
-		private System.Windows.Forms.Button cmdCheckpoint;
-		private System.Windows.Forms.Button cmdTreasure;
+		private System.Windows.Forms.ComboBox ddlWarpType;
 	}
 }

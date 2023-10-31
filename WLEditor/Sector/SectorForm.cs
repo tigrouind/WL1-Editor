@@ -11,12 +11,12 @@ namespace WLEditor
 	{
 		public event EventHandler<KeyEventArgs> ProcessCommandKey;
 		public event EventHandler SectorChanged;
+		public event EventHandler<(int Sector, bool Checkpoint, int TreasureId)> SectorLoad;
+
 		public readonly DirectBitmap TilesEnemies = new DirectBitmap(32 * 6, 32 * 147);
 		public readonly (Rectangle Rectangle, Point Point)[] enemiesRects = new (Rectangle, Point)[6 * 147];
 		readonly char[] treasureNames = { 'C', 'I', 'F', 'O', 'A', 'N', 'H', 'M', 'L', 'K', 'B', 'D', 'G', 'J', 'E' };
 		readonly int[] boss = { 0x4CA9, 0x460D, 0x4C0C, 0x4E34, 0x4B06, 0x4D1A, 0x527D };
-		public event EventHandler LoadCheckPoint;
-		public event EventHandler<int> LoadTreasure;
 
 		Rom rom;
 		int currentCourseId;
@@ -450,30 +450,32 @@ namespace WLEditor
 			flowLayoutPanel1.ResumeLayout();
 		}
 
-		void UpdateTitle()
+		void LoadWarpTypeDropdown()
 		{
+			ignoreEvents = true;
 			if (isWarp)
 			{
 				if (currentTreasureId != -1)
 				{
-					Text = string.Format($"Treasure {treasureNames[currentTreasureId]} warp");
+					ddlWarpType.SelectedIndex = 34 + treasureNames[currentTreasureId] - 'A';
 				}
 				else
 				{
-					Text = string.Format($"Sector {currentSector:D2}");
+					ddlWarpType.SelectedIndex = 2 + currentSector;
 				}
 			}
 			else
 			{
 				if (currentCheckPoint)
 				{
-					Text = "Checkpoint header";
+					ddlWarpType.SelectedIndex = 1;
 				}
 				else
 				{
-					Text = "Level header";
+					ddlWarpType.SelectedIndex = 0;
 				}
 			}
+			ignoreEvents = false;
 		}
 
 		#region Load
@@ -498,7 +500,6 @@ namespace WLEditor
 			zoom = Math.Min(2, zoomLevel);
 			ddlEnemies.DropDownWidth = 20 + zoom * 32 * 5 + SystemInformation.VerticalScrollBarWidth;
 			ddlEnemies.ItemHeight = zoom * 32;
-			cmdTreasure.Top = ddlEnemies.Bottom + ddlEnemies.Margin.Bottom;
 			labEnemies.Height = zoom * 32;
 		}
 
@@ -560,7 +561,7 @@ namespace WLEditor
 			}
 
 			SetControlsVisibility();
-			UpdateTitle();
+			LoadWarpTypeDropdown();
 
 			void LoadLevel()
 			{
@@ -580,7 +581,6 @@ namespace WLEditor
 			{
 				bool hasCheckpoint = Sector.GetLevelHeader(rom, currentCourseId) != Sector.GetCheckpoint(rom, currentCourseId);
 				LoadCheckBox(checkBoxCheckpoint, hasCheckpoint);
-				cmdCheckpoint.Visible = hasCheckpoint;
 			}
 		}
 
@@ -607,9 +607,6 @@ namespace WLEditor
 			LoadDropdown(ddlAnimation, currentWarp.TileAnimation);
 			LoadDropdown(ddlAnimationSpeed, currentWarp.AnimationSpeed);
 			LoadDropdownAny<EnemyInfo>(ddlEnemies, currentWarp.Enemy, x => x.EnemyPointers);
-
-			cmdTreasure.Visible = currentTreasureId == -1 && ddlEnemies.SelectedItem != null
-				&& (ddlEnemies.SelectedItem as ComboboxItem<EnemyInfo>).Value.TreasureId != -1;
 
 			LoadDropdown(ddlCameraType, currentWarp.CameraType);
 			LoadNumericUpDown(txbCameraX, currentWarp.CameraX);
@@ -715,7 +712,6 @@ namespace WLEditor
 
 				OnSectorChanged();
 				SetControlsVisibility();
-				UpdateTitle();
 			}
 
 			int GetFreeWarp()
@@ -751,8 +747,6 @@ namespace WLEditor
 				{
 					Sector.SaveCheckpoint(rom, currentCourseId, Sector.GetLevelHeader(rom, currentCourseId));
 				}
-
-				cmdCheckpoint.Visible = checkBoxCheckpoint.Checked;
 			}
 
 			int GetFreeLevelHeader()
@@ -817,7 +811,6 @@ namespace WLEditor
 			{
 				var item = (ComboboxItem<EnemyInfo>)ddlEnemies.SelectedItem;
 				currentWarp.Enemy = item.Value.EnemyPointers[0];
-				cmdTreasure.Visible = currentTreasureId == -1 && item.Value.TreasureId != -1;
 
 				SaveWarp();
 				OnSectorChanged();
@@ -943,15 +936,36 @@ namespace WLEditor
 			}
 		}
 
-		void CmdCheckpoint_Click(object sender, EventArgs e)
+		private void DdlWarpType_SelectedIndexChanged(object sender, EventArgs e)
 		{
-			LoadCheckPoint(sender, e);
-		}
-
-		private void CmdTreasure_Click(object sender, EventArgs e)
-		{
-			var item = (ComboboxItem<EnemyInfo>)ddlEnemies.SelectedItem;
-			LoadTreasure(sender, item.Value.TreasureId - 1);
+			if (!ignoreEvents)
+			{
+				if (ddlWarpType.SelectedIndex == 0)
+				{
+					SectorLoad(sender, (-1, false, -1));
+				}
+				else if (ddlWarpType.SelectedIndex == 1)
+				{
+					bool hasCheckpoint = Sector.GetLevelHeader(rom, currentCourseId) != Sector.GetCheckpoint(rom, currentCourseId);
+					if (hasCheckpoint)
+					{
+						SectorLoad(sender, (-1, true, -1));
+					}
+					else
+					{
+						MessageBox.Show("Checkpoint is not enabled in this level", Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+						LoadWarpTypeDropdown();
+					}
+				}
+				else if (ddlWarpType.SelectedIndex < 34)
+				{
+					SectorLoad(sender, (ddlWarpType.SelectedIndex - 2, false, -1));
+				}
+				else
+				{
+					SectorLoad(sender, (-1, false, Array.IndexOf(treasureNames, (char)('A' + ddlWarpType.SelectedIndex - 34))));
+				}
+			}
 		}
 
 		#endregion

@@ -161,7 +161,7 @@ namespace WLEditor
 			this.regionsToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.regionsToolStripMenuItem.Name = "regionsToolStripMenuItem";
 			this.regionsToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F1;
-			this.regionsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.regionsToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
 			this.regionsToolStripMenuItem.Text = "Sectors";
 			this.regionsToolStripMenuItem.Click += new System.EventHandler(this.RegionsToolStripMenuItemClick);
 			// 
@@ -172,7 +172,7 @@ namespace WLEditor
 			this.objectsToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.objectsToolStripMenuItem.Name = "objectsToolStripMenuItem";
 			this.objectsToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F2;
-			this.objectsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.objectsToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
 			this.objectsToolStripMenuItem.Text = "Objects";
 			this.objectsToolStripMenuItem.Click += new System.EventHandler(this.ObjectsToolStripMenuItemClick);
 			// 
@@ -183,7 +183,7 @@ namespace WLEditor
 			this.collidersToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.collidersToolStripMenuItem.Name = "collidersToolStripMenuItem";
 			this.collidersToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F3;
-			this.collidersToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.collidersToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
 			this.collidersToolStripMenuItem.Text = "Block types";
 			this.collidersToolStripMenuItem.Click += new System.EventHandler(this.CollidersToolStripMenuItemClick);
 			// 
@@ -194,7 +194,7 @@ namespace WLEditor
 			this.collectiblesToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.collectiblesToolStripMenuItem.Name = "collectiblesToolStripMenuItem";
 			this.collectiblesToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F4;
-			this.collectiblesToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.collectiblesToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
 			this.collectiblesToolStripMenuItem.Text = "Collectibles";
 			this.collectiblesToolStripMenuItem.Click += new System.EventHandler(this.CollectiblesToolStripMenuItem_Click);
 			// 
@@ -202,7 +202,7 @@ namespace WLEditor
 			// 
 			this.switchBlockToolStripMenuItem.Name = "switchBlockToolStripMenuItem";
 			this.switchBlockToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F5;
-			this.switchBlockToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.switchBlockToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
 			this.switchBlockToolStripMenuItem.Text = "[!] Block mode";
 			this.switchBlockToolStripMenuItem.Click += new System.EventHandler(this.SwitchBlockToolStripMenuItem_Click);
 			// 
@@ -212,7 +212,7 @@ namespace WLEditor
 			this.animationToolStripMenuItem.CheckOnClick = true;
 			this.animationToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.animationToolStripMenuItem.Name = "animationToolStripMenuItem";
-			this.animationToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.animationToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
 			this.animationToolStripMenuItem.Text = "Animation";
 			this.animationToolStripMenuItem.Click += new System.EventHandler(this.AnimationToolStripMenuItemClick);
 			// 
@@ -227,7 +227,7 @@ namespace WLEditor
             this.zoomInToolStripMenuItem,
             this.zoomOutToolStripMenuItem});
 			this.zoomToolStripMenuItem.Name = "zoomToolStripMenuItem";
-			this.zoomToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.zoomToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
 			this.zoomToolStripMenuItem.Text = "Zoom";
 			// 
 			// zoom100ToolStripMenuItem
@@ -299,14 +299,14 @@ namespace WLEditor
 			this.toolboxToolStripMenuItem.Enabled = false;
 			this.toolboxToolStripMenuItem.Name = "toolboxToolStripMenuItem";
 			this.toolboxToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Shift | System.Windows.Forms.Keys.F1)));
-			this.toolboxToolStripMenuItem.Size = new System.Drawing.Size(239, 22);
+			this.toolboxToolStripMenuItem.Size = new System.Drawing.Size(219, 22);
 			this.toolboxToolStripMenuItem.Text = "Blocks / Objects...";
 			this.toolboxToolStripMenuItem.CheckedChanged += new System.EventHandler(this.ToolboxToolStripMenuItemClick);
 			// 
 			// toolStripMenuItem2
 			// 
 			this.toolStripMenuItem2.Name = "toolStripMenuItem2";
-			this.toolStripMenuItem2.Size = new System.Drawing.Size(236, 6);
+			this.toolStripMenuItem2.Size = new System.Drawing.Size(216, 6);
 			// 
 			// sectorsToolStripMenuItem
 			// 
@@ -314,8 +314,8 @@ namespace WLEditor
 			this.sectorsToolStripMenuItem.Enabled = false;
 			this.sectorsToolStripMenuItem.Name = "sectorsToolStripMenuItem";
 			this.sectorsToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Shift | System.Windows.Forms.Keys.F2)));
-			this.sectorsToolStripMenuItem.Size = new System.Drawing.Size(239, 22);
 			this.sectorsToolStripMenuItem.Text = "Warp / Level header...";
+			this.sectorsToolStripMenuItem.Size = new System.Drawing.Size(219, 22);
 			this.sectorsToolStripMenuItem.CheckedChanged += new System.EventHandler(this.SectorsToolStripMenuItemClick);
 			// 
 			// overworldToolStripMenuItem
@@ -324,7 +324,7 @@ namespace WLEditor
 			this.overworldToolStripMenuItem.Enabled = false;
 			this.overworldToolStripMenuItem.Name = "overworldToolStripMenuItem";
 			this.overworldToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Shift | System.Windows.Forms.Keys.F3)));
-			this.overworldToolStripMenuItem.Size = new System.Drawing.Size(239, 22);
+			this.overworldToolStripMenuItem.Size = new System.Drawing.Size(219, 22);
 			this.overworldToolStripMenuItem.Text = "Overworld...";
 			this.overworldToolStripMenuItem.CheckedChanged += new System.EventHandler(this.OverworldToolStripMenuItemClick);
 			// 

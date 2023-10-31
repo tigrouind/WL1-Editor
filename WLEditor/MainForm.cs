@@ -95,9 +95,8 @@ namespace WLEditor
 
 			sectorForm.FormClosing += SectorFormClosing;
 			sectorForm.ProcessCommandKey += ProcessSubFormCommand;
-			sectorForm.SectorChanged += SectorChanged;
-			sectorForm.LoadCheckPoint += LoadCheckpoint;
-			sectorForm.LoadTreasure += LoadTreasureWarp;
+			sectorForm.SectorChanged += SectorFormSectorChanged;
+			sectorForm.SectorLoad += SectorFormSectorLoad;
 
 			SetZoomLevel(2);
 
@@ -116,11 +115,23 @@ namespace WLEditor
 
 			#region Subforms
 
-			void SectorChanged(object sender, EventArgs e)
+			void SectorFormSectorChanged(object sender, EventArgs e)
 			{
 				currentWarp = Sector.SearchWarp(rom, currentCourseId, levelPictureBox.CurrentSector, treasureId);
 				LoadLevel();
 				SetChanges(true);
+			}
+
+			void SectorFormSectorLoad(object sender, (int Sector, bool Checkpoint, int TreasureId) e)
+			{
+				treasureId = e.TreasureId;
+				levelPictureBox.CurrentSector = e.Sector;
+				checkPoint = e.Checkpoint;
+
+				currentWarp = Sector.SearchWarp(rom, currentCourseId, levelPictureBox.CurrentSector, treasureId);
+				LoadLevel();
+				sectorForm.LoadSector(currentCourseId, levelPictureBox.CurrentSector, treasureId, checkPoint);
+				levelPictureBox.ClearSelection();
 			}
 
 			void WorldMapChanged(object sender, EventArgs e)
@@ -169,19 +180,10 @@ namespace WLEditor
 			void LevelPictureBoxSectorChanged(object sender, EventArgs e)
 			{
 				treasureId = -1;
+				checkPoint = false;
 
-				int warpTarget = Sector.SearchWarp(rom, currentCourseId, levelPictureBox.CurrentSector, treasureId);
-				if (warpTarget != currentWarp || checkPoint)
-				{
-					checkPoint = false;
-					currentWarp = warpTarget;
-					LoadLevel();
-				}
-				else
-				{
-					levelPictureBox.Invalidate();
-				}
-
+				currentWarp = Sector.SearchWarp(rom, currentCourseId, levelPictureBox.CurrentSector, treasureId);
+				LoadLevel();
 				sectorForm.LoadSector(currentCourseId, levelPictureBox.CurrentSector, treasureId, checkPoint);
 				levelPictureBox.ClearSelection();
 			}
@@ -441,28 +443,6 @@ namespace WLEditor
 					LoadLevel();
 				}
 			}
-		}
-
-		void LoadTreasureWarp(object sender, int warpId)
-		{
-			treasureId = warpId;
-			levelPictureBox.CurrentSector = -1;
-			checkPoint = false;
-			currentWarp = Sector.SearchWarp(rom, currentCourseId, levelPictureBox.CurrentSector, treasureId);
-
-			LoadLevel();
-			sectorForm.LoadSector(currentCourseId, levelPictureBox.CurrentSector, treasureId, checkPoint);
-		}
-
-		void LoadCheckpoint(object sender, EventArgs e)
-		{
-			checkPoint = true;
-			levelPictureBox.CurrentSector = -1;
-			currentWarp = -1;
-			treasureId = -1;
-
-			LoadLevel();
-			sectorForm.LoadSector(currentCourseId, levelPictureBox.CurrentSector, treasureId, checkPoint);
 		}
 
 		#region Save
