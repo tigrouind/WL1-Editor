@@ -26,7 +26,7 @@ namespace WLEditor
 		bool currentCheckPoint;
 		int scroll;
 		int zoom;
-		bool ignoreEvents, isWarp;
+		bool ignoreEvents;
 		bool formLoaded;
 
 		public SectorForm()
@@ -442,10 +442,10 @@ namespace WLEditor
 		{
 			flowLayoutPanel1.SuspendLayout();
 
-			panelWarp.Visible = isWarp && currentTreasureId == -1;
-			panelMusic.Visible = !isWarp && !currentCheckPoint;
-			panelStatus.Visible = !isWarp;
-			grpTileset.Visible = grpCamera.Visible = !isWarp || Sector.GetWarp(rom, currentCourseId, currentSector) >= 0x5B7A || currentTreasureId != -1;
+			panelWarp.Visible = currentSector != -1;
+			panelMusic.Visible = currentSector == -1 && currentTreasureId == -1 && !currentCheckPoint;
+			panelStatus.Visible = currentSector == -1 && currentTreasureId == -1;
+			grpTileset.Visible = grpCamera.Visible = currentSector == -1 || Sector.GetWarp(rom, currentCourseId, currentSector) >= 0x5B7A;
 
 			flowLayoutPanel1.ResumeLayout();
 		}
@@ -453,27 +453,22 @@ namespace WLEditor
 		void LoadWarpTypeDropdown()
 		{
 			ignoreEvents = true;
-			if (isWarp)
+
+			if (currentTreasureId != -1)
 			{
-				if (currentTreasureId != -1)
-				{
-					ddlWarpType.SelectedIndex = 34 + treasureNames[currentTreasureId] - 'A';
-				}
-				else
-				{
-					ddlWarpType.SelectedIndex = 2 + currentSector;
-				}
+				ddlWarpType.SelectedIndex = 34 + treasureNames[currentTreasureId] - 'A';
+			}
+			else if (currentSector != -1)
+			{
+				ddlWarpType.SelectedIndex = 2 + currentSector;
+			}
+			else if (currentCheckPoint)
+			{
+				ddlWarpType.SelectedIndex = 1;
 			}
 			else
 			{
-				if (currentCheckPoint)
-				{
-					ddlWarpType.SelectedIndex = 1;
-				}
-				else
-				{
-					ddlWarpType.SelectedIndex = 0;
-				}
+				ddlWarpType.SelectedIndex = 0;
 			}
 			ignoreEvents = false;
 		}
@@ -566,7 +561,6 @@ namespace WLEditor
 			void LoadLevel()
 			{
 				currentWarp = Sector.GetLevelHeader(rom, currentCourseId, currentCheckPoint);
-				isWarp = false;
 				LoadWarp();
 			}
 
@@ -588,8 +582,6 @@ namespace WLEditor
 		{
 			LoadDropdown(ddlWarp, Math.Min(warp, 0x5B7A));
 			currentWarp = Sector.GetWarp(rom, warp);
-			isWarp = true;
-
 			LoadWarp();
 		}
 
@@ -615,7 +607,7 @@ namespace WLEditor
 			LoadNumericUpDown(txbWarioX, currentWarp.WarioX);
 			LoadNumericUpDown(txbWarioY, currentWarp.WarioY);
 
-			if (!isWarp)
+			if (currentSector == -1 && currentTreasureId == -1)
 			{
 				LoadDropdown(ddlWarioStatus, currentWarp.WarioStatus);
 				LoadDropdown(ddlWarioAttributes, currentWarp.WarioSpriteAttributes);
@@ -913,18 +905,14 @@ namespace WLEditor
 
 		void SaveWarp()
 		{
-			if (isWarp)
+			if (currentTreasureId != -1)
 			{
-				int warp;
-				if (currentTreasureId != -1)
-				{
-					warp = Sector.GetTreasureWarp(rom, currentTreasureId);
-				}
-				else
-				{
-					warp = Sector.GetWarp(rom, currentCourseId, currentSector);
-				}
-
+				int warp = Sector.GetTreasureWarp(rom, currentTreasureId);
+				Sector.SaveWarp(rom, warp, currentWarp);
+			}
+			else if (currentSector != -1)
+			{
+				int warp = Sector.GetWarp(rom, currentCourseId, currentSector);
 				Sector.SaveWarp(rom, warp, currentWarp);
 			}
 			else
