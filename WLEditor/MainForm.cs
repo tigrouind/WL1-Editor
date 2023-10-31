@@ -105,7 +105,6 @@ namespace WLEditor
 				if (DispatchShortcut(e.KeyData))
 				{
 					e.Handled = true;
-					Focus(); //prevent main window disappearing
 				}
 				else if (sender != overworldForm)
 				{
@@ -142,16 +141,19 @@ namespace WLEditor
 			void ToolBoxFormClosing(object sender, EventArgs e)
 			{
 				toolboxToolStripMenuItem.Checked = false;
+				Focus(); //prevent main window disapearing
 			}
 
 			void OverworldFormClosing(object sender, EventArgs e)
 			{
 				overworldToolStripMenuItem.Checked = false;
+				Focus(); //prevent main window disapearing
 			}
 
 			void SectorFormClosing(object sender, EventArgs e)
 			{
 				sectorsToolStripMenuItem.Checked = false;
+				Focus(); //prevent main window disapearing
 			}
 
 			#endregion
@@ -710,7 +712,7 @@ namespace WLEditor
 			{
 				if (form.Visible)
 				{
-					form.Hide();
+					form.Close();
 				}
 			}
 		}
