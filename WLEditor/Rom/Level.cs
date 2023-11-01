@@ -695,7 +695,7 @@ namespace WLEditor
 				var allTiles = GetAllTiles();
 
 				//rom expansion give new banks for level data
-				rom.ExpandTo1MB();
+				rom.ExpandTo(RomSize.ROM_1MB);
 
 				//write them back to ROM
 				byte bank = 0x20;
@@ -713,7 +713,7 @@ namespace WLEditor
 
 						if (bank == 0x40)
 						{
-							rom.ExpandTo2MB();
+							rom.ExpandTo(RomSize.ROM_2MB);
 						}
 					}
 
