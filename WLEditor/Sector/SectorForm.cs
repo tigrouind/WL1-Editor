@@ -316,13 +316,18 @@ namespace WLEditor
 				{
 					e.DrawBackground();
 
+					Rectangle rect = new Rectangle(e.Bounds.Left, e.Bounds.Top, 20, e.Bounds.Height);
 					if (item.BossId >= 0)
 					{
-						e.Graphics.FillRectangle(Brushes.MistyRose, new Rectangle(e.Bounds.Left, e.Bounds.Top, 20, e.Bounds.Height));
+						e.Graphics.FillRectangle(Brushes.MistyRose, rect);
 					}
 					else if (item.TreasureId >= 1 && item.TreasureId <= 15)
 					{
-						e.Graphics.FillRectangle(Brushes.Wheat, new Rectangle(e.Bounds.Left, e.Bounds.Top, 20, e.Bounds.Height));
+						e.Graphics.FillRectangle(Brushes.Wheat, rect);
+					}
+					else
+					{
+						e.Graphics.FillRectangle(Brushes.White, rect);
 					}
 				}
 
@@ -339,7 +344,10 @@ namespace WLEditor
 								|| item.EnemyIds[index] == 10 //moving pouncer
 								|| item.EnemyIds[index] == 71) //guragura with coin
 							{
-								e.Graphics.FillRectangle(Brushes.DarkSeaGreen, destRect);
+								using (var darkBrush = new SolidBrush(Color.FromArgb(64, 0, 0, 0)))
+								{
+									e.Graphics.FillRectangle(darkBrush, destRect);
+								}
 							}
 
 							var imgRect = new Rectangle(index * 32, item.Index * 32, 32, 32);
