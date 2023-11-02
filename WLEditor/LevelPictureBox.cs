@@ -85,16 +85,20 @@ namespace WLEditor
 						}
 					}
 
+					if (ShowSectors)
+					{
+						DrawCamera();
+					}
+
+					selection.DrawSelection(e.Graphics);
+
 					//sectors
 					if (ShowSectors)
 					{
 						DrawSectors(font, format);
-						DrawCamera();
 						DrawSelectedSector();
 						DrawScrollLines();
 					}
-
-					selection.DrawSelection(e.Graphics);
 				}
 			}
 
@@ -200,7 +204,7 @@ namespace WLEditor
 				{
 					int drawSector = x + y * 16;
 
-					e.Graphics.FillRectangle(Brushes.Blue, x * 256 * zoom, y * 256 * zoom, 16 * zoom, 16 * zoom);
+					e.Graphics.FillRectangle(EnemyBrush, x * 256 * zoom, y * 256 * zoom, 16 * zoom, 16 * zoom);
 					e.Graphics.DrawString(drawSector.ToString("D2"), font, Brushes.White, (x * 256 + 8) * zoom, (y * 256 + 8) * zoom, format);
 
 					int sectorTarget = Level.Warps[drawSector];
@@ -209,7 +213,7 @@ namespace WLEditor
 						string text = GetWarpName();
 						var result = TextRenderer.MeasureText(text, font);
 
-						e.Graphics.FillRectangle(Brushes.Blue, (x * 256 + 20) * zoom, y * 256 * zoom, result.Width, 16 * zoom);
+						e.Graphics.FillRectangle(EnemyBrush, (x * 256 + 20) * zoom, y * 256 * zoom, result.Width, 16 * zoom);
 						e.Graphics.DrawString(text, font, Brushes.White, (x * 256) * zoom + result.Width / 2 + 20 * zoom, (y * 256 + 8) * zoom, format);
 					}
 
@@ -239,7 +243,7 @@ namespace WLEditor
 				void DrawSectorBorders()
 				{
 					//draw sector borders
-					using (Pen penBlue = new Pen(Color.Blue, 2.0f * zoom))
+					using (Pen penBlue = new Pen(EnemyBrush, 2.0f * zoom))
 					{
 						penBlue.DashPattern = new[] { 5.0f, 1.0f };
 
