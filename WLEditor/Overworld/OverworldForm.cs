@@ -261,6 +261,7 @@ namespace WLEditor
 				}
 				if (pathMode)
 				{
+					eventForm.DrawEvents(e.Graphics, false);
 					pathForm.Draw(e.Graphics);
 				}
 				if (selectionMode)
@@ -1062,6 +1063,12 @@ namespace WLEditor
 				Overworld.SetMusic(rom, currentWorld, musicTrack - 1);
 				SetChanges(ChangeEnum.None);
 			}
+		}
+
+		private void TransparentPathToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			pathForm.TransparentPath = transparentPathToolStripMenuItem.Checked;
+			pictureBox1.Invalidate();
 		}
 	}
 }

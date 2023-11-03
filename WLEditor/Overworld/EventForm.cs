@@ -334,7 +334,7 @@ namespace WLEditor
 
 		#endregion
 
-		public void DrawEvents(Graphics graphics)
+		public void DrawEvents(Graphics graphics, bool drawRects = true)
 		{
 			using (var brushEvent = new SolidBrush(Color.FromArgb(128, 255, 128, 0)))
 			using (var brushStep = new SolidBrush(Color.FromArgb(128, 64, 192, 192)))
@@ -344,15 +344,16 @@ namespace WLEditor
 					bool selected = worldEv == worldEvent;
 					for (int i = 0; i < worldEv.Count; i++)
 					{
-						var item = worldEv[i];
-						int position = item.Position;
+						var (position, tileIndex) = worldEv[i];
 						int x = position % 32;
 						int y = position / 32;
-						byte tileIndex = item.Index;
 
 						if (i >= eventStep && selected)
 						{
-							graphics.FillRectangle(brushEvent, new Rectangle(x * 8 * zoom, y * 8 * zoom, 8 * zoom, 8 * zoom));
+							if (drawRects)
+							{
+								graphics.FillRectangle(brushEvent, new Rectangle(x * 8 * zoom, y * 8 * zoom, 8 * zoom, 8 * zoom));
+							}
 						}
 						else
 						{
@@ -363,7 +364,7 @@ namespace WLEditor
 											new Rectangle(x * 8 * zoom, y * 8 * zoom, 8 * zoom, 8 * zoom),
 											new Rectangle(srcx * 8, srcy * 8, 8, 8), GraphicsUnit.Pixel);
 
-							if (selected)
+							if (selected && drawRects)
 							{
 								graphics.FillRectangle(brushStep, new Rectangle(x * 8 * zoom, y * 8 * zoom, 8 * zoom, 8 * zoom));
 							}

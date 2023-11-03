@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -18,13 +19,15 @@ namespace WLEditor
 
 		PathModeEnum pathMode;
 		const int gridSnap = 4;
+		readonly ImageAttributes transparentImageAttributes;
+		public bool TransparentPath;
 
 		int zoom;
 		int currentWorld;
 		readonly PictureBox pictureBox;
 		readonly DirectBitmap tilesFlag = new DirectBitmap(16 * 8, 1 * 8);
 
-		Bitmap pathBitmap;
+		Bitmap pathABitmap, pathBBitmap;
 
 		public Func<int> GetAnimationIndex;
 
@@ -60,6 +63,7 @@ namespace WLEditor
 		public PathForm(PictureBox box)
 		{
 			pictureBox = box;
+			transparentImageAttributes = GetTransparentImageAttributes();
 		}
 
 		void SetChanges()
@@ -132,8 +136,11 @@ namespace WLEditor
 		{
 			zoom = zoomLevel;
 
-			pathBitmap?.Dispose();
-			pathBitmap = new Bitmap(pictureBox.Width, pictureBox.Height);
+			pathABitmap?.Dispose();
+			pathABitmap = new Bitmap(pictureBox.Width, pictureBox.Height);
+
+			pathBBitmap?.Dispose();
+			pathBBitmap = new Bitmap(pictureBox.Width, pictureBox.Height);
 		}
 
 		public void LoadPaths(Rom rom)
@@ -650,17 +657,32 @@ namespace WLEditor
 
 		public void Draw(Graphics g)
 		{
-			using (Graphics gPath = Graphics.FromImage(pathBitmap))
+			using (Graphics gPathA = Graphics.FromImage(pathABitmap))
+			using (Graphics gPathB = Graphics.FromImage(pathBBitmap))
 			{
-				gPath.Clear(Color.Transparent);
+				gPathA.Clear(Color.Transparent);
+				gPathB.Clear(Color.Transparent);
 
 				DrawPaths();
 				DrawLevels();
 				DrawExits();
+				if (!TransparentPath)
+				{
+					DrawProgress();
+				}
 
-				g.DrawImage(pathBitmap, 0, 0);
+				gPathB.DrawImage(pathABitmap, 0, 0);
 
-				DrawProgress();
+				if (TransparentPath)
+				{
+					g.DrawImage(pathBBitmap, new Rectangle(0, 0, pathBBitmap.Width, pathBBitmap.Height),
+						0, 0, pathBBitmap.Width, pathBBitmap.Height, GraphicsUnit.Pixel, transparentImageAttributes);
+				}
+				else
+				{
+					g.DrawImage(pathBBitmap, 0, 0);
+				}
+
 				DrawFlag();
 
 				void DrawLevels()
@@ -684,11 +706,14 @@ namespace WLEditor
 
 							using (GraphicsPath path = RoundedRect(new Rectangle(posX * zoom, posY * zoom, 8 * zoom, 8 * zoom), zoom * 2))
 							{
-								g.DrawPath(pen, path);
-								gPath.FillPath(selected ? Brushes.Lime : Brushes.MediumSeaGreen, path);
+								gPathB.DrawPath(pen, path);
+								gPathA.FillPath(selected ? Brushes.Lime : Brushes.MediumSeaGreen, path);
 							}
 
-							gPath.DrawString((Array.IndexOf(levels[currentWorld], level) + 1).ToString(), font, Brushes.Black, (posX + 4) * zoom, (posY + 4) * zoom, format);
+							if (!TransparentPath)
+							{
+								gPathA.DrawString((Array.IndexOf(levels[currentWorld], level) + 1).ToString(), font, Brushes.Black, (posX + 4) * zoom, (posY + 4) * zoom, format);
+							}
 						}
 					}
 				}
@@ -730,11 +755,14 @@ namespace WLEditor
 
 							using (GraphicsPath path = RoundedRect(new Rectangle(exitX * zoom, exitY * zoom, 8 * zoom, 8 * zoom), zoom * 2))
 							{
-								g.DrawPath(penBorder, path);
-								gPath.FillPath(selected ? Brushes.Lime : Brushes.MediumSeaGreen, path);
+								gPathB.DrawPath(penBorder, path);
+								gPathA.FillPath(selected ? Brushes.Lime : Brushes.MediumSeaGreen, path);
 							}
 
-							gPath.DrawString(new[] { "A", "B", "C", "C" }[Array.IndexOf(flags, dir.Next)], font, Brushes.Black, (exitX + 4) * zoom, (exitY + 4) * zoom, format);
+							if (!TransparentPath)
+							{
+								gPathA.DrawString(new[] { "A", "B", "C", "C" }[Array.IndexOf(flags, dir.Next)], font, Brushes.Black, (exitX + 4) * zoom, (exitY + 4) * zoom, format);
+							}
 						}
 					}
 				}
@@ -767,7 +795,7 @@ namespace WLEditor
 					{
 						using (var pen = new Pen(Color.Black, zoom * 6.0f))
 						{
-							g.DrawLines(pen, points.ToArray());
+							gPathB.DrawLines(pen, points.ToArray());
 						}
 
 						using (var brush = new SolidBrush(Color.Black))
@@ -778,7 +806,7 @@ namespace WLEditor
 							foreach (var item in colors.GroupByAdjacent(x => x, (x, y) => new { Color = x, Count = y.Count() }))
 							{
 								brush.Color = item.Color;
-								gPath.FillPolygon(brush, GetLineStrip(n, item.Count + 1).ToArray(), FillMode.Winding);
+								gPathA.FillPolygon(brush, GetLineStrip(n, item.Count + 1).ToArray(), FillMode.Winding);
 								n += item.Count;
 							}
 
@@ -857,8 +885,8 @@ namespace WLEditor
 								int progress = Array.IndexOf(flags, dirs.Progress);
 								if (progress != -1)
 								{
-									g.FillRectangle(Brushes.Gray, (currentPath.X + offsets[dir, 0]) * zoom, (currentPath.Y + offsets[dir, 1]) * zoom, 8 * zoom, 8 * zoom);
-									g.DrawString((progress + 1).ToString(), font, Brushes.White, (currentPath.X + 4 + offsets[dir, 0]) * zoom, (currentPath.Y + 4 + offsets[dir, 1]) * zoom, format);
+									gPathA.FillRectangle(Brushes.Gray, (currentPath.X + offsets[dir, 0]) * zoom, (currentPath.Y + offsets[dir, 1]) * zoom, 8 * zoom, 8 * zoom);
+									gPathA.DrawString((progress + 1).ToString(), font, Brushes.White, (currentPath.X + 4 + offsets[dir, 0]) * zoom, (currentPath.Y + 4 + offsets[dir, 1]) * zoom, format);
 								}
 							}
 						}
@@ -885,6 +913,22 @@ namespace WLEditor
 					return path;
 				}
 			}
+		}
+
+		ImageAttributes GetTransparentImageAttributes()
+		{
+			var ptsArray = new float[][]
+			{
+				new float[] {1, 0, 0, 0, 0},
+				new float[] {0, 1, 0, 0, 0},
+				new float[] {0, 0, 1, 0, 0},
+				new float[] {0, 0, 0, 0.5f, 0},
+				new float[] {0, 0, 0, 0, 1}
+			};
+			var clrMatrix = new ColorMatrix(ptsArray);
+			var imgAttributes = new ImageAttributes();
+			imgAttributes.SetColorMatrix(clrMatrix);
+			return imgAttributes;
 		}
 
 		PathModeEnum GroupPath(WorldPathStatusEnum status)
