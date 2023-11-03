@@ -1,5 +1,7 @@
 using Microsoft.VisualBasic;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
@@ -28,6 +30,9 @@ namespace WLEditor
 		int zoom;
 		bool ignoreEvents;
 		bool formLoaded;
+
+		readonly Stack<int> lastFreeWarp = new Stack<int>();
+		readonly Stack<int> lastFreeCheckpoint = new Stack<int>();
 
 		public SectorForm()
 		{
@@ -706,6 +711,14 @@ namespace WLEditor
 						}
 					}
 				}
+				else
+				{
+					int previousWarp = Sector.GetWarp(rom, currentCourseId, currentSector);
+					if (previousWarp >= 0x5B7A)
+					{
+						lastFreeWarp.Push(previousWarp);
+					}
+				}
 
 				Sector.SaveWarp(rom, currentCourseId, currentSector, warp);
 				LoadWarp(warp);
@@ -720,8 +733,16 @@ namespace WLEditor
 				var all = Enumerable.Range(0, 370)
 					.Select(x => 0x5B7A + x * 24);
 
-				return all
+				var free = all
 					.Except(used)
+					.ToArray();
+
+				if (lastFreeWarp.Count > 0 && free.Contains(lastFreeWarp.Peek()))
+				{
+					return lastFreeWarp.Pop();
+				}
+
+				return free
 					.DefaultIfEmpty(-1)
 					.First();
 			}
@@ -733,7 +754,7 @@ namespace WLEditor
 			{
 				if (checkBoxCheckpoint.Checked)
 				{
-					int header = GetFreeLevelHeader();
+					int header = GetFreeCheckpoint();
 					if (header == -1)
 					{
 						MessageBox.Show("No more checkpoint headers.\r\nPlease free a checkpoint in another level", Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -745,20 +766,28 @@ namespace WLEditor
 				}
 				else
 				{
+					lastFreeCheckpoint.Push(Sector.GetCheckpoint(rom, currentCourseId));
 					Sector.SaveCheckpoint(rom, currentCourseId, Sector.GetLevelHeader(rom, currentCourseId));
 				}
 			}
 
-			int GetFreeLevelHeader()
+			int GetFreeCheckpoint()
 			{
 				int header = Sector.GetLevelHeader(rom, currentCourseId);
 				var used = Sector.GetLevelHeaderUsage(rom);
 				var all = Enumerable.Range(0, 77)
 					.Select(x => 0x460C + x * 30);
 
-				return all
+				var free = all
 					.Except(used)
-					.OrderByDescending(x => x == (header + 30))
+					.ToArray();
+
+				if (lastFreeCheckpoint.Count > 0 && free.Contains(lastFreeCheckpoint.Peek()))
+				{
+					return lastFreeCheckpoint.Pop();
+				}
+
+				return free
 					.DefaultIfEmpty(-1)
 					.First();
 			}
