@@ -12,6 +12,7 @@ namespace WLEditor
 	{
 		WorldPath[] worldData;
 		WorldPath[] overWorldData;
+		(int X, int Y)[] flags;
 
 		WorldPath currentPath;
 		WorldPathDirection currentDirection;
@@ -44,18 +45,6 @@ namespace WLEditor
 			new [] { 0, 1, 5, 2, 4, 3, 6, 7 }
 		};
 
-		readonly int[][][] startPositionData =
-		{
-			new [] { new [] { 0x5558, 0x6075, 0 } },
-			new [] { new [] { 0x5558, 0x6075, 0 } },
-			new [] { new [] { 0x554C, 0x0000, 0 }, new [] { 0x5552, 0x6095, 1 } },
-			new [] { new [] { 0x5527, 0x608D, 0 } },
-			new [] { new [] { 0x553F, 0x607D, 0 } },
-			new [] { new [] { 0x552D, 0x6089, 0 } },
-			new [] { new [] { 0x5533, 0x6085, 0 } },
-			new [] { new [] { 0x5539, 0x6081, 0 } }
-		};
-
 		readonly Color[] pathColors = { Color.Lime, Color.Red, Color.Blue, Color.MediumSeaGreen, Color.Brown, Color.SteelBlue };
 
 		public event EventHandler PathChanged;
@@ -78,56 +67,34 @@ namespace WLEditor
 			bool result = Overworld.SavePaths(rom, PathData, currentWorld == 8, out errorMessage);
 			if (result)
 			{
-				int[] worldIndex = { 0, 0, 1, 5, 2, 3, 4, 6, 7 };
-				Overworld.SaveProgressNextDirection(rom, PathData, levels[currentWorld], worldIndex[currentWorld]);
+				Overworld.SaveProgressNextDirection(rom, currentWorld, PathData, levels[currentWorld]);
 
-				if (currentWorld != 8)
+				if (currentWorld == 8)
 				{
-					SaveStartPosition();
+					Overworld.SaveFlags(rom, flags);
+				}
+				else
+				{
+					Overworld.SaveTreasures(rom, PathData);
+					Overworld.SaveStartPosition(rom, currentWorld, FindExitPosition);
 				}
 			}
 
 			return result;
 
-			void SaveStartPosition()
+			(int posX, int posY) FindExitPosition(int startLevel)
 			{
-				foreach (var pos in startPositionData[currentWorld])
+				int level = levels[currentWorld][startLevel];
+
+				var item = PathData[level];
+				var dir = item.Directions.FirstOrDefault(x => x.Path.Count > 0 && IsSpecialExit(x.Next));
+				if (dir != null)
 				{
-					var (posX, posY) = FindExitPosition(pos[2]);
-					Overworld.SaveStartPosition(rom, posX, posY, FindClosestSide(posX, posY), pos[0], pos[1]);
+					return GetPathPosition(item, dir);
 				}
-
-				int FindClosestSide(int x, int y)
+				else
 				{
-					int[] borders = { x, 160 - x, y, 144 - y };
-					int bestSide = -1, min = int.MaxValue;
-
-					for (int i = 0; i < borders.Length; i++)
-					{
-						if (borders[i] < min)
-						{
-							min = borders[i];
-							bestSide = i;
-						}
-					}
-
-					return bestSide;
-				}
-
-				(int posX, int posY) FindExitPosition(int startLevel)
-				{
-					int level = levels[currentWorld][startLevel];
-
-					var item = PathData[level];
-					var dir = item.Directions.FirstOrDefault(x => x.Path.Count > 0 && IsSpecialExit(x.Next));
-					if (dir != null)
-					{
-						return GetPathPosition(item, dir);
-					}
-					else
-					{
-						return (item.X, item.Y);
-					}
+					return (item.X, item.Y);
 				}
 			}
 		}
@@ -147,6 +114,7 @@ namespace WLEditor
 		{
 			worldData = Overworld.LoadPaths(rom, false);
 			overWorldData = Overworld.LoadPaths(rom, true);
+			flags = Overworld.LoadFlags(rom);
 			Overworld.DumpFlags(rom, tilesFlag);
 		}
 
@@ -397,27 +365,30 @@ namespace WLEditor
 
 			void MoveFlag()
 			{
-				int posX = currentPath.FlagX / gridSnap * gridSnap;
-				int posY = currentPath.FlagY / gridSnap * gridSnap;
+				var item = flags[currentLevel];
+				int posX = item.X / gridSnap * gridSnap;
+				int posY = item.Y / gridSnap * gridSnap;
 
 				switch (keyCode)
 				{
 					case Keys.Up:
-						currentPath.FlagY = Math.Max(posY - gridSnap, 0);
+						item.Y = Math.Max(posY - gridSnap, 0);
 						break;
 
 					case Keys.Down:
-						currentPath.FlagY = Math.Min(posY + gridSnap, CurrentMapY - 16);
+						item.Y = Math.Min(posY + gridSnap, CurrentMapY - 16);
 						break;
 
 					case Keys.Left:
-						currentPath.FlagX = Math.Max(posX - gridSnap, 0);
+						item.X = Math.Max(posX - gridSnap, 0);
 						break;
 
 					case Keys.Right:
-						currentPath.FlagX = Math.Min(posX + gridSnap, CurrentMapX - 16);
+						item.X = Math.Min(posX + gridSnap, CurrentMapX - 16);
 						break;
 				}
+
+				flags[currentLevel] = item;
 			}
 
 			void MoveLevel()
@@ -722,12 +693,12 @@ namespace WLEditor
 				{
 					if (currentWorld == 8 && currentLevel != 7)
 					{
-						var item = PathData[currentLevel];
+						var item = flags[currentLevel];
 						int animationIndex = GetAnimationIndex();
 						for (int n = 0; n < 4; n++)
 						{
 							var src = new Rectangle((n + animationIndex % 3 * 4) * 8, 0, 8, 8);
-							var dest = new Rectangle((item.FlagX + n % 2 * 8) * zoom, (item.FlagY + n / 2 * 8) * zoom, 8 * zoom, 8 * zoom);
+							var dest = new Rectangle((item.X + n % 2 * 8) * zoom, (item.Y + n / 2 * 8) * zoom, 8 * zoom, 8 * zoom);
 							g.DrawImage(tilesFlag.Bitmap, dest, src, GraphicsUnit.Pixel);
 						}
 					}

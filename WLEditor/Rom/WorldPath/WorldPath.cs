@@ -5,8 +5,5 @@ namespace WLEditor
 		public int X;
 		public int Y;
 		public WorldPathDirection[] Directions; //Right, Left, Up, Down
-
-		public int FlagX;
-		public int FlagY;
 	}
 }
