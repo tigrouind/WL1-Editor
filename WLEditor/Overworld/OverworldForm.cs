@@ -21,7 +21,7 @@ namespace WLEditor
 		int currentWorld;
 
 		List<SelectionChange> changes = new List<SelectionChange>();
-		int selectedTile;
+		int SelectedTile => selection2.GetCurrentTile((x, y) => x + y * 16);
 
 		bool eventMode;
 		bool pathMode;
@@ -36,7 +36,8 @@ namespace WLEditor
 		bool lastTileSide;
 		ChangeEnum changesFlag;
 
-		readonly Selection selection = new Selection(8);
+		readonly Selection selection1 = new Selection(8);
+		readonly Selection selection2 = new Selection(8);
 		bool selectionMode;
 
 		readonly byte[] worldTiles = new byte[32 * 32];
@@ -49,7 +50,7 @@ namespace WLEditor
 		public OverworldForm()
 		{
 			InitializeComponent();
-			eventForm = new EventForm(pictureBox1, tilesWorld8x8, selection);
+			eventForm = new EventForm(pictureBox1, tilesWorld8x8, selection1);
 			eventForm.EventIndexChanged += (s, e) => UpdateTitle();
 			eventForm.EventChanged += (s, e) => SetChanges(ChangeEnum.Event);
 
@@ -57,19 +58,8 @@ namespace WLEditor
 			pathForm.PathChanged += (s, e) => SetChanges(ChangeEnum.Path);
 			pathForm.GetAnimationIndex = () => animationIndex;
 
-			selection.InvalidateSelection += InvalidateSelection;
-
-			void InvalidateSelection(object sender, SelectionEventArgs e)
-			{
-				if (selectionMode)
-				{
-					pictureBox1.Invalidate(e.ClipRectangle);
-				}
-				else
-				{
-					pictureBox2.Invalidate(e.ClipRectangle);
-				}
-			}
+			selection1.InvalidateSelection += (s, e) => pictureBox1.Invalidate(e.ClipRectangle);
+			selection2.InvalidateSelection += (s, e) => pictureBox2.Invalidate(e.ClipRectangle);
 		}
 
 		readonly ComboboxItemCollection<(int BankA, int TileAddressA, int BankB, int TileAddressB, int MaxLength)> worldData = new ComboboxItemCollection<(int, int, int, int, int)>
@@ -90,7 +80,8 @@ namespace WLEditor
 			this.rom = rom;
 			formLoaded = false;
 			changesFlag = ChangeEnum.None;
-			selection.ClearSelection();
+			selection1.ClearSelection();
+			selection2.ClearSelection();
 
 			if (Visible)
 			{
@@ -144,7 +135,7 @@ namespace WLEditor
 			eventForm.LoadWorld(rom, currentWorld);
 			pathForm.LoadWorld(currentWorld);
 
-			selection.ClearUndo();
+			selection1.ClearUndo();
 
 			UpdateTitle();
 			ClearAllTiles();
@@ -177,7 +168,8 @@ namespace WLEditor
 
 				currentWorld = WorldComboBox.SelectedIndex;
 				LoadWorld();
-				selection.ClearSelection();
+				selection1.ClearSelection();
+				selection2.ClearSelection();
 				SetZoom(zoom);
 			}
 		}
@@ -264,10 +256,8 @@ namespace WLEditor
 					eventForm.DrawEvents(e.Graphics, false);
 					pathForm.Draw(e.Graphics);
 				}
-				if (selectionMode)
-				{
-					selection.DrawSelection(e.Graphics);
-				}
+
+				selection1.DrawSelection(e.Graphics);
 			}
 
 			void RenderTiles()
@@ -341,15 +331,7 @@ namespace WLEditor
 				e.Graphics.PixelOffsetMode = PixelOffsetMode.Half;
 				e.Graphics.DrawImage(tilesWorld8x8.Bitmap, 0, 0, 128 * zoom, 128 * zoom);
 
-				if (!selectionMode)
-				{
-					selection.DrawSelection(e.Graphics);
-				}
-
-				using (Brush brush = new SolidBrush(Color.FromArgb(128, 255, 0, 0)))
-				{
-					e.Graphics.FillRectangle(brush, (selectedTile % 16) * 8 * zoom, (selectedTile / 16) * 8 * zoom, 8 * zoom, 8 * zoom);
-				}
+				selection2.DrawSelection(e.Graphics);
 			}
 		}
 
@@ -363,7 +345,8 @@ namespace WLEditor
 
 			eventForm.SetZoom(zoomlevel);
 			pathForm.SetZoom(zoomlevel);
-			selection.SetZoom(zoomlevel);
+			selection1.SetZoom(zoomlevel);
+			selection2.SetZoom(zoomlevel);
 
 			zoom = zoomlevel;
 		}
@@ -462,6 +445,7 @@ namespace WLEditor
 				{
 					if (!pathMode)
 					{
+						var selection = selectionMode? selection1 : selection2;
 						selection.CopySelection(CopyTileAt);
 						selection.ClearSelection();
 					}
@@ -471,14 +455,14 @@ namespace WLEditor
 				{
 					if (!pathMode && selectionMode)
 					{
-						if (selection.PasteSelection(PasteTileAt))
+						if (selection1.PasteSelection(PasteTileAt))
 						{
 							RaiseTileMoveEvent();
 							pictureBox1.Invalidate();
 							SetChanges(eventMode ? ChangeEnum.Event : ChangeEnum.Tile);
 						}
 
-						selection.ClearSelection();
+						selection1.ClearSelection();
 					}
 
 					int PasteTileAt(int x, int y, int data)
@@ -497,14 +481,14 @@ namespace WLEditor
 					if (!pathMode && selectionMode)
 					{
 						int tile = GetEmptyTile();
-						if (selection.CopySelection(CopyTileAt) && selection.DeleteSelection(SetTileAt, GetEmptyTile()))
+						if (selection1.CopySelection(CopyTileAt) && selection1.DeleteSelection(SetTileAt, GetEmptyTile()))
 						{
 							RaiseTileMoveEvent();
 							pictureBox1.Invalidate();
 							SetChanges(eventMode ? ChangeEnum.Event : ChangeEnum.Tile);
 						}
 
-						selection.ClearSelection();
+						selection1.ClearSelection();
 					}
 				}
 
@@ -513,14 +497,14 @@ namespace WLEditor
 					if (!pathMode && selectionMode)
 					{
 						int tile = GetEmptyTile();
-						if (selection.DeleteSelection(SetTileAt, GetEmptyTile()))
+						if (selection1.DeleteSelection(SetTileAt, GetEmptyTile()))
 						{
 							RaiseTileMoveEvent();
 							pictureBox1.Invalidate();
 							SetChanges(eventMode ? ChangeEnum.Event : ChangeEnum.Tile);
 						}
 
-						selection.ClearSelection();
+						selection1.ClearSelection();
 					}
 				}
 
@@ -558,7 +542,7 @@ namespace WLEditor
 				{
 					if (!pathMode)
 					{
-						if (selection.Undo(SetTileAt, GetTileAt))
+						if (selection1.Undo(SetTileAt, GetTileAt))
 						{
 							RaiseTileMoveEvent();
 							pictureBox1.Invalidate();
@@ -571,7 +555,7 @@ namespace WLEditor
 				{
 					if (!pathMode)
 					{
-						if (selection.Redo(SetTileAt, GetTileAt))
+						if (selection1.Redo(SetTileAt, GetTileAt))
 						{
 							RaiseTileMoveEvent();
 							pictureBox1.Invalidate();
@@ -650,14 +634,8 @@ namespace WLEditor
 
 		#region Mouse
 
-		void UpdateSelection(TileEventArgs e, bool mode)
+		void UpdateSelection(TileEventArgs e, Selection selection)
 		{
-			if (selectionMode != mode)
-			{
-				selection.ClearSelection();
-				selectionMode = mode;
-			}
-
 			if (e.Button == MouseButtons.Left)
 			{
 				if (e.Status == TileEventStatus.MouseDown)
@@ -668,10 +646,6 @@ namespace WLEditor
 				{
 					selection.SetSelection(e.TileX, e.TileY);
 				}
-			}
-			else
-			{
-				selection.ClearSelection();
 			}
 		}
 
@@ -712,18 +686,29 @@ namespace WLEditor
 					changes = new List<SelectionChange>();
 				}
 
-				if ((e.Status == TileEventStatus.MouseDown || e.Status == TileEventStatus.MouseMove) && !selection.HasSelection)
+				if ((e.Status == TileEventStatus.MouseDown || e.Status == TileEventStatus.MouseMove) && !selection1.HasSelection && SelectedTile != -1)
 				{
-					UpdateTile(e.TileX, e.TileY, selectedTile ^ 0x80);
+					UpdateTile(e.TileX, e.TileY, SelectedTile ^ 0x80);
 				}
 
 				if (e.Status == TileEventStatus.MouseUp)
 				{
-					selection.AddChanges(changes);
+					selection1.AddChanges(changes);
 				}
 			}
 
-			UpdateSelection(e, true);
+			selectionMode = true;
+			UpdateSelection(e, selection1);
+
+			if (e.Button == MouseButtons.Right && e.Status == TileEventStatus.MouseDown)
+			{
+				selection1.ClearSelection();
+			}
+
+			if (SelectedTile == -1)
+			{
+				selection2.ClearSelection();
+			}
 
 			void UpdateTile(int x, int y, int newTile)
 			{
@@ -791,16 +776,15 @@ namespace WLEditor
 
 		void PictureBox2TileMouseDown(TileEventArgs e)
 		{
-			if (e.Button == MouseButtons.Right)
-			{
-				if (e.Status == TileEventStatus.MouseDown)
-				{
-					selectedTile = e.TileX + e.TileY * 16;
-					pictureBox2.Invalidate();
-				}
-			}
+			selectionMode = false;
+			UpdateSelection(e, selection2);
 
-			UpdateSelection(e, false);
+			selection1.ClearSelection();
+
+			if (e.Button == MouseButtons.Right && e.Status == TileEventStatus.MouseDown)
+			{
+				selection2.StartSelection(e.TileX, e.TileY);
+			}
 		}
 
 		void PictureBox2MouseMove(object sender, MouseEventArgs e)
@@ -815,13 +799,6 @@ namespace WLEditor
 		{
 			currentTile = -1;
 			lastTile = -1;
-
-			if (selectionMode)
-			{
-				selection.ClearSelection();
-				selectionMode = false;
-			}
-
 			PictureBox2MouseEvent(e, TileEventStatus.MouseDown);
 		}
 
@@ -1036,8 +1013,9 @@ namespace WLEditor
 				pictureBox1.Invalidate();
 				pictureBox2.Visible = !pathMode;
 				UpdateBounds();
-				selection.ClearUndo();
-				selection.ClearSelection();
+				selection1.ClearUndo();
+				selection1.ClearSelection();
+				selection2.ClearSelection();
 
 				ignoreEvents = true;
 				tileModeToolStripMenuItem.Checked = mode == 0;

@@ -53,6 +53,18 @@ namespace WLEditor
 			return (start, end);
 		}
 
+		public int GetCurrentTile(Func<int, int, int> getIndex)
+		{
+			if (selection && selectionStart.X == selectionEnd.X && selectionStart.Y == selectionEnd.Y)
+			{
+				return getIndex(selectionStart.X, selectionEnd.Y);
+			}
+			else
+			{
+				return -1;
+			}
+		}
+
 		void Invalidate()
 		{
 			InvalidateSelection(this, new SelectionEventArgs(GetSelectionRectangle()));

@@ -215,7 +215,7 @@ namespace WLEditor
 
 						if (e.Button == MouseButtons.Right)
 						{
-							if (control == toolboxForm.Tiles16x16)
+							if (control == toolboxForm.Tiles16x16 && currentTile != -1)
 							{
 								UpdateTile(tileIndex, currentTile);
 							}

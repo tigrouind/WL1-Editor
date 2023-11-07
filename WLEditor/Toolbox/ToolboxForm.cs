@@ -62,6 +62,11 @@ namespace WLEditor
 		{
 			KeyEventArgs args = new KeyEventArgs(keyData);
 
+			if (tiles16x16PictureBox.ProcessCommandKey(keyData))
+			{
+				return true;
+			}
+
 			ProcessCommandKey(this, args);
 			if (args.Handled)
 			{
