@@ -211,6 +211,13 @@ namespace WLEditor
 					{
 						if (eventStep > 0)
 						{
+							var (Position, Index) = worldEvent[eventStep - 1];
+							var changes = new List<SelectionChange>
+							{
+								new SelectionChange { X = Position % 32, Y = Position / 32, Data = Index }
+							};
+							history.AddChanges(changes);
+
 							worldEvent.RemoveAt(eventStep - 1);
 							eventStep--;
 
@@ -226,6 +233,13 @@ namespace WLEditor
 				case Keys.Delete | Keys.Shift:
 					if (worldEvent.Count > 0)
 					{
+						var changes = new List<SelectionChange>();
+						foreach(var (Position, Index) in worldEvent)
+						{
+							changes.Add(new SelectionChange { X = Position % 32, Y = Position / 32, Data = Index });
+						}
+						history.AddChanges(changes);
+
 						worldEvent.Clear();
 						eventStep = 0;
 
