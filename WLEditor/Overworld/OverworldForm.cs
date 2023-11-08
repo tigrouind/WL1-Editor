@@ -521,7 +521,7 @@ namespace WLEditor
 					{
 						if (eventMode)
 						{
-							int index = eventForm.FindEvent(x + y * 32);
+							int index = eventForm.FindEvent(x, y);
 							return new ClipboardData { Index = index, Tile = eventForm.GetEvent(index) };
 						}
 
@@ -615,7 +615,7 @@ namespace WLEditor
 				{
 					if (lastTileSide)
 					{
-						int tileIndex = eventForm.GetTileAt(lastTile);
+						int tileIndex = eventForm.GetTileAt(lastTile % 32, lastTile / 32);
 						if (tileIndex == -1)
 						{
 							tileIndex = worldTiles[lastTile];
@@ -819,7 +819,7 @@ namespace WLEditor
 		{
 			if (eventMode)
 			{
-				return eventForm.GetEvent(eventForm.FindEvent(x + y * 32));
+				return eventForm.GetEvent(eventForm.FindEvent(x, y));
 			}
 
 			return worldTiles[x + y * 32];
@@ -839,11 +839,11 @@ namespace WLEditor
 
 					if (data == -1)
 					{
-						eventForm.RemoveEvent(x + y * 32);
+						eventForm.RemoveEvent(x, y);
 					}
 					else
 					{
-						eventForm.AddEvent((byte)data, x + y * 32);
+						eventForm.AddEvent((byte)data, x, y);
 					}
 				}
 				else

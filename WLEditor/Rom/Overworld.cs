@@ -238,16 +238,16 @@ namespace WLEditor
 
 		#region Events
 
-		public static List<(int Position, byte Index)>[] LoadEvents(Rom rom, int[] events)
+		public static List<(int X, int Y, byte Index)>[] LoadEvents(Rom rom, int[] events)
 		{
 			rom.SetBank(8);
 
-			var result = new List<List<(int, byte)>>();
+			var result = new List<List<(int, int, byte)>>();
 			foreach (var item in events)
 			{
 				int tileIndexAddress = rom.ReadWord(item + 1);
 				int tilePositionAddress = rom.ReadWord(item + 4);
-				var eventItem = new List<(int, byte)>();
+				var eventItem = new List<(int, int, byte)>();
 
 				int position = 0;
 				while (true)
@@ -260,7 +260,8 @@ namespace WLEditor
 						break;
 					}
 
-					eventItem.Add((tilePosition - 0x9800, tileIndex));
+					int tilePos = tilePosition - 0x9800;
+					eventItem.Add((tilePos % 32, tilePos / 32, tileIndex));
 					position++;
 				};
 
@@ -270,7 +271,7 @@ namespace WLEditor
 			return result.ToArray();
 		}
 
-		public static bool SaveEvents(Rom rom, List<(int Position, byte Index)>[] events,
+		public static bool SaveEvents(Rom rom, List<(int X, int Y, byte Index)>[] events,
 			int[][] eventPointers, int[,] eventAddressOffset, int maxSize, out string errorMessage)
 		{
 			int size = events.Sum(x => x.Sum(y => 3) + 2);
@@ -317,7 +318,7 @@ namespace WLEditor
 				//position
 				foreach (var item in worldEvent)
 				{
-					rom.WriteWordSwap(position, (ushort)(item.Position + 0x9800));
+					rom.WriteWordSwap(position, (ushort)(item.X + item.Y * 32 + 0x9800));
 					position += 2;
 				}
 				rom.WriteByte(position++, 0xFF);

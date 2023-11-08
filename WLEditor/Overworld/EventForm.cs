@@ -7,8 +7,8 @@ namespace WLEditor
 {
 	public class EventForm
 	{
-		List<(int Position, byte Index)>[] worldEvents = new List<(int Position, byte Index)>[0];
-		List<(int Position, byte Index)> worldEvent;
+		List<(int X, int Y, byte Index)>[] worldEvents = new List<(int X, int Y, byte Index)>[0];
+		List<(int X, int Y, byte Index)> worldEvent;
 		int eventStep;
 
 		int zoom;
@@ -211,10 +211,10 @@ namespace WLEditor
 					{
 						if (eventStep > 0)
 						{
-							var (Position, Index) = worldEvent[eventStep - 1];
+							var (x, y, Index) = worldEvent[eventStep - 1];
 							var changes = new List<SelectionChange>
 							{
-								new SelectionChange { X = Position % 32, Y = Position / 32, Data = Index }
+								new SelectionChange { X = x, Y = y, Data = Index }
 							};
 							history.AddChanges(changes);
 
@@ -234,9 +234,9 @@ namespace WLEditor
 					if (worldEvent.Count > 0)
 					{
 						var changes = new List<SelectionChange>();
-						foreach(var (Position, Index) in worldEvent)
+						foreach (var (x, y, Index) in worldEvent)
 						{
-							changes.Add(new SelectionChange { X = Position % 32, Y = Position / 32, Data = Index });
+							changes.Add(new SelectionChange { X = x, Y = y, Data = Index });
 						}
 						history.AddChanges(changes);
 
@@ -265,7 +265,7 @@ namespace WLEditor
 			}
 		}
 
-		public int GetTileAt(int tilePos)
+		public int GetTileAt(int posx, int posy)
 		{
 			foreach (var worldEv in worldEvents)
 			{
@@ -274,11 +274,11 @@ namespace WLEditor
 				int index;
 				if (selected)
 				{
-					index = worldEv.FindIndex(0, eventStep, x => x.Position == tilePos);
+					index = worldEv.FindIndex(0, eventStep, x => x.X == posx && x.Y == posy);
 				}
 				else
 				{
-					index = worldEv.FindIndex(x => x.Position == tilePos);
+					index = worldEv.FindIndex(x => x.X == posx && x.Y == posy);
 				}
 
 				if (index != -1)
@@ -295,9 +295,9 @@ namespace WLEditor
 			return -1;
 		}
 
-		public int FindEvent(int tilePos)
+		public int FindEvent(int posx, int posy)
 		{
-			return worldEvent.FindIndex(x => x.Position == tilePos);
+			return worldEvent.FindIndex(x => x.X == posx && x.Y == posy);
 		}
 
 		public int GetEvent(int index)
@@ -310,26 +310,26 @@ namespace WLEditor
 			return -1;
 		}
 
-		public void AddEvent(byte tileData, int tilePos)
+		public void AddEvent(byte tileData, int posx, int posy)
 		{
-			int index = worldEvent.FindIndex(x => x.Position == tilePos);
+			int index = worldEvent.FindIndex(x => x.X == posx && x.Y == posy);
 			if (index == -1)
 			{
-				worldEvent.Insert(eventStep, (tilePos, tileData));
+				worldEvent.Insert(eventStep, (posx, posy, tileData));
 				eventStep++;
 			}
 			else
 			{
-				worldEvent[index] = (tilePos, tileData);
+				worldEvent[index] = (posx, posy, tileData);
 			}
 
 			pictureBox.Invalidate();
 			EventIndexChange();
 		}
 
-		public void RemoveEvent(int tilePos)
+		public void RemoveEvent(int posx, int posy)
 		{
-			int index = worldEvent.FindIndex(x => x.Position == tilePos);
+			int index = worldEvent.FindIndex(x => x.X == posx && x.Y == posy);
 			if (index >= 0)
 			{
 				worldEvent.RemoveAt(index);
@@ -360,9 +360,7 @@ namespace WLEditor
 					bool selected = worldEv == worldEvent;
 					for (int i = 0; i < worldEv.Count; i++)
 					{
-						var (position, tileIndex) = worldEv[i];
-						int x = position % 32;
-						int y = position / 32;
+						var (x, y, tileIndex) = worldEv[i];
 
 						if (i >= eventStep && selected)
 						{
