@@ -20,6 +20,7 @@ namespace WLEditor
 		public int ScrollLines;
 		int mouseDownSector;
 		readonly Selection selection = new Selection(16);
+		readonly History history = new History();
 		List<SelectionChange> changes = new List<SelectionChange>();
 
 		public event EventHandler<TileEventArgs> TileMouseDown;
@@ -488,8 +489,9 @@ namespace WLEditor
 
 		public bool PasteSelection()
 		{
-			if (selection.PasteSelection(PasteTileAt))
+			if (selection.HasSelection)
 			{
+				history.AddChanges(selection.PasteSelection(PasteTileAt));
 				RaiseTileMoveEvent();
 				Invalidate();
 				return true;
@@ -500,8 +502,11 @@ namespace WLEditor
 
 		public bool CutSelection()
 		{
-			if (selection.CopySelection(CopyTileAt) && selection.DeleteSelection(SetTileAt, GetEmptyTile()))
+			if (selection.HasSelection)
 			{
+				selection.CopySelection(CopyTileAt);
+				history.AddChanges(selection.DeleteSelection(SetTileAt, GetEmptyTile()));
+
 				RaiseTileMoveEvent();
 				Invalidate();
 				return true;
@@ -512,8 +517,9 @@ namespace WLEditor
 
 		public bool DeleteSelection()
 		{
-			if (selection.DeleteSelection(SetTileAt, GetEmptyTile()))
+			if (selection.HasSelection)
 			{
+				history.AddChanges(selection.DeleteSelection(SetTileAt, GetEmptyTile()));
 				RaiseTileMoveEvent();
 				Invalidate();
 				return true;
@@ -595,12 +601,12 @@ namespace WLEditor
 
 		public void CommitChanges()
 		{
-			selection.AddChanges(changes);
+			history.AddChanges(changes);
 		}
 
 		public bool Undo()
 		{
-			if (selection.Undo(SetTileAt, GetTileAt))
+			if (history.Undo(SetTileAt, GetTileAt))
 			{
 				RaiseTileMoveEvent();
 				Invalidate();
@@ -612,7 +618,7 @@ namespace WLEditor
 
 		public bool Redo()
 		{
-			if (selection.Redo(SetTileAt, GetTileAt))
+			if (history.Redo(SetTileAt, GetTileAt))
 			{
 				RaiseTileMoveEvent();
 				Invalidate();
@@ -624,7 +630,7 @@ namespace WLEditor
 
 		public void ClearUndo()
 		{
-			selection.ClearUndo();
+			history.ClearUndo();
 		}
 
 		#endregion

@@ -17,6 +17,7 @@ namespace WLEditor
 		readonly PictureBox pictureBox;
 		readonly DirectBitmap tilesWorld8x8;
 		readonly Selection selection;
+		readonly History history;
 
 		public event EventHandler EventChanged;
 		public event EventHandler EventIndexChanged;
@@ -97,11 +98,12 @@ namespace WLEditor
 			71
 		};
 
-		public EventForm(PictureBox pictureBox, DirectBitmap tilesWorld8x8, Selection selection)
+		public EventForm(PictureBox pictureBox, DirectBitmap tilesWorld8x8, Selection selection, History history)
 		{
 			this.tilesWorld8x8 = tilesWorld8x8;
 			this.pictureBox = pictureBox;
 			this.selection = selection;
+			this.history = history;
 		}
 
 		public void SetZoom(int zoomLevel)
@@ -151,7 +153,7 @@ namespace WLEditor
 						eventStep = worldEvent.Count;
 					}
 
-					selection.ClearUndo();
+					history.ClearUndo();
 					EventIndexChange();
 					pictureBox.Invalidate();
 					return true;
@@ -167,7 +169,7 @@ namespace WLEditor
 						eventStep = 0;
 					}
 
-					selection.ClearUndo();
+					history.ClearUndo();
 					EventIndexChange();
 					pictureBox.Invalidate();
 					return true;
@@ -181,7 +183,7 @@ namespace WLEditor
 					{
 						NextEvent();
 						eventStep = 0;
-						selection.ClearUndo();
+						history.ClearUndo();
 					}
 
 					EventIndexChange();
@@ -197,7 +199,7 @@ namespace WLEditor
 					{
 						PreviousEvent();
 						eventStep = worldEvent.Count;
-						selection.ClearUndo();
+						history.ClearUndo();
 					}
 
 					EventIndexChange();

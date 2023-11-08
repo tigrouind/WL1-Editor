@@ -103,6 +103,7 @@
       <DependentUpon>SectorForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Selection\ClipboardData.cs" />
+    <Compile Include="Selection\History.cs" />
     <Compile Include="Selection\Selection.cs" />
     <Compile Include="Selection\SelectionChange.cs" />
     <Compile Include="Selection\SelectionEventArgs.cs" />

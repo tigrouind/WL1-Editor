@@ -16,9 +16,6 @@ namespace WLEditor
 		Point selectionStart, selectionEnd;
 		public event EventHandler<SelectionEventArgs> InvalidateSelection;
 
-		readonly List<List<SelectionChange>> undo = new List<List<SelectionChange>>();
-		readonly List<List<SelectionChange>> redo = new List<List<SelectionChange>>();
-
 		public Selection(int tileSize)
 		{
 			this.tileSize = tileSize;
@@ -112,7 +109,7 @@ namespace WLEditor
 			return false;
 		}
 
-		public bool DeleteSelection(Func<int, int, int, int> setTileAt, int emptyTile)
+		public List<SelectionChange> DeleteSelection(Func<int, int, int, int> setTileAt, int emptyTile)
 		{
 			if (selection)
 			{
@@ -132,14 +129,13 @@ namespace WLEditor
 					}
 				}
 
-				AddChanges(changes);
-				return changes.Count > 0;
+				return changes;
 			}
 
-			return false;
+			return null;
 		}
 
-		public bool PasteSelection(Func<int, int, int, int> setTileAt)
+		public List<SelectionChange> PasteSelection(Func<int, int, int, int> setTileAt)
 		{
 			if (selection)
 			{
@@ -163,11 +159,10 @@ namespace WLEditor
 						}
 					}
 				}
+				var changes = new List<SelectionChange>();
 
 				if (selectionData != null && selectionWidth > 0 && selectionHeight > 0)
 				{
-					var changes = new List<SelectionChange>();
-
 					bool invertX = selectionStart.X > selectionEnd.X;
 					bool invertY = selectionStart.Y > selectionEnd.Y;
 
@@ -194,13 +189,12 @@ namespace WLEditor
 									}
 								}
 							}
-
-					AddChanges(changes);
-					return changes.Any();
 				}
+
+				return changes;
 			}
 
-			return false;
+			return null;
 		}
 
 		public void StartSelection(int x, int y)
@@ -245,53 +239,5 @@ namespace WLEditor
 		}
 
 		public bool HasSelection => selection;
-
-		#region Undo
-
-		public void ClearUndo()
-		{
-			redo.Clear();
-			undo.Clear();
-		}
-
-		public void AddChanges(List<SelectionChange> changes)
-		{
-			if (changes.Count > 0)
-			{
-				undo.Add(changes);
-				redo.Clear();
-			}
-		}
-
-		public bool Undo(Func<int, int, int, int> setTileAt, Func<int, int, int> getTileAt)
-		{
-			return ApplyChanges(setTileAt, getTileAt, undo, redo);
-		}
-
-		public bool Redo(Func<int, int, int, int> setTileAt, Func<int, int, int> getTileAt)
-		{
-			return ApplyChanges(setTileAt, getTileAt, redo, undo);
-		}
-
-		bool ApplyChanges(Func<int, int, int, int> setTileAt, Func<int, int, int> getTileAt, List<List<SelectionChange>> source, List<List<SelectionChange>> dest)
-		{
-			if (source.Count > 0)
-			{
-				var changes = new List<SelectionChange>();
-				foreach (var tile in source.Last())
-				{
-					changes.Add(new SelectionChange { X = tile.X, Y = tile.Y, Data = getTileAt(tile.X, tile.Y) });
-					setTileAt(tile.X, tile.Y, tile.Data);
-				}
-
-				source.RemoveAt(source.Count - 1);
-				dest.Add(changes);
-				return true;
-			}
-
-			return false;
-		}
-
-		#endregion
 	}
 }

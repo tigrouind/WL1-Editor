@@ -38,6 +38,7 @@ namespace WLEditor
 
 		readonly Selection selection1 = new Selection(8);
 		readonly Selection selection2 = new Selection(8);
+		readonly History history = new History();
 		bool selectionMode;
 
 		readonly byte[] worldTiles = new byte[32 * 32];
@@ -50,7 +51,7 @@ namespace WLEditor
 		public OverworldForm()
 		{
 			InitializeComponent();
-			eventForm = new EventForm(pictureBox1, tilesWorld8x8, selection1);
+			eventForm = new EventForm(pictureBox1, tilesWorld8x8, selection1, history);
 			eventForm.EventIndexChanged += (s, e) => UpdateTitle();
 			eventForm.EventChanged += (s, e) => SetChanges(ChangeEnum.Event);
 
@@ -135,7 +136,7 @@ namespace WLEditor
 			eventForm.LoadWorld(rom, currentWorld);
 			pathForm.LoadWorld(currentWorld);
 
-			selection1.ClearUndo();
+			history.ClearUndo();
 
 			UpdateTitle();
 			ClearAllTiles();
@@ -455,8 +456,9 @@ namespace WLEditor
 				{
 					if (!pathMode && selectionMode)
 					{
-						if (selection1.PasteSelection(PasteTileAt))
+						if (selection1.HasSelection)
 						{
+							history.AddChanges(selection1.PasteSelection(PasteTileAt));
 							RaiseTileMoveEvent();
 							pictureBox1.Invalidate();
 							SetChanges(eventMode ? ChangeEnum.Event : ChangeEnum.Tile);
@@ -481,8 +483,11 @@ namespace WLEditor
 					if (!pathMode && selectionMode)
 					{
 						int tile = GetEmptyTile();
-						if (selection1.CopySelection(CopyTileAt) && selection1.DeleteSelection(SetTileAt, GetEmptyTile()))
+						if (selection1.HasSelection)
 						{
+							selection1.CopySelection(CopyTileAt);
+							history.AddChanges(selection1.DeleteSelection(SetTileAt, GetEmptyTile()));
+
 							RaiseTileMoveEvent();
 							pictureBox1.Invalidate();
 							SetChanges(eventMode ? ChangeEnum.Event : ChangeEnum.Tile);
@@ -497,8 +502,10 @@ namespace WLEditor
 					if (!pathMode && selectionMode)
 					{
 						int tile = GetEmptyTile();
-						if (selection1.DeleteSelection(SetTileAt, GetEmptyTile()))
+						if (selection1.HasSelection)
 						{
+							history.AddChanges(selection1.DeleteSelection(SetTileAt, GetEmptyTile()));
+
 							RaiseTileMoveEvent();
 							pictureBox1.Invalidate();
 							SetChanges(eventMode ? ChangeEnum.Event : ChangeEnum.Tile);
@@ -542,7 +549,7 @@ namespace WLEditor
 				{
 					if (!pathMode)
 					{
-						if (selection1.Undo(SetTileAt, GetTileAt))
+						if (history.Undo(SetTileAt, GetTileAt))
 						{
 							RaiseTileMoveEvent();
 							pictureBox1.Invalidate();
@@ -555,7 +562,7 @@ namespace WLEditor
 				{
 					if (!pathMode)
 					{
-						if (selection1.Redo(SetTileAt, GetTileAt))
+						if (history.Redo(SetTileAt, GetTileAt))
 						{
 							RaiseTileMoveEvent();
 							pictureBox1.Invalidate();
@@ -693,7 +700,7 @@ namespace WLEditor
 
 				if (e.Status == TileEventStatus.MouseUp)
 				{
-					selection1.AddChanges(changes);
+					history.AddChanges(changes);
 				}
 			}
 
@@ -1013,7 +1020,7 @@ namespace WLEditor
 				pictureBox1.Invalidate();
 				pictureBox2.Visible = !pathMode;
 				UpdateBounds();
-				selection1.ClearUndo();
+				history.ClearUndo();
 				selection1.ClearSelection();
 				selection2.ClearSelection();
 
