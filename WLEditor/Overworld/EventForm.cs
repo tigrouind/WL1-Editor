@@ -78,11 +78,11 @@ namespace WLEditor
 			},
 		};
 
-		readonly int[,] eventAddressOffset =
+		readonly (int Tile, int Position)[] eventAddressOffset =
 		{
-			{ 1, 4 },
-			{ 1, 4 },
-			{ 0, 2 }
+			( 1, 4 ),
+			( 1, 4 ),
+			( 0, 2 )
 		};
 
 		readonly int[] eventMaxSize =

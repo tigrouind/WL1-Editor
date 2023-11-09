@@ -272,7 +272,7 @@ namespace WLEditor
 		}
 
 		public static bool SaveEvents(Rom rom, List<(int X, int Y, byte Index)>[] events,
-			int[][] eventPointers, int[,] eventAddressOffset, int maxSize, out string errorMessage)
+			int[][] eventPointers, (int Tile, int Position)[] eventAddressOffset, int maxSize, out string errorMessage)
 		{
 			int size = events.Sum(x => x.Sum(y => 3) + 2);
 			if (size > maxSize)
@@ -282,7 +282,7 @@ namespace WLEditor
 			}
 
 			rom.SetBank(8);
-			int position = rom.ReadWord(eventPointers[0][0] + eventAddressOffset[0, 0]);
+			int position = rom.ReadWord(eventPointers[0][0] + eventAddressOffset[0].Tile);
 
 			for (int i = 0; i < events.Length; i++)
 			{
@@ -294,7 +294,7 @@ namespace WLEditor
 					var item = eventPointers[j];
 					if (i < item.Length && item[i] != 0)
 					{
-						rom.WriteWord(item[i] + eventAddressOffset[j, 0], (ushort)position);
+						rom.WriteWord(item[i] + eventAddressOffset[j].Tile, (ushort)position);
 					}
 				}
 
@@ -311,7 +311,7 @@ namespace WLEditor
 					var item = eventPointers[j];
 					if (i < item.Length && item[i] != 0)
 					{
-						rom.WriteWord(item[i] + eventAddressOffset[j, 1], (ushort)position);
+						rom.WriteWord(item[i] + eventAddressOffset[j].Position, (ushort)position);
 					}
 				}
 
