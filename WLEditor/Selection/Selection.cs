@@ -82,7 +82,15 @@ namespace WLEditor
 			if (selection)
 			{
 				var (start, end) = GetSelection();
+				CopyToClipboard(start, end);
 
+				return true;
+			}
+
+			return false;
+
+			void CopyToClipboard(Point start, Point end)
+			{
 				using (var memoryStream = new MemoryStream())
 				using (var writer = new BinaryWriter(memoryStream))
 				{
@@ -102,11 +110,7 @@ namespace WLEditor
 
 					Clipboard.SetData("WLEditor", memoryStream);
 				}
-
-				return true;
 			}
-
-			return false;
 		}
 
 		public List<SelectionChange> DeleteSelection(Func<int, int, int, int> setTileAt, int emptyTile)
@@ -139,26 +143,7 @@ namespace WLEditor
 		{
 			if (selection)
 			{
-				int selectionWidth = 0, selectionHeight = 0;
-				ClipboardData[] selectionData = null;
-
-				var memoryStream = (MemoryStream)Clipboard.GetData("WLEditor");
-				if (memoryStream != null)
-				{
-					using (var reader = new BinaryReader(memoryStream))
-					{
-						if (reader.ReadInt32() == tileSize)
-						{
-							selectionWidth = reader.ReadInt32();
-							selectionHeight = reader.ReadInt32();
-							selectionData = Enumerable.Range(0, selectionWidth * selectionHeight)
-								.Select((x, i) => new { Order = reader.ReadInt32(), Tile = reader.ReadInt32(), Index = i })
-								.OrderBy(x => x.Order)   //used for ordering events
-								.Select(x => new ClipboardData { Index = x.Index, Tile = x.Tile })
-								.ToArray();
-						}
-					}
-				}
+				var (selectionWidth, selectionHeight, selectionData) = GetDataFromClipboard();
 				var changes = new List<SelectionChange>();
 
 				if (selectionData != null && selectionWidth > 0 && selectionHeight > 0)
@@ -169,7 +154,9 @@ namespace WLEditor
 					var (start, end) = GetSelection();
 
 					for (int ty = start.Y; ty <= end.Y; ty += selectionHeight)
+					{
 						for (int tx = start.X; tx <= end.X; tx += selectionWidth)
+						{
 							foreach (var data in selectionData)
 							{
 								Point dest = new Point
@@ -189,12 +176,39 @@ namespace WLEditor
 									}
 								}
 							}
+						}
+					}
 				}
 
 				return changes;
 			}
 
 			return null;
+
+			(int selectionWidth, int selectionHeight, ClipboardData[] selectionData) GetDataFromClipboard()
+			{
+				var memoryStream = (MemoryStream)Clipboard.GetData("WLEditor");
+				if (memoryStream != null)
+				{
+					using (var reader = new BinaryReader(memoryStream))
+					{
+						if (reader.ReadInt32() == tileSize)
+						{
+							int selectionWidth = reader.ReadInt32();
+							int selectionHeight = reader.ReadInt32();
+							ClipboardData[] selectionData = Enumerable.Range(0, selectionWidth * selectionHeight)
+								.Select((x, i) => new { Order = reader.ReadInt32(), Tile = reader.ReadInt32(), Index = i })
+								.OrderBy(x => x.Order)   //used for ordering events
+								.Select(x => new ClipboardData { Index = x.Index, Tile = x.Tile })
+								.ToArray();
+
+							return (selectionWidth, selectionHeight, selectionData);
+						}
+					}
+				}
+
+				return (0, 0, null);
+			}
 		}
 
 		public void StartSelection(int x, int y)
