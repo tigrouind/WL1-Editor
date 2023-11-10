@@ -609,18 +609,16 @@ namespace WLEditor
 
 		public static void SaveTreasures(Rom rom, WorldPath[] pathData)
 		{
-			var treasureLevelPairs = Enumerable.Range(0, 43)
-				.Select(x => new { TreasureId = Sector.GetTreasureId(rom, x), Level = x })
-				.Where(x => x.TreasureId != -1)
-				.GroupBy(x => x.TreasureId)
-				.Select(x => x.First())
+			var treasures = Enumerable.Range(0, 15)
+				.Select<int, (int TreasureId, int Level)>(x => (x, 255))
+				.Concat(Enumerable.Range(0, 43)
+					.Where(x => pathData[x].Directions.Any(d => d.Path.Count > 0)) //skip unreachable levels
+					.Select<int, (int TreasureId, int Level)>(x => (Sector.GetTreasureId(rom, x), x))
+					.Where(x => x.TreasureId != -1))
+				.GroupBy(x => x.TreasureId, (x, y) => y.Last().Level)
 				.ToArray();
 
-			var levelsWithTreasure = treasureLevelPairs
-				.Select(x => x.Level)
-				.ToHashSet();
-
-			var overworldTreasureList = new int[43];
+			var overworldTreasureList = new Dictionary<int, int>();
 			SaveTreasureOverworldLists();
 			SaveTreasureLevelBinding();
 			SaveTreasurePositionPerLevel();
@@ -659,27 +657,22 @@ namespace WLEditor
 						overworldTreasureList[level] = position;
 					}
 
-					int treasureCount = levelsPerOverworld[i].Count(x => levelsWithTreasure.Contains(x));
+					int treasureCount = levelsPerOverworld[i].Count(x => treasures.Contains(x));
 					position += treasureCount;
 					position++; //0xFF marker
 				}
+
+				overworldTreasureList[255] = position;
 			}
 
 			void SaveTreasureLevelBinding()
 			{
-				var treasureToLevel = treasureLevelPairs
-					.ToDictionary(x => x.TreasureId, x => x.Level);
-
 				rom.SetBank(0x1);
 				int position = 0x586B;
 
 				for (int treasureId = 0; treasureId < 15; treasureId++)
 				{
-					if (!treasureToLevel.TryGetValue(treasureId, out int level))
-					{
-						level = 0xFF;
-					}
-
+					int level = treasures[treasureId];
 					rom.WriteWord(position + 1, (ushort)overworldTreasureList[level]); //ld hl, XXXX
 					rom.WriteByte(position + 4, (byte)level); //ld b, XX
 					position += 7;
@@ -693,11 +686,11 @@ namespace WLEditor
 
 				//group levels at same position (usually duplicates)
 				foreach (var levels in pathData
-					.Select((x, i) => new { Index = i, Item = x })
-					.GroupBy(x => (x.Item.X, x.Item.Y)))
+					.Select((x, i) => new { Index = i, x.X, x.Y })
+					.GroupBy(x => (x.X, x.Y)))
 				{
 					int index = 0xFF;
-					if (levels.Any(x => levelsWithTreasure.Contains(x.Index)))
+					if (levels.Any(x => treasures.Contains(x.Index)))
 					{
 						index = position++;
 						int pointer = rom.ReadWord(0x5A63 + index * 2);
