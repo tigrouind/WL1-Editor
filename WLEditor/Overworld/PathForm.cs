@@ -67,7 +67,7 @@ namespace WLEditor
 			bool result = Overworld.SavePaths(rom, PathData, currentWorld == 8, out errorMessage);
 			if (result)
 			{
-				Overworld.SaveProgressNextDirection(rom, currentWorld, PathData, levels[currentWorld]);
+				Overworld.SaveProgressNextDirection(rom, currentWorld, PathData, levels[currentWorld], IsSpecialExit);
 
 				if (currentWorld == 8)
 				{
@@ -76,27 +76,11 @@ namespace WLEditor
 				else
 				{
 					Overworld.SaveTreasures(rom, PathData);
-					Overworld.SaveStartPosition(rom, currentWorld, FindExitPosition);
+					Overworld.SaveStartPosition(rom, currentWorld, PathData, levels[currentWorld], IsSpecialExit, GetPathPosition);
 				}
 			}
 
 			return result;
-
-			(int posX, int posY) FindExitPosition(int startLevel)
-			{
-				int level = levels[currentWorld][startLevel];
-
-				var item = PathData[level];
-				var dir = item.Directions.FirstOrDefault(x => x.Path.Count > 0 && IsSpecialExit(x.Next));
-				if (dir != null)
-				{
-					return GetPathPosition(item, dir);
-				}
-				else
-				{
-					return (item.X, item.Y);
-				}
-			}
 		}
 
 		public void SetZoom(int zoomLevel)

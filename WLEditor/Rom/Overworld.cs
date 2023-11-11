@@ -48,24 +48,24 @@ namespace WLEditor
 
 		static readonly int[] overWorldNextDir =
 		{
-			0x40A5,
-			0x40B5,
-			0x40C2,
-			0x40CD,
-			0x40DB,
-			0x40E6
+			0x40A4,
+			0x40B4,
+			0x40C1,
+			0x40CC,
+			0x40DA,
+			0x40E5
 		};
 
-		static readonly (int StartPositionAddress, int StartFunctionAddress, int StartLevel)[][] startPositionData =
+		static readonly (int StartPositionAddress, int StartFunctionAddress, int FirstLevelAddress, WorldPathNextEnum Exit)[][] startPositionData =
 		{
-			new [] { ( 0x5558, 0x6075, 0 ) },
-			new [] { ( 0x5558, 0x6075, 0 ) },
-			new [] { ( 0x554C, 0x0000, 0 ), ( 0x5552, 0x6095, 1 ) },
-			new [] { ( 0x5527, 0x608D, 0 ) },
-			new [] { ( 0x553F, 0x607D, 0 ) },
-			new [] { ( 0x552D, 0x6089, 0 ) },
-			new [] { ( 0x5533, 0x6085, 0 ) },
-			new [] { ( 0x5539, 0x6081, 0 ) }
+			new [] { ( 0x5558, 0x6075, 0x41CF, WorldPathNextEnum.Overworld) },
+			new [] { ( 0x5558, 0x6075, 0x41CF, WorldPathNextEnum.Overworld) },
+			new [] { ( 0x554C, 0x0000, 0x41DF, WorldPathNextEnum.Overworld), ( 0x5552, 0x6095, 0x41EF, WorldPathNextEnum.Sherbet) },
+			new [] { ( 0x5527, 0x608D, 0x422F, WorldPathNextEnum.Teapot) },
+			new [] { ( 0x553F, 0x607D, 0x41FF, WorldPathNextEnum.Overworld) },
+			new [] { ( 0x552D, 0x6089, 0x421F, WorldPathNextEnum.Overworld) },
+			new [] { ( 0x5533, 0x6085, 0x420F, WorldPathNextEnum.Overworld) },
+			new [] { ( 0x5539, 0x6081, 0x423F, WorldPathNextEnum.Overworld) }
 		};
 
 		public static readonly WorldPathProgressEnum[] ProgressFlags =
@@ -720,12 +720,16 @@ namespace WLEditor
 			}
 		}
 
-		public static void SaveStartPosition(Rom rom, int currentWorld, Func<int, (int x, int y)> findExitPosition)
+		public static void SaveStartPosition(Rom rom, int currentWorld, WorldPath[] pathData, int[] levels,
+			Func<WorldPathNextEnum, bool> isSpecialExit,
+			Func<WorldPath, WorldPathDirection, (int posX, int posY)> getPathPosition)
 		{
-			foreach ((int startPositionAddress, int startFunctionAddress, int startLevel) in startPositionData[currentWorld])
+			foreach ((int startPositionAddress, int startFunctionAddress, int firstLevelAddress, WorldPathNextEnum exit) in startPositionData[currentWorld])
 			{
-				(int x, int y) = findExitPosition(startLevel);
+				int startLevel = GetFirstLevel(pathData, levels, isSpecialExit, exit);
+				(int x, int y) = FindExitPosition(pathData[startLevel], exit);
 				SaveStartPosition(x, y, startPositionAddress, startFunctionAddress, FindClosestSide(x, y));
+				SaveFirstLevel(firstLevelAddress, startLevel);
 			}
 
 			void SaveStartPosition(int x, int y, int startPositionAddress, int startFunctionAddress, int side)
@@ -750,6 +754,12 @@ namespace WLEditor
 				}
 			}
 
+			void SaveFirstLevel(int firstLevelAddress, int startLevel)
+			{
+				rom.SetBank(8);
+				rom.WriteByte(firstLevelAddress + 1, (byte)startLevel); //ld a, XX
+			}
+
 			int FindClosestSide(int x, int y)
 			{
 				int[] borders = { x, 160 - x, y, 144 - y };
@@ -766,6 +776,28 @@ namespace WLEditor
 
 				return bestSide;
 			}
+
+			(int posX, int posY) FindExitPosition(WorldPath item, WorldPathNextEnum exit)
+			{
+				var dir = item.Directions.Where(x => x.Path.Count > 0 && x.Next == exit)
+					.Concat(item.Directions.Where(x => x.Path.Count > 0 && isSpecialExit(x.Next))) //fallback
+					.FirstOrDefault();
+
+				if (dir != null)
+				{
+					return getPathPosition(item, dir);
+				}
+
+				return (item.X, item.Y);
+			}
+		}
+
+		static int GetFirstLevel(WorldPath[] pathData, int[] levels, Func<WorldPathNextEnum, bool> isSpecialExit, WorldPathNextEnum exit)
+		{
+			return levels.Where(x => pathData[x].Directions.Any(d => d.Path.Count > 0 && d.Next == exit))
+				.Concat(levels.Where(x => pathData[x].Directions.Any(d => d.Path.Count > 0 && isSpecialExit(d.Next)))) //fallback
+				.Append(levels.First())
+				.First();
 		}
 
 		#region Music
@@ -786,15 +818,17 @@ namespace WLEditor
 
 		#region Progress
 
-		public static void SaveProgressNextDirection(Rom rom, int currentWorld, WorldPath[] pathData, int[] levels)
+		public static void SaveProgressNextDirection(Rom rom, int currentWorld, WorldPath[] pathData, int[] levels, Func<WorldPathNextEnum, bool> isSpecialExit)
 		{
+			var directions = new byte[] { 0x10, 0x20, 0x40, 0x80 };
+
 			rom.SetBank(8);
 			if (currentWorld == 8)
 			{
-				for (int flag = 0; flag < 6; flag++)
+				foreach (var (progress, dir) in GetProgressNextDirections(0)
+					.Where(x => x.Progress < overWorldNextDir.Length))
 				{
-					var nextDir = SearchProgressNextDirection((WorldPathProgressEnum)(1 << flag));
-					rom.WriteByte(overWorldNextDir[flag], nextDir);
+					rom.WriteByte(overWorldNextDir[progress] + 1, directions[dir]); //ld a, XX
 				}
 			}
 			else
@@ -802,28 +836,49 @@ namespace WLEditor
 				int[] worldIndex = { 0, 0, 1, 5, 2, 3, 4, 6 };
 				int world = worldIndex[currentWorld];
 
-				for (int flag = 0; flag < 8; flag++)
+				int firstLevel = GetFirstLevel(pathData, levels, isSpecialExit, WorldPathNextEnum.Overworld);
+				foreach (var (progress, dir) in GetProgressNextDirections(firstLevel))
 				{
-					var nextDir = SearchProgressNextDirection((WorldPathProgressEnum)(1 << flag));
-					rom.WriteByte(0x735D + 16 * world + flag + 8, nextDir);
+					rom.WriteByte(0x735D + world * 16 + progress + 8, directions[dir]);
 				}
 			}
 
-			byte SearchProgressNextDirection(WorldPathProgressEnum flag)
+			IEnumerable<(int Progress, int Dir)> GetProgressNextDirections(int startLevel)
 			{
-				foreach (int level in levels)
+				var result = new Dictionary<WorldPathProgressEnum, int>();
+				var seen = new HashSet<int>();
+				var queue = new Queue<int>();
+				queue.Enqueue(startLevel);
+				seen.Add(startLevel);
+
+				while (queue.Count > 0) //bfs
 				{
+					var path = pathData[queue.Dequeue()];
+
 					for (int dir = 0; dir < 4; dir++)
 					{
-						var pathDir = pathData[level].Directions[dir];
-						if (pathDir.Path.Count > 0 && pathDir.Progress == flag)
+						var pathDir = path.Directions[dir];
+						if (pathDir.Path.Count > 0)
 						{
-							return new byte[] { 0x10, 0x20, 0x40, 0x80 }[dir];
+							if (pathDir.Progress != WorldPathProgressEnum.None && !result.ContainsKey(pathDir.Progress))
+							{
+								int progress = Array.IndexOf(ProgressFlags, pathDir.Progress);
+								if (progress != -1) //should never happen
+								{
+									yield return (progress - 1, dir);
+								}
+
+								result.Add(pathDir.Progress, dir);
+							}
+
+							if (!isSpecialExit(pathDir.Next) && !seen.Contains((int)pathDir.Next))
+							{
+								queue.Enqueue((int)pathDir.Next);
+								seen.Add((int)pathDir.Next);
+							}
 						}
 					}
 				}
-
-				return 0;
 			}
 		}
 
