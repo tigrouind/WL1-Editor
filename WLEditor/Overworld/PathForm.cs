@@ -326,25 +326,15 @@ namespace WLEditor
 
 			void SetProgress()
 			{
-				WorldPathProgressEnum[] flags =
+				int progress = Array.IndexOf(Overworld.ProgressFlags, currentDirection.Progress);
+				if (progress != -1)
 				{
-					WorldPathProgressEnum.None,
-					WorldPathProgressEnum.Level1,
-					WorldPathProgressEnum.Level2,
-					WorldPathProgressEnum.Level3,
-					WorldPathProgressEnum.Level4,
-					WorldPathProgressEnum.Level5,
-					WorldPathProgressEnum.Level6,
-					WorldPathProgressEnum.Level7,
-					WorldPathProgressEnum.Level8
-				};
-
-				int progress = Array.IndexOf(flags, currentDirection.Progress);
-				currentDirection.Progress = flags[(progress + 1) % flags.Length];
-				var reverseDir = GetReverseWorldPathDir(currentDirection);
-				if (reverseDir != null)
-				{
-					reverseDir.Progress = currentDirection.Progress;
+					currentDirection.Progress = Overworld.ProgressFlags[(progress + 1) % Overworld.ProgressFlags.Length];
+					var reverseDir = GetReverseWorldPathDir(currentDirection);
+					if (reverseDir != null)
+					{
+						reverseDir.Progress = currentDirection.Progress;
+					}
 				}
 			}
 
@@ -839,25 +829,13 @@ namespace WLEditor
 						for (int dir = 0; dir < 4; dir++)
 						{
 							var dirs = currentPath.Directions[dir];
-							if (dirs.Path.Count > 0)
+							if (dirs.Path.Count > 0 && dirs.Progress != WorldPathProgressEnum.None)
 							{
-								WorldPathProgressEnum[] flags =
-								{
-									WorldPathProgressEnum.Level1,
-									WorldPathProgressEnum.Level2,
-									WorldPathProgressEnum.Level3,
-									WorldPathProgressEnum.Level4,
-									WorldPathProgressEnum.Level5,
-									WorldPathProgressEnum.Level6,
-									WorldPathProgressEnum.Level7,
-									WorldPathProgressEnum.Level8
-								};
-
-								int progress = Array.IndexOf(flags, dirs.Progress);
+								int progress = Array.IndexOf(Overworld.ProgressFlags, dirs.Progress);
 								if (progress != -1)
 								{
 									gPathA.FillRectangle(Brushes.Gray, (currentPath.X + offsets[dir, 0]) * zoom, (currentPath.Y + offsets[dir, 1]) * zoom, 8 * zoom, 8 * zoom);
-									gPathA.DrawString((progress + 1).ToString(), font, Brushes.White, (currentPath.X + 4 + offsets[dir, 0]) * zoom, (currentPath.Y + 4 + offsets[dir, 1]) * zoom, format);
+									gPathA.DrawString(progress.ToString(), font, Brushes.White, (currentPath.X + 4 + offsets[dir, 0]) * zoom, (currentPath.Y + 4 + offsets[dir, 1]) * zoom, format);
 								}
 							}
 						}

@@ -68,6 +68,19 @@ namespace WLEditor
 			new [] { ( 0x5539, 0x6081, 0 ) }
 		};
 
+		public static readonly WorldPathProgressEnum[] ProgressFlags =
+		{
+			WorldPathProgressEnum.None,
+			WorldPathProgressEnum.Level1,
+			WorldPathProgressEnum.Level2,
+			WorldPathProgressEnum.Level3,
+			WorldPathProgressEnum.Level4,
+			WorldPathProgressEnum.Level5,
+			WorldPathProgressEnum.Level6,
+			WorldPathProgressEnum.Level7,
+			WorldPathProgressEnum.Level8
+		};
+
 		#region World 8x8 tiles
 
 		static void RLEDecompressTiles(Rom rom, int tilesdata, byte[] decompressed)
