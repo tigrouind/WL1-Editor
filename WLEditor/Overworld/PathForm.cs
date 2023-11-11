@@ -353,58 +353,42 @@ namespace WLEditor
 				}
 			}
 
-			void MoveFlag()
+			void MoveItem(ref int x, ref int y, int border)
 			{
-				var item = flags[currentLevel];
-				int posX = item.X / gridSnap * gridSnap;
-				int posY = item.Y / gridSnap * gridSnap;
+				//align on grid
+				int posX = x / gridSnap * gridSnap;
+				int posY = y / gridSnap * gridSnap;
 
 				switch (keyCode)
 				{
 					case Keys.Up:
-						item.Y = Math.Max(posY - gridSnap, 0);
+						y = Math.Max(posY - gridSnap, 0);
 						break;
 
 					case Keys.Down:
-						item.Y = Math.Min(posY + gridSnap, CurrentMapY - 16);
+						y = Math.Min(posY + gridSnap, CurrentMapY - border);
 						break;
 
 					case Keys.Left:
-						item.X = Math.Max(posX - gridSnap, 0);
+						x = Math.Max(posX - gridSnap, 0);
 						break;
 
 					case Keys.Right:
-						item.X = Math.Min(posX + gridSnap, CurrentMapX - 16);
+						x = Math.Min(posX + gridSnap, CurrentMapX - border);
 						break;
 				}
+			}
 
+			void MoveFlag()
+			{
+				var item = flags[currentLevel];
+				MoveItem(ref item.X, ref item.Y, 16);
 				flags[currentLevel] = item;
 			}
 
 			void MoveLevel()
 			{
-				//align on grid
-				int posX = currentPath.X / gridSnap * gridSnap;
-				int posY = currentPath.Y / gridSnap * gridSnap;
-
-				switch (keyCode)
-				{
-					case Keys.Up:
-						currentPath.Y = Math.Max(posY - gridSnap, 0);
-						break;
-
-					case Keys.Down:
-						currentPath.Y = Math.Min(posY + gridSnap, CurrentMapY - 8);
-						break;
-
-					case Keys.Left:
-						currentPath.X = Math.Max(posX - gridSnap, 0);
-						break;
-
-					case Keys.Right:
-						currentPath.X = Math.Min(posX + gridSnap, CurrentMapX - 8);
-						break;
-				}
+				MoveItem(ref currentPath.X, ref currentPath.Y, 8);
 
 				foreach (var dir in currentPath.Directions)
 				{
