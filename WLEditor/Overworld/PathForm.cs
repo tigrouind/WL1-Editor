@@ -210,7 +210,7 @@ namespace WLEditor
 					pathMode = pathMode == PathModeEnum.Water ? PathModeEnum.None : PathModeEnum.Water;
 					return true;
 
-				case Keys.X:
+				case Keys.E:
 					if (currentDirection != null && IsSpecialExit(currentDirection.Next))
 					{
 						SetExit();
@@ -220,7 +220,7 @@ namespace WLEditor
 					}
 					return true;
 
-				case Keys.F:
+				case Keys.P:
 					if (currentDirection != null)
 					{
 						SetProgress();
@@ -706,7 +706,7 @@ namespace WLEditor
 
 							if (!TransparentPath)
 							{
-								gPathA.DrawString(new[] { "A", "B", "C", "C" }[Array.IndexOf(flags, dir.Next)], font, Brushes.Black, (exitX + 4) * zoom, (exitY + 4) * zoom, format);
+								gPathA.DrawString(new[] { "O", "S", "T", "T" }[Array.IndexOf(flags, dir.Next)], font, Brushes.Black, (exitX + 4) * zoom, (exitY + 4) * zoom, format);
 							}
 						}
 					}
