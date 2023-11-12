@@ -286,8 +286,8 @@ namespace WLEditor
 			// 
 			this.windowToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolboxToolStripMenuItem,
-            this.toolStripMenuItem2,
             this.sectorsToolStripMenuItem,
+            this.toolStripMenuItem2,
             this.overworldToolStripMenuItem});
 			this.windowToolStripMenuItem.Name = "windowToolStripMenuItem";
 			this.windowToolStripMenuItem.Size = new System.Drawing.Size(63, 20);
