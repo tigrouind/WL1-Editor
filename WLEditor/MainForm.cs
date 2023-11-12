@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Media;
 using System.Reflection;
@@ -470,7 +471,16 @@ namespace WLEditor
 				if (saveFile)
 				{
 					rom.FixCRC();
-					rom.Save(romFilePath);
+					try
+					{
+						rom.Save(romFilePath);
+					}
+					catch (UnauthorizedAccessException)
+					{
+						MessageBox.Show("The ROM file is marked as read-only and cannot be overwritten.", Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+						return false;
+					}
+
 					SetChanges(false);
 				}
 			}
