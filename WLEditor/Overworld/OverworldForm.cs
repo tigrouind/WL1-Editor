@@ -576,7 +576,7 @@ namespace WLEditor
 				bool DispatchShortcut()
 				{
 					ToolStripMenuItem toolStrip = menuStrip1.Items.GetAllMenuItems()
-						.FirstOrDefault(x => x.ShortcutKeys == keyData);
+						.FirstOrDefault(x => x.ShortcutKeys == keyData || x.ShortcutKeyDisplayString == keyData.ToString());
 
 					if (toolStrip != null)
 					{

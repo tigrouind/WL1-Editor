@@ -63,6 +63,7 @@ namespace WLEditor
 			this.timer = new System.Windows.Forms.Timer(this.components);
 			this.statusStrip1 = new System.Windows.Forms.StatusStrip();
 			this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
+			this.scrollBoundaryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.menuStrip1.SuspendLayout();
 			this.tableLayoutPanel1.SuspendLayout();
 			this.LevelPanel.SuspendLayout();
@@ -148,6 +149,7 @@ namespace WLEditor
             this.collidersToolStripMenuItem,
             this.collectiblesToolStripMenuItem,
             this.switchBlockToolStripMenuItem,
+            this.scrollBoundaryToolStripMenuItem,
             this.animationToolStripMenuItem,
             this.zoomToolStripMenuItem});
 			this.viewToolStripMenuItem.Name = "viewToolStripMenuItem";
@@ -205,6 +207,15 @@ namespace WLEditor
 			this.switchBlockToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
 			this.switchBlockToolStripMenuItem.Text = "[!] Block mode";
 			this.switchBlockToolStripMenuItem.Click += new System.EventHandler(this.SwitchBlockToolStripMenuItem_Click);
+			// 
+			// scrollBoundaryToolStripMenuItem
+			// 
+			this.scrollBoundaryToolStripMenuItem.Name = "scrollBoundaryToolStripMenuItem";
+			this.scrollBoundaryToolStripMenuItem.Size = new System.Drawing.Size(210, 24);
+			this.scrollBoundaryToolStripMenuItem.ShortcutKeyDisplayString = "";
+			this.scrollBoundaryToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F6;
+			this.scrollBoundaryToolStripMenuItem.Text = "Scroll boundaries";
+			this.scrollBoundaryToolStripMenuItem.Click += new System.EventHandler(this.ScrollBoundaryToolStripMenuItem_Click);
 			// 
 			// animationToolStripMenuItem
 			// 
@@ -446,5 +457,6 @@ namespace WLEditor
 		private System.Windows.Forms.ToolStripMenuItem overworldToolStripMenuItem;
 		private System.Windows.Forms.ToolStripSeparator toolStripMenuItem2;
 		private System.Windows.Forms.ToolStripMenuItem switchBlockToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem scrollBoundaryToolStripMenuItem;
 	}
 }

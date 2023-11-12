@@ -102,7 +102,7 @@ namespace WLEditor
 
 			void ProcessSubFormCommand(object sender, KeyEventArgs e)
 			{
-				if (DispatchShortcut(e.KeyData))
+				if ((sender != overworldForm || e.Modifiers == Keys.Shift || e.Modifiers == Keys.Control) && DispatchShortcut(e.KeyData))
 				{
 					e.Handled = true;
 				}
@@ -613,11 +613,6 @@ namespace WLEditor
 					zoomOutToolStripMenuItem.PerformClick();
 					return true;
 
-				case Keys.S:
-					levelPictureBox.ScrollLines = (levelPictureBox.ScrollLines + 1) % 5;
-					levelPictureBox.Invalidate();
-					break;
-
 				case Keys.Control | Keys.C:
 					levelPictureBox.CopySelection();
 					levelPictureBox.ClearSelection();
@@ -680,6 +675,12 @@ namespace WLEditor
 			}
 
 			return false;
+		}
+
+		private void ScrollBoundaryToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			levelPictureBox.ScrollLines = (levelPictureBox.ScrollLines + 1) % 5;
+			levelPictureBox.Invalidate();
 		}
 
 		#region Subforms
