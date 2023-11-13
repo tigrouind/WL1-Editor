@@ -10,7 +10,7 @@ namespace WLEditor
 	public class Selection
 	{
 		int zoom;
-		int tileSize;
+		readonly int tileSize;
 
 		bool selection;
 		Point selectionStart, selectionEnd;

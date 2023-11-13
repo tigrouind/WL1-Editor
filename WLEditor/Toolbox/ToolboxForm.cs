@@ -88,7 +88,7 @@ namespace WLEditor
 		{
 			byte tileIndex = (byte)(e.TileX + e.TileY * 8);
 			var tileInfo = Level.GetTileInfo(tileIndex);
-			toolStripStatusLabel1.Text = string.Format($"{tileIndex:X2} {tileInfo.Text}");
+			toolStripStatusLabel1.Text = $"{tileIndex:X2} {tileInfo.Text}";
 			statusStrip1.Visible = true;
 		}
 

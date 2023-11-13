@@ -237,7 +237,7 @@ namespace WLEditor
 
 			if (compressedData.Length > maxSize)
 			{
-				errorMessage = string.Format($"Tile data is too big to fit in ROM.\r\n Please free at least {compressedData.Length - maxSize} byte(s).");
+				errorMessage = $"Tile data is too big to fit in ROM.\r\n Please free at least {compressedData.Length - maxSize} byte(s).";
 				return false;
 			}
 
@@ -290,7 +290,7 @@ namespace WLEditor
 			int size = events.Sum(x => x.Sum(y => 3) + 2);
 			if (size > maxSize)
 			{
-				errorMessage = string.Format($"Event data is too big to fit in ROM.\r\n Please free at least {size - maxSize} byte(s).");
+				errorMessage = $"Event data is too big to fit in ROM.\r\n Please free at least {size - maxSize} byte(s).";
 				return false;
 			}
 
@@ -480,7 +480,7 @@ namespace WLEditor
 
 				if (bytesToFree > 0)
 				{
-					return string.Format($"Path data is too big to fit in ROM. Please free at least {bytesToFree} byte(s).");
+					return $"Path data is too big to fit in ROM. Please free at least {bytesToFree} byte(s).";
 				}
 
 				return null;

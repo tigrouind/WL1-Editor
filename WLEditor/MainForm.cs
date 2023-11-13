@@ -195,7 +195,7 @@ namespace WLEditor
 			{
 				byte tileIndex = Level.LevelData[e.TileX + e.TileY * 256 + 0x1000];
 				var tileInfo = Level.GetTileInfo(tileIndex);
-				toolStripStatusLabel1.Text = string.Format($"{e.TileX}:{e.TileY} - {tileIndex:X2} {tileInfo.Text}");
+				toolStripStatusLabel1.Text = $"{e.TileX}:{e.TileY} - {tileIndex:X2} {tileInfo.Text}";
 			}
 
 			void LevelPictureBoxTileMouseDown(object sender, TileEventArgs e)
@@ -378,7 +378,7 @@ namespace WLEditor
 
 				var items = Level.GetCourseIds(rom)
 					.OrderBy(x => x.CourseNo)
-					.Select(x => new ComboboxItem<int>(x.CourseId, string.Format($"{x.CourseNo:D2} {LevelNames[x.CourseId]}")))
+					.Select(x => new ComboboxItem<int>(x.CourseId, $"{x.CourseNo:D2} {LevelNames[x.CourseId]}"))
 					.ToList();
 
 				levelComboBox.Items.AddRange(items.ToArray());
