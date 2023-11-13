@@ -20,7 +20,7 @@ namespace WLEditor
 		readonly History history;
 
 		public event EventHandler EventChanged;
-		public event EventHandler EventIndexChanged;
+		public Action UpdateTitle;
 
 		readonly int[][][] eventPointers =
 		{
@@ -133,7 +133,7 @@ namespace WLEditor
 		public string GetTitle()
 		{
 			int eventId = Array.IndexOf(worldEvents, worldEvent);
-			return string.Format(eventStep == 0 ? $"Event {eventId + 1}" : $"Event {eventId + 1} / Step {eventStep}");
+			return eventStep == 0 ? $"Event {eventId + 1}" : $"Event {eventId + 1} / Step {eventStep}";
 		}
 
 		#region Commands
@@ -154,7 +154,7 @@ namespace WLEditor
 					}
 
 					history.ClearUndo();
-					EventIndexChange();
+					UpdateTitle();
 					pictureBox.Invalidate();
 					return true;
 
@@ -170,7 +170,7 @@ namespace WLEditor
 					}
 
 					history.ClearUndo();
-					EventIndexChange();
+					UpdateTitle();
 					pictureBox.Invalidate();
 					return true;
 
@@ -186,7 +186,7 @@ namespace WLEditor
 						history.ClearUndo();
 					}
 
-					EventIndexChange();
+					UpdateTitle();
 					pictureBox.Invalidate();
 					return true;
 
@@ -202,7 +202,7 @@ namespace WLEditor
 						history.ClearUndo();
 					}
 
-					EventIndexChange();
+					UpdateTitle();
 					pictureBox.Invalidate();
 					return true;
 
@@ -222,7 +222,7 @@ namespace WLEditor
 							eventStep--;
 
 							pictureBox.Invalidate();
-							EventIndexChange();
+							UpdateTitle();
 							SetChanges();
 						}
 
@@ -244,7 +244,7 @@ namespace WLEditor
 						eventStep = 0;
 
 						pictureBox.Invalidate();
-						EventIndexChange();
+						UpdateTitle();
 						SetChanges();
 					}
 					return true;
@@ -263,36 +263,6 @@ namespace WLEditor
 				int eventId = Array.IndexOf(worldEvents, worldEvent);
 				worldEvent = worldEvents[eventId + 1];
 			}
-		}
-
-		public int GetTileAt(int posx, int posy)
-		{
-			foreach (var worldEv in worldEvents)
-			{
-				bool selected = worldEv == worldEvent;
-
-				int index;
-				if (selected)
-				{
-					index = worldEv.FindIndex(0, eventStep, x => x.X == posx && x.Y == posy);
-				}
-				else
-				{
-					index = worldEv.FindIndex(x => x.X == posx && x.Y == posy);
-				}
-
-				if (index != -1)
-				{
-					return worldEv[index].Index;
-				}
-
-				if (selected)
-				{
-					break;
-				}
-			}
-
-			return -1;
 		}
 
 		public int FindEvent(int posx, int posy)
@@ -324,7 +294,7 @@ namespace WLEditor
 			}
 
 			pictureBox.Invalidate();
-			EventIndexChange();
+			UpdateTitle();
 		}
 
 		public void RemoveEvent(int posx, int posy)
@@ -339,13 +309,8 @@ namespace WLEditor
 				}
 
 				pictureBox.Invalidate();
-				EventIndexChange();
+				UpdateTitle();
 			}
-		}
-
-		void EventIndexChange()
-		{
-			EventIndexChanged(this, EventArgs.Empty);
 		}
 
 		#endregion

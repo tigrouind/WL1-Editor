@@ -52,10 +52,11 @@ namespace WLEditor
 		{
 			InitializeComponent();
 			eventForm = new EventForm(pictureBox1, tilesWorld8x8, selection1, history);
-			eventForm.EventIndexChanged += (s, e) => UpdateTitle();
+			eventForm.UpdateTitle = UpdateTitle;
 			eventForm.EventChanged += (s, e) => SetChanges(ChangeEnum.Event);
 
 			pathForm = new PathForm(pictureBox1);
+			pathForm.UpdateTitle = UpdateTitle;
 			pathForm.PathChanged += (s, e) => SetChanges(ChangeEnum.Path);
 			pathForm.GetAnimationIndex = () => animationIndex;
 
@@ -459,7 +460,7 @@ namespace WLEditor
 						if (selection1.HasSelection)
 						{
 							history.AddChanges(selection1.PasteSelection(PasteTileAt));
-							RaiseTileMoveEvent();
+							UpdateTitle();
 							pictureBox1.Invalidate();
 							SetChanges(eventMode ? ChangeEnum.Event : ChangeEnum.Tile);
 						}
@@ -488,7 +489,7 @@ namespace WLEditor
 							selection1.CopySelection(CopyTileAt);
 							history.AddChanges(selection1.DeleteSelection(SetTileAt, GetEmptyTile()));
 
-							RaiseTileMoveEvent();
+							UpdateTitle();
 							pictureBox1.Invalidate();
 							SetChanges(eventMode ? ChangeEnum.Event : ChangeEnum.Tile);
 						}
@@ -506,7 +507,7 @@ namespace WLEditor
 						{
 							history.AddChanges(selection1.DeleteSelection(SetTileAt, GetEmptyTile()));
 
-							RaiseTileMoveEvent();
+							UpdateTitle();
 							pictureBox1.Invalidate();
 							SetChanges(eventMode ? ChangeEnum.Event : ChangeEnum.Tile);
 						}
@@ -551,7 +552,7 @@ namespace WLEditor
 					{
 						if (history.Undo(SetTileAt, GetTileAt))
 						{
-							RaiseTileMoveEvent();
+							UpdateTitle();
 							pictureBox1.Invalidate();
 							SetChanges(eventMode ? ChangeEnum.Event : ChangeEnum.Tile);
 						}
@@ -564,7 +565,7 @@ namespace WLEditor
 					{
 						if (history.Redo(SetTileAt, GetTileAt))
 						{
-							RaiseTileMoveEvent();
+							UpdateTitle();
 							pictureBox1.Invalidate();
 							SetChanges(eventMode ? ChangeEnum.Event : ChangeEnum.Tile);
 						}
@@ -595,44 +596,42 @@ namespace WLEditor
 			WorldMapChanged(this, EventArgs.Empty);
 		}
 
-		void RaiseTileMoveEvent()
-		{
-			UpdateTitle();
-		}
-
 		void UpdateTitle()
 		{
-			var items = new List<string>();
-
-			if (!pathMode)
+			string title;
+			if (eventMode)
 			{
-				if (eventMode)
-				{
-					items.Add(eventForm.GetTitle());
-				}
+				title = eventForm.GetTitle();
+			}
+			else if (pathMode)
+			{
+				title = pathForm.GetTitle();
+			}
+			else
+			{
+				title = GetTitle();
+			}
 
+			toolStripStatusLabel1.Text = title;
+			statusStrip1.Visible = !string.IsNullOrEmpty(title);
+
+			string GetTitle()
+			{
 				if (lastTile != -1)
 				{
 					if (lastTileSide)
 					{
-						int tileIndex = eventForm.GetTileAt(lastTile % 32, lastTile / 32);
-						if (tileIndex == -1)
-						{
-							tileIndex = worldTiles[lastTile];
-						}
-
-						items.Add(string.Format($"{lastTile % 32}:{lastTile / 32} - {tileIndex:X2}"));
+						int tileIndex = worldTiles[lastTile];
+						return $"{lastTile % 32}:{lastTile / 32} - {tileIndex:X2}";
 					}
 					else
 					{
-						items.Add(string.Format($"{lastTile ^ 0x80:X2}"));
+						return $"{lastTile ^ 0x80:X2}";
 					}
 				}
 
-				toolStripStatusLabel1.Text = string.Join(new string(' ', 5), items.ToArray());
+				return string.Empty;
 			}
-
-			statusStrip1.Visible = eventMode || !pathMode;
 		}
 
 		int CurrentMapX => currentWorld == 8 ? 32 : 20;
@@ -673,13 +672,13 @@ namespace WLEditor
 				}
 			}
 
-			if (status == TileEventStatus.MouseDown || status == TileEventStatus.MouseMove)
+			if (status == TileEventStatus.MouseDown || status == TileEventStatus.MouseMove && !pathMode && !eventMode)
 			{
 				if (tilePos != lastTile)
 				{
 					lastTileSide = true;
 					lastTile = tilePos;
-					RaiseTileMoveEvent();
+					UpdateTitle();
 				}
 			}
 		}
@@ -776,7 +775,7 @@ namespace WLEditor
 				{
 					lastTileSide = false;
 					lastTile = tilePos;
-					RaiseTileMoveEvent();
+					UpdateTitle();
 				}
 			}
 		}
@@ -1018,6 +1017,7 @@ namespace WLEditor
 
 				UpdateTitle();
 				pictureBox1.Invalidate();
+
 				pictureBox2.Visible = !pathMode;
 				UpdateBounds();
 				history.ClearUndo();
@@ -1025,9 +1025,10 @@ namespace WLEditor
 				selection2.ClearSelection();
 
 				ignoreEvents = true;
-				tileModeToolStripMenuItem.Checked = mode == 0;
-				eventModeToolStripMenuItem.Checked = mode == 1;
-				pathModeToolStripMenuItem.Checked = mode == 2;
+				tileModeToolStripMenuItem.Checked = !eventMode && !pathMode;
+				eventModeToolStripMenuItem.Checked = eventMode;
+				pathModeToolStripMenuItem.Checked = pathMode;
+				transparentPathToolStripMenuItem.Enabled = pathMode;
 				ignoreEvents = false;
 			}
 		}

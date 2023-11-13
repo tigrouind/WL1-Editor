@@ -166,7 +166,7 @@ namespace WLEditor
 			// 
 			this.musicToolStripMenuItem.Name = "musicToolStripMenuItem";
 			this.musicToolStripMenuItem.Size = new System.Drawing.Size(179, 24);
-			this.musicToolStripMenuItem.ShortcutKeyDisplayString = "M";
+			this.musicToolStripMenuItem.ShortcutKeyDisplayString = "";
 			this.musicToolStripMenuItem.Text = "Change music...";
 			this.musicToolStripMenuItem.Click += new System.EventHandler(this.MusicToolStripMenuItem_Click);
 			// 
@@ -210,6 +210,7 @@ namespace WLEditor
 			// transparentPathToolStripMenuItem
 			// 
 			this.transparentPathToolStripMenuItem.CheckOnClick = true;
+			this.transparentPathToolStripMenuItem.Enabled = false;
 			this.transparentPathToolStripMenuItem.Name = "transparentPathToolStripMenuItem";
 			this.transparentPathToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F4;
 			this.transparentPathToolStripMenuItem.Size = new System.Drawing.Size(213, 24);

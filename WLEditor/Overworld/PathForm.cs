@@ -19,6 +19,7 @@ namespace WLEditor
 		int currentLevel;
 
 		PathModeEnum pathMode;
+		public Action UpdateTitle;
 		const int gridSnap = 4;
 		readonly ImageAttributes transparentImageAttributes;
 		public bool TransparentPath;
@@ -54,6 +55,24 @@ namespace WLEditor
 		{
 			pictureBox = box;
 			transparentImageAttributes = GetTransparentImageAttributes();
+		}
+
+		public string GetTitle()
+		{
+			switch (pathMode)
+			{
+				case PathModeEnum.None:
+					return "Normal path";
+
+				case PathModeEnum.Water:
+					return "Water path";
+
+				case PathModeEnum.Invisible:
+					return "Invisible path";
+
+				default:
+					throw new NotSupportedException();
+			}
 		}
 
 		void SetChanges()
@@ -111,6 +130,7 @@ namespace WLEditor
 			currentLevel = levels[currentWorld][0];
 			currentPath = PathData[currentLevel];
 			currentDirection = null;
+			pathMode = PathModeEnum.None;
 			bitmapCache = false;
 		}
 
@@ -129,14 +149,17 @@ namespace WLEditor
 			{
 				case Keys.PageUp:
 					NextLevel();
+					UpdateTitle();
 					return true;
 
 				case Keys.PageDown:
 					PreviousLevel();
+					UpdateTitle();
 					return true;
 
 				case Keys.Shift | Keys.Delete:
 					RemoveAllPaths();
+					UpdateTitle();
 
 					Invalidate();
 					SetChanges();
@@ -147,6 +170,7 @@ namespace WLEditor
 					{
 						RemovePath();
 						BindPaths();
+						UpdateTitle();
 
 						Invalidate();
 						SetChanges();
@@ -158,6 +182,7 @@ namespace WLEditor
 				case Keys.Left:
 				case Keys.Right:
 					ChangeDirection();
+					UpdateTitle();
 					Invalidate();
 					return true;
 
@@ -196,12 +221,9 @@ namespace WLEditor
 					SetChanges();
 					return true;
 
-				case Keys.I:
-					pathMode = pathMode == PathModeEnum.Invisible ? PathModeEnum.None : PathModeEnum.Invisible;
-					return true;
-
-				case Keys.W:
-					pathMode = pathMode == PathModeEnum.Water ? PathModeEnum.None : PathModeEnum.Water;
+				case Keys.M:
+					pathMode = (PathModeEnum)(((int)pathMode + 1) % 3);
+					UpdateTitle();
 					return true;
 
 				case Keys.E:
@@ -414,7 +436,7 @@ namespace WLEditor
 				else
 				{
 					currentDirection = null;
-					pathMode = 0;
+					pathMode = PathModeEnum.None;
 				}
 			}
 
@@ -427,7 +449,7 @@ namespace WLEditor
 					currentLevel = levels[currentWorld][level + 1];
 					currentPath = PathData[currentLevel];
 
-					pathMode = 0;
+					pathMode = PathModeEnum.None;
 					Invalidate();
 				}
 			}
@@ -441,7 +463,7 @@ namespace WLEditor
 					currentLevel = levels[currentWorld][level - 1];
 					currentPath = PathData[currentLevel];
 
-					pathMode = 0;
+					pathMode = PathModeEnum.None;
 					Invalidate();
 				}
 			}
