@@ -1053,7 +1053,7 @@ namespace WLEditor
 		private void TransparentPathToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			pathForm.TransparentPath = transparentPathToolStripMenuItem.Checked;
-			pictureBox1.Invalidate();
+			pathForm.Invalidate();
 		}
 	}
 }

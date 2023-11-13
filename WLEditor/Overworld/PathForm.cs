@@ -29,6 +29,7 @@ namespace WLEditor
 		readonly DirectBitmap tilesFlag = new DirectBitmap(16 * 8, 1 * 8);
 
 		Bitmap pathABitmap, pathBBitmap;
+		bool bitmapCache;
 
 		public Func<int> GetAnimationIndex;
 
@@ -92,6 +93,8 @@ namespace WLEditor
 
 			pathBBitmap?.Dispose();
 			pathBBitmap = new Bitmap(pictureBox.Width, pictureBox.Height);
+
+			bitmapCache = false;
 		}
 
 		public void LoadPaths(Rom rom)
@@ -108,9 +111,16 @@ namespace WLEditor
 			currentLevel = levels[currentWorld][0];
 			currentPath = PathData[currentLevel];
 			currentDirection = null;
+			bitmapCache = false;
 		}
 
 		#region Commands
+
+		public void Invalidate()
+		{
+			bitmapCache = false;
+			pictureBox.Invalidate();
+		}
 
 		public bool ProcessPathKey(Keys key)
 		{
@@ -128,7 +138,7 @@ namespace WLEditor
 				case Keys.Shift | Keys.Delete:
 					RemoveAllPaths();
 
-					pictureBox.Invalidate();
+					Invalidate();
 					SetChanges();
 					return true;
 
@@ -138,7 +148,7 @@ namespace WLEditor
 						RemovePath();
 						BindPaths();
 
-						pictureBox.Invalidate();
+						Invalidate();
 						SetChanges();
 					}
 					return true;
@@ -148,7 +158,7 @@ namespace WLEditor
 				case Keys.Left:
 				case Keys.Right:
 					ChangeDirection();
-					pictureBox.Invalidate();
+					Invalidate();
 					return true;
 
 				case Keys.Up | Keys.Control:
@@ -158,7 +168,7 @@ namespace WLEditor
 					MoveLevel();
 					BindPaths();
 
-					pictureBox.Invalidate();
+					Invalidate();
 					SetChanges();
 					return true;
 
@@ -170,7 +180,7 @@ namespace WLEditor
 					{
 						MoveFlag();
 
-						pictureBox.Invalidate();
+						Invalidate();
 						SetChanges();
 					}
 					return true;
@@ -182,7 +192,7 @@ namespace WLEditor
 					AddPath();
 					BindPaths();
 
-					pictureBox.Invalidate();
+					Invalidate();
 					SetChanges();
 					return true;
 
@@ -199,7 +209,7 @@ namespace WLEditor
 					{
 						SetExit();
 
-						pictureBox.Invalidate();
+						Invalidate();
 						SetChanges();
 					}
 					return true;
@@ -209,7 +219,7 @@ namespace WLEditor
 					{
 						SetProgress();
 
-						pictureBox.Invalidate();
+						Invalidate();
 						SetChanges();
 					}
 					return true;
@@ -418,7 +428,7 @@ namespace WLEditor
 					currentPath = PathData[currentLevel];
 
 					pathMode = 0;
-					pictureBox.Invalidate();
+					Invalidate();
 				}
 			}
 
@@ -432,7 +442,7 @@ namespace WLEditor
 					currentPath = PathData[currentLevel];
 
 					pathMode = 0;
-					pictureBox.Invalidate();
+					Invalidate();
 				}
 			}
 
@@ -586,22 +596,17 @@ namespace WLEditor
 
 		public void Draw(Graphics g)
 		{
-			using (Graphics gPathA = Graphics.FromImage(pathABitmap))
-			using (Graphics gPathB = Graphics.FromImage(pathBBitmap))
+			if (!bitmapCache)
 			{
-				gPathA.Clear(Color.Transparent);
-				gPathB.Clear(Color.Transparent);
+				bitmapCache = true;
+				RenderPath();
+			}
 
-				DrawPaths();
-				DrawLevels();
-				DrawExits();
-				if (!TransparentPath)
-				{
-					DrawProgress();
-				}
+			DrawPath();
+			DrawFlag();
 
-				gPathB.DrawImage(pathABitmap, 0, 0);
-
+			void DrawPath()
+			{
 				if (TransparentPath)
 				{
 					g.DrawImage(pathBBitmap, new Rectangle(0, 0, pathBBitmap.Width, pathBBitmap.Height),
@@ -611,211 +616,230 @@ namespace WLEditor
 				{
 					g.DrawImage(pathBBitmap, 0, 0);
 				}
+			}
 
-				DrawFlag();
-
-				void DrawLevels()
+			void DrawFlag()
+			{
+				if (currentWorld == 8 && currentLevel != 7)
 				{
-					using (var format = new StringFormat())
-					using (var font = new Font("Arial", 5.0f * zoom))
-					using (var pen = new Pen(Color.Black, zoom * 2.0f))
+					var item = flags[currentLevel];
+					int animationIndex = GetAnimationIndex();
+					for (int n = 0; n < 4; n++)
 					{
-						format.LineAlignment = StringAlignment.Center;
-						format.Alignment = StringAlignment.Center;
+						var src = new Rectangle((n + animationIndex % 3 * 4) * 8, 0, 8, 8);
+						var dest = new Rectangle((item.X + n % 2 * 8) * zoom, (item.Y + n / 2 * 8) * zoom, 8 * zoom, 8 * zoom);
+						g.DrawImage(tilesFlag.Bitmap, dest, src, GraphicsUnit.Pixel);
+					}
+				}
+			}
 
-						WorldPathNextEnum next = currentDirection == null ? (WorldPathNextEnum)(-1) : currentDirection.Next;
+			void RenderPath()
+			{
+				//bitmaps are needed because path layer can be rendered with transparency
+				//and because path are rendered in two steps
+				using (Graphics gPathA = Graphics.FromImage(pathABitmap))
+				using (Graphics gPathB = Graphics.FromImage(pathBBitmap))
+				{
+					gPathA.Clear(Color.Transparent);
+					gPathB.Clear(Color.Transparent);
 
-						foreach (var level in levels[currentWorld].OrderBy(x => x == currentLevel || next == (WorldPathNextEnum)x))
+					DrawPaths();
+					DrawLevels();
+					DrawExits();
+					if (!TransparentPath)
+					{
+						DrawProgress();
+					}
+
+					gPathB.DrawImage(pathABitmap, 0, 0);
+
+					void DrawLevels()
+					{
+						using (var format = new StringFormat())
+						using (var font = new Font("Arial", 5.0f * zoom))
+						using (var pen = new Pen(Color.Black, zoom * 2.0f))
 						{
-							var item = PathData[level];
-							int posX = item.X;
-							int posY = item.Y;
+							format.LineAlignment = StringAlignment.Center;
+							format.Alignment = StringAlignment.Center;
 
-							bool selected = currentPath == item || next == (WorldPathNextEnum)level;
+							WorldPathNextEnum next = currentDirection == null ? (WorldPathNextEnum)(-1) : currentDirection.Next;
 
-							using (GraphicsPath path = RoundedRect(new Rectangle(posX * zoom, posY * zoom, 8 * zoom, 8 * zoom), zoom * 2))
+							foreach (var level in levels[currentWorld].OrderBy(x => x == currentLevel || next == (WorldPathNextEnum)x))
 							{
-								gPathB.DrawPath(pen, path);
-								gPathA.FillPath(selected ? Brushes.Lime : Brushes.MediumSeaGreen, path);
-							}
+								var item = PathData[level];
+								int posX = item.X;
+								int posY = item.Y;
 
-							if (!TransparentPath)
-							{
-								gPathA.DrawString((Array.IndexOf(levels[currentWorld], level) + 1).ToString(), font, Brushes.Black, (posX + 4) * zoom, (posY + 4) * zoom, format);
+								bool selected = currentPath == item || next == (WorldPathNextEnum)level;
+
+								using (GraphicsPath path = RoundedRect(new Rectangle(posX * zoom, posY * zoom, 8 * zoom, 8 * zoom), zoom * 2))
+								{
+									gPathB.DrawPath(pen, path);
+									gPathA.FillPath(selected ? Brushes.Lime : Brushes.MediumSeaGreen, path);
+								}
+
+								if (!TransparentPath)
+								{
+									gPathA.DrawString((Array.IndexOf(levels[currentWorld], level) + 1).ToString(), font, Brushes.Black, (posX + 4) * zoom, (posY + 4) * zoom, format);
+								}
 							}
 						}
 					}
-				}
 
-				void DrawFlag()
-				{
-					if (currentWorld == 8 && currentLevel != 7)
+					void DrawExits()
 					{
-						var item = flags[currentLevel];
-						int animationIndex = GetAnimationIndex();
-						for (int n = 0; n < 4; n++)
+						using (var format = new StringFormat())
+						using (var font = new Font("Arial", 5.0f * zoom))
+						using (var penBorder = new Pen(Color.Black, zoom * 2.0f))
 						{
-							var src = new Rectangle((n + animationIndex % 3 * 4) * 8, 0, 8, 8);
-							var dest = new Rectangle((item.X + n % 2 * 8) * zoom, (item.Y + n / 2 * 8) * zoom, 8 * zoom, 8 * zoom);
-							g.DrawImage(tilesFlag.Bitmap, dest, src, GraphicsUnit.Pixel);
-						}
-					}
-				}
+							format.LineAlignment = StringAlignment.Center;
+							format.Alignment = StringAlignment.Center;
 
-				void DrawExits()
-				{
-					using (var format = new StringFormat())
-					using (var font = new Font("Arial", 5.0f * zoom))
-					using (var penBorder = new Pen(Color.Black, zoom * 2.0f))
-					{
-						format.LineAlignment = StringAlignment.Center;
-						format.Alignment = StringAlignment.Center;
-
-						foreach (var dir in currentPath.Directions.Where(x => x.Path.Count > 0 && IsSpecialExit(x.Next))
-								.OrderBy(x => x == currentDirection))
-						{
-							var (nextX, nextY) = GetPathPosition(currentPath, dir);
-
-							int exitX = Math.Max(0, Math.Min(nextX, CurrentMapX - 8));
-							int exitY = Math.Max(0, Math.Min(nextY, CurrentMapY - 8));
-							WorldPathNextEnum[] flags = { WorldPathNextEnum.Overworld, WorldPathNextEnum.Sherbet, WorldPathNextEnum.Teapot, WorldPathNextEnum.TeapotOverworld };
-
-							bool selected = dir == currentDirection;
-
-							using (GraphicsPath path = RoundedRect(new Rectangle(exitX * zoom, exitY * zoom, 8 * zoom, 8 * zoom), zoom * 2))
+							foreach (var dir in currentPath.Directions.Where(x => x.Path.Count > 0 && IsSpecialExit(x.Next))
+									.OrderBy(x => x == currentDirection))
 							{
-								gPathB.DrawPath(penBorder, path);
-								gPathA.FillPath(selected ? Brushes.Lime : Brushes.MediumSeaGreen, path);
-							}
+								var (nextX, nextY) = GetPathPosition(currentPath, dir);
 
-							if (!TransparentPath)
-							{
-								gPathA.DrawString(new[] { "O", "S", "T", "T" }[Array.IndexOf(flags, dir.Next)], font, Brushes.Black, (exitX + 4) * zoom, (exitY + 4) * zoom, format);
+								int exitX = Math.Max(0, Math.Min(nextX, CurrentMapX - 8));
+								int exitY = Math.Max(0, Math.Min(nextY, CurrentMapY - 8));
+								WorldPathNextEnum[] flags = { WorldPathNextEnum.Overworld, WorldPathNextEnum.Sherbet, WorldPathNextEnum.Teapot, WorldPathNextEnum.TeapotOverworld };
+
+								bool selected = dir == currentDirection;
+
+								using (GraphicsPath path = RoundedRect(new Rectangle(exitX * zoom, exitY * zoom, 8 * zoom, 8 * zoom), zoom * 2))
+								{
+									gPathB.DrawPath(penBorder, path);
+									gPathA.FillPath(selected ? Brushes.Lime : Brushes.MediumSeaGreen, path);
+								}
+
+								if (!TransparentPath)
+								{
+									gPathA.DrawString(new[] { "O", "S", "T", "T" }[Array.IndexOf(flags, dir.Next)], font, Brushes.Black, (exitX + 4) * zoom, (exitY + 4) * zoom, format);
+								}
 							}
 						}
 					}
-				}
 
-				void DrawPaths()
-				{
-					foreach (var dirs in currentPath.Directions.Where(x => x.Path.Count > 0).OrderBy(x => currentDirection == x))
+					void DrawPaths()
 					{
-						int startX = currentPath.X;
-						int startY = currentPath.Y;
-						bool selected = currentDirection == dirs;
-
-						List<Point> points = new List<Point>();
-						List<Color> colors = new List<Color>();
-
-						points.Add(new Point((startX + 4) * zoom, (startY + 4) * zoom));
-						foreach (var path in dirs.Path)
+						foreach (var dirs in currentPath.Directions.Where(x => x.Path.Count > 0).OrderBy(x => currentDirection == x))
 						{
-							GetPathPosition(path, ref startX, ref startY);
+							int startX = currentPath.X;
+							int startY = currentPath.Y;
+							bool selected = currentDirection == dirs;
+
+							List<Point> points = new List<Point>();
+							List<Color> colors = new List<Color>();
+
 							points.Add(new Point((startX + 4) * zoom, (startY + 4) * zoom));
-
-							Color color = pathColors[(int)GroupPath(path.Status) + (selected ? 0 : 3)];
-							colors.Add(color);
-						}
-
-						DrawLine(points, colors);
-					}
-
-					void DrawLine(List<Point> points, List<Color> colors)
-					{
-						using (var pen = new Pen(Color.Black, zoom * 6.0f))
-						{
-							gPathB.DrawLines(pen, points.ToArray());
-						}
-
-						using (var brush = new SolidBrush(Color.Black))
-						{
-							var miterPoints = GetMitterPoints(zoom * 4.0f);
-
-							int n = 0;
-							foreach (var item in colors.GroupByAdjacent(x => x, (x, y) => new { Color = x, Count = y.Count() }))
+							foreach (var path in dirs.Path)
 							{
-								brush.Color = item.Color;
-								gPathA.FillPolygon(brush, GetLineStrip(n, item.Count + 1).ToArray(), FillMode.Winding);
-								n += item.Count;
+								GetPathPosition(path, ref startX, ref startY);
+								points.Add(new Point((startX + 4) * zoom, (startY + 4) * zoom));
+
+								Color color = pathColors[(int)GroupPath(path.Status) + (selected ? 0 : 3)];
+								colors.Add(color);
 							}
 
-							IEnumerable<PointF> GetLineStrip(int index, int count)
+							DrawLine(points, colors);
+						}
+
+						void DrawLine(List<Point> points, List<Color> colors)
+						{
+							using (var pen = new Pen(Color.Black, zoom * 6.0f))
 							{
-								for (int i = 0; i < count; i++)
+								gPathB.DrawLines(pen, points.ToArray());
+							}
+
+							using (var brush = new SolidBrush(Color.Black))
+							{
+								var miterPoints = GetMitterPoints(zoom * 4.0f);
+
+								int n = 0;
+								foreach (var item in colors.GroupByAdjacent(x => x, (x, y) => new { Color = x, Count = y.Count() }))
 								{
-									yield return miterPoints[(index + i) * 2];
+									brush.Color = item.Color;
+									gPathA.FillPolygon(brush, GetLineStrip(n, item.Count + 1).ToArray(), FillMode.Winding);
+									n += item.Count;
 								}
 
-								for (int i = count - 1; i >= 0; i--)
+								IEnumerable<PointF> GetLineStrip(int index, int count)
 								{
-									yield return miterPoints[(index + i) * 2 + 1];
+									for (int i = 0; i < count; i++)
+									{
+										yield return miterPoints[(index + i) * 2];
+									}
+
+									for (int i = count - 1; i >= 0; i--)
+									{
+										yield return miterPoints[(index + i) * 2 + 1];
+									}
 								}
 							}
-						}
 
-						List<PointF> GetMitterPoints(float thickness)
-						{
-							var result = new List<PointF>();
-							for (int i = 0; i < points.Count; i++)
+							List<PointF> GetMitterPoints(float thickness)
 							{
-								PointF getLineA() => new PointF(points[i].X - points[i - 1].X, points[i].Y - points[i - 1].Y).Normalized();
-								PointF getLineB() => new PointF(points[i + 1].X - points[i].X, points[i + 1].Y - points[i].Y).Normalized();
+								var result = new List<PointF>();
+								for (int i = 0; i < points.Count; i++)
+								{
+									PointF getLineA() => new PointF(points[i].X - points[i - 1].X, points[i].Y - points[i - 1].Y).Normalized();
+									PointF getLineB() => new PointF(points[i + 1].X - points[i].X, points[i + 1].Y - points[i].Y).Normalized();
 
-								PointF lineA = (i == 0) ? getLineB() : getLineA();
-								PointF lineB = (i == points.Count - 1) ? getLineA() : getLineB();
+									PointF lineA = (i == 0) ? getLineB() : getLineA();
+									PointF lineB = (i == points.Count - 1) ? getLineA() : getLineB();
 
-								PointF normal = new PointF(-lineA.Y, lineA.X).Normalized();
-								PointF tangent = new PointF(lineA.X + lineB.X, lineA.Y + lineB.Y).Normalized();
-								PointF miter = new PointF(-tangent.Y, tangent.X);
+									PointF normal = new PointF(-lineA.Y, lineA.X).Normalized();
+									PointF tangent = new PointF(lineA.X + lineB.X, lineA.Y + lineB.Y).Normalized();
+									PointF miter = new PointF(-tangent.Y, tangent.X);
 
-								float length = thickness * 0.5f / (normal.X * miter.X + normal.Y * miter.Y);
-								result.Add(new PointF(points[i].X + miter.X * length, points[i].Y + miter.Y * length));
-								result.Add(new PointF(points[i].X - miter.X * length, points[i].Y - miter.Y * length));
+									float length = thickness * 0.5f / (normal.X * miter.X + normal.Y * miter.Y);
+									result.Add(new PointF(points[i].X + miter.X * length, points[i].Y + miter.Y * length));
+									result.Add(new PointF(points[i].X - miter.X * length, points[i].Y - miter.Y * length));
+								}
+
+								return result;
 							}
-
-							return result;
 						}
 					}
-				}
 
-				void DrawProgress()
-				{
-					using (var format = new StringFormat())
-					using (var font = new Font("Arial", 5.0f * zoom))
+					void DrawProgress()
 					{
-						format.LineAlignment = StringAlignment.Center;
-						format.Alignment = StringAlignment.Center;
-
-						int[,] offsets =
+						using (var format = new StringFormat())
+						using (var font = new Font("Arial", 5.0f * zoom))
 						{
+							format.LineAlignment = StringAlignment.Center;
+							format.Alignment = StringAlignment.Center;
+
+							int[,] offsets =
+							{
 							{  8,  0 },
 							{ -8,  0 },
 							{  0, -8 },
 							{  0,  8 }
 						};
 
-						for (int dir = 0; dir < 4; dir++)
-						{
-							var dirs = currentPath.Directions[dir];
-							if (dirs.Path.Count > 0 && dirs.Progress != WorldPathProgressEnum.None)
+							for (int dir = 0; dir < 4; dir++)
 							{
-								int progress = Array.IndexOf(Overworld.ProgressFlags, dirs.Progress);
-								if (progress != -1)
+								var dirs = currentPath.Directions[dir];
+								if (dirs.Path.Count > 0 && dirs.Progress != WorldPathProgressEnum.None)
 								{
-									gPathA.FillRectangle(Brushes.Gray, (currentPath.X + offsets[dir, 0]) * zoom, (currentPath.Y + offsets[dir, 1]) * zoom, 8 * zoom, 8 * zoom);
-									gPathA.DrawString(progress.ToString(), font, Brushes.White, (currentPath.X + 4 + offsets[dir, 0]) * zoom, (currentPath.Y + 4 + offsets[dir, 1]) * zoom, format);
+									int progress = Array.IndexOf(Overworld.ProgressFlags, dirs.Progress);
+									if (progress != -1)
+									{
+										gPathA.FillRectangle(Brushes.Gray, (currentPath.X + offsets[dir, 0]) * zoom, (currentPath.Y + offsets[dir, 1]) * zoom, 8 * zoom, 8 * zoom);
+										gPathA.DrawString(progress.ToString(), font, Brushes.White, (currentPath.X + 4 + offsets[dir, 0]) * zoom, (currentPath.Y + 4 + offsets[dir, 1]) * zoom, format);
+									}
 								}
 							}
 						}
 					}
-				}
 
-				GraphicsPath RoundedRect(Rectangle bounds, int offset)
-				{
-					GraphicsPath path = new GraphicsPath();
-
-					path.AddLines(new[]
+					GraphicsPath RoundedRect(Rectangle bounds, int offset)
 					{
+						GraphicsPath path = new GraphicsPath();
+
+						path.AddLines(new[]
+						{
 						new Point(bounds.Left + offset, bounds.Top),
 						new Point(bounds.Right - offset, bounds.Top),
 						new Point(bounds.Right, bounds.Top + offset),
@@ -826,8 +850,9 @@ namespace WLEditor
 						new Point(bounds.Left, bounds.Top + offset)
 					});
 
-					path.CloseFigure();
-					return path;
+						path.CloseFigure();
+						return path;
+					}
 				}
 			}
 		}
