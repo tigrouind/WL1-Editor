@@ -82,6 +82,17 @@ namespace WLEditor
 			}
 		}
 
+		public byte[] ReadBytes(int position, int size)
+		{
+			var result = new byte[size];
+			for (int i = 0; i < size; i++)
+			{
+				result[i] = ReadByte(position + i);
+			}
+
+			return result;
+		}
+
 		#endregion
 
 		#region CRC

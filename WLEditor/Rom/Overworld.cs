@@ -113,7 +113,7 @@ namespace WLEditor
 			}
 		}
 
-		public static IEnumerable<byte> RLECompressTiles(byte[] tilesdata)
+		static IEnumerable<byte> RLECompressTiles(byte[] tilesdata)
 		{
 			List<byte> result = new List<byte>();
 			int current = 0;
@@ -169,24 +169,52 @@ namespace WLEditor
 					yield return val;
 				}
 			}
-
-			yield return 0;
 		}
 
 		public static void DumpFlags(Rom rom, DirectBitmap bitmap)
 		{
 			rom.SetBank(0x14);
-			byte[] data = new byte[12 * 16];
-			rom.ReadBytes(0x7B97, data.Length, data);
+			var data = rom.ReadBytes(0x7B97, 12 * 16);
 			Level.Dump8x8Tiles(data, bitmap, 12, 0, 0x1E, paletteColors, true);
 		}
 
 		public static void Dump8x8Tiles(Rom rom, int bank, int tileAddress, DirectBitmap bitmap)
 		{
+			Level.Dump8x8Tiles(Dump8x8Tiles(rom, bank, tileAddress).Skip(128 * 16).ToArray(), bitmap, 256, 0, 0xE1, paletteColors, false);
+		}
+
+		public static IEnumerable<byte> Dump8x8Tiles(Rom rom, int bank, int tileAddress)
+		{
 			rom.SetBank(bank);
 			byte[] data = new byte[384 * 8 * 2];
 			RLEDecompressTiles(rom, tileAddress, data);
-			Level.Dump8x8Tiles(Zip(Enumerable.Range(0, 384 * 8), x => data[x], x => data[x + 384 * 8]).Skip(128 * 16), bitmap, 256, 0, 0xE1, paletteColors, false);
+			return Zip(Enumerable.Range(0, 384 * 8), x => data[x], x => data[x + 384 * 8]);
+		}
+
+		public static byte[] RLECompressMapTiles(byte[] data)
+		{
+			return RLECompressTiles(data).Append((byte)0).ToArray();
+		}
+
+		public static byte[] RLECompress8x8Tiles(byte[] data)
+		{
+			return RLECompressTiles(Unzip(data).ToArray()).ToArray();
+		}
+
+		public static bool Save8x8Tiles(Rom rom, int bank, int address, byte[] data, int compressedSize, out string message)
+		{
+			var compressedData = RLECompress8x8Tiles(data);
+			if (compressedData.Length > compressedSize)
+			{
+				message = $"Data is too big to fit in ROM.\r\nPlease free at least {compressedData.Length - compressedSize} byte(s)";
+				return false;
+			}
+
+			rom.SetBank(bank);
+			rom.WriteBytes(address, compressedData);
+
+			message = string.Empty;
+			return true;
 		}
 
 		public static void DumpAnimatedTilesA(Rom rom, int tileAddress, int tilePosition, DirectBitmap bitmap, int index, int offset)
@@ -199,7 +227,7 @@ namespace WLEditor
 		{
 			rom.SetBank(8);
 			Level.Dump8x8Tiles(Enumerable.Range(0, 16)
-			.Select(x => rom.ReadByte(tileAddress + x)), bitmap, 1, tilePosition, 0xE1, paletteColors, false);
+				.Select(x => rom.ReadByte(tileAddress + x)), bitmap, 1, tilePosition, 0xE1, paletteColors, false);
 		}
 
 		static IEnumerable<TResult> Zip<T, TResult>(IEnumerable<T> source, Func<T, TResult> first, Func<T, TResult> second)
@@ -208,6 +236,19 @@ namespace WLEditor
 			{
 				yield return first(item);
 				yield return second(item);
+			}
+		}
+
+		static IEnumerable<T> Unzip<T>(T[] source)
+		{
+			for (int i = 0; i < source.Length; i += 2)
+			{
+				yield return source[i];
+			}
+
+			for (int i = 0; i < source.Length; i += 2)
+			{
+				yield return source[i + 1];
 			}
 		}
 
@@ -233,11 +274,11 @@ namespace WLEditor
 		public static bool SaveTiles(Rom rom, int bank, int address, byte[] data, int maxSize, out string errorMessage)
 		{
 			rom.SetBank(bank);
-			var compressedData = RLECompressTiles(data).ToArray();
+			var compressedData = RLECompressMapTiles(data);
 
 			if (compressedData.Length > maxSize)
 			{
-				errorMessage = $"Tile data is too big to fit in ROM.\r\n Please free at least {compressedData.Length - maxSize} byte(s).";
+				errorMessage = $"Tile data is too big to fit in ROM.\r\nPlease free at least {compressedData.Length - maxSize} byte(s).";
 				return false;
 			}
 

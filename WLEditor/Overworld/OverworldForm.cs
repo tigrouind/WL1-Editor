@@ -3,7 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Windows.Forms;
 
 namespace WLEditor
@@ -1055,6 +1057,50 @@ namespace WLEditor
 		{
 			pathForm.TransparentPath = transparentPathToolStripMenuItem.Checked;
 			pathForm.Invalidate();
+		}
+
+		private void ImportToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			if (!SaveChanges())
+			{
+				return;
+			}
+
+			OpenFileDialog openFile = new OpenFileDialog
+			{
+				Filter = "Tile data (*.chr, *.prg)|*.chr;*.prg"
+			};
+
+			var result = openFile.ShowDialog();
+			if (result == DialogResult.OK)
+			{
+				if (Path.GetExtension(openFile.FileName) == ".chr" && !Gfx.ImportCHR(rom, openFile.FileName, out string message))
+				{
+					MessageBox.Show(message, "Import failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				}
+				else if (Path.GetExtension(openFile.FileName) == ".prg" && !Gfx.ImportPRG(rom, openFile.FileName, out message))
+				{
+					MessageBox.Show(message, "Import failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				}
+				else
+				{
+					SetChanges(ChangeEnum.None);
+					LoadWorld();
+					MessageBox.Show("Successfully imported", Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
+				}
+			}
+		}
+
+		private void ExportToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			FolderBrowserDialog save = new FolderBrowserDialog();
+
+			var result = save.ShowDialog();
+			if (result == DialogResult.OK)
+			{
+				Gfx.Export(rom, save.SelectedPath);
+				MessageBox.Show("Data successfully exported", Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
+			}
 		}
 	}
 }
