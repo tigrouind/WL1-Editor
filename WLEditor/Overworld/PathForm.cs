@@ -12,6 +12,7 @@ namespace WLEditor
 	{
 		WorldPath[] worldData;
 		WorldPath[] overWorldData;
+		int[] levelToCourseId;
 		(int X, int Y)[] flags;
 
 		WorldPath currentPath;
@@ -59,19 +60,31 @@ namespace WLEditor
 
 		public string GetTitle()
 		{
-			switch (pathMode)
+			if (currentWorld == 8)
 			{
-				case PathModeEnum.None:
-					return "Normal path";
+				return GetPathMode();
+			}
+			else
+			{
+				return $"Course {levelToCourseId[currentLevel]:D2} - {GetPathMode()}";
+			}
 
-				case PathModeEnum.Water:
-					return "Water path";
+			string GetPathMode()
+			{
+				switch (pathMode)
+				{
+					case PathModeEnum.None:
+						return "Normal path";
 
-				case PathModeEnum.Invisible:
-					return "Invisible path";
+					case PathModeEnum.Water:
+						return "Water path";
 
-				default:
-					throw new NotSupportedException();
+					case PathModeEnum.Invisible:
+						return "Invisible path";
+
+					default:
+						throw new NotSupportedException();
+				}
 			}
 		}
 
@@ -122,6 +135,7 @@ namespace WLEditor
 			overWorldData = Overworld.LoadPaths(rom, true);
 			flags = Overworld.LoadFlags(rom);
 			Overworld.DumpFlags(rom, tilesFlag);
+			levelToCourseId = Level.GetCourseIds(rom).Select(x => x.CourseNo).ToArray();
 		}
 
 		public void LoadWorld(int world)
