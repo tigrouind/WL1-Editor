@@ -24,13 +24,14 @@ namespace WLEditor
 		static readonly int[] music =
 		{
 			0x6204,
-			0x6204,
+			0,
 			0x78AE,
 			0x7DB0,
 			0x7980,
 			0x7C04,
 			0x7B62,
 			0x7A9A,
+			0,
 			0x4D55,
 		};
 
@@ -80,6 +81,14 @@ namespace WLEditor
 			WorldPathProgressEnum.Level7,
 			WorldPathProgressEnum.Level8
 		};
+
+		public static bool HasPaths(int world) => world != 8 && world != 1;
+
+		public static bool HasEvents(int world) => world != 8;
+
+		public static bool HasMusic(int world) => world!= 8 && world != 1 && world < 10;
+
+		public static bool IsOverworld(int world) => world == 9;
 
 		#region World 8x8 tiles
 
@@ -864,7 +873,7 @@ namespace WLEditor
 			var directions = new byte[] { 0x10, 0x20, 0x40, 0x80 };
 
 			rom.SetBank(8);
-			if (currentWorld == 8)
+			if (IsOverworld(currentWorld))
 			{
 				foreach (var (progress, dir) in GetProgressNextDirections(0)
 					.Where(x => x.Progress < overWorldNextDir.Length))

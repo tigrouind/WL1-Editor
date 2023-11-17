@@ -1,13 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace WLEditor
 {
 	public class EventForm
 	{
-		List<(int X, int Y, byte Index)>[] worldEvents = new List<(int X, int Y, byte Index)>[0];
+		List<(int X, int Y, byte Index)>[] worldEvents;
 		List<(int X, int Y, byte Index)> worldEvent;
 		int eventStep;
 
@@ -74,6 +75,12 @@ namespace WLEditor
 			},
 			new []
 			{
+				new int[] { },
+				new int[] { },
+				new int[] { },
+			},
+			new []
+			{
 				new [] { 0x66C6 }
 			},
 		};
@@ -95,6 +102,7 @@ namespace WLEditor
 			91,
 			416,
 			252,
+			0,
 			71
 		};
 

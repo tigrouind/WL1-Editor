@@ -38,13 +38,14 @@ namespace WLEditor
 		readonly int[][] levels =
 		{
 			new [] { 7, 15, 14, 12, 25, 41 },
-			new [] { 7, 15, 14, 12, 25, 41 },
+			new [] { 0 },
 			new [] { 6, 16, 13, 5, 17, 9 },
 			new [] { 33, 2, 4, 8, 32, 24 },
 			new [] { 3, 21, 22, 39, 27, 28 },
 			new [] { 0, 30, 31, 11, 20 },
 			new [] { 38, 29, 1, 19, 18, 26 },
 			new [] { 37, 34, 35, 40 },
+			new [] { 0 },
 			new [] { 0, 1, 5, 2, 4, 3, 6, 7 }
 		};
 
@@ -60,7 +61,7 @@ namespace WLEditor
 
 		public string GetTitle()
 		{
-			if (currentWorld == 8)
+			if (Overworld.IsOverworld(currentWorld))
 			{
 				return GetPathMode();
 			}
@@ -93,16 +94,16 @@ namespace WLEditor
 			PathChanged(this, EventArgs.Empty);
 		}
 
-		WorldPath[] PathData => currentWorld == 8 ? overWorldData : worldData;
+		WorldPath[] PathData => Overworld.IsOverworld(currentWorld) ? overWorldData : worldData;
 
 		public bool SavePaths(Rom rom, out string errorMessage)
 		{
-			bool result = Overworld.SavePaths(rom, PathData, currentWorld == 8, out errorMessage);
+			bool result = Overworld.SavePaths(rom, PathData, Overworld.IsOverworld(currentWorld), out errorMessage);
 			if (result)
 			{
 				Overworld.SaveProgressNextDirection(rom, currentWorld, PathData, levels[currentWorld], IsSpecialExit);
 
-				if (currentWorld == 8)
+				if (Overworld.IsOverworld(currentWorld))
 				{
 					Overworld.SaveFlags(rom, flags);
 				}
@@ -215,7 +216,7 @@ namespace WLEditor
 				case Keys.Down | Keys.Alt:
 				case Keys.Left | Keys.Alt:
 				case Keys.Right | Keys.Alt:
-					if (currentWorld == 8 && currentLevel != 7)
+					if (Overworld.IsOverworld(currentWorld) && currentLevel != 7)
 					{
 						MoveFlag();
 
@@ -371,7 +372,7 @@ namespace WLEditor
 			void SetExit()
 			{
 				RemoveReversePath(currentDirection);
-				if (currentWorld == 8)
+				if (Overworld.IsOverworld(currentWorld))
 				{
 					currentDirection.Next = WorldPathNextEnum.TeapotOverworld;
 				}
@@ -535,7 +536,7 @@ namespace WLEditor
 				if (dir.Path.Count == 0 || !IsSpecialExit(dir.Next))
 				{
 					RemoveReversePath(dir);
-					dir.Next = currentWorld == 8 ? WorldPathNextEnum.TeapotOverworld : WorldPathNextEnum.Overworld;
+					dir.Next = Overworld.IsOverworld(currentWorld) ? WorldPathNextEnum.TeapotOverworld : WorldPathNextEnum.Overworld;
 				}
 			}
 
@@ -656,7 +657,7 @@ namespace WLEditor
 
 			void DrawFlag()
 			{
-				if (currentWorld == 8 && currentLevel != 7)
+				if (Overworld.IsOverworld(currentWorld) && currentLevel != 7)
 				{
 					var item = flags[currentLevel];
 					int animationIndex = GetAnimationIndex();
@@ -977,8 +978,8 @@ namespace WLEditor
 			}
 		}
 
-		int CurrentMapX => currentWorld == 8 ? 256 : 160;
+		int CurrentMapX => Overworld.IsOverworld(currentWorld) ? 256 : 160;
 
-		int CurrentMapY => currentWorld == 8 ? 256 : 144;
+		int CurrentMapY => Overworld.IsOverworld(currentWorld) ? 256 : 144;
 	}
 }

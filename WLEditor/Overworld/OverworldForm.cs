@@ -76,6 +76,7 @@ namespace WLEditor
 			{ ( 0x09, 0x4E13, 0x09, 0x7216, 393 ), "5 SS Tea Cup" },
 			{ ( 0x14, 0x6909, 0x14, 0x7813, 388 ), "6 Parsley Woods" },
 			{ ( 0x09, 0x5C6C, 0x09, 0x739F, 322 ), "7 Syrup Castle" },
+			{ ( 0x09, 0x5C6C, 0x09, 0x763B, 247 ), "7 Syrup Castle - DEFEATED" },
 			{ ( 0x14, 0x5AA0, 0x09, 0x6AA5, 787 ), "8 Overworld" }
 		};
 
@@ -136,8 +137,15 @@ namespace WLEditor
 
 			Overworld.LoadTiles(rom, data.BankB, data.TileAddressB, worldTiles);
 
-			eventForm.LoadWorld(rom, currentWorld);
-			pathForm.LoadWorld(currentWorld);
+			if (Overworld.HasEvents(currentWorld))
+			{
+				eventForm.LoadWorld(rom, currentWorld);
+			}
+
+			if (Overworld.HasPaths(currentWorld))
+			{
+				pathForm.LoadWorld(currentWorld);
+			}
 
 			history.ClearUndo();
 
@@ -171,6 +179,15 @@ namespace WLEditor
 				}
 
 				currentWorld = WorldComboBox.SelectedIndex;
+				if ((!Overworld.HasPaths(currentWorld) && pathMode) || (!Overworld.HasEvents(currentWorld) && eventMode))
+				{
+					ChangeEditMode(0);
+				}
+
+				eventModeToolStripMenuItem.Enabled = Overworld.HasEvents(currentWorld);
+				pathModeToolStripMenuItem.Enabled = Overworld.HasPaths(currentWorld);
+				musicToolStripMenuItem.Enabled = Overworld.HasMusic(currentWorld);
+
 				LoadWorld();
 				selection1.ClearSelection();
 				selection2.ClearSelection();
@@ -184,14 +201,14 @@ namespace WLEditor
 			if ((changesFlag & ChangeEnum.Tile) != 0)
 			{
 				//improve tile compression
-				if (currentWorld != 8)
+				if (!Overworld.IsOverworld(currentWorld))
 				{
 					CopyTilesOnTheRightSide();
 				}
 
 				var worldInfo = worldData[currentWorld].Value;
 				if (!Overworld.SaveTiles(rom, worldInfo.BankB, worldInfo.TileAddressB,
-								currentWorld == 8 ? worldTiles : worldTiles.Take(564).ToArray(), worldInfo.MaxLength, out message))
+								Overworld.IsOverworld(currentWorld) ? worldTiles : worldTiles.Take(564).ToArray(), worldInfo.MaxLength, out message))
 				{
 					MessageBox.Show(message, Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
 					return false;
@@ -636,9 +653,9 @@ namespace WLEditor
 			}
 		}
 
-		int CurrentMapX => currentWorld == 8 ? 32 : 20;
+		int CurrentMapX => Overworld.IsOverworld(currentWorld) ? 32 : 20;
 
-		int CurrentMapY => currentWorld == 8 ? 32 : 18;
+		int CurrentMapY => Overworld.IsOverworld(currentWorld) ? 32 : 18;
 
 		#region Mouse
 
@@ -902,7 +919,7 @@ namespace WLEditor
 					case 1:
 					case 4:
 					case 5:
-					case 8:
+					case 9:
 						if ((timerTicks % 3) == 0)
 						{
 							animationIndex++;
@@ -986,7 +1003,7 @@ namespace WLEditor
 						break;
 					}
 
-				case 8:
+				case 9:
 					Overworld.DumpAnimatedTilesA(rom, animationOverworld[0].Address, animationOverworld[0].Position, tilesWorld8x8, animationIndex % 8, 8);
 					invalidTiles[animationOverworld[0].Position] = true;
 					break;
@@ -1002,12 +1019,18 @@ namespace WLEditor
 
 		private void EventModeToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			ChangeEditMode(1);
+			if (Overworld.HasEvents(currentWorld))
+			{
+				ChangeEditMode(1);
+			}
 		}
 
 		private void PathModeToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			ChangeEditMode(2);
+			if (Overworld.HasPaths(currentWorld))
+			{
+				ChangeEditMode(2);
+			}
 		}
 
 		void ChangeEditMode(int mode)
@@ -1030,8 +1053,9 @@ namespace WLEditor
 				tileModeToolStripMenuItem.Checked = !eventMode && !pathMode;
 				eventModeToolStripMenuItem.Checked = eventMode;
 				pathModeToolStripMenuItem.Checked = pathMode;
-				transparentPathToolStripMenuItem.Enabled = pathMode;
 				ignoreEvents = false;
+
+				transparentPathToolStripMenuItem.Enabled = pathMode;
 			}
 		}
 
