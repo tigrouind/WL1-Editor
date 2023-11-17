@@ -688,39 +688,28 @@ namespace WLEditor
 
 			void SaveTreasureOverworldLists()
 			{
-				var overworldListOffsets = new int[]
+				var overworldLists = new (int Offset, int[] Levels)[]
 				{
-					0x5D15,
-					0x78F0,
-					0x7DE1,
-					0x79B1,
-					0x7C2D,
-					0x7B9D,
-					0x7AE7
-				};
-
-				int[][] levelsPerOverworld =
-				{
-					new [] { 7, 23, 15, 14, 36, 12, 25, 41 },
-					new [] { 6, 16, 13, 5, 10, 17, 9 },
-					new [] { 33, 2, 4, 8, 32, 24 },
-					new [] { 3, 21, 22, 39, 27, 28 },
-					new [] { 0, 30, 31, 11, 20 },
-					new [] { 38, 42, 29, 1, 19, 18, 26 },
-					new [] { 37, 34, 35, 40 }
+					(0x5D15, new [] { 7, 23, 15, 14, 36, 12, 25, 41 }),
+					(0x78F0, new [] { 6, 16, 13, 5, 10, 17, 9 }),
+					(0x7DE1, new [] { 33, 2, 4, 8, 32, 24 }),
+					(0x79B1, new [] { 3, 21, 22, 39, 27, 28 }),
+					(0x7C2D, new [] { 0, 30, 31, 11, 20 }),
+					(0x7B9D, new [] { 38, 42, 29, 1, 19, 18, 26 }),
+					(0x7AE7, new [] { 37, 34, 35, 40 })
 				};
 
 				rom.SetBank(0x8);
-				int position = rom.ReadWord(overworldListOffsets[0] + 1);
-				for (int i = 0; i < 7; i++)
+				int position = rom.ReadWord(overworldLists[0].Offset + 1);
+				foreach (var (Offset, Levels) in overworldLists)
 				{
-					rom.WriteWord(overworldListOffsets[i] + 1, (ushort)position); //ld hl, XXXX
-					foreach (var level in levelsPerOverworld[i])
+					rom.WriteWord(Offset + 1, (ushort)position); //ld hl, XXXX
+					foreach (var level in Levels)
 					{
 						overworldTreasureList[level] = position;
 					}
 
-					int treasureCount = levelsPerOverworld[i].Count(x => treasures.Contains(x));
+					int treasureCount = Levels.Count(x => treasures.Contains(x));
 					position += treasureCount;
 					position++; //0xFF marker
 				}
