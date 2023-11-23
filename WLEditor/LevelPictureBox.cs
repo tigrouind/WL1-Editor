@@ -98,8 +98,9 @@ namespace WLEditor
 					{
 						DrawSectors(font, format);
 						DrawSelectedSector();
-						DrawScrollLines();
 					}
+
+					DrawScrollLines();
 				}
 			}
 
@@ -310,11 +311,23 @@ namespace WLEditor
 				if (ScrollLines != 0)
 				{
 					int positionY = new[] { 23, 15, 7, -1 }[ScrollLines - 1];
+					int lower = (positionY + 9) * 16;
+					int upper = positionY * 16;
+
+					using (Brush brush = new SolidBrush(Color.FromArgb(192, 50, 25, 0)))
+					{
+						e.Graphics.FillRectangle(brush, 0, 0, 4096 * zoom, upper * zoom);
+						e.Graphics.FillRectangle(brush, 0, lower * zoom, 4096 * zoom, (32 * 16 - lower) * zoom);
+					}
+
 					using (Pen pen = new Pen(Color.Yellow, 2.0f * zoom))
 					{
 						pen.DashPattern = new[] { 5.0f, 1.0f };
-						e.Graphics.DrawLine(pen, 0, positionY * 16 * zoom, 4096 * zoom, positionY * 16 * zoom);
-						e.Graphics.DrawLine(pen, 0, (positionY + 9) * 16 * zoom, 4096 * zoom, (positionY + 9) * 16 * zoom);
+						e.Graphics.DrawLine(pen, 0, upper * zoom, 4096 * zoom, upper * zoom);
+						if (ScrollLines > 1)
+						{
+							e.Graphics.DrawLine(pen, 0, lower * zoom, 4096 * zoom, lower * zoom);
+						}
 					}
 				}
 			}
