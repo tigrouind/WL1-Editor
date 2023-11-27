@@ -620,7 +620,11 @@ namespace WLEditor
 
 		public static bool SaveChanges(Rom rom, int course, out string errorMessage)
 		{
-			SaveBlocksToRom();
+			if (!SaveBlocksToRom(out errorMessage))
+			{
+				return false;
+			}
+
 			if (!SaveObjectsToRom(out errorMessage))
 			{
 				return false;
@@ -628,50 +632,90 @@ namespace WLEditor
 
 			return true;
 
-			void SaveBlocksToRom()
+			bool SaveBlocksToRom(out string message)
 			{
-				var allTiles = GetAllTiles();
+				var allTiles = GetAllTiles()
+					.Select(x => RLECompressTiles(x).ToArray())
+					.ToArray();
+
+				if (!CheckSize())
+				{
+					message = $"Block data is too big to fit in ROM.";
+					return false;
+				}
 
 				//rom expansion give new banks for level data
-				rom.ExpandTo(RomSize.ROM_1MB);
+				rom.ExpandTo1MB();
+				if (rom.IsMBC3())
+				{
+					rom.SetBank(0x20);
+					rom.WriteBytes(0x4000, new byte[0x80000]); //zero out (before IPS patch)
+				}
 
 				//write them back to ROM
-				byte bank = 0x20;
-				byte subbank = 0;
-				int writePosition = 0x4040; //first 64 bytes are reserved for level pointers
-				for (int i = 0; i < 0x2B; i++)
-				{
-					byte[] tileData = RLECompressTiles(allTiles[i]).ToArray();
-					if ((writePosition + tileData.Length) >= 0x8000 || subbank >= 32)
-					{
-						//no more space, switch to another bank
-						bank++;
-						subbank = 0;
-						writePosition = 0x4040;
+				WriteBlocks();
 
-						if (bank == 0x40)
+				message = string.Empty;
+				return true;
+
+				void WriteBlocks()
+				{
+					byte bank = 0x3F;
+					byte subbank = 0;
+					int writePosition = 0x4040; //first 64 bytes are reserved for level pointers
+					for (int i = 0; i < 0x2B; i++)
+					{
+						byte[] tileData = allTiles[i];
+						if ((writePosition + tileData.Length) >= 0x8000 || subbank >= 32)
 						{
-							rom.ExpandTo(RomSize.ROM_2MB);
+							//no more space, switch to another bank
+							bank--;
+							subbank = 0;
+							writePosition = 0x4040;
 						}
+
+						//write data to bank
+						rom.SetBank(bank);
+						rom.WriteWord(0x4000 + subbank * 2, (ushort)writePosition);
+						rom.WriteBytes(writePosition, tileData);
+
+						//update level header
+						rom.SetBank(0xC);
+						int headerposition = rom.ReadWord(0x4560 + i * 2);
+						rom.WriteByte(headerposition + 9, bank);
+						rom.WriteByte(headerposition + 10, subbank);
+
+						headerposition = rom.ReadWord(0x45B6 + i * 2);
+						rom.WriteByte(headerposition + 9, bank);
+						rom.WriteByte(headerposition + 10, subbank);
+
+						subbank++;
+						writePosition += tileData.Length;
+					}
+				}
+
+				bool CheckSize()
+				{
+					int writePosition = 0;
+					byte bank = 0x3F;
+
+					foreach (var tileData in allTiles)
+					{
+						if ((writePosition + tileData.Length) >= (0x4000 - 0x40))
+						{
+							writePosition = 0;
+							bank--;
+
+							if (bank <= 0x32)
+							{
+								return false;
+							}
+						}
+
+						writePosition += tileData.Length;
 					}
 
-					//write data to bank
-					rom.SetBank(bank);
-					rom.WriteWord(0x4000 + subbank * 2, (ushort)writePosition);
-					rom.WriteBytes(writePosition, tileData);
-
-					//update level header
-					rom.SetBank(0xC);
-					int headerposition = rom.ReadWord(0x4560 + i * 2);
-					rom.WriteByte(headerposition + 9, bank);
-					rom.WriteByte(headerposition + 10, subbank);
-
-					headerposition = rom.ReadWord(0x45B6 + i * 2);
-					rom.WriteByte(headerposition + 9, bank);
-					rom.WriteByte(headerposition + 10, subbank);
-
-					subbank++;
-					writePosition += tileData.Length;
+					return true;
 				}
 
 				byte[][] GetAllTiles()

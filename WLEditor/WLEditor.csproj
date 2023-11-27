@@ -61,7 +61,6 @@
     <Compile Include="Extensions.cs" />
     <Compile Include="Overworld\Gfx.cs" />
     <Compile Include="Overworld\PathModeEnum.cs" />
-    <Compile Include="RomSize.cs" />
     <Compile Include="Rom\WorldPath\Enum\WorldPathNextEnum.cs" />
     <Compile Include="Rom\Level.cs" />
     <Compile Include="LevelPictureBox.cs">

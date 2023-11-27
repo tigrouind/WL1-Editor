@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace WLEditor
@@ -141,15 +142,19 @@ namespace WLEditor
 
 		#endregion
 
-		public void ExpandTo(RomSize romSize)
+		public void ExpandTo1MB()
 		{
-			int size = new int[] { 32768, 65536, 131072, 262144, 524288, 1048576, 2097152 }[(int)romSize];
-			if (data.Length < size)
+			if (data.Length < 1024 * 1024) //only expand if needed (it might be already MCB3 or MBC5)
 			{
 				WriteByte(0x0147, 0x13); //MBC3+RAM+BATTERY
-				WriteByte(0x0148, (byte)romSize);
-				Array.Resize(ref data, size);
+				WriteByte(0x0148, 0x05); //1MB
+				Array.Resize(ref data, 1024 * 1024);
 			}
+		}
+
+		public bool IsMBC3()
+		{
+			return ReadByte(0x147) == 0x13;
 		}
 
 		public string Title

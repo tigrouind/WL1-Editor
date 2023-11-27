@@ -336,7 +336,7 @@ namespace WLEditor
 			{
 				Rom newRom = new Rom();
 				newRom.Load(openFileDialog1.FileName);
-				if (newRom.Title == "SUPERMARIOLAND3")
+				if (newRom.Title.StartsWith("SUPERMARIOLAND3"))
 				{
 					if (!newRom.CheckCRC())
 					{
