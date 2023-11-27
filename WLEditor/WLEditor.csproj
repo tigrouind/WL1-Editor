@@ -73,7 +73,7 @@
     <Compile Include="MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Overworld\ChangeEnum.cs" />
+    <Compile Include="ChangeEnum.cs" />
     <Compile Include="Overworld\EventForm.cs" />
     <Compile Include="Rom\Overworld.cs" />
     <Compile Include="Overworld\OverworldForm.cs">

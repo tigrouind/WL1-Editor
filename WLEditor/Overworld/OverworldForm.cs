@@ -55,11 +55,11 @@ namespace WLEditor
 			InitializeComponent();
 			eventForm = new EventForm(pictureBox1, tilesWorld8x8, selection1, history);
 			eventForm.UpdateTitle = UpdateTitle;
-			eventForm.EventChanged += (s, e) => SetChanges(ChangeEnum.Event);
+			eventForm.EventChanged += (s, e) => SetChanges(ChangeEnum.WorldEvent);
 
 			pathForm = new PathForm(pictureBox1);
 			pathForm.UpdateTitle = UpdateTitle;
-			pathForm.PathChanged += (s, e) => SetChanges(ChangeEnum.Path);
+			pathForm.PathChanged += (s, e) => SetChanges(ChangeEnum.WorldPath);
 			pathForm.GetAnimationIndex = () => animationIndex;
 
 			selection1.InvalidateSelection += (s, e) => pictureBox1.Invalidate(e.ClipRectangle);
@@ -198,7 +198,7 @@ namespace WLEditor
 		public bool SaveChanges()
 		{
 			string message;
-			if ((changesFlag & ChangeEnum.Tile) != 0)
+			if ((changesFlag & ChangeEnum.WorldTile) != 0)
 			{
 				//improve tile compression
 				if (!Overworld.IsOverworld(currentWorld))
@@ -214,10 +214,10 @@ namespace WLEditor
 					return false;
 				}
 
-				changesFlag &= ~ChangeEnum.Tile;
+				changesFlag &= ~ChangeEnum.WorldTile;
 			}
 
-			if ((changesFlag & ChangeEnum.Event) != 0)
+			if ((changesFlag & ChangeEnum.WorldEvent) != 0)
 			{
 				if (!eventForm.SaveEvents(rom, out message))
 				{
@@ -225,10 +225,10 @@ namespace WLEditor
 					return false;
 				}
 
-				changesFlag &= ~ChangeEnum.Event;
+				changesFlag &= ~ChangeEnum.WorldEvent;
 			}
 
-			if ((changesFlag & ChangeEnum.Path) != 0)
+			if ((changesFlag & ChangeEnum.WorldPath) != 0)
 			{
 				if (!pathForm.SavePaths(rom, out message))
 				{
@@ -236,7 +236,7 @@ namespace WLEditor
 					return false;
 				}
 
-				changesFlag &= ~ChangeEnum.Path;
+				changesFlag &= ~ChangeEnum.WorldPath;
 			}
 
 			return true;
@@ -481,7 +481,7 @@ namespace WLEditor
 							history.AddChanges(selection1.PasteSelection(PasteTileAt));
 							UpdateTitle();
 							pictureBox1.Invalidate();
-							SetChanges(eventMode ? ChangeEnum.Event : ChangeEnum.Tile);
+							SetChanges(eventMode ? ChangeEnum.WorldEvent : ChangeEnum.WorldTile);
 						}
 
 						selection1.ClearSelection();
@@ -510,7 +510,7 @@ namespace WLEditor
 
 							UpdateTitle();
 							pictureBox1.Invalidate();
-							SetChanges(eventMode ? ChangeEnum.Event : ChangeEnum.Tile);
+							SetChanges(eventMode ? ChangeEnum.WorldEvent : ChangeEnum.WorldTile);
 						}
 
 						selection1.ClearSelection();
@@ -528,7 +528,7 @@ namespace WLEditor
 
 							UpdateTitle();
 							pictureBox1.Invalidate();
-							SetChanges(eventMode ? ChangeEnum.Event : ChangeEnum.Tile);
+							SetChanges(eventMode ? ChangeEnum.WorldEvent : ChangeEnum.WorldTile);
 						}
 
 						selection1.ClearSelection();
@@ -573,7 +573,7 @@ namespace WLEditor
 						{
 							UpdateTitle();
 							pictureBox1.Invalidate();
-							SetChanges(eventMode ? ChangeEnum.Event : ChangeEnum.Tile);
+							SetChanges(eventMode ? ChangeEnum.WorldEvent : ChangeEnum.WorldTile);
 						}
 					}
 				}
@@ -586,7 +586,7 @@ namespace WLEditor
 						{
 							UpdateTitle();
 							pictureBox1.Invalidate();
-							SetChanges(eventMode ? ChangeEnum.Event : ChangeEnum.Tile);
+							SetChanges(eventMode ? ChangeEnum.WorldEvent : ChangeEnum.WorldTile);
 						}
 					}
 				}
@@ -742,7 +742,7 @@ namespace WLEditor
 				{
 					changes.Add(new SelectionChange { X = x, Y = y, Data = previousTile });
 					pictureBox1.Invalidate(new Rectangle(x * 8 * zoom, y * 8 * zoom, 8 * zoom, 8 * zoom));
-					SetChanges(eventMode ? ChangeEnum.Event : ChangeEnum.Tile);
+					SetChanges(eventMode ? ChangeEnum.WorldEvent : ChangeEnum.WorldTile);
 				}
 			}
 		}

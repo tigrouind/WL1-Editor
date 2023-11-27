@@ -70,7 +70,7 @@ namespace WLEditor
 		int animatedTileIndex;
 		int timerTicks;
 		string romFilePath;
-		bool hasChanges;
+		ChangeEnum changeMode;
 		int zoom;
 		bool ignoreEvents;
 
@@ -119,7 +119,7 @@ namespace WLEditor
 			{
 				currentWarp = Sector.SearchWarp(rom, currentCourseId, levelPictureBox.CurrentSector, treasureId);
 				LoadLevel();
-				SetChanges(true);
+				SetChanges(ChangeEnum.Sectors);
 			}
 
 			void SectorFormSectorLoad(object sender, (int Sector, bool Checkpoint, int TreasureId) e)
@@ -136,7 +136,7 @@ namespace WLEditor
 
 			void WorldMapChanged(object sender, EventArgs e)
 			{
-				SetChanges(true);
+				SetChanges(ChangeEnum.WorldMap);
 			}
 
 			void ToolBoxFormClosing(object sender, EventArgs e)
@@ -257,7 +257,7 @@ namespace WLEditor
 						levelPictureBox.AddChange(tileIndex % 256, tileIndex / 256);
 						Level.LevelData[tileIndex + 0x1000] = (byte)currentTile;
 						levelPictureBox.InvalidateTile(tileIndex);
-						SetChanges(true);
+						SetChanges(ChangeEnum.Blocks);
 					}
 				}
 
@@ -269,7 +269,7 @@ namespace WLEditor
 						levelPictureBox.AddChange(tileIndex % 256, tileIndex / 256);
 						Level.ObjectsData[tileIndex] = (byte)currentObject;
 						levelPictureBox.InvalidateObject(tileIndex, currentObject, previousObject);
-						SetChanges(true);
+						SetChanges(ChangeEnum.Blocks);
 					}
 				}
 			}
@@ -351,7 +351,7 @@ namespace WLEditor
 					overworldForm.LoadRom(rom);
 					romFilePath = openFileDialog1.FileName;
 
-					SetChanges(false);
+					SetChanges(ChangeEnum.None);
 					ignoreEvents = true;
 					levelComboBox.SelectedIndex = 0;
 					ignoreEvents = false;
@@ -454,7 +454,7 @@ namespace WLEditor
 		{
 			if (rom.IsLoaded)
 			{
-				if (hasChanges)
+				if ((changeMode & ChangeEnum.Blocks) != 0)
 				{
 					if (!Level.SaveChanges(rom, currentCourseId, out string message))
 					{
@@ -481,17 +481,25 @@ namespace WLEditor
 						return false;
 					}
 
-					SetChanges(false);
+					SetChanges(ChangeEnum.None);
 				}
 			}
 
 			return true;
 		}
 
-		void SetChanges(bool hasChanges)
+		void SetChanges(ChangeEnum mode)
 		{
-			this.hasChanges = hasChanges;
-			saveToolStripMenuItem.Enabled = hasChanges;
+			if (mode == ChangeEnum.None)
+			{
+				changeMode = ChangeEnum.None;
+				saveToolStripMenuItem.Enabled = false;
+			}
+			else
+			{
+				changeMode |= mode;
+				saveToolStripMenuItem.Enabled = true;
+			}
 		}
 
 		void SaveToolStripMenuItemClick(object sender, EventArgs e)
@@ -505,7 +513,7 @@ namespace WLEditor
 
 			bool AskForSavingChanges()
 			{
-				if (hasChanges)
+				if (changeMode != ChangeEnum.None)
 				{
 					DialogResult result = MessageBox.Show("Save pending changes ?", Text, MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
 					switch (result)
@@ -631,7 +639,7 @@ namespace WLEditor
 				case Keys.Control | Keys.V:
 					if (levelPictureBox.PasteSelection())
 					{
-						SetChanges(true);
+						SetChanges(ChangeEnum.Blocks);
 					}
 
 					levelPictureBox.ClearSelection();
@@ -640,7 +648,7 @@ namespace WLEditor
 				case Keys.Control | Keys.X:
 					if (levelPictureBox.CutSelection())
 					{
-						SetChanges(true);
+						SetChanges(ChangeEnum.Blocks);
 					}
 
 					levelPictureBox.ClearSelection();
@@ -649,7 +657,7 @@ namespace WLEditor
 				case Keys.Delete:
 					if (levelPictureBox.DeleteSelection())
 					{
-						SetChanges(true);
+						SetChanges(ChangeEnum.Blocks);
 					}
 
 					levelPictureBox.ClearSelection();
@@ -658,14 +666,14 @@ namespace WLEditor
 				case Keys.Control | Keys.Z:
 					if (levelPictureBox.Undo())
 					{
-						SetChanges(true);
+						SetChanges(ChangeEnum.Blocks);
 					}
 					return true;
 
 				case Keys.Control | Keys.Y:
 					if (levelPictureBox.Redo())
 					{
-						SetChanges(true);
+						SetChanges(ChangeEnum.Blocks);
 					}
 					return true;
 			}
