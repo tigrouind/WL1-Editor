@@ -463,7 +463,7 @@ namespace WLEditor
 			return pathData;
 		}
 
-		public static bool SavePaths(Rom rom, WorldPath[] pathData, bool overWorld, out string errorMessage)
+		public static bool SavePaths(Rom rom, WorldPath[] pathData, int currentWorld, out string errorMessage)
 		{
 			(int, int)[] duplicates =
 			{
@@ -473,6 +473,7 @@ namespace WLEditor
 				( 38, 42 ), // parsley woods 1 / flooded
 			};
 
+			bool overWorld = IsOverworld(currentWorld);
 			if (!overWorld)
 			{
 				//will be stored using shared pointers
@@ -506,6 +507,7 @@ namespace WLEditor
 				}
 			}
 
+			SpecialFixes();
 			SaveProgression();
 			SaveLevelsPosition();
 
@@ -592,6 +594,22 @@ namespace WLEditor
 							}
 						}
 					}
+				}
+			}
+
+			void SpecialFixes()
+			{
+				if (currentWorld == 2)
+				{
+					//fix current path being set to 0x2F after beating teapot 6 (hidden path to teapot 4 / boss)
+					rom.SetBank(0x8);
+					rom.WriteByte(0x78CD, 0x09); //replace "ld a, 2F" by "ld a, 09"
+				}
+				else if (currentWorld == 6)
+				{
+					//fix parsley woods unpassable unless lake is drained
+					rom.SetBank(0x8);
+					rom.WriteByte(0x417C, 0x18); //replace "jr nz, 4159" by "jr 4159"
 				}
 			}
 

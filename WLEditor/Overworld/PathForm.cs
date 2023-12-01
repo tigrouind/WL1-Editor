@@ -98,7 +98,7 @@ namespace WLEditor
 
 		public bool SavePaths(Rom rom, out string errorMessage)
 		{
-			bool result = Overworld.SavePaths(rom, PathData, Overworld.IsOverworld(currentWorld), out errorMessage);
+			bool result = Overworld.SavePaths(rom, PathData, currentWorld, out errorMessage);
 			if (result)
 			{
 				Overworld.SaveProgressNextDirection(rom, currentWorld, PathData, levels[currentWorld], IsSpecialExit);
