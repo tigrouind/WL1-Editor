@@ -132,6 +132,7 @@ namespace WLEditor
 				warpInfo.CameraY = rom.ReadByte(warp + 5) / 8 + (cameraSector / 16) * 32;
 				warpInfo.CameraX = rom.ReadByte(warp + 6) / 8 + (cameraSector % 16) * 32;
 				warpInfo.CameraType = rom.ReadByte(warp + 7);
+				warpInfo.WarioSpriteAttributes = rom.ReadByte(warp + 8);
 				warpInfo.AnimationSpeed = rom.ReadByte(warp + 9);
 				warpInfo.Palette = rom.ReadByte(warp + 10);
 				warpInfo.Bank = rom.ReadByte(warp + 11);
@@ -161,6 +162,7 @@ namespace WLEditor
 			rom.WriteByte(warp + 4, (byte)(warpInfo.CameraX / 32 + (warpInfo.CameraY / 32) * 16));
 			rom.WriteByte(warp + 5, (byte)((warpInfo.CameraY % 32) * 8));
 			rom.WriteByte(warp + 6, (byte)((warpInfo.CameraX % 32) * 8));
+			rom.WriteByte(warp + 8, (byte)warpInfo.WarioSpriteAttributes);
 			rom.WriteByte(warp + 7, (byte)warpInfo.CameraType);
 			rom.WriteByte(warp + 9, (byte)warpInfo.AnimationSpeed);
 			rom.WriteByte(warp + 10, (byte)warpInfo.Palette);

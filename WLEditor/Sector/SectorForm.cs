@@ -287,11 +287,17 @@ namespace WLEditor
 			{ 0x01, "Swimming" },
 		};
 
-		readonly ComboboxItemCollection<int> warioAttributes = new ComboboxItemCollection<int>
+		readonly ComboboxItemCollection<int> warioAttributesLevel = new ComboboxItemCollection<int>
 		{
 			{ 0x00, "Left facing" },
 			{ 0x20, "Right facing" },
 			{ 0xA0, "Behind background" },
+		};
+
+		readonly ComboboxItemCollection<int> warioAttributesSector = new ComboboxItemCollection<int>
+		{
+			{ 0x00, "Normal" },
+			{ 0x01, "Behind background" },
 		};
 
 		readonly ComboboxItemCollection<int> warps = new ComboboxItemCollection<int>
@@ -401,8 +407,11 @@ namespace WLEditor
 				ddlWarioStatus.Items.Clear();
 				ddlWarioStatus.Items.AddRange(warioStatus.ToArray());
 
-				ddlWarioAttributes.Items.Clear();
-				ddlWarioAttributes.Items.AddRange(warioAttributes.ToArray());
+				ddlWarioAttributesLevel.Items.Clear();
+				ddlWarioAttributesLevel.Items.AddRange(warioAttributesLevel.ToArray());
+
+				ddlWarioAttributesSector.Items.Clear();
+				ddlWarioAttributesSector.Items.AddRange(warioAttributesSector.ToArray());
 
 				ddlMusic.Items.Clear();
 				ddlMusic.Items.AddRange(music.ToArray());
@@ -455,10 +464,12 @@ namespace WLEditor
 		{
 			flowLayoutPanel1.SuspendLayout();
 
+			bool validWarp = currentSector != -1 && Sector.GetWarp(rom, currentCourseId, currentSector) >= 0x5B7A;
 			panelWarp.Visible = currentSector != -1;
 			panelMusic.Visible = currentSector == -1 && currentTreasureId == -1 && !currentCheckPoint;
-			panelStatus.Visible = currentSector == -1 && currentTreasureId == -1;
-			grpTileset.Visible = grpCamera.Visible = currentSector == -1 || Sector.GetWarp(rom, currentCourseId, currentSector) >= 0x5B7A;
+			panelStatusLevel.Visible = currentSector == -1 && currentTreasureId == -1;
+			panelStatusSector.Visible = validWarp || currentTreasureId != -1;
+			grpTileset.Visible = grpCamera.Visible = currentSector == -1 || validWarp;
 
 			flowLayoutPanel1.ResumeLayout();
 		}
@@ -620,11 +631,9 @@ namespace WLEditor
 			LoadNumericUpDown(txbWarioX, currentWarp.WarioX);
 			LoadNumericUpDown(txbWarioY, currentWarp.WarioY);
 
-			if (currentSector == -1 && currentTreasureId == -1)
-			{
-				LoadDropdown(ddlWarioStatus, currentWarp.WarioStatus);
-				LoadDropdown(ddlWarioAttributes, currentWarp.WarioSpriteAttributes);
-			}
+			LoadDropdown(ddlWarioStatus, currentWarp.WarioStatus);
+			LoadDropdown(ddlWarioAttributesLevel, currentWarp.WarioSpriteAttributes);
+			LoadDropdown(ddlWarioAttributesSector, currentWarp.WarioSpriteAttributes);
 
 			void LoadNumericUpDown(NumericUpDown numericUpDown, int value)
 			{
@@ -923,11 +932,24 @@ namespace WLEditor
 			}
 		}
 
-		void DdlWarioAttributes_SelectedIndexChanged(object sender, EventArgs e)
+		void DdlWarioAttributesLevel_SelectedIndexChanged(object sender, EventArgs e)
 		{
 			if (!ignoreEvents)
 			{
-				var item = (ComboboxItem<int>)ddlWarioAttributes.SelectedItem;
+				var item = (ComboboxItem<int>)ddlWarioAttributesLevel.SelectedItem;
+				currentWarp.WarioSpriteAttributes = item.Value;
+
+				SaveWarp();
+				OnSectorChanged();
+			}
+		}
+
+
+		void DdlWarioAttributesSector_SelectedIndexChanged(object sender, EventArgs e)
+		{
+			if (!ignoreEvents)
+			{
+				var item = (ComboboxItem<int>)ddlWarioAttributesSector.SelectedItem;
 				currentWarp.WarioSpriteAttributes = item.Value;
 
 				SaveWarp();
