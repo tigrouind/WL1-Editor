@@ -278,12 +278,16 @@ namespace WLEditor
 		{
 			rom.SetBank(bank);
 			RLEDecompressTiles(rom, tileAddress, data);
+			for (int i = 0; i < data.Length; i++)
+			{
+				data[i] ^= 0x80;
+			}
 		}
 
 		public static bool SaveTiles(Rom rom, int bank, int address, byte[] data, int maxSize, out string errorMessage)
 		{
 			rom.SetBank(bank);
-			var compressedData = RLECompressMapTiles(data);
+			var compressedData = RLECompressMapTiles(data.Select(x => (byte)(x ^ 0x80)).ToArray());
 
 			if (compressedData.Length > maxSize)
 			{
@@ -324,7 +328,7 @@ namespace WLEditor
 					}
 
 					int tilePos = tilePosition - 0x9800;
-					eventItem.Add((tilePos % 32, tilePos / 32, tileIndex));
+					eventItem.Add((tilePos % 32, tilePos / 32, (byte)(tileIndex ^ 0x80)));
 					position++;
 				};
 
@@ -351,40 +355,49 @@ namespace WLEditor
 			{
 				var worldEvent = events[i];
 
-				//fix pointers
-				for (int j = 0; j < eventPointers.GetLength(0); j++)
+				SaveTilesIndex();
+				SaveTilesPosition();
+
+				void SaveTilesIndex()
 				{
-					var item = eventPointers[j];
-					if (i < item.Length && item[i] != 0)
+					//fix pointers
+					for (int j = 0; j < eventPointers.GetLength(0); j++)
 					{
-						rom.WriteWord(item[i] + eventAddressOffset[j].Tile, (ushort)position);
+						var item = eventPointers[j];
+						if (i < item.Length && item[i] != 0)
+						{
+							rom.WriteWord(item[i] + eventAddressOffset[j].Tile, (ushort)position);
+						}
 					}
-				}
 
-				//tile
-				foreach (var item in worldEvent)
-				{
-					rom.WriteByte(position++, item.Index);
-				}
-				rom.WriteByte(position++, 0xFF);
-
-				//fix pointers
-				for (int j = 0; j < eventPointers.GetLength(0); j++)
-				{
-					var item = eventPointers[j];
-					if (i < item.Length && item[i] != 0)
+					//tile
+					foreach (var item in worldEvent)
 					{
-						rom.WriteWord(item[i] + eventAddressOffset[j].Position, (ushort)position);
+						rom.WriteByte(position++, (byte)(item.Index ^ 0x80));
 					}
+					rom.WriteByte(position++, 0xFF);
 				}
 
-				//position
-				foreach (var item in worldEvent)
+				void SaveTilesPosition()
 				{
-					rom.WriteWordSwap(position, (ushort)(item.X + item.Y * 32 + 0x9800));
-					position += 2;
+					//fix pointers
+					for (int j = 0; j < eventPointers.GetLength(0); j++)
+					{
+						var item = eventPointers[j];
+						if (i < item.Length && item[i] != 0)
+						{
+							rom.WriteWord(item[i] + eventAddressOffset[j].Position, (ushort)position);
+						}
+					}
+
+					//position
+					foreach (var item in worldEvent)
+					{
+						rom.WriteWordSwap(position, (ushort)(item.X + item.Y * 32 + 0x9800));
+						position += 2;
+					}
+					rom.WriteByte(position++, 0xFF);
 				}
-				rom.WriteByte(position++, 0xFF);
 			}
 
 			errorMessage = string.Empty;

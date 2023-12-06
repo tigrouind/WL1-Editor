@@ -287,7 +287,7 @@ namespace WLEditor
 				{
 					for (int x = 0; x < CurrentMapX; x++)
 					{
-						byte tileIndex = (byte)(worldTiles[x + y * 32] ^ 0x80);
+						byte tileIndex = worldTiles[x + y * 32];
 						int previousTileIndex = previousWorldTiles[x + y * 32];
 						if (tileIndex != previousTileIndex)
 						{
@@ -548,7 +548,7 @@ namespace WLEditor
 						return new ClipboardData { Tile = GetTileAt(x, y) };
 					}
 
-					return new ClipboardData { Tile = (x + y * 16) ^ 0x80 };
+					return new ClipboardData { Tile = (x + y * 16) };
 				}
 
 				int GetEmptyTile()
@@ -558,7 +558,7 @@ namespace WLEditor
 						return -1;
 					}
 
-					return Level.GetEmptyTile(tilesWorld8x8.Bits, 8, 16) ^ 0x80;
+					return Level.GetEmptyTile(tilesWorld8x8.Bits, 8, 16);
 				}
 
 				#endregion
@@ -645,7 +645,7 @@ namespace WLEditor
 					}
 					else
 					{
-						return $"{lastTile ^ 0x80:X2}";
+						return $"{lastTile:X2}";
 					}
 				}
 
@@ -713,7 +713,7 @@ namespace WLEditor
 
 				if ((e.Status == TileEventStatus.MouseDown || e.Status == TileEventStatus.MouseMove) && !selection1.HasSelection && SelectedTile != -1)
 				{
-					UpdateTile(e.TileX, e.TileY, SelectedTile ^ 0x80);
+					UpdateTile(e.TileX, e.TileY, SelectedTile);
 				}
 
 				if (e.Status == TileEventStatus.MouseUp)
@@ -850,7 +850,7 @@ namespace WLEditor
 			{
 				if (eventMode)
 				{
-					if (data == 0xFF) //not allowed because used as a marker
+					if (data == 0x7F) //not allowed because 0xFF used as a marker
 					{
 						return data; //no changes
 					}

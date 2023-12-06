@@ -330,7 +330,6 @@ namespace WLEditor
 						}
 						else
 						{
-							tileIndex ^= 0x80;
 							int srcx = tileIndex % 16;
 							int srcy = tileIndex / 16;
 							graphics.DrawImage(tilesWorld8x8.Bitmap,
