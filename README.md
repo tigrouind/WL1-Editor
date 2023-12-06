@@ -22,12 +22,12 @@ In the editor, near the sector number, a label <kbd>S..</kbd> indicate if sector
 <kbd>Middle-click</kbd> on a sector to select it. If that sector is associated with a warp (usually there is a door in it), it will load related tiles and enemies. If you hold <kbd>Shift</kbd> or <kbd>Control</kbd> during click, it will select the first sector that targets the sector under mouse.
 
 ### Editing level tiles
-- Open <kbd>View</kbd> > <kbd>Toolbox</kbd> and select <kbd>16x16 Tiles</kbd> view.
+- Open <kbd>Window</kbd> > <kbd>Blocks / Objects</kbd> and select <kbd>Blocks</kbd> view.
 - Select a tile in the toolbox by left clicking on it.
 - Right-click inside level view. 
 
 ### Editing objects (enemies / power-ups)
-- Open <kbd>View</kbd> > <kbd>Toolbox</kbd> and select <kbd>Objects</kbd> view.
+- Open <kbd>Window</kbd> > <kbd>Block / Objects</kbd> and select <kbd>Objects</kbd> view.
 - Select an enemy or a power up in the toolbox by left clicking on it. 
 - Right-click inside level view. 
 
@@ -35,10 +35,6 @@ Available enemies depends of current sector / warp.
 
 | Key | Description |
 | :-: | - |
-| <kbd>S</kbd> | Display scroll lines.
-| <kbd>B</kbd> | Toggle <kbd>!</kbd> blocks (if any).
-| <kbd>C</kbd> | Toggle checkpoint header (if possible).
-| <kbd>T</kbd> | Toggle [treasure warps](#treasure-rooms) (if possible).
 | <kbd>Ctrl</kbd> + <kbd>Mouse wheel</kbd> | Zoom in / out.
 | <kbd>Ctrl</kbd> + <kbd>C</kbd> <br> <kbd>Ctrl</kbd> + <kbd>V</kbd> | [Copy / paste](#copy--paste) tiles and enemies.
 | <kbd>Ctrl</kbd> + <kbd>Z</kbd> <br> <kbd>Ctrl</kbd> + <kbd>Y</kbd> | Undo / redo changes.
@@ -71,7 +67,7 @@ Enemy sets specify which enemies will be loaded for a given warp (up to 6 enemie
 Tips : 
 - Red items are boss enemies sets.
 - Yellow items are related to treasure rooms. 
-- Green items :
+- Darker items :
   - Exit skull already open (no need to use coins)
   - Guragura with coin sequence (as in 1st level ending)
   - Pouncer that follows player (will try go right, then down, then up)
@@ -80,7 +76,6 @@ Tips :
 
 Treasure rooms have their own dedicated warps (one for each treasure, 15 in total).
 These warps are used during the transition between treasure totals screen and treasure room.
-Press <kbd>T</kbd> when treasure room is loaded to load the related treasure warp.
 
 Warps that lead to an area with a key (or a skull) must use the enemy set with the letter corresponding to that treasure.
 Eg: if a warp leads to an area where there is a key for treasure J, an enemy set with the letter J must be used.
@@ -97,17 +92,15 @@ When such a warp is loaded, if the treasure has already been collected, the game
 | <kbd>Right-click</kbd> in right side | Select current tile.
 | <kbd>Right-click</kbd> in left side | Add a new tile.
 | <kbd>Ctrl</kbd> + <kbd>Mouse wheel</kbd> | Zoom in / out.
-| <kbd>M</kbd> | Change music soundtrack.
 | <kbd>Ctrl</kbd> + <kbd>C</kbd> <br> <kbd>Ctrl</kbd> + <kbd>V</kbd> | [Copy / paste](#copy--paste) tiles (between left and right side or in left side).
 | <kbd>Ctrl</kbd> + <kbd>Z</kbd> <br> <kbd>Ctrl</kbd> + <kbd>Y</kbd> | Undo / redo changes.
 | <kbd>Delete</kbd> | Clear what is currently under selection.
 
 ### Editing events
-Events are used to update map tiles during gameplay, it's usually triggered after completing a level (eg: event 1 is triggered after completing first level, making a path to second level and so on).
+[Events](#Progress--Events) are used to update map tiles during gameplay, it's usually triggered after completing a level (eg: event 1 is triggered after completing first level, making a path to second level and so on).
 
 | Key | Description |
 | :-: | - |
-| <kbd>E</kbd> | Enable / disable event mode.
 | <kbd>Page-Up</kbd> <br> <kbd>Page-Down</kbd> | Select event.
 | <kbd>Home</kbd> <br> <kbd>End</kbd> | Select event step.
 | <kbd>Right-click</kbd> in left side | Add event at current step.
@@ -120,12 +113,11 @@ Events are used to update map tiles during gameplay, it's usually triggered afte
 Tips : 
 - Tiles in amber are tiles related to current event.
 - Tiles in cyan are current event tiles already applied.
-- Tile 255 (which is rightmost tile of the middle row) cannot be used in events because 255 is a special value used as a marker. It's a limitation of the game engine.
+- Tile 0x7F (which is rightmost tile of the middle row) cannot be used in events because it's a marker. It's a limitation of the game engine.
 
 ### Editing paths
 | Key | Description |
 | :-: | - |
-| <kbd>P</kbd> | Enable / disable path mode.
 | <kbd>Page-Up</kbd> <br> <kbd>Page-Down</kbd> | Select a level.
 | <kbd>Ctrl</kbd> + <kbd>↑<br>← ↓ →</kbd> | Move current level. Position will be aligned on a 4 x 4 grid.
 | <kbd>↑<br>← ↓ →</kbd> | Select a direction (N/S/E/W). Path in current direction is highlighted.
@@ -133,12 +125,33 @@ Tips :
 | <kbd>Alt</kbd> + <kbd>↑<br>← ↓ →</kbd> | Move overworld completion flag.
 | <kbd>Delete</kbd> | Delete last path segment.
 | <kbd>Shift</kbd> + <kbd>Delete</kbd> | Delete all paths in all directions.
-| <kbd>I</kbd> | Enable / disable hidden path mode. This will only be set for new paths.<br>Player won't be visible when walking on such paths. This is shown in red.
-| <kbd>W</kbd> | Enable / disable underwater path mode. This shown in blue.
-| <kbd>F</kbd> | Set progress required to take that path. A direction must be selected.<br>A number is shown near level to indicate progression required.<br>Nothing shown means no progress is required.
-| <kbd>X</kbd> | Set end of path exit target.<br>A = Overworld.<br>B = Sherbet Land.<br>C = Mt Teapot.
+| <kbd>M</kbd> | Change path mode. This will only be set for new paths.<br>Green = normal path.<br>Red = player won't be visible when walking on such paths.<br>Blue = underwater.
+| <kbd>P</kbd> | Set progress required to take current path. A direction must be selected.<br>A number is shown near level to indicate progression required.<br>Nothing shown means no progress is required.
+| <kbd>E</kbd> | Set end of path exit target.<br><kbd>O</kbd> = Overworld.<br><kbd>S</kbd> = Sherbet Land.<br><kbd>T</kbd> = Mt Teapot.
 
 Tips : 
-- Path last segment must end up exactly at same position as level to be connected. It might be necessary to move level first to align it on the grid.
+- Path last segment must end up exactly at same position as level to be connected. It might be necessary to move level to align it on the grid.
 - Events should be edited to match paths. If you don't want to bother with events, remove all events and hardcode paths in map.
-- It you are planning to do a new map, it's easier to delete all events and paths first.
+- It you are planning to do a new overworld map, it's easier to delete all events and paths first.
+
+&nbsp; | Progress  | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 |
+ --: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: 
+1 | Rice beach<br>&nbsp;| [1](#)<br>&nbsp;| [2](#)<br>&nbsp;| [3](#)<br>&nbsp;| | [4](#)<br>&nbsp;| [5](#)<br>💀 | | |
+1 | Rice beach<br>(flooded)| | | | [3](#)<br>⚑| | | 6<br>★ | |
+2 | Mt. Tea Pot<br>&nbsp;| [1](#)<br>&nbsp;| [2](#)<br>&nbsp;| [2](#)<br>⚑ | [3](#)<br>&nbsp;| [4](#)<br>&nbsp;| [5](#)<br>&nbsp;| [6](#)<br>❕| [4](#)<br>💀
+3 | Sherbet Land<br>&nbsp;| [1](#)<br>&nbsp;| [2](#)<br>&nbsp;| [2](#)<br>⚑ | [3](#)<br>&nbsp;| [3](#)<br>⚑ | [4](#)<br>★ | 5<br>★ | 6<br>💀
+4 | Stove Canyon<br>&nbsp;| [1](#)<br>&nbsp;| [2](#)<br>&nbsp;| [3](#)<br>&nbsp;| [4](#)<br>&nbsp;| [4](#)<br>⚑ | 5<br>★| [6](#)<br>💀 | |
+5 | SS Tea Cup<br>&nbsp;| [1](#)<br>&nbsp;| [2](#)<br>&nbsp;| [3](#)<br>&nbsp;| [4](#)<br>&nbsp;| [5](#)<br>💀 | | | |
+6 | Parsely Woods<br>&nbsp;| [1](#)<br>&nbsp;| [2](#)<br>❕| [3](#)<br>&nbsp;| [4](#)<br>&nbsp;| [5](#)<br>&nbsp;| [6](#)<br>💀 | | |
+7 | Syrup Castle | [1](#)<br>&nbsp; | [2](#)<br>❕  | [3](#)<br>❕  | | | | | |
+&nbsp; | Overworld | 1<br>| 2<br>| 4<br>| 5<br>| 6<br>| 3<br>| | |
+
+| Icon | Description |
+| :--: | :- |
+💀 | boss / last level|
+★ | secret level |
+⚑ | secret exit |
+[1-6](#) | event associated |
+❕ | special event, activated by hitting huge block |
+
+
