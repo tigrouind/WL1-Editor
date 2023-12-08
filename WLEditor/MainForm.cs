@@ -136,7 +136,7 @@ namespace WLEditor
 
 			void WorldMapChanged(object sender, EventArgs e)
 			{
-				SetChanges(ChangeEnum.WorldMap);
+				SetChanges(ChangeEnum.WorldEvent | ChangeEnum.WorldPath | ChangeEnum.WorldTile);
 			}
 
 			void ToolBoxFormClosing(object sender, EventArgs e)

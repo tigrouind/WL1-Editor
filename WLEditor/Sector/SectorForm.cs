@@ -674,7 +674,7 @@ namespace WLEditor
 			{
 				scroll = (scroll & ~0x2) | (checkBoxLeft.Checked ? 0x2 : 0);
 				SaveScroll();
-				OnSectorChanged();
+				Setchanges();
 			}
 		}
 
@@ -684,7 +684,7 @@ namespace WLEditor
 			{
 				scroll = (scroll & ~0x1) | (checkBoxRight.Checked ? 0x1 : 0);
 				SaveScroll();
-				OnSectorChanged();
+				Setchanges();
 			}
 		}
 
@@ -732,7 +732,7 @@ namespace WLEditor
 				Sector.SaveWarp(rom, currentCourseId, currentSector, warp);
 				LoadWarp(warp);
 
-				OnSectorChanged();
+				Setchanges();
 				SetControlsVisibility();
 			}
 
@@ -815,7 +815,7 @@ namespace WLEditor
 				currentWarp.Palette = item.Value.Palette;
 
 				SaveWarp();
-				OnSectorChanged();
+				Setchanges();
 			}
 		}
 
@@ -827,7 +827,7 @@ namespace WLEditor
 				currentWarp.TileAnimation = item.Value;
 
 				SaveWarp();
-				OnSectorChanged();
+				Setchanges();
 			}
 		}
 
@@ -839,7 +839,7 @@ namespace WLEditor
 				currentWarp.AnimationSpeed = item.Value;
 
 				SaveWarp();
-				OnSectorChanged();
+				Setchanges();
 			}
 		}
 
@@ -851,7 +851,7 @@ namespace WLEditor
 				currentWarp.Enemy = item.Value.EnemyPointers[0];
 
 				SaveWarp();
-				OnSectorChanged();
+				Setchanges();
 			}
 		}
 
@@ -862,7 +862,7 @@ namespace WLEditor
 				currentWarp.WarioX = (int)txbWarioX.Value;
 
 				SaveWarp();
-				OnSectorChanged();
+				Setchanges();
 			}
 		}
 
@@ -873,7 +873,7 @@ namespace WLEditor
 				currentWarp.WarioY = (int)txbWarioY.Value;
 
 				SaveWarp();
-				OnSectorChanged();
+				Setchanges();
 			}
 		}
 
@@ -884,7 +884,7 @@ namespace WLEditor
 				currentWarp.CameraX = (int)txbCameraX.Value;
 
 				SaveWarp();
-				OnSectorChanged();
+				Setchanges();
 			}
 		}
 
@@ -895,7 +895,7 @@ namespace WLEditor
 				currentWarp.CameraY = (int)txbCameraY.Value;
 
 				SaveWarp();
-				OnSectorChanged();
+				Setchanges();
 			}
 		}
 
@@ -907,7 +907,7 @@ namespace WLEditor
 				currentWarp.CameraType = item.Value;
 
 				SaveWarp();
-				OnSectorChanged();
+				Setchanges();
 			}
 		}
 
@@ -928,7 +928,7 @@ namespace WLEditor
 				currentWarp.WarioStatus = item.Value;
 
 				SaveWarp();
-				OnSectorChanged();
+				Setchanges();
 			}
 		}
 
@@ -940,7 +940,7 @@ namespace WLEditor
 				currentWarp.WarioSpriteAttributes = item.Value;
 
 				SaveWarp();
-				OnSectorChanged();
+				Setchanges();
 			}
 		}
 
@@ -953,11 +953,11 @@ namespace WLEditor
 				currentWarp.WarioSpriteAttributes = item.Value;
 
 				SaveWarp();
-				OnSectorChanged();
+				Setchanges();
 			}
 		}
 
-		void OnSectorChanged()
+		void Setchanges()
 		{
 			SectorChanged?.Invoke(this, EventArgs.Empty);
 		}
@@ -1077,7 +1077,7 @@ namespace WLEditor
 
 				SaveWarp();
 				LoadWarp();
-				OnSectorChanged();
+				Setchanges();
 			}
 
 		}

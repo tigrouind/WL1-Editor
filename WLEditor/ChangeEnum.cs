@@ -8,9 +8,8 @@ namespace WLEditor
 		None = 0,
 		Blocks = 1,
 		Sectors = 2,
-		WorldMap = 4,
-		WorldTile = 8,
-		WorldEvent = 16,
-		WorldPath = 32
+		WorldTile = 4,
+		WorldEvent = 8,
+		WorldPath = 16
 	}
 }
