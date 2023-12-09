@@ -59,7 +59,6 @@
     <Compile Include="ComboboxItemCollection.cs" />
     <Compile Include="DirectBitmap.cs" />
     <Compile Include="Extensions.cs" />
-    <Compile Include="Overworld\Gfx.cs" />
     <Compile Include="Overworld\PathModeEnum.cs" />
     <Compile Include="Rom\WorldPath\Enum\WorldPathNextEnum.cs" />
     <Compile Include="Rom\Level.cs" />

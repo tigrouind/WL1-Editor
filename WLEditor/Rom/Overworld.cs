@@ -82,9 +82,9 @@ namespace WLEditor
 			WorldPathProgressEnum.Level8
 		};
 
-		public static bool HasPaths(int world) => world != 8 && world != 1;
+		public static bool HasPaths(int world) => world != 8 && world != 1 && world < 10;
 
-		public static bool HasEvents(int world) => world != 8;
+		public static bool HasEvents(int world) => world != 8 && world < 10;
 
 		public static bool HasMusic(int world) => world!= 8 && world != 1 && world < 10;
 
@@ -187,9 +187,16 @@ namespace WLEditor
 			Level.Dump8x8Tiles(data, bitmap, 12, 0, 0x1E, paletteColors, true);
 		}
 
-		public static void Dump8x8Tiles(Rom rom, int bank, int tileAddress, DirectBitmap bitmap)
+		public static void Dump8x8Tiles(Rom rom, int bank, int tileAddress, DirectBitmap bitmap, byte palette)
 		{
-			Level.Dump8x8Tiles(Dump8x8Tiles(rom, bank, tileAddress).Skip(128 * 16).ToArray(), bitmap, 256, 0, 0xE1, paletteColors, false);
+			Level.Dump8x8Tiles(Dump8x8Tiles(rom, bank, tileAddress).Skip(128 * 16).ToArray(), bitmap, 256, 0, palette, paletteColors, false);
+		}
+
+		public static void Dump8x8TilesUncompressed(Rom rom, int bank, int tileAddress, int tiles, int pos, DirectBitmap bitmap, byte palette)
+		{
+			rom.SetBank(bank);
+			var data = rom.ReadBytes(tileAddress, tiles * 16);
+			Level.Dump8x8Tiles(data, bitmap, tiles, pos, palette, paletteColors, false);
 		}
 
 		public static IEnumerable<byte> Dump8x8Tiles(Rom rom, int bank, int tileAddress)
@@ -232,9 +239,9 @@ namespace WLEditor
 			Level.Dump8x8Tiles(Zip(Enumerable.Range(0, 8), x => rom.ReadByte(tileAddress + x * offset + index), x => (byte)0), bitmap, 1, tilePosition, 0xE1, paletteColors, false);
 		}
 
-		public static void DumpAnimatedTilesB(Rom rom, int tileAddress, int tilePosition, DirectBitmap bitmap)
+		public static void DumpAnimatedTilesB(Rom rom, int bank, int tileAddress, int tilePosition, DirectBitmap bitmap)
 		{
-			rom.SetBank(8);
+			rom.SetBank(bank);
 			Level.Dump8x8Tiles(Enumerable.Range(0, 16)
 				.Select(x => rom.ReadByte(tileAddress + x)), bitmap, 1, tilePosition, 0xE1, paletteColors, false);
 		}

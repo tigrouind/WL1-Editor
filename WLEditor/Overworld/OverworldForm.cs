@@ -66,18 +66,36 @@ namespace WLEditor
 			selection2.InvalidateSelection += (s, e) => pictureBox2.Invalidate(e.ClipRectangle);
 		}
 
-		readonly ComboboxItemCollection<(int BankA, int TileAddressA, int BankB, int TileAddressB, int MaxLength)> worldData = new ComboboxItemCollection<(int, int, int, int, int)>
+		readonly ComboboxItemCollection<(int BankA, int TileAddressA, int MaxLengthA, byte Palette, int BankB, int TileAddressB, int MaxLengthB, int UncompressedSize)> worldData = new ComboboxItemCollection<(int, int, int, byte, int, int, int, int)>
 		{
-			{ ( 0x09, 0x407A, 0x09, 0x6DBE, 373 ), "1 Rice Beach" },
-			{ ( 0x09, 0x407A, 0x09, 0x74E1, 346 ), "1 Rice Beach - FLOODED" },
-			{ ( 0x09, 0x407A, 0x09, 0x6F33, 368 ), "2 Mt. Teapot" },
-			{ ( 0x14, 0x6909, 0x14, 0x76D2, 321 ), "3 Sherbet Land" },
-			{ ( 0x09, 0x4E13, 0x09, 0x70A3, 371 ), "4 Stove Canyon" },
-			{ ( 0x09, 0x4E13, 0x09, 0x7216, 393 ), "5 SS Tea Cup" },
-			{ ( 0x14, 0x6909, 0x14, 0x7813, 388 ), "6 Parsley Woods" },
-			{ ( 0x09, 0x5C6C, 0x09, 0x739F, 322 ), "7 Syrup Castle" },
-			{ ( 0x09, 0x5C6C, 0x09, 0x763B, 247 ), "7 Syrup Castle - DEFEATED" },
-			{ ( 0x14, 0x5AA0, 0x09, 0x6AA5, 787 ), "8 Overworld" }
+			{ ( 0x09, 0x407A, 3477, 0xE1, 0x09, 0x6DBE, 373,  564 ), "1 Rice Beach" },
+			{ ( 0x09, 0x407A, 3477, 0xE1, 0x09, 0x74E1, 346,  564 ), "1 Rice Beach - FLOODED" },
+			{ ( 0x09, 0x407A, 3477, 0xE1, 0x09, 0x6F33, 368,  564 ), "2 Mt. Teapot" },
+			{ ( 0x14, 0x6909, 3524, 0xE1, 0x14, 0x76D2, 321,  564 ), "3 Sherbet Land" },
+			{ ( 0x09, 0x4E13, 3667, 0xE1, 0x09, 0x70A3, 371,  564 ), "4 Stove Canyon" },
+			{ ( 0x09, 0x4E13, 3667, 0xE1, 0x09, 0x7216, 393,  564 ), "5 SS Tea Cup" },
+			{ ( 0x14, 0x6909, 3524, 0xE1, 0x14, 0x7813, 388,  564 ), "6 Parsley Woods" },
+			{ ( 0x09, 0x5C6C, 3639, 0xE1, 0x09, 0x739F, 322,  564 ), "7 Syrup Castle" },
+			{ ( 0x09, 0x5C6C, 3639, 0xE1, 0x09, 0x763B, 247,  564 ), "7 Syrup Castle - DEFEATED" },
+			{ ( 0x14, 0x5AA0, 3682, 0xE1, 0x09, 0x6AA5, 787, 1024 ), "8 Overworld" },
+
+			{ ( 0x12, 0x54C2, 4761, 0xE4, 0x12, 0x6763, 199, 308 ), "Title screen" },
+			{ ( 0x06, 0x5706, 4141, 0xD0, 0x06, 0x6737, 306, 564 ), "Save Selection" },
+			{ ( 0x06, 0x7469, 1085, 0xE4, 0x06, 0x78AA, 284, 564 ), "Mini Game Selection" },
+			{ ( 0x1E, 0x7236, 2859, 0xE1, 0x1E, 0x7D67, 346, 564 ), "Mini Game 1" },
+			{ ( 0x1E, 0x57CF, 4731, 0xE4, 0x1E, 0x6A50, 337, 564 ), "Mini Game 2" },
+			{ ( 0x1E, 0x57CF, 4731, 0xE4, 0x1E, 0x6BA1, 258, 564 ), "Mini Game 2" },
+			{ ( 0x1E, 0x57CF, 4731, 0xE4, 0x1E, 0x6CA3, 352, 564 ), "Mini Game 2" },
+			{ ( 0x06, 0x41E3, 5078, 0xE1, 0x06, 0x55BC, 330, 564 ), "Treasure" },
+			{ ( 0x05, 0x4FF1, 2289, 0xE1, 0x05, 0x58EA,  79, 564 ), "Time up" },
+			{ ( 0x05, 0x4FF1, 2289, 0xE1, 0x05, 0x593A,  77, 564 ), "Time up" },
+			{ ( 0x05, 0x4FF1, 2289, 0xE1, 0x05, 0x5987, 162, 564 ), "Game over" },
+			{ ( 0x1F, 0x53C8, 5430, 0xE1, 0x1F, 0x754D,  88, 436 ), "End 1" },
+			{ ( 0x1F, 0x53C8, 5430, 0xE1, 0x1F, 0x75A6, 124, 436 ), "End 2" },
+			{ ( 0x1F, 0x53C8, 5430, 0xE1, 0x1F, 0x74B4, 148, 436 ), "End 3" },
+			{ ( 0x1F, 0x53C8, 5430, 0xE1, 0x1F, 0x7627, 120, 436 ), "End 4" },
+			{ ( 0x1F, 0x53C8, 5430, 0xE1, 0x1F, 0x73D3, 225, 436 ), "End 5" },
+			{ ( 0x1F, 0x53C8, 5430, 0xE1, 0x1F, 0x727B, 344, 948 ), "End 6" }
 		};
 
 		public void LoadRom(Rom rom)
@@ -129,12 +147,23 @@ namespace WLEditor
 		void LoadWorld()
 		{
 			var data = worldData[currentWorld].Value;
-			Overworld.Dump8x8Tiles(rom, data.BankA, data.TileAddressA, tilesWorld8x8);
+			Overworld.Dump8x8Tiles(rom, data.BankA, data.TileAddressA, tilesWorld8x8, data.Palette);
+
+			if (data.TileAddressB == 0x7627)
+			{
+				Overworld.Dump8x8TilesUncompressed(rom, data.BankA, 0x6F01, 35, 144, tilesWorld8x8, data.Palette);
+			}
+			else if (data.TileAddressB == 0x727B)
+			{
+				Overworld.Dump8x8TilesUncompressed(rom, data.BankA, 0x6B01, 64, 64, tilesWorld8x8, data.Palette);
+			}
+
 			if (timerTicks != 0)
 			{
 				DumpAnimatedTiles();
 			}
 
+			Array.Clear(worldTiles, 0, worldTiles.Length);
 			Overworld.LoadTiles(rom, data.BankB, data.TileAddressB, worldTiles);
 
 			if (Overworld.HasEvents(currentWorld))
@@ -153,15 +182,15 @@ namespace WLEditor
 			ClearAllTiles();
 			pictureBox1.Invalidate();
 			pictureBox2.Invalidate();
+		}
 
-			void ClearAllTiles()
+		void ClearAllTiles()
+		{
+			for (int y = 0; y < CurrentMapY; y++)
 			{
-				for (int y = 0; y < CurrentMapY; y++)
+				for (int x = 0; x < CurrentMapX; x++)
 				{
-					for (int x = 0; x < CurrentMapX; x++)
-					{
-						previousWorldTiles[x + y * 32] = -1;
-					}
+					previousWorldTiles[x + y * 32] = -1;
 				}
 			}
 		}
@@ -203,12 +232,12 @@ namespace WLEditor
 				//improve tile compression
 				if (!Overworld.IsOverworld(currentWorld))
 				{
-					CopyTilesOnTheRightSide();
+					CopyTilesOnTheRightSide(worldTiles);
 				}
 
 				var worldInfo = worldData[currentWorld].Value;
 				if (!Overworld.SaveTiles(rom, worldInfo.BankB, worldInfo.TileAddressB,
-								Overworld.IsOverworld(currentWorld) ? worldTiles : worldTiles.Take(564).ToArray(), worldInfo.MaxLength, out message))
+								worldTiles.Take(worldInfo.UncompressedSize).ToArray(), worldInfo.MaxLengthB, out message))
 				{
 					MessageBox.Show(message, Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
 					return false;
@@ -240,16 +269,16 @@ namespace WLEditor
 			}
 
 			return true;
+		}
 
-			void CopyTilesOnTheRightSide()
+		void CopyTilesOnTheRightSide(byte[] tileData)
+		{
+			for (int y = 0; y < tileData.Length / 32; y++)
 			{
-				for (int y = 0; y < 17; y++)
+				var data = tileData[19 + y * 32];
+				for (int x = 20; x < 32; x++)
 				{
-					var data = worldTiles[19 + y * 32];
-					for (int x = 20; x < 32; x++)
-					{
-						worldTiles[x + y * 32] = data;
-					}
+					tileData[x + y * 32] = data;
 				}
 			}
 		}
@@ -466,7 +495,7 @@ namespace WLEditor
 				{
 					if (!pathMode)
 					{
-						var selection = selectionMode? selection1 : selection2;
+						var selection = selectionMode ? selection1 : selection2;
 						selection.CopySelection(CopyTileAt);
 						selection.ClearSelection();
 					}
@@ -667,7 +696,7 @@ namespace WLEditor
 
 		int CurrentMapX => Overworld.IsOverworld(currentWorld) ? 32 : 20;
 
-		int CurrentMapY => Overworld.IsOverworld(currentWorld) ? 32 : 18;
+		int CurrentMapY => Overworld.IsOverworld(currentWorld) ? 32 : (worldData[currentWorld].Value.UncompressedSize + 31) / 32;
 
 		#region Mouse
 
@@ -903,6 +932,11 @@ namespace WLEditor
 			( 0x5CD1, 244 )
 		};
 
+		readonly (int Address, int Position)[] animationOverworld =
+		{
+			( 0x46F6, 42 )
+		};
+
 		readonly (int Address, int Position)[,] animationLava =
 		{
 			{ ( 0x5222, 218 ), ( 0x5242, 202 ), ( 0x5252, 203 ), ( 0x5232, 219 ) },
@@ -915,9 +949,10 @@ namespace WLEditor
 			{ ( 0x519D, 53 ), ( 0x518D, 54 ) },
 		};
 
-		readonly (int Address, int Position)[] animationOverworld =
+		readonly (int Address, int Position)[,] animationEnding =
 		{
-			( 0x46F6, 42 )
+			{ ( 0x6AC1, 98 ), ( 0x6AD1, 99 ) },
+			{ ( 0x6AE1, 98 ), ( 0x6AF1, 99 ) },
 		};
 
 		public void TimerTick()
@@ -932,7 +967,8 @@ namespace WLEditor
 					case 4:
 					case 5:
 					case 9:
-						if ((timerTicks % 3) == 0)
+					case 26:
+						if ((timerTicks % 4) == 0)
 						{
 							animationIndex++;
 							DumpAnimatedTiles();
@@ -986,39 +1022,43 @@ namespace WLEditor
 			{
 				case 0:
 				case 1:
-					for (int i = 0; i < animationSea.GetLength(0); i++)
-					{
-						Overworld.DumpAnimatedTilesA(rom, animationSea[i].Address, animationSea[i].Position, tilesWorld8x8, animationIndex % 6, 6);
-						invalidTiles[animationSea[i].Position] = true;
-					}
+					AnimatedTileA(6, animationSea);
 					break;
 
 				case 4:
-					{
-						int index = animationIndex % 2;
-						for (int i = 0; i < animationLava.GetLength(1); i++)
-						{
-							Overworld.DumpAnimatedTilesB(rom, animationLava[index, i].Address, animationLava[index, i].Position, tilesWorld8x8);
-							invalidTiles[animationLava[index, i].Position] = true;
-						}
-						break;
-					}
+					AnimateTilesB(8, animationLava);
+					break;
 
 				case 5:
-					{
-						int index = animationIndex % 2;
-						for (int i = 0; i < animationWater.GetLength(1); i++)
-						{
-							Overworld.DumpAnimatedTilesB(rom, animationWater[index, i].Address, animationWater[index, i].Position, tilesWorld8x8);
-							invalidTiles[animationWater[index, i].Position] = true;
-						}
-						break;
-					}
+					AnimateTilesB(8, animationWater);
+					break;
 
 				case 9:
-					Overworld.DumpAnimatedTilesA(rom, animationOverworld[0].Address, animationOverworld[0].Position, tilesWorld8x8, animationIndex % 8, 8);
-					invalidTiles[animationOverworld[0].Position] = true;
+					AnimatedTileA(8, animationOverworld);
 					break;
+
+				case 26:
+					AnimateTilesB(0x1f, animationEnding);
+					break;
+			}
+
+			void AnimatedTileA(int count, (int Address, int Position)[] animation)
+			{
+				for (int i = 0; i < animation.GetLength(0); i++)
+				{
+					Overworld.DumpAnimatedTilesA(rom, animation[i].Address, animation[i].Position, tilesWorld8x8, animationIndex % count, count);
+					invalidTiles[animation[i].Position] = true;
+				}
+			}
+
+			void AnimateTilesB(int bank, (int Address, int Position)[,] animation)
+			{
+				int index = animationIndex % animation.GetLength(0);
+				for (int i = 0; i < animation.GetLength(1); i++)
+				{
+					Overworld.DumpAnimatedTilesB(rom, bank, animation[index, i].Address, animation[index, i].Position, tilesWorld8x8);
+					invalidTiles[animation[index, i].Position] = true;
+				}
 			}
 		}
 
@@ -1097,45 +1137,85 @@ namespace WLEditor
 
 		private void ImportToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			if (!SaveChanges())
-			{
-				return;
-			}
-
 			OpenFileDialog openFile = new OpenFileDialog
 			{
-				Filter = "Tile data (*.chr, *.prg)|*.chr;*.prg"
+				Filter = "Tile/Map data (*.chr, *.prg)|*.chr;*.prg"
 			};
 
 			var result = openFile.ShowDialog();
 			if (result == DialogResult.OK)
 			{
-				if (Path.GetExtension(openFile.FileName) == ".chr" && !Gfx.ImportCHR(rom, openFile.FileName, out string message))
+				if (Path.GetExtension(openFile.FileName) == ".chr")
 				{
-					MessageBox.Show(message, "Import failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+					ImportCHR();
 				}
-				else if (Path.GetExtension(openFile.FileName) == ".prg" && !Gfx.ImportPRG(rom, openFile.FileName, out message))
+				else if (Path.GetExtension(openFile.FileName) == ".prg")
 				{
-					MessageBox.Show(message, "Import failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+					ImportPRG();
+				}
+			}
+
+			void ImportCHR()
+			{
+				var item = worldData[currentWorld].Value;
+				var data = File.ReadAllBytes(openFile.FileName);
+				var romData = Overworld.Dump8x8Tiles(rom, item.BankA, item.TileAddressA).ToArray();
+				Array.Copy(data, 0, romData, 128 * 16, Math.Min(data.Length, 256 * 16));
+
+				if (Overworld.Save8x8Tiles(rom, item.BankA, item.TileAddressA, romData, item.MaxLengthA, out string message))
+				{
+					Overworld.Dump8x8Tiles(rom, item.BankA, item.TileAddressA, tilesWorld8x8, item.Palette);
+					ClearAllTiles();
+					WorldMapChanged(this, EventArgs.Empty);
+
+					pictureBox1.Invalidate();
+					pictureBox2.Invalidate();
 				}
 				else
 				{
-					WorldMapChanged(this, EventArgs.Empty);
-					LoadWorld();
-					MessageBox.Show("Successfully imported", Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
+					MessageBox.Show(message, "Import failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
 				}
+			}
+
+			void ImportPRG()
+			{
+				var item = worldData[currentWorld].Value;
+				var data = File.ReadAllBytes(openFile.FileName);
+				Array.Copy(data, worldTiles, Math.Min(data.Length, item.UncompressedSize));
+
+				SetChanges();
+				pictureBox1.Invalidate();
 			}
 		}
 
-		private void ExportToolStripMenuItem_Click(object sender, EventArgs e)
+		private void ExportTilesToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			FolderBrowserDialog save = new FolderBrowserDialog();
+			SaveFileDialog saveFile = new SaveFileDialog
+			{
+				Filter = "Tile data (*.chr)|*.chr"
+			};
 
-			var result = save.ShowDialog();
+			var result = saveFile.ShowDialog();
 			if (result == DialogResult.OK)
 			{
-				Gfx.Export(rom, save.SelectedPath);
-				MessageBox.Show("Data successfully exported", Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
+				var item = worldData[currentWorld].Value;
+				var data = Overworld.Dump8x8Tiles(rom, item.BankA, item.TileAddressA).Skip(128 * 16).ToArray();
+				File.WriteAllBytes(saveFile.FileName, data);
+			}
+		}
+
+		private void ExportMapToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			var saveFile = new SaveFileDialog
+			{
+				Filter = "Map data (*.prg)|*.prg"
+			};
+
+			var result = saveFile.ShowDialog();
+			if (result == DialogResult.OK)
+			{
+				var item = worldData[currentWorld].Value;
+				File.WriteAllBytes(saveFile.FileName, worldTiles.Take(item.UncompressedSize).ToArray());
 			}
 		}
 	}
