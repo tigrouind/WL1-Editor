@@ -467,24 +467,25 @@ namespace WLEditor
 				{
 					return false;
 				}
-
-				if (saveFile)
-				{
-					rom.FixCRC();
-					try
-					{
-						rom.Save(romFilePath);
-					}
-					catch (UnauthorizedAccessException)
-					{
-						MessageBox.Show("The ROM file is marked as read-only and cannot be overwritten.", Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
-						return false;
-					}
-
-					SetChanges(ChangeEnum.None);
-				}
 			}
 
+			return true;
+		}
+
+		bool SaveRomFile(string filePath)
+		{
+			rom.FixCRC();
+			try
+			{
+				rom.Save(filePath);
+			}
+			catch (UnauthorizedAccessException)
+			{
+				MessageBox.Show("The ROM file is marked as read-only and cannot be overwritten.", Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+				return false;
+			}
+
+			SetChanges(ChangeEnum.None);
 			return true;
 		}
 
@@ -504,7 +505,10 @@ namespace WLEditor
 
 		void SaveToolStripMenuItemClick(object sender, EventArgs e)
 		{
-			SaveChanges(true);
+			if (SaveChanges(true))
+			{
+				SaveRomFile(romFilePath);
+			}
 		}
 
 		void MainFormFormClosing(object sender, FormClosingEventArgs e)
@@ -519,7 +523,7 @@ namespace WLEditor
 					switch (result)
 					{
 						case DialogResult.Yes:
-							return SaveChanges(true);
+							return SaveChanges(true) && SaveRomFile(romFilePath);
 
 						case DialogResult.No:
 							return true;
@@ -539,18 +543,20 @@ namespace WLEditor
 
 		void SaveAsToolStripMenuItemClick(object sender, EventArgs e)
 		{
-			SaveFileDialog saveFileDialog = new SaveFileDialog
+			if (SaveChanges(true))
 			{
-				Filter = "GB ROM Image (*.gb)|*.gb"
-			};
-
-			if (saveFileDialog.ShowDialog() == DialogResult.OK)
-			{
-				string previousRomFilePath = romFilePath;
-				romFilePath = saveFileDialog.FileName;
-				if (!SaveChanges(true))
+				SaveFileDialog saveFileDialog = new SaveFileDialog
 				{
-					romFilePath = previousRomFilePath;
+					Filter = "GB ROM Image (*.gb)|*.gb"
+				};
+
+				if (saveFileDialog.ShowDialog() == DialogResult.OK)
+				{
+					var filePath = saveFileDialog.FileName;
+					if (SaveRomFile(filePath))
+					{
+						romFilePath = filePath;
+					}
 				}
 			}
 		}
