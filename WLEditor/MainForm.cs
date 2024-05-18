@@ -433,7 +433,7 @@ namespace WLEditor
 				int switchType = Level.GetSwitchType();
 				if (switchType == 0 && !switchBlockToolStripMenuItem.Checked)
 				{
-					SystemSounds.Beep.Play();
+					MessageBox.Show("There is no switch block to activate in this level", Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
 				}
 
 				switchBlockToolStripMenuItem.Checked = switchType != 0 && !switchBlockToolStripMenuItem.Checked;
