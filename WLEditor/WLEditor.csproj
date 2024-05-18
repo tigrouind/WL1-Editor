@@ -51,8 +51,10 @@
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ComboboxItem.cs" />
@@ -109,20 +111,17 @@
     <Compile Include="Rom\Sprite.cs" />
     <Compile Include="TileEventArgs.cs" />
     <Compile Include="TileEventStatus.cs" />
-    <Compile Include="Toolbox\ObjectsPictureBox.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Toolbox\Tiles16x16PictureBox.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Toolbox\Tiles8x8PictureBox.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Toolbox\ToolboxForm.cs">
+    <Compile Include="Toolbox\ObjectsForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Toolbox\ToolboxForm.Designer.cs">
-      <DependentUpon>ToolboxForm.cs</DependentUpon>
+    <Compile Include="Toolbox\ObjectsForm.Designer.cs">
+      <DependentUpon>ObjectsForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Toolbox\BlocksForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Toolbox\BlocksForm.Designer.cs">
+      <DependentUpon>BlocksForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Toolbox\Warp.cs" />
   </ItemGroup>
@@ -139,8 +138,11 @@
     <EmbeddedResource Include="Sector\SectorForm.resx">
       <DependentUpon>SectorForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Toolbox\ToolboxForm.resx">
-      <DependentUpon>ToolboxForm.cs</DependentUpon>
+    <EmbeddedResource Include="Toolbox\ObjectsForm.resx">
+      <DependentUpon>ObjectsForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Toolbox\BlocksForm.resx">
+      <DependentUpon>BlocksForm.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />

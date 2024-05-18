@@ -22,12 +22,12 @@ In the editor, near the sector number, a label <kbd>S..</kbd> indicate if sector
 <kbd>Middle-click</kbd> on a sector to select it. If that sector is associated with a warp (usually there is a door in it), it will load related tiles and enemies. If you hold <kbd>Shift</kbd> or <kbd>Control</kbd> during click, it will select the first sector that targets the sector under mouse.
 
 ### Editing level tiles
-- Open <kbd>Window</kbd> > <kbd>Blocks / Objects</kbd> and select <kbd>Blocks</kbd> view.
+- Open <kbd>Window</kbd> > <kbd>Blocks</kbd>.
 - Select a tile in the toolbox by left clicking on it.
 - Right-click inside level view. 
 
 ### Editing objects (enemies / power-ups)
-- Open <kbd>Window</kbd> > <kbd>Block / Objects</kbd> and select <kbd>Objects</kbd> view.
+- Open <kbd>Window</kbd> > <kbd>Objects</kbd>.
 - Select an enemy or a power up in the toolbox by left clicking on it. 
 - Right-click inside level view. 
 

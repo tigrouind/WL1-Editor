@@ -1,17 +1,23 @@
-
-using System;
+﻿using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 
-namespace WLEditor
+namespace WLEditor.Toolbox
 {
-	public class ObjectsPictureBox : PictureBox
+	public partial class ObjectsForm : Form
 	{
 		public int CurrentObject;
+		public event EventHandler<KeyEventArgs> ProcessCommandKey;
+		public PictureBox PictureBox => pictureBox;
 		int zoom;
 
-		protected override void OnPaint(PaintEventArgs e)
+		public ObjectsForm()
+		{
+			InitializeComponent();
+		}
+
+		void PictureBoxPaint(object sender, PaintEventArgs e)
 		{
 			if (Level.LevelData != null && !DesignMode)
 			{
@@ -21,7 +27,7 @@ namespace WLEditor
 					Alignment = StringAlignment.Center
 				};
 
-				using (Brush brush = new SolidBrush(Color.FromArgb(128, 255, 0, 0)))
+				using (Brush brush = new SolidBrush(Color.FromArgb(128, 255, 255, 0)))
 				using (Pen pen = new Pen(Color.White, 1.5f * zoom))
 				using (Font font = new Font("Arial", 8 * zoom))
 				{
@@ -72,18 +78,41 @@ namespace WLEditor
 			}
 		}
 
-		protected override void OnMouseDown(MouseEventArgs e)
+		void PictureBoxMouseDown(object sender, MouseEventArgs e)
 		{
 			int index = e.Location.X / 32 / zoom + (e.Location.Y / 32 / zoom) * 4;
 			CurrentObject = index;
-			Invalidate();
+			pictureBox.Invalidate();
+		}
+
+		void ObjectsFormClosing(object sender, FormClosingEventArgs e)
+		{
+			if (e.CloseReason == CloseReason.UserClosing)
+			{
+				e.Cancel = true;
+				Hide();
+			}
+		}
+
+		protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+		{
+			KeyEventArgs args = new KeyEventArgs(keyData);
+
+			ProcessCommandKey(this, args);
+			if (args.Handled)
+			{
+				return true;
+			}
+
+			return base.ProcessCmdKey(ref msg, keyData);
 		}
 
 		public void SetZoom(int zoomlevel)
 		{
-			Height = 128 * zoomlevel;
-			Width = 128 * zoomlevel;
+			pictureBox.Height = 128 * zoomlevel;
+			pictureBox.Width = 128 * zoomlevel;
 			zoom = zoomlevel;
+			pictureBox.Invalidate();
 		}
 	}
 }

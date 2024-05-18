@@ -6,15 +6,18 @@ using System.Linq;
 using System.Media;
 using System.Reflection;
 using System.Windows.Forms;
+using WLEditor.Toolbox;
 
 namespace WLEditor
 {
 	public partial class MainForm : Form
 	{
 		Rom rom = new Rom();
-		readonly ToolboxForm toolboxForm = new ToolboxForm();
+		readonly BlocksForm blocksForm = new BlocksForm();
+		readonly ObjectsForm objectsForm = new ObjectsForm();
 		readonly OverworldForm overworldForm = new OverworldForm();
 		readonly SectorForm sectorForm = new SectorForm();
+		Form lastFormFocus;
 
 		public readonly static string[] LevelNames =
 		{
@@ -85,9 +88,15 @@ namespace WLEditor
 			levelPictureBox.SectorChanged += LevelPictureBoxSectorChanged;
 			levelPictureBox.GetSourceSector = x => Sector.GetSourceSector(rom, currentCourseId, x);
 
-			toolboxForm.MouseWheel += LevelPanelMouseWheel;
-			toolboxForm.FormClosing += ToolBoxFormClosing;
-			toolboxForm.ProcessCommandKey += ProcessSubFormCommand;
+			blocksForm.MouseWheel += LevelPanelMouseWheel;
+			blocksForm.FormClosing += BlocksFormClosing;
+			blocksForm.ProcessCommandKey += ProcessSubFormCommand;
+			blocksForm.GotFocus += (s, e) => lastFormFocus = blocksForm;
+
+			objectsForm.MouseWheel += LevelPanelMouseWheel;
+			objectsForm.FormClosing += ObjectsFormClosing;
+			objectsForm.ProcessCommandKey += ProcessSubFormCommand;
+			objectsForm.GotFocus += (s, e) => lastFormFocus = objectsForm;
 
 			overworldForm.FormClosing += OverworldFormClosing;
 			overworldForm.ProcessCommandKey += ProcessSubFormCommand;
@@ -139,9 +148,15 @@ namespace WLEditor
 				SetChanges(ChangeEnum.WorldEvent | ChangeEnum.WorldPath | ChangeEnum.WorldTile);
 			}
 
-			void ToolBoxFormClosing(object sender, EventArgs e)
+			void BlocksFormClosing(object sender, EventArgs e)
 			{
-				toolboxToolStripMenuItem.Checked = false;
+				blocksToolStripMenuItem.Checked = false;
+				Focus(); //prevent main window disapearing
+			}
+
+			void ObjectsFormClosing(object sender, EventArgs e)
+			{
+				objectsFormToolStripMenuItem.Checked = false;
 				Focus(); //prevent main window disapearing
 			}
 
@@ -200,27 +215,26 @@ namespace WLEditor
 
 			void LevelPictureBoxTileMouseDown(object sender, TileEventArgs e)
 			{
-				if (toolboxForm.Visible)
+				if (blocksForm.Visible || objectsForm.Visible)
 				{
 					if (e.Status == TileEventStatus.MouseDown)
 					{
 						levelPictureBox.StartChanges();
 					}
 
-					if ((e.Status == TileEventStatus.MouseMove || e.Status == TileEventStatus.MouseDown) && !levelPictureBox.HasSelection)
+					if (e.Status == TileEventStatus.MouseMove || e.Status == TileEventStatus.MouseDown)
 					{
-						int tileIndex = e.TileX + e.TileY * 256;
-						var control = toolboxForm.SelectedPanel;
-						int currentTile = toolboxForm.Tiles16x16.CurrentTile;
-						int currentObject = toolboxForm.Objects.CurrentObject;
-
-						if (e.Button == MouseButtons.Right)
+						if (e.Button == MouseButtons.Right && !levelPictureBox.HasSelection)
 						{
-							if (control == toolboxForm.Tiles16x16 && currentTile != -1)
+							int tileIndex = e.TileX + e.TileY * 256;
+							int currentTile = blocksForm.CurrentTile;
+							int currentObject = objectsForm.CurrentObject;
+
+							if (currentTile != -1 && blocksForm.Visible && (!objectsForm.Visible || lastFormFocus == blocksForm))
 							{
 								UpdateTile(tileIndex, currentTile);
 							}
-							else if (levelPictureBox.ShowObjects && control == toolboxForm.Objects)
+							else if (levelPictureBox.ShowObjects && objectsForm.Visible && (!blocksForm.Visible || lastFormFocus == objectsForm))
 							{
 								UpdateObject(tileIndex, currentObject);
 							}
@@ -288,7 +302,8 @@ namespace WLEditor
 				levelPictureBox.ClearTileCache();
 				levelPictureBox.Invalidate();
 
-				toolboxForm.Invalidate(true);
+				blocksForm.Invalidate(true);
+				objectsForm.Invalidate(true);
 			}
 		}
 
@@ -357,7 +372,8 @@ namespace WLEditor
 					ignoreEvents = false;
 					LevelComboBoxSelectedIndexChanged(sender, e);
 
-					toolboxToolStripMenuItem.Enabled = true;
+					blocksToolStripMenuItem.Enabled = true;
+					objectsFormToolStripMenuItem.Enabled = true;
 					overworldToolStripMenuItem.Enabled = true;
 					sectorsToolStripMenuItem.Enabled = true;
 					saveAsToolStripMenuItem.Enabled = true;
@@ -576,7 +592,8 @@ namespace WLEditor
 			zoomInToolStripMenuItem.Enabled = zoomLevel < 4;
 
 			levelPictureBox.SetZoom(zoomLevel);
-			toolboxForm.SetZoom(zoomLevel);
+			blocksForm.SetZoom(zoomLevel);
+			objectsForm.SetZoom(zoomLevel);
 			overworldForm.SetZoom(zoomLevel);
 			sectorForm.SetZoom(zoomLevel);
 		}
@@ -709,9 +726,14 @@ namespace WLEditor
 
 		#region Subforms
 
-		void ToolboxToolStripMenuItemClick(object sender, EventArgs e)
+		void BlocksToolStripMenuItemClick(object sender, EventArgs e)
 		{
-			ToggleForm(toolboxForm, toolboxToolStripMenuItem.Checked);
+			ToggleForm(blocksForm, blocksToolStripMenuItem.Checked);
+		}
+
+		void ObjectsFormToolStripMenuItemClick(object sender, EventArgs e)
+		{
+			ToggleForm(objectsForm, objectsFormToolStripMenuItem.Checked);
 		}
 
 		void OverworldToolStripMenuItemClick(object sender, EventArgs e)
@@ -769,17 +791,9 @@ namespace WLEditor
 
 				//redraw
 				levelPictureBox.InvalidateAnimatedTiles();
-				if (toolboxForm.Visible)
+				if (blocksForm.Visible)
 				{
-					var control = toolboxForm.SelectedPanel;
-					if (control == toolboxForm.Tiles16x16)
-					{
-						toolboxForm.Tiles16x16.Invalidate();
-					}
-					else if (control == toolboxForm.Tiles8x8)
-					{
-						toolboxForm.Tiles8x8.Invalidate();
-					}
+					blocksForm.PictureBox.Invalidate();
 				}
 			}
 		}
@@ -791,5 +805,6 @@ namespace WLEditor
 		}
 
 		#endregion
+
 	}
 }
