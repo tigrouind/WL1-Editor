@@ -1145,20 +1145,25 @@ namespace WLEditor
 			var result = openFile.ShowDialog();
 			if (result == DialogResult.OK)
 			{
-				if (Path.GetExtension(openFile.FileName) == ".chr")
-				{
-					ImportCHR();
-				}
-				else if (Path.GetExtension(openFile.FileName) == ".prg")
-				{
-					ImportPRG();
-				}
+				Import(openFile.FileName);
+			}
+		}
+
+		void Import(string filePath)
+		{
+			if (Path.GetExtension(filePath) == ".chr")
+			{
+				ImportCHR();
+			}
+			else if (Path.GetExtension(filePath) == ".prg")
+			{
+				ImportPRG();
 			}
 
 			void ImportCHR()
 			{
 				var item = worldData[currentWorld].Value;
-				var data = File.ReadAllBytes(openFile.FileName);
+				var data = File.ReadAllBytes(filePath);
 				var romData = Overworld.Dump8x8Tiles(rom, item.BankA, item.TileAddressA).ToArray();
 				Array.Copy(data, 0, romData, 128 * 16, Math.Min(data.Length, 256 * 16));
 
@@ -1180,12 +1185,30 @@ namespace WLEditor
 			void ImportPRG()
 			{
 				var item = worldData[currentWorld].Value;
-				var data = File.ReadAllBytes(openFile.FileName);
+				var data = File.ReadAllBytes(filePath);
 				Array.Copy(data, worldTiles, Math.Min(data.Length, item.UncompressedSize));
 
 				SetChanges();
 				pictureBox1.Invalidate();
 			}
+		}
+
+		protected override void OnDragEnter(DragEventArgs e)
+		{
+			e.Effect = DragDropEffects.Move;
+			base.OnDragEnter(e);
+		}
+
+		protected override void OnDragDrop(DragEventArgs e)
+		{
+			string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+			string filePath = files[0];
+			if (File.Exists(filePath))
+			{
+				Import(filePath);
+			}
+
+			base.OnDragDrop(e);
 		}
 
 		private void ExportTilesToolStripMenuItem_Click(object sender, EventArgs e)

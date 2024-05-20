@@ -77,7 +77,7 @@ namespace WLEditor
 		int zoom;
 		bool ignoreEvents;
 
-		public MainForm()
+		public MainForm(string romFile)
 		{
 			InitializeComponent();
 			Icon = Icon.ExtractAssociatedIcon(Assembly.GetExecutingAssembly().Location);
@@ -109,6 +109,11 @@ namespace WLEditor
 			sectorForm.SectorLoad += SectorFormSectorLoad;
 
 			SetZoomLevel(2);
+
+			if (File.Exists(romFile))
+			{
+				LoadRom(romFile);
+			}
 
 			void ProcessSubFormCommand(object sender, KeyEventArgs e)
 			{
@@ -344,47 +349,72 @@ namespace WLEditor
 		{
 			OpenFileDialog openFileDialog1 = new OpenFileDialog
 			{
-				Filter = "GB ROM Image (*.gb)|*.gb"
+				Filter = "GB ROM Image (*.gb)|*.gb|All Files (*.*)|*.*"
 			};
 
 			if (openFileDialog1.ShowDialog() == DialogResult.OK)
 			{
-				Rom newRom = new Rom();
-				newRom.Load(openFileDialog1.FileName);
-				if (newRom.Title.StartsWith("SUPERMARIOLAND3"))
-				{
-					if (!newRom.CheckCRC())
-					{
-						MessageBox.Show("ROM checksum failed", Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
-					}
-
-					rom = newRom;
-					LoadLevelCombobox();
-					Sprite.DumpBonusSprites(rom);
-					Sprite.DumpPlayerSprite(rom);
-					sectorForm.LoadRom(rom);
-					overworldForm.LoadRom(rom);
-					romFilePath = openFileDialog1.FileName;
-
-					SetChanges(ChangeEnum.None);
-					ignoreEvents = true;
-					levelComboBox.SelectedIndex = 0;
-					ignoreEvents = false;
-					LevelComboBoxSelectedIndexChanged(sender, e);
-
-					blocksToolStripMenuItem.Enabled = true;
-					objectsFormToolStripMenuItem.Enabled = true;
-					overworldToolStripMenuItem.Enabled = true;
-					sectorsToolStripMenuItem.Enabled = true;
-					saveAsToolStripMenuItem.Enabled = true;
-					levelComboBox.Visible = true;
-					LevelPanel.Visible = true;
-				}
-				else
+				if (!LoadRom(openFileDialog1.FileName))
 				{
 					MessageBox.Show("Please select a valid WarioLand 1 rom", Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
 				}
 			}
+		}
+
+		protected override void OnDragEnter(DragEventArgs e)
+		{
+			e.Effect = DragDropEffects.Move;
+			base.OnDragEnter(e);
+		}
+
+		protected override void OnDragDrop(DragEventArgs e)
+		{
+			string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+			string filePath = files[0];
+			if (File.Exists(filePath))
+			{
+				LoadRom(filePath);
+			}
+
+			base.OnDragDrop(e);
+		}
+
+		bool LoadRom(string filePath)
+		{
+			Rom newRom = new Rom();
+			newRom.Load(filePath);
+			if (!newRom.Title.StartsWith("SUPERMARIOLAND3"))
+			{
+				return false;
+			}
+
+			if (!newRom.CheckCRC())
+			{
+				MessageBox.Show("ROM checksum failed", Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+			}
+
+			rom = newRom;
+			LoadLevelCombobox();
+			Sprite.DumpBonusSprites(rom);
+			Sprite.DumpPlayerSprite(rom);
+			sectorForm.LoadRom(rom);
+			overworldForm.LoadRom(rom);
+			romFilePath = filePath;
+
+			SetChanges(ChangeEnum.None);
+			ignoreEvents = true;
+			levelComboBox.SelectedIndex = 0;
+			ignoreEvents = false;
+			LevelComboBoxSelectedIndexChanged(this, EventArgs.Empty);
+
+			blocksToolStripMenuItem.Enabled = true;
+			objectsFormToolStripMenuItem.Enabled = true;
+			overworldToolStripMenuItem.Enabled = true;
+			sectorsToolStripMenuItem.Enabled = true;
+			saveAsToolStripMenuItem.Enabled = true;
+			levelComboBox.Visible = true;
+			LevelPanel.Visible = true;
+			return true;
 
 			void LoadLevelCombobox()
 			{
@@ -527,9 +557,10 @@ namespace WLEditor
 			}
 		}
 
-		void MainFormFormClosing(object sender, FormClosingEventArgs e)
+		protected override void OnFormClosing(FormClosingEventArgs e)
 		{
 			e.Cancel = !AskForSavingChanges();
+			base.OnFormClosing(e);
 
 			bool AskForSavingChanges()
 			{
@@ -554,7 +585,6 @@ namespace WLEditor
 
 				return true;
 			}
-
 		}
 
 		void SaveAsToolStripMenuItemClick(object sender, EventArgs e)
@@ -805,6 +835,5 @@ namespace WLEditor
 		}
 
 		#endregion
-
 	}
 }
