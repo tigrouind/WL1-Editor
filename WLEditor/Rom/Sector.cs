@@ -362,21 +362,26 @@ namespace WLEditor
 			cameraY = Math.Max(cameraY, 0);  //top limit
 			cameraY = Math.Min(cameraY, 32 + 12); //bottom limit
 
-			if (cameraType == 0) //scroll X
+			switch (cameraType)
 			{
-				if (cameraY < 16)
-				{
-					cameraY = 12;
-					warioY = Math.Max(warioY, 16);
-				}
-				else if (cameraY >= 16 && cameraY < 32)
-				{
-					cameraY = 28;
-				}
-				else
-				{
-					cameraY = 44;
-				}
+				case 0x00: //scroll X
+				case 0x01: //train bumps
+				case 0x30: //train auto-scroll right
+				case 0x31: //train auto-scroll left
+					if (cameraY < 16)
+					{
+						cameraY = 12;
+						warioY = Math.Max(warioY, 16);
+					}
+					else if (cameraY >= 16 && cameraY < 32)
+					{
+						cameraY = 28;
+					}
+					else
+					{
+						cameraY = 44;
+					}
+					break;
 			}
 
 			return (cameraY, warioY);
