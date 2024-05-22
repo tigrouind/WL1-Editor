@@ -708,8 +708,9 @@ namespace WLEditor
 								int posY = item.Y;
 
 								bool selected = currentPath == item || next == (WorldPathNextEnum)level;
+								var dest = new Rectangle(posX * zoom, posY * zoom, 8 * zoom, 8 * zoom);
 
-								using (GraphicsPath path = RoundedRect(new Rectangle(posX * zoom, posY * zoom, 8 * zoom, 8 * zoom), zoom * 2))
+								using (GraphicsPath path = RoundedRect(dest, zoom * 2))
 								{
 									gPathB.DrawPath(pen, path);
 									gPathA.FillPath(selected ? Brushes.Lime : Brushes.MediumSeaGreen, path);
@@ -717,7 +718,7 @@ namespace WLEditor
 
 								if (!TransparentPath)
 								{
-									gPathA.DrawString((Array.IndexOf(levels[currentWorld], level) + 1).ToString(), font, Brushes.Black, (posX + 4) * zoom, (posY + 4) * zoom, format);
+									gPathA.DrawString((Array.IndexOf(levels[currentWorld], level) + 1).ToString(), font, Brushes.Black, dest, format);
 								}
 							}
 						}
@@ -742,8 +743,9 @@ namespace WLEditor
 								WorldPathNextEnum[] flags = { WorldPathNextEnum.Overworld, WorldPathNextEnum.Sherbet, WorldPathNextEnum.Teapot, WorldPathNextEnum.TeapotOverworld };
 
 								bool selected = dir == currentDirection;
+								var dest = new Rectangle(exitX * zoom, exitY * zoom, 8 * zoom, 8 * zoom);
 
-								using (GraphicsPath path = RoundedRect(new Rectangle(exitX * zoom, exitY * zoom, 8 * zoom, 8 * zoom), zoom * 2))
+								using (GraphicsPath path = RoundedRect(dest, zoom * 2))
 								{
 									gPathB.DrawPath(penBorder, path);
 									gPathA.FillPath(selected ? Brushes.Lime : Brushes.MediumSeaGreen, path);
@@ -751,7 +753,7 @@ namespace WLEditor
 
 								if (!TransparentPath)
 								{
-									gPathA.DrawString(new[] { "O", "S", "T", "T" }[Array.IndexOf(flags, dir.Next)], font, Brushes.Black, (exitX + 4) * zoom, (exitY + 4) * zoom, format);
+									gPathA.DrawString(new[] { "O", "S", "T", "T" }[Array.IndexOf(flags, dir.Next)], font, Brushes.Black, dest, format);
 								}
 							}
 						}
@@ -863,8 +865,9 @@ namespace WLEditor
 									int progress = Array.IndexOf(Overworld.ProgressFlags, dirs.Progress);
 									if (progress != -1)
 									{
-										gPathA.FillRectangle(Brushes.Gray, (currentPath.X + offsets[dir, 0]) * zoom, (currentPath.Y + offsets[dir, 1]) * zoom, 8 * zoom, 8 * zoom);
-										gPathA.DrawString(progress.ToString(), font, Brushes.White, (currentPath.X + 4 + offsets[dir, 0]) * zoom, (currentPath.Y + 4 + offsets[dir, 1]) * zoom, format);
+										var dest = new Rectangle((currentPath.X + offsets[dir, 0]) * zoom, (currentPath.Y + offsets[dir, 1]) *zoom, 8 * zoom, 8 * zoom);
+										gPathA.FillRectangle(Brushes.Gray, dest);
+										gPathA.DrawString(progress.ToString(), font, Brushes.White, dest, format);
 									}
 								}
 							}

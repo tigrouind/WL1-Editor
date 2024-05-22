@@ -139,7 +139,7 @@ namespace WLEditor
 								}
 								else
 								{
-									e.Graphics.DrawString(data.ToString(), font, Brushes.White, (i * 16 + 8) * zoom, (j * 16 + 8) * zoom, format);
+									e.Graphics.DrawString(data.ToString(), font, Brushes.White, destRect, format);
 								}
 							}
 						}
@@ -206,8 +206,9 @@ namespace WLEditor
 				{
 					int drawSector = x + y * 16;
 
-					e.Graphics.FillRectangle(EnemyBrush, x * 256 * zoom, y * 256 * zoom, 16 * zoom, 16 * zoom);
-					e.Graphics.DrawString(drawSector.ToString("D2"), font, Brushes.White, (x * 256 + 8) * zoom, (y * 256 + 8) * zoom, format);
+					var dest = new Rectangle(x * 256 * zoom, y * 256 * zoom, 16 * zoom, 16 * zoom);
+					e.Graphics.FillRectangle(EnemyBrush, dest);
+					e.Graphics.DrawString(drawSector.ToString("D2"), font, Brushes.White, dest, format);
 
 					int sectorTarget = Level.Warps[drawSector];
 					if (sectorTarget != 255)
@@ -215,8 +216,9 @@ namespace WLEditor
 						string text = GetWarpName();
 						var result = TextRenderer.MeasureText(text, font);
 
-						e.Graphics.FillRectangle(EnemyBrush, (x * 256 + 20) * zoom, y * 256 * zoom, result.Width, 16 * zoom);
-						e.Graphics.DrawString(text, font, Brushes.White, (x * 256) * zoom + result.Width / 2 + 20 * zoom, (y * 256 + 8) * zoom, format);
+						dest = new Rectangle((x * 256 + 20) * zoom, y * 256 * zoom, result.Width, 16 * zoom);
+						e.Graphics.FillRectangle(EnemyBrush, dest);
+						e.Graphics.DrawString(text, font, Brushes.White, dest, format);
 					}
 
 					string GetWarpName()

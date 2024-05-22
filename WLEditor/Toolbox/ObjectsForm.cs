@@ -67,7 +67,7 @@ namespace WLEditor.Toolbox
 						}
 						else
 						{
-							e.Graphics.DrawString(index.ToString(), font, Brushes.White, (x + 16) * zoom, (y + 16) * zoom, format);
+							e.Graphics.DrawString(index.ToString(), font, Brushes.White, new Rectangle(x * zoom, y * zoom, 32 * zoom, 32 * zoom), format);
 						}
 					}
 					else //power up
