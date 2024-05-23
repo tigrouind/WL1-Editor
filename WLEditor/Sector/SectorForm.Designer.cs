@@ -83,7 +83,6 @@ namespace WLEditor
 			this.labWarioStatusSector = new System.Windows.Forms.Label();
 			this.ddlWarioAttributesSector = new System.Windows.Forms.ComboBox();
 			this.panelMusic = new System.Windows.Forms.Panel();
-			this.labCheckpoint = new System.Windows.Forms.Label();
 			this.checkBoxCheckpoint = new System.Windows.Forms.CheckBox();
 			this.panelStatusLevel = new System.Windows.Forms.Panel();
 			this.ddlWarioAttributesLevel = new System.Windows.Forms.ComboBox();
@@ -91,6 +90,7 @@ namespace WLEditor
 			this.panelWarp = new System.Windows.Forms.Panel();
 			this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
 			this.ddlWarpType = new System.Windows.Forms.ComboBox();
+			this.panelScroll = new System.Windows.Forms.Panel();
 			((System.ComponentModel.ISupportInitialize)(this.txbCameraX)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.txbCameraY)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.txbWarioY)).BeginInit();
@@ -102,12 +102,13 @@ namespace WLEditor
 			this.panelStatusSector.SuspendLayout();
 			this.panelWarp.SuspendLayout();
 			this.flowLayoutPanel1.SuspendLayout();
+			this.panelScroll.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// labWarp
 			// 
 			this.labWarp.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.labWarp.Location = new System.Drawing.Point(9, 28);
+			this.labWarp.Location = new System.Drawing.Point(9, 2);
 			this.labWarp.Name = "labWarp";
 			this.labWarp.Size = new System.Drawing.Size(67, 20);
 			this.labWarp.TabIndex = 4;
@@ -119,7 +120,7 @@ namespace WLEditor
 			this.ddlWarp.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.ddlWarp.DropDownWidth = 300;
 			this.ddlWarp.FormattingEnabled = true;
-			this.ddlWarp.Location = new System.Drawing.Point(85, 29);
+			this.ddlWarp.Location = new System.Drawing.Point(85, 3);
 			this.ddlWarp.Name = "ddlWarp";
 			this.ddlWarp.Size = new System.Drawing.Size(295, 21);
 			this.ddlWarp.TabIndex = 3;
@@ -127,30 +128,32 @@ namespace WLEditor
 			// 
 			// checkBoxRight
 			// 
-			this.checkBoxRight.Location = new System.Drawing.Point(105, 6);
+			this.checkBoxRight.Location = new System.Drawing.Point(138, 3);
 			this.checkBoxRight.Name = "checkBoxRight";
-			this.checkBoxRight.Size = new System.Drawing.Size(18, 20);
+			this.checkBoxRight.Size = new System.Drawing.Size(51, 20);
 			this.checkBoxRight.TabIndex = 2;
+			this.checkBoxRight.Text = "Right";
 			this.checkBoxRight.UseVisualStyleBackColor = true;
 			this.checkBoxRight.CheckedChanged += new System.EventHandler(this.CheckBoxRightCheckedChanged);
 			// 
 			// checkBoxLeft
 			// 
-			this.checkBoxLeft.Location = new System.Drawing.Point(85, 6);
+			this.checkBoxLeft.Location = new System.Drawing.Point(85, 3);
 			this.checkBoxLeft.Name = "checkBoxLeft";
-			this.checkBoxLeft.Size = new System.Drawing.Size(18, 20);
+			this.checkBoxLeft.Size = new System.Drawing.Size(47, 20);
 			this.checkBoxLeft.TabIndex = 1;
+			this.checkBoxLeft.Text = "Left";
 			this.checkBoxLeft.UseVisualStyleBackColor = true;
 			this.checkBoxLeft.CheckedChanged += new System.EventHandler(this.CheckBoxLeftCheckedChanged);
 			// 
 			// labScroll
 			// 
 			this.labScroll.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.labScroll.Location = new System.Drawing.Point(3, 4);
+			this.labScroll.Location = new System.Drawing.Point(8, 1);
 			this.labScroll.Name = "labScroll";
 			this.labScroll.Size = new System.Drawing.Size(71, 20);
 			this.labScroll.TabIndex = 10;
-			this.labScroll.Text = "Scroll bounds";
+			this.labScroll.Text = "Camera limits";
 			this.labScroll.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// ddlTileSet
@@ -169,7 +172,7 @@ namespace WLEditor
 			this.labAnimation.Name = "labAnimation";
 			this.labAnimation.Size = new System.Drawing.Size(72, 18);
 			this.labAnimation.TabIndex = 41;
-			this.labAnimation.Text = "Animation set";
+			this.labAnimation.Text = "Animation";
 			this.labAnimation.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// ddlAnimation
@@ -230,7 +233,7 @@ namespace WLEditor
 			this.labEnemies.Name = "labEnemies";
 			this.labEnemies.Size = new System.Drawing.Size(64, 38);
 			this.labEnemies.TabIndex = 16;
-			this.labEnemies.Text = "Enemy set";
+			this.labEnemies.Text = "Enemy";
 			this.labEnemies.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// labWario
@@ -327,7 +330,7 @@ namespace WLEditor
 			// labMusic
 			// 
 			this.labMusic.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.labMusic.Location = new System.Drawing.Point(30, 2);
+			this.labMusic.Location = new System.Drawing.Point(30, 3);
 			this.labMusic.Name = "labMusic";
 			this.labMusic.Size = new System.Drawing.Size(47, 20);
 			this.labMusic.TabIndex = 14;
@@ -358,7 +361,7 @@ namespace WLEditor
 			this.grpCamera.Controls.Add(this.txbWarioX);
 			this.grpCamera.Controls.Add(this.ddlCameraType);
 			this.grpCamera.Controls.Add(this.cmdCalculatePos);
-			this.grpCamera.Location = new System.Drawing.Point(0, 307);
+			this.grpCamera.Location = new System.Drawing.Point(0, 200);
 			this.grpCamera.Margin = new System.Windows.Forms.Padding(0);
 			this.grpCamera.Name = "grpCamera";
 			this.grpCamera.Padding = new System.Windows.Forms.Padding(0);
@@ -396,7 +399,7 @@ namespace WLEditor
 			this.grpTileset.Controls.Add(this.labAnimation);
 			this.grpTileset.Controls.Add(this.ddlEnemies);
 			this.grpTileset.Controls.Add(this.ddlAnimationSpeed);
-			this.grpTileset.Location = new System.Drawing.Point(0, 188);
+			this.grpTileset.Location = new System.Drawing.Point(0, 81);
 			this.grpTileset.Margin = new System.Windows.Forms.Padding(0);
 			this.grpTileset.Name = "grpTileset";
 			this.grpTileset.Padding = new System.Windows.Forms.Padding(0);
@@ -427,33 +430,22 @@ namespace WLEditor
 			// 
 			this.panelMusic.AutoSize = true;
 			this.panelMusic.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.panelMusic.Controls.Add(this.labCheckpoint);
-			this.panelMusic.Controls.Add(this.checkBoxCheckpoint);
 			this.panelMusic.Controls.Add(this.ddlMusic);
 			this.panelMusic.Controls.Add(this.labMusic);
-			this.panelMusic.Location = new System.Drawing.Point(0, 54);
+			this.panelMusic.Location = new System.Drawing.Point(0, 306);
 			this.panelMusic.Margin = new System.Windows.Forms.Padding(0);
 			this.panelMusic.Name = "panelMusic";
-			this.panelMusic.Size = new System.Drawing.Size(383, 54);
+			this.panelMusic.Size = new System.Drawing.Size(383, 27);
 			this.panelMusic.TabIndex = 0;
-			// 
-			// labCheckpoint
-			// 
-			this.labCheckpoint.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.labCheckpoint.Location = new System.Drawing.Point(6, 29);
-			this.labCheckpoint.Name = "labCheckpoint";
-			this.labCheckpoint.Size = new System.Drawing.Size(71, 20);
-			this.labCheckpoint.TabIndex = 16;
-			this.labCheckpoint.Text = "Checkpoint";
-			this.labCheckpoint.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// checkBoxCheckpoint
 			// 
-			this.checkBoxCheckpoint.Location = new System.Drawing.Point(85, 31);
+			this.checkBoxCheckpoint.Location = new System.Drawing.Point(3, 336);
 			this.checkBoxCheckpoint.Name = "checkBoxCheckpoint";
-			this.checkBoxCheckpoint.Size = new System.Drawing.Size(18, 20);
-			this.checkBoxCheckpoint.TabIndex = 15;
-			this.checkBoxCheckpoint.UseVisualStyleBackColor = true;
+			this.checkBoxCheckpoint.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+			this.checkBoxCheckpoint.Size = new System.Drawing.Size(96, 20);
+			this.checkBoxCheckpoint.TabIndex = 48;
+			this.checkBoxCheckpoint.Text = "Checkpoint";
 			this.checkBoxCheckpoint.CheckedChanged += new System.EventHandler(this.CheckBoxCheckpoint_CheckedChanged);
 			// 
 			// panelStatusLevel
@@ -485,7 +477,7 @@ namespace WLEditor
 			this.panelStatusSector.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.panelStatusSector.Controls.Add(this.ddlWarioAttributesSector);
 			this.panelStatusSector.Controls.Add(this.labWarioStatusSector);
-			this.panelStatusSector.Location = new System.Drawing.Point(0, 161);
+			this.panelStatusSector.Location = new System.Drawing.Point(0, 54);
 			this.panelStatusSector.Margin = new System.Windows.Forms.Padding(0);
 			this.panelStatusSector.Name = "panelStatusSector";
 			this.panelStatusSector.Size = new System.Drawing.Size(383, 27);
@@ -495,32 +487,30 @@ namespace WLEditor
 			// 
 			this.panelWarp.AutoSize = true;
 			this.panelWarp.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.panelWarp.Controls.Add(this.labScroll);
-			this.panelWarp.Controls.Add(this.checkBoxLeft);
-			this.panelWarp.Controls.Add(this.checkBoxRight);
 			this.panelWarp.Controls.Add(this.labWarp);
 			this.panelWarp.Controls.Add(this.ddlWarp);
-			this.panelWarp.Location = new System.Drawing.Point(0, 108);
+			this.panelWarp.Location = new System.Drawing.Point(0, 0);
 			this.panelWarp.Margin = new System.Windows.Forms.Padding(0);
 			this.panelWarp.Name = "panelWarp";
-			this.panelWarp.Size = new System.Drawing.Size(383, 53);
+			this.panelWarp.Size = new System.Drawing.Size(383, 27);
 			this.panelWarp.TabIndex = 1;
 			// 
 			// flowLayoutPanel1
 			// 
 			this.flowLayoutPanel1.AutoSize = true;
 			this.flowLayoutPanel1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.flowLayoutPanel1.Controls.Add(this.ddlWarpType);
-			this.flowLayoutPanel1.Controls.Add(this.panelStatusLevel);
-			this.flowLayoutPanel1.Controls.Add(this.panelMusic);
 			this.flowLayoutPanel1.Controls.Add(this.panelWarp);
+			this.flowLayoutPanel1.Controls.Add(this.panelStatusLevel);
 			this.flowLayoutPanel1.Controls.Add(this.panelStatusSector);
 			this.flowLayoutPanel1.Controls.Add(this.grpTileset);
 			this.flowLayoutPanel1.Controls.Add(this.grpCamera);
+			this.flowLayoutPanel1.Controls.Add(this.panelMusic);
+			this.flowLayoutPanel1.Controls.Add(this.checkBoxCheckpoint);
+			this.flowLayoutPanel1.Controls.Add(this.panelScroll);
 			this.flowLayoutPanel1.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
-			this.flowLayoutPanel1.Location = new System.Drawing.Point(8, 7);
+			this.flowLayoutPanel1.Location = new System.Drawing.Point(8, 35);
 			this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-			this.flowLayoutPanel1.Size = new System.Drawing.Size(383, 413);
+			this.flowLayoutPanel1.Size = new System.Drawing.Size(383, 385);
 			this.flowLayoutPanel1.TabIndex = 46;
 			// 
 			// ddlWarpType
@@ -578,11 +568,24 @@ namespace WLEditor
             "Treasure M",
             "Treasure N",
             "Treasure O"});
-			this.ddlWarpType.Location = new System.Drawing.Point(3, 3);
+			this.ddlWarpType.Location = new System.Drawing.Point(8, 8);
 			this.ddlWarpType.Name = "ddlWarpType";
-			this.ddlWarpType.Size = new System.Drawing.Size(377, 21);
+			this.ddlWarpType.Size = new System.Drawing.Size(380, 21);
 			this.ddlWarpType.TabIndex = 47;
 			this.ddlWarpType.SelectedIndexChanged += new System.EventHandler(this.DdlWarpType_SelectedIndexChanged);
+			// 
+			// panelScroll
+			// 
+			this.panelScroll.AutoSize = true;
+			this.panelScroll.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			this.panelScroll.Controls.Add(this.checkBoxRight);
+			this.panelScroll.Controls.Add(this.labScroll);
+			this.panelScroll.Controls.Add(this.checkBoxLeft);
+			this.panelScroll.Location = new System.Drawing.Point(0, 359);
+			this.panelScroll.Margin = new System.Windows.Forms.Padding(0);
+			this.panelScroll.Name = "panelScroll";
+			this.panelScroll.Size = new System.Drawing.Size(192, 26);
+			this.panelScroll.TabIndex = 48;
 			// 
 			// SectorForm
 			// 
@@ -590,7 +593,8 @@ namespace WLEditor
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.AutoSize = true;
 			this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.ClientSize = new System.Drawing.Size(409, 412);
+			this.ClientSize = new System.Drawing.Size(408, 426);
+			this.Controls.Add(this.ddlWarpType);
 			this.Controls.Add(this.flowLayoutPanel1);
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
 			this.MaximizeBox = false;
@@ -599,7 +603,7 @@ namespace WLEditor
 			this.Padding = new System.Windows.Forms.Padding(5);
 			this.ShowIcon = false;
 			this.ShowInTaskbar = false;
-			this.Text = "Warp / Level header";
+			this.Text = "Sectors / Level header";
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.SectorFormFormClosing);
 			this.VisibleChanged += new System.EventHandler(this.SectorFormVisibleChanged);
 			((System.ComponentModel.ISupportInitialize)(this.txbCameraX)).EndInit();
@@ -614,6 +618,7 @@ namespace WLEditor
 			this.panelWarp.ResumeLayout(false);
 			this.flowLayoutPanel1.ResumeLayout(false);
 			this.flowLayoutPanel1.PerformLayout();
+			this.panelScroll.ResumeLayout(false);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -629,10 +634,10 @@ namespace WLEditor
 		private System.Windows.Forms.Label labWarioStatusLevel;
 		private System.Windows.Forms.ComboBox ddlWarioStatus;
 		private System.Windows.Forms.ComboBox ddlWarioAttributesLevel;
-		private System.Windows.Forms.Label labCheckpoint;
 		private System.Windows.Forms.CheckBox checkBoxCheckpoint;
 		private System.Windows.Forms.ComboBox ddlWarpType;
 		private System.Windows.Forms.Label labWarioStatusSector;
 		private System.Windows.Forms.ComboBox ddlWarioAttributesSector;
+		private System.Windows.Forms.Panel panelScroll;
 	}
 }

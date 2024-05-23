@@ -57,8 +57,8 @@ Tips :
 - You can delete what is under selection by pressing <kbd>Delete</kbd> key.
 - You can undo or redo changes with <kbd>Ctrl-Z</kbd> / <kbd>Ctrl-Y</kbd>.
 
-## Warp / level header
-- Open <kbd>View</kbd> > <kbd>Warp / Level header</kbd>
+## Sectors / level header
+- Open <kbd>View</kbd> > <kbd>Sectors / Level header</kbd>
 - <kbd>Middle-click</kbd> on a sector to highlight it.
 If you click on a sector already selected, it will unselected sector and show level header (which has similar properties to warps).
 

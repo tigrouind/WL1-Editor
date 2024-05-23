@@ -465,8 +465,8 @@ namespace WLEditor
 			flowLayoutPanel1.SuspendLayout();
 
 			bool validWarp = currentSector != -1 && Sector.GetWarp(rom, currentCourseId, currentSector) >= 0x5B7A;
-			panelWarp.Visible = currentSector != -1;
-			panelMusic.Visible = currentSector == -1 && currentTreasureId == -1 && !currentCheckPoint;
+			panelScroll.Visible = panelWarp.Visible = currentSector != -1;
+			checkBoxCheckpoint.Visible = panelMusic.Visible = currentSector == -1 && currentTreasureId == -1 && !currentCheckPoint;
 			panelStatusLevel.Visible = currentSector == -1 && currentTreasureId == -1;
 			panelStatusSector.Visible = validWarp || currentTreasureId != -1;
 			grpTileset.Visible = grpCamera.Visible = currentSector == -1 || validWarp;
