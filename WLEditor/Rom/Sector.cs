@@ -230,7 +230,7 @@ namespace WLEditor
 			rom.WriteByte(0x4000 + course * 32 + sector, (byte)scroll);
 		}
 
-		public static void SaveLevelScroll(Rom rom, int course, bool checkPoint, int sector, int scroll)
+		public static void SaveLevelScroll(Rom rom, int course, int sector, int scroll, bool checkPoint)
 		{
 			rom.SetBank(0xC);
 			int header = rom.ReadWord((checkPoint ? 0x45B6 : 0x4560) + course * 2);

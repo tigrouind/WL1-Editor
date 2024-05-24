@@ -564,7 +564,6 @@ namespace WLEditor
 			{
 				int warp = Sector.GetTreasureWarp(rom, currentTreasureId);
 				LoadWarp(warp);
-				LoadScroll();
 			}
 			else if (currentCourseId != -1 && currentSector != -1)
 			{
@@ -691,8 +690,8 @@ namespace WLEditor
 		void SaveScroll()
 		{
 			Sector.SaveScroll(rom, currentCourseId, currentSector, scroll);
-			Sector.SaveLevelScroll(rom, currentCourseId, false, currentSector, scroll);
-			Sector.SaveLevelScroll(rom, currentCourseId, true, currentSector, scroll);
+			Sector.SaveLevelScroll(rom, currentCourseId, currentSector, scroll, false);
+			Sector.SaveLevelScroll(rom, currentCourseId, currentSector, scroll, true);
 		}
 
 		void DdlWarpSelectedIndexChanged(object sender, EventArgs e)
