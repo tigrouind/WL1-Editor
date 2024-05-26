@@ -106,6 +106,7 @@ namespace WLEditor
 
 			void DrawObjects(Font font, StringFormat format)
 			{
+				var positions = new List<(int, int, byte, Rectangle)>();
 				for (int j = 0; j < 32; j++)
 				{
 					for (int i = 0; i < 256; i++)
@@ -113,35 +114,43 @@ namespace WLEditor
 						byte data = Level.ObjectsData[i + j * 256];
 						if (data > 0)
 						{
-							Rectangle destRect = new Rectangle(i * 16 * zoom, j * 16 * zoom, 16 * zoom, 16 * zoom);
+							Rectangle rect = new Rectangle(i * 16 * zoom, j * 16 * zoom, 16 * zoom, 16 * zoom);
+							positions.Add((i, j, data, rect));
+						}
+					}
+				}
+
+				foreach ((int i, int j, byte data, Rectangle rect) in positions)
+				{
+					if (rect.IntersectsWith(e.ClipRectangle))
+					{
+						e.Graphics.FillRectangle(EnemyBrush, rect);
+					}
+				}
+
+				foreach ((int i, int j, byte data, Rectangle rect) in positions)
+				{
+					if (data > 6) //power up
+					{
+						if (rect.IntersectsWith(e.ClipRectangle))
+						{
+							e.Graphics.DrawImage(Sprite.TilesObjects.Bitmap, rect, new Rectangle((data - 7) * 16, 0, 16, 16), GraphicsUnit.Pixel);
+						}
+					}
+					else //enemy
+					{
+						var (enemyRect, enemyOffset) = Sprite.LoadedSprites[data - 1];
+						if (enemyRect != default)
+						{
+							var destRect = new Rectangle((i * 16 + enemyOffset.X) * zoom, (j * 16 + enemyOffset.Y) * zoom, enemyRect.Width * zoom, enemyRect.Height * zoom);
 							if (destRect.IntersectsWith(e.ClipRectangle))
 							{
-								e.Graphics.FillRectangle(EnemyBrush, destRect);
-
-								//power up
-								if (data > 6)
-								{
-									e.Graphics.DrawImage(Sprite.TilesObjects.Bitmap, destRect, new Rectangle((data - 7) * 16, 0, 16, 16), GraphicsUnit.Pixel);
-								}
+								e.Graphics.DrawImage(Sprite.TilesEnemies.Bitmap, destRect, enemyRect, GraphicsUnit.Pixel);
 							}
-
-							//enemy
-							if (data <= 6)
-							{
-								var (enemyRect, enemyOffset) = Sprite.LoadedSprites[data - 1];
-								if (enemyRect != default)
-								{
-									destRect = new Rectangle((i * 16 + enemyOffset.X) * zoom, (j * 16 + enemyOffset.Y) * zoom, enemyRect.Width * zoom, enemyRect.Height * zoom);
-									if (destRect.IntersectsWith(e.ClipRectangle))
-									{
-										e.Graphics.DrawImage(Sprite.TilesEnemies.Bitmap, destRect, enemyRect, GraphicsUnit.Pixel);
-									}
-								}
-								else
-								{
-									e.Graphics.DrawString(data.ToString(), font, Brushes.White, destRect, format);
-								}
-							}
+						}
+						else if (rect.IntersectsWith(e.ClipRectangle))
+						{
+							e.Graphics.DrawString(data.ToString(), font, Brushes.White, rect, format);
 						}
 					}
 				}
