@@ -469,7 +469,7 @@ namespace WLEditor
 			checkBoxCheckpoint.Visible = panelMusic.Visible = currentSector == -1 && currentTreasureId == -1 && !currentCheckPoint;
 			panelStatusLevel.Visible = currentSector == -1 && currentTreasureId == -1;
 			panelStatusSector.Visible = validWarp || currentTreasureId != -1;
-			grpTileset.Visible = grpCamera.Visible = currentSector == -1 || validWarp;
+			panelTileset.Visible = panelCamera.Visible = currentSector == -1 || validWarp;
 
 			flowLayoutPanel1.ResumeLayout();
 		}

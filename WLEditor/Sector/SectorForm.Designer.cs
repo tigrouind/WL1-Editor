@@ -76,10 +76,10 @@ namespace WLEditor
 			this.txbWarioX = new System.Windows.Forms.NumericUpDown();
 			this.labMusic = new System.Windows.Forms.Label();
 			this.ddlMusic = new System.Windows.Forms.ComboBox();
-			this.grpCamera = new System.Windows.Forms.GroupBox();
+			this.panelCamera = new System.Windows.Forms.Panel();
 			this.labWarioStatusLevel = new System.Windows.Forms.Label();
 			this.ddlWarioStatus = new System.Windows.Forms.ComboBox();
-			this.grpTileset = new System.Windows.Forms.GroupBox();
+			this.panelTileset = new System.Windows.Forms.Panel();
 			this.labWarioStatusSector = new System.Windows.Forms.Label();
 			this.ddlWarioAttributesSector = new System.Windows.Forms.ComboBox();
 			this.panelMusic = new System.Windows.Forms.Panel();
@@ -91,18 +91,20 @@ namespace WLEditor
 			this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
 			this.ddlWarpType = new System.Windows.Forms.ComboBox();
 			this.panelScroll = new System.Windows.Forms.Panel();
+			this.flowLayoutPanel2 = new System.Windows.Forms.FlowLayoutPanel();
 			((System.ComponentModel.ISupportInitialize)(this.txbCameraX)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.txbCameraY)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.txbWarioY)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.txbWarioX)).BeginInit();
-			this.grpCamera.SuspendLayout();
-			this.grpTileset.SuspendLayout();
+			this.panelCamera.SuspendLayout();
+			this.panelTileset.SuspendLayout();
 			this.panelMusic.SuspendLayout();
 			this.panelStatusLevel.SuspendLayout();
 			this.panelStatusSector.SuspendLayout();
 			this.panelWarp.SuspendLayout();
 			this.flowLayoutPanel1.SuspendLayout();
 			this.panelScroll.SuspendLayout();
+			this.flowLayoutPanel2.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// labWarp
@@ -120,7 +122,7 @@ namespace WLEditor
 			this.ddlWarp.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.ddlWarp.DropDownWidth = 300;
 			this.ddlWarp.FormattingEnabled = true;
-			this.ddlWarp.Location = new System.Drawing.Point(85, 3);
+			this.ddlWarp.Location = new System.Drawing.Point(88, 3);
 			this.ddlWarp.Name = "ddlWarp";
 			this.ddlWarp.Size = new System.Drawing.Size(295, 21);
 			this.ddlWarp.TabIndex = 3;
@@ -344,30 +346,28 @@ namespace WLEditor
 			this.ddlMusic.FormattingEnabled = true;
 			this.ddlMusic.Location = new System.Drawing.Point(85, 3);
 			this.ddlMusic.Name = "ddlMusic";
-			this.ddlMusic.Size = new System.Drawing.Size(295, 21);
+			this.ddlMusic.Size = new System.Drawing.Size(298, 21);
 			this.ddlMusic.TabIndex = 0;
 			this.ddlMusic.SelectedIndexChanged += new System.EventHandler(this.DdlMusicSelectedIndexChanged);
 			// 
-			// grpCamera
+			// panelCamera
 			// 
-			this.grpCamera.AutoSize = true;
-			this.grpCamera.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.grpCamera.Controls.Add(this.labCameraType);
-			this.grpCamera.Controls.Add(this.txbWarioY);
-			this.grpCamera.Controls.Add(this.txbCameraX);
-			this.grpCamera.Controls.Add(this.labWario);
-			this.grpCamera.Controls.Add(this.labCamera);
-			this.grpCamera.Controls.Add(this.txbCameraY);
-			this.grpCamera.Controls.Add(this.txbWarioX);
-			this.grpCamera.Controls.Add(this.ddlCameraType);
-			this.grpCamera.Controls.Add(this.cmdCalculatePos);
-			this.grpCamera.Location = new System.Drawing.Point(0, 200);
-			this.grpCamera.Margin = new System.Windows.Forms.Padding(0);
-			this.grpCamera.Name = "grpCamera";
-			this.grpCamera.Padding = new System.Windows.Forms.Padding(0);
-			this.grpCamera.Size = new System.Drawing.Size(383, 106);
-			this.grpCamera.TabIndex = 3;
-			this.grpCamera.TabStop = false;
+			this.panelCamera.AutoSize = true;
+			this.panelCamera.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			this.panelCamera.Controls.Add(this.labCameraType);
+			this.panelCamera.Controls.Add(this.txbWarioY);
+			this.panelCamera.Controls.Add(this.txbCameraX);
+			this.panelCamera.Controls.Add(this.labWario);
+			this.panelCamera.Controls.Add(this.labCamera);
+			this.panelCamera.Controls.Add(this.txbCameraY);
+			this.panelCamera.Controls.Add(this.txbWarioX);
+			this.panelCamera.Controls.Add(this.ddlCameraType);
+			this.panelCamera.Controls.Add(this.cmdCalculatePos);
+			this.panelCamera.Location = new System.Drawing.Point(0, 160);
+			this.panelCamera.Margin = new System.Windows.Forms.Padding(0);
+			this.panelCamera.Name = "panelCamera";
+			this.panelCamera.Size = new System.Drawing.Size(383, 93);
+			this.panelCamera.TabIndex = 3;
 			// 
 			// labWarioStatusLevel
 			// 
@@ -388,24 +388,22 @@ namespace WLEditor
 			this.ddlWarioStatus.TabIndex = 29;
 			this.ddlWarioStatus.SelectedIndexChanged += new System.EventHandler(this.DdlWarioStatus_SelectedIndexChanged);
 			// 
-			// grpTileset
+			// panelTileset
 			// 
-			this.grpTileset.AutoSize = true;
-			this.grpTileset.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.grpTileset.Controls.Add(this.ddlTileSet);
-			this.grpTileset.Controls.Add(this.labTileSet);
-			this.grpTileset.Controls.Add(this.ddlAnimation);
-			this.grpTileset.Controls.Add(this.labEnemies);
-			this.grpTileset.Controls.Add(this.labAnimation);
-			this.grpTileset.Controls.Add(this.ddlEnemies);
-			this.grpTileset.Controls.Add(this.ddlAnimationSpeed);
-			this.grpTileset.Location = new System.Drawing.Point(0, 81);
-			this.grpTileset.Margin = new System.Windows.Forms.Padding(0);
-			this.grpTileset.Name = "grpTileset";
-			this.grpTileset.Padding = new System.Windows.Forms.Padding(0);
-			this.grpTileset.Size = new System.Drawing.Size(383, 119);
-			this.grpTileset.TabIndex = 2;
-			this.grpTileset.TabStop = false;
+			this.panelTileset.AutoSize = true;
+			this.panelTileset.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			this.panelTileset.Controls.Add(this.ddlTileSet);
+			this.panelTileset.Controls.Add(this.labTileSet);
+			this.panelTileset.Controls.Add(this.ddlAnimation);
+			this.panelTileset.Controls.Add(this.labEnemies);
+			this.panelTileset.Controls.Add(this.labAnimation);
+			this.panelTileset.Controls.Add(this.ddlEnemies);
+			this.panelTileset.Controls.Add(this.ddlAnimationSpeed);
+			this.panelTileset.Location = new System.Drawing.Point(0, 54);
+			this.panelTileset.Margin = new System.Windows.Forms.Padding(0);
+			this.panelTileset.Name = "panelTileset";
+			this.panelTileset.Size = new System.Drawing.Size(383, 106);
+			this.panelTileset.TabIndex = 2;
 			// 
 			// labWarioStatusSector
 			// 
@@ -432,15 +430,15 @@ namespace WLEditor
 			this.panelMusic.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.panelMusic.Controls.Add(this.ddlMusic);
 			this.panelMusic.Controls.Add(this.labMusic);
-			this.panelMusic.Location = new System.Drawing.Point(0, 306);
+			this.panelMusic.Location = new System.Drawing.Point(0, 27);
 			this.panelMusic.Margin = new System.Windows.Forms.Padding(0);
 			this.panelMusic.Name = "panelMusic";
-			this.panelMusic.Size = new System.Drawing.Size(383, 27);
+			this.panelMusic.Size = new System.Drawing.Size(386, 27);
 			this.panelMusic.TabIndex = 0;
 			// 
 			// checkBoxCheckpoint
 			// 
-			this.checkBoxCheckpoint.Location = new System.Drawing.Point(3, 336);
+			this.checkBoxCheckpoint.Location = new System.Drawing.Point(3, 57);
 			this.checkBoxCheckpoint.Name = "checkBoxCheckpoint";
 			this.checkBoxCheckpoint.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
 			this.checkBoxCheckpoint.Size = new System.Drawing.Size(96, 20);
@@ -455,7 +453,7 @@ namespace WLEditor
 			this.panelStatusLevel.Controls.Add(this.ddlWarioAttributesLevel);
 			this.panelStatusLevel.Controls.Add(this.labWarioStatusLevel);
 			this.panelStatusLevel.Controls.Add(this.ddlWarioStatus);
-			this.panelStatusLevel.Location = new System.Drawing.Point(0, 27);
+			this.panelStatusLevel.Location = new System.Drawing.Point(0, 0);
 			this.panelStatusLevel.Margin = new System.Windows.Forms.Padding(0);
 			this.panelStatusLevel.Name = "panelStatusLevel";
 			this.panelStatusLevel.Size = new System.Drawing.Size(383, 27);
@@ -477,7 +475,7 @@ namespace WLEditor
 			this.panelStatusSector.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.panelStatusSector.Controls.Add(this.ddlWarioAttributesSector);
 			this.panelStatusSector.Controls.Add(this.labWarioStatusSector);
-			this.panelStatusSector.Location = new System.Drawing.Point(0, 54);
+			this.panelStatusSector.Location = new System.Drawing.Point(0, 27);
 			this.panelStatusSector.Margin = new System.Windows.Forms.Padding(0);
 			this.panelStatusSector.Name = "panelStatusSector";
 			this.panelStatusSector.Size = new System.Drawing.Size(383, 27);
@@ -489,28 +487,27 @@ namespace WLEditor
 			this.panelWarp.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.panelWarp.Controls.Add(this.labWarp);
 			this.panelWarp.Controls.Add(this.ddlWarp);
-			this.panelWarp.Location = new System.Drawing.Point(0, 0);
+			this.panelWarp.Location = new System.Drawing.Point(0, 106);
 			this.panelWarp.Margin = new System.Windows.Forms.Padding(0);
 			this.panelWarp.Name = "panelWarp";
-			this.panelWarp.Size = new System.Drawing.Size(383, 27);
+			this.panelWarp.Size = new System.Drawing.Size(386, 27);
 			this.panelWarp.TabIndex = 1;
 			// 
 			// flowLayoutPanel1
 			// 
 			this.flowLayoutPanel1.AutoSize = true;
 			this.flowLayoutPanel1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.flowLayoutPanel1.Controls.Add(this.panelWarp);
-			this.flowLayoutPanel1.Controls.Add(this.panelStatusLevel);
-			this.flowLayoutPanel1.Controls.Add(this.panelStatusSector);
-			this.flowLayoutPanel1.Controls.Add(this.grpTileset);
-			this.flowLayoutPanel1.Controls.Add(this.grpCamera);
+			this.flowLayoutPanel1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(223)))), ((int)(((byte)(207)))), ((int)(((byte)(192)))));
+			this.flowLayoutPanel1.Controls.Add(this.ddlWarpType);
 			this.flowLayoutPanel1.Controls.Add(this.panelMusic);
 			this.flowLayoutPanel1.Controls.Add(this.checkBoxCheckpoint);
 			this.flowLayoutPanel1.Controls.Add(this.panelScroll);
+			this.flowLayoutPanel1.Controls.Add(this.panelWarp);
+			this.flowLayoutPanel1.Controls.Add(this.flowLayoutPanel2);
 			this.flowLayoutPanel1.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
-			this.flowLayoutPanel1.Location = new System.Drawing.Point(8, 35);
+			this.flowLayoutPanel1.Location = new System.Drawing.Point(8, 8);
 			this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-			this.flowLayoutPanel1.Size = new System.Drawing.Size(383, 385);
+			this.flowLayoutPanel1.Size = new System.Drawing.Size(389, 392);
 			this.flowLayoutPanel1.TabIndex = 46;
 			// 
 			// ddlWarpType
@@ -568,9 +565,9 @@ namespace WLEditor
             "Treasure M",
             "Treasure N",
             "Treasure O"});
-			this.ddlWarpType.Location = new System.Drawing.Point(8, 8);
+			this.ddlWarpType.Location = new System.Drawing.Point(3, 3);
 			this.ddlWarpType.Name = "ddlWarpType";
-			this.ddlWarpType.Size = new System.Drawing.Size(380, 21);
+			this.ddlWarpType.Size = new System.Drawing.Size(383, 21);
 			this.ddlWarpType.TabIndex = 47;
 			this.ddlWarpType.SelectedIndexChanged += new System.EventHandler(this.DdlWarpType_SelectedIndexChanged);
 			// 
@@ -581,11 +578,27 @@ namespace WLEditor
 			this.panelScroll.Controls.Add(this.checkBoxRight);
 			this.panelScroll.Controls.Add(this.labScroll);
 			this.panelScroll.Controls.Add(this.checkBoxLeft);
-			this.panelScroll.Location = new System.Drawing.Point(0, 359);
+			this.panelScroll.Location = new System.Drawing.Point(0, 80);
 			this.panelScroll.Margin = new System.Windows.Forms.Padding(0);
 			this.panelScroll.Name = "panelScroll";
 			this.panelScroll.Size = new System.Drawing.Size(192, 26);
 			this.panelScroll.TabIndex = 48;
+			// 
+			// flowLayoutPanel2
+			// 
+			this.flowLayoutPanel2.AutoSize = true;
+			this.flowLayoutPanel2.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			this.flowLayoutPanel2.BackColor = System.Drawing.SystemColors.Control;
+			this.flowLayoutPanel2.Controls.Add(this.panelStatusLevel);
+			this.flowLayoutPanel2.Controls.Add(this.panelStatusSector);
+			this.flowLayoutPanel2.Controls.Add(this.panelTileset);
+			this.flowLayoutPanel2.Controls.Add(this.panelCamera);
+			this.flowLayoutPanel2.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
+			this.flowLayoutPanel2.ForeColor = System.Drawing.SystemColors.ControlText;
+			this.flowLayoutPanel2.Location = new System.Drawing.Point(3, 136);
+			this.flowLayoutPanel2.Name = "flowLayoutPanel2";
+			this.flowLayoutPanel2.Size = new System.Drawing.Size(383, 253);
+			this.flowLayoutPanel2.TabIndex = 48;
 			// 
 			// SectorForm
 			// 
@@ -593,8 +606,7 @@ namespace WLEditor
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.AutoSize = true;
 			this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.ClientSize = new System.Drawing.Size(408, 426);
-			this.Controls.Add(this.ddlWarpType);
+			this.ClientSize = new System.Drawing.Size(416, 418);
 			this.Controls.Add(this.flowLayoutPanel1);
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
 			this.MaximizeBox = false;
@@ -610,8 +622,8 @@ namespace WLEditor
 			((System.ComponentModel.ISupportInitialize)(this.txbCameraY)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.txbWarioY)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.txbWarioX)).EndInit();
-			this.grpCamera.ResumeLayout(false);
-			this.grpTileset.ResumeLayout(false);
+			this.panelCamera.ResumeLayout(false);
+			this.panelTileset.ResumeLayout(false);
 			this.panelMusic.ResumeLayout(false);
 			this.panelStatusLevel.ResumeLayout(false);
 			this.panelStatusSector.ResumeLayout(false);
@@ -619,13 +631,15 @@ namespace WLEditor
 			this.flowLayoutPanel1.ResumeLayout(false);
 			this.flowLayoutPanel1.PerformLayout();
 			this.panelScroll.ResumeLayout(false);
+			this.flowLayoutPanel2.ResumeLayout(false);
+			this.flowLayoutPanel2.PerformLayout();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
 		}
 
-		private System.Windows.Forms.GroupBox grpCamera;
-		private System.Windows.Forms.GroupBox grpTileset;
+		private System.Windows.Forms.Panel panelCamera;
+		private System.Windows.Forms.Panel panelTileset;
 		private System.Windows.Forms.Panel panelMusic;
 		private System.Windows.Forms.Panel panelStatusLevel;
 		private System.Windows.Forms.Panel panelStatusSector;
@@ -639,5 +653,6 @@ namespace WLEditor
 		private System.Windows.Forms.Label labWarioStatusSector;
 		private System.Windows.Forms.ComboBox ddlWarioAttributesSector;
 		private System.Windows.Forms.Panel panelScroll;
+		private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel2;
 	}
 }
