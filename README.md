@@ -96,6 +96,9 @@ When such a warp is loaded, if the treasure has already been collected, the game
 | <kbd>Ctrl</kbd> + <kbd>Z</kbd> <br> <kbd>Ctrl</kbd> + <kbd>Y</kbd> | Undo / redo changes.
 | <kbd>Delete</kbd> | Clear what is currently under selection.
 
+Tips : 
+It's possible to edit tiles/map in an external tool (eg: YY-CHR, Tilemap Studio, ...) using the export/import functionality : <kbd>Edit</kbd> > <kbd>Tile data</kbd>.
+
 ### Editing events
 [Events](#Progress--Events) are used to update map tiles during gameplay, it's usually triggered after completing a level (eg: event 1 is triggered after completing first level, making a path to second level and so on).
 
@@ -126,7 +129,7 @@ Tips :
 | <kbd>Delete</kbd> | Delete last path segment.
 | <kbd>Shift</kbd> + <kbd>Delete</kbd> | Delete all paths in all directions.
 | <kbd>M</kbd> | Change path mode. This will only be set for new paths.<br>Green = normal path.<br>Red = player won't be visible when walking on such paths.<br>Blue = underwater.
-| <kbd>P</kbd> | Set progress required to take current path. A direction must be selected.<br>A number is shown near level to indicate progression required.<br>Nothing shown means no progress is required.
+| <kbd>P</kbd> | Set [progress](#progress) required to take current path. A direction must be selected.<br>A number is shown near level to indicate progression required.<br>Nothing shown means no progress is required.
 | <kbd>E</kbd> | Set end of path exit target.<br><kbd>O</kbd> = Overworld.<br><kbd>S</kbd> = Sherbet Land.<br><kbd>T</kbd> = Mt Teapot.
 
 Tips : 
@@ -134,24 +137,22 @@ Tips :
 - Events should be edited to match paths. If you don't want to bother with events, remove all events and hardcode paths in map.
 - It you are planning to do a new overworld map, it's easier to delete all events and paths first.
 
-&nbsp; | Progress  | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 |
- --: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: 
-1 | Rice beach<br>&nbsp;| [1](#)<br>&nbsp;| [2](#)<br>&nbsp;| [3](#)<br>&nbsp;| | [4](#)<br>&nbsp;| [5](#)<br>💀 | | |
-1 | Rice beach<br>(flooded)| | | | [3](#)<br>⚑| | | 6<br>★ | |
-2 | Mt. Tea Pot<br>&nbsp;| [1](#)<br>&nbsp;| [2](#)<br>&nbsp;| [2](#)<br>⚑ | [3](#)<br>&nbsp;| [4](#)<br>&nbsp;| [5](#)<br>&nbsp;| [6](#)<br>❕| [4](#)<br>💀
-3 | Sherbet Land<br>&nbsp;| [1](#)<br>&nbsp;| [2](#)<br>&nbsp;| [2](#)<br>⚑ | [3](#)<br>&nbsp;| [3](#)<br>⚑ | [4](#)<br>★ | 5<br>★ | 6<br>💀
-4 | Stove Canyon<br>&nbsp;| [1](#)<br>&nbsp;| [2](#)<br>&nbsp;| [3](#)<br>&nbsp;| [4](#)<br>&nbsp;| [4](#)<br>⚑ | 5<br>★| [6](#)<br>💀 | |
-5 | SS Tea Cup<br>&nbsp;| [1](#)<br>&nbsp;| [2](#)<br>&nbsp;| [3](#)<br>&nbsp;| [4](#)<br>&nbsp;| [5](#)<br>💀 | | | |
-6 | Parsely Woods<br>&nbsp;| [1](#)<br>&nbsp;| [2](#)<br>❕| [3](#)<br>&nbsp;| [4](#)<br>&nbsp;| [5](#)<br>&nbsp;| [6](#)<br>💀 | | |
-7 | Syrup Castle | [1](#)<br>&nbsp; | [2](#)<br>❕  | [3](#)<br>❕  | | | | | |
-&nbsp; | Overworld | 1<br>| 2<br>| 4<br>| 5<br>| 6<br>| 3<br>| | |
+### Progress 
+This table show which progress unlocked depending the completed level : 
+
+| Progress | Rice beach | Mt. Tea Pot | Sherbet Land | Stove Canyon | SS Tea Cup | Parsely Woods | Syrup Castle | Overworld |
+| :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
+| 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 |
+| 2 | 2 | 2 | 2 | 2 | 2 | 2❕ | 2❕ | 2 |
+| 3 | 3 | 2 🅰️ | 2 🅰️ | 3 | 3 | 3 | 3❕ | 4 |
+| 4 | 3 🅰️ | 3 | 3 | 4 | 4 | 4 | | 5 |
+| 5 | 4 | 4 | 3 🅰️ | 4 🅰️ | 5 ⚑ | 5 | | 6 |
+| 6 | 5 ⚑ | 5 | 4 🅱️ | 5 🅱️ | | 6 ⚑ | | 3 |
+| 7 | 6 🅱️ | 6❕ | 5 🅱️ | 6 ⚑ | | | | |
+| 8 | | 4 ⚑ | 6 ⚑ | | | | | | |
 
 | Icon | Description |
 | :--: | :- |
-💀 | boss / last level|
-★ | secret level |
-⚑ | secret exit |
-[1-6](#) | event associated |
-❕ | special event, activated by hitting huge block |
-
-
+| 🅰️ / 🅱️ | secret exit / level |
+| ❕ | special event (huge [!] block) |
+| ⚑ | boss / last level |
