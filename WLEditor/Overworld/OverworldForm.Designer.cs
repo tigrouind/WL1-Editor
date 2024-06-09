@@ -183,7 +183,7 @@ namespace WLEditor
             this.exportMapToolStripMenuItem});
 			this.tileDataToolStripMenuItem.Name = "tileDataToolStripMenuItem";
 			this.tileDataToolStripMenuItem.Size = new System.Drawing.Size(180, 24);
-			this.tileDataToolStripMenuItem.Text = "Title data";
+			this.tileDataToolStripMenuItem.Text = "Tile data";
 			// 
 			// importToolStripMenuItem
 			// 
