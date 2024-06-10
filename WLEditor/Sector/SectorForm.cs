@@ -2,6 +2,7 @@ using Microsoft.VisualBasic;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
@@ -311,36 +312,18 @@ namespace WLEditor
 
 		void DdlEnemiesDrawItem(object sender, DrawItemEventArgs e)
 		{
-			if (e.Index >= 0 && !DesignMode)
+			if (!DesignMode && e.Index >= 0)
 			{
 				e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
 				e.Graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
 				e.Graphics.PixelOffsetMode = PixelOffsetMode.Half;
 
+				bool selected = (e.State & DrawItemState.Selected) != 0;
 				var item = ((ComboboxItem<EnemyInfo>)ddlEnemies.Items[e.Index]).Value;
 
 				DrawBackground();
 				DrawSprites();
 				DrawText();
-
-				void DrawBackground()
-				{
-					e.DrawBackground();
-
-					Rectangle rect = new Rectangle(e.Bounds.Left, e.Bounds.Top, 20, e.Bounds.Height);
-					if (item.BossId >= 0)
-					{
-						e.Graphics.FillRectangle(Brushes.MistyRose, rect);
-					}
-					else if (item.TreasureId >= 1 && item.TreasureId <= 15)
-					{
-						e.Graphics.FillRectangle(Brushes.Wheat, rect);
-					}
-					else
-					{
-						e.Graphics.FillRectangle(Brushes.White, rect);
-					}
-				}
 
 				void DrawSprites()
 				{
@@ -368,26 +351,49 @@ namespace WLEditor
 					}
 				}
 
-				void DrawText()
+				void DrawBackground()
 				{
-					using (var format = new StringFormat())
-					{
-						format.Alignment = StringAlignment.Center;
-						format.LineAlignment = StringAlignment.Center;
-						var dest = new Rectangle(10, e.Bounds.Top + 16 * zoom, 0, 0);
+					e.DrawBackground();
 
+					if (!selected)
+					{
+						Brush brush = null;
 						if (item.BossId >= 0)
 						{
-							e.Graphics.DrawString($"B{item.BossId + 1}", e.Font, Brushes.Black, dest, format);
+							brush = Brushes.MistyRose;
 						}
 						else if (item.TreasureId >= 1 && item.TreasureId <= 15)
 						{
-							e.Graphics.DrawString($"{treasureNames[item.TreasureId - 1]}", e.Font, Brushes.Black, dest, format);
+							brush = Brushes.Wheat;
 						}
-						else
+
+						if (brush != null)
 						{
-							e.Graphics.DrawString($"{e.Index:D2}", e.Font, Brushes.Black, dest, format);
+							e.Graphics.FillRectangle(brush, new Rectangle(e.Bounds.Left, e.Bounds.Top, 20, e.Bounds.Height));
 						}
+					}
+				}
+
+				void DrawText()
+				{
+					string text = $"{e.Index:D2}";
+					if (item.BossId >= 0)
+					{
+						text = $"B{item.BossId + 1}";
+					}
+					else if (item.TreasureId >= 1 && item.TreasureId <= 15)
+					{
+						text = $"{treasureNames[item.TreasureId - 1]}";
+					}
+
+					using (var format = new StringFormat())
+					using (var textBrush = new SolidBrush(e.ForeColor))
+					{
+						format.Alignment = StringAlignment.Center;
+						format.LineAlignment = StringAlignment.Center;
+
+						e.Graphics.DrawString(text, e.Font, textBrush,
+							new Rectangle(10, e.Bounds.Top + 16 * zoom, 0, 0), format);
 					}
 				}
 			}

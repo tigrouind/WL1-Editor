@@ -294,7 +294,6 @@ namespace WLEditor
 			// 
 			// ddlEnemies
 			// 
-			this.ddlEnemies.BackColor = System.Drawing.SystemColors.Control;
 			this.ddlEnemies.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
 			this.ddlEnemies.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.ddlEnemies.FormattingEnabled = true;
