@@ -224,6 +224,7 @@ namespace WLEditor
 			this.animationToolStripMenuItem.CheckOnClick = true;
 			this.animationToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.animationToolStripMenuItem.Name = "animationToolStripMenuItem";
+			this.animationToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F7;
 			this.animationToolStripMenuItem.Size = new System.Drawing.Size(217, 24);
 			this.animationToolStripMenuItem.Text = "Animation";
 			this.animationToolStripMenuItem.Click += new System.EventHandler(this.AnimationToolStripMenuItemClick);
