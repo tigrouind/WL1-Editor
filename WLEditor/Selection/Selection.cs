@@ -197,7 +197,7 @@ namespace WLEditor
 							int selectionWidth = reader.ReadInt32();
 							int selectionHeight = reader.ReadInt32();
 							ClipboardData[] selectionData = Enumerable.Range(0, selectionWidth * selectionHeight)
-								.Select((x, i) => new { Order = reader.ReadInt32(), Tile = reader.ReadInt32(), Index = i })
+								.Select((x, i) => (Order: reader.ReadInt32(), Tile: reader.ReadInt32(), Index: i ))
 								.OrderBy(x => x.Order)   //used for ordering events
 								.Select(x => new ClipboardData { Index = x.Index, Tile = x.Tile })
 								.ToArray();

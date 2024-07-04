@@ -795,7 +795,7 @@ namespace WLEditor
 								var miterPoints = GetMitterPoints(zoom * 4.0f);
 
 								int n = 0;
-								foreach (var item in colors.GroupByAdjacent(x => x, (x, y) => new { Color = x, Count = y.Count() }))
+								foreach (var item in colors.GroupByAdjacent(x => x, (x, y) => (Color: x, Count: y.Count() )))
 								{
 									brush.Color = item.Color;
 									gPathA.FillPolygon(brush, GetLineStrip(n, item.Count + 1).ToArray(), FillMode.Winding);

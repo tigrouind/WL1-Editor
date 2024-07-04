@@ -776,7 +776,7 @@ namespace WLEditor
 
 				//group levels at same position (usually duplicates)
 				foreach (var levels in pathData
-					.Select((x, i) => new { Index = i, x.X, x.Y })
+					.Select((x, i) => (Index: i, x.X, x.Y))
 					.GroupBy(x => (x.X, x.Y)))
 				{
 					int index = 0xFF;
