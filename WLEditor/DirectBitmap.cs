@@ -1,32 +1,34 @@
-﻿using System;
+using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 
 public class DirectBitmap : IDisposable
 {
-	public Bitmap Bitmap { get; private set; }
-	public uint[] Bits { get; private set; }
-	public bool Disposed { get; private set; }
-	public int Height { get; private set; }
-	public int Width { get; private set; }
+	public readonly Bitmap Bitmap;
+	public readonly uint[] Bits;
+	public readonly int Height;
+	public readonly int Width;
 
-	protected GCHandle BitsHandle { get; private set; }
+	readonly GCHandle bitsHandle;
+	bool disposed;
 
 	public DirectBitmap(int width, int height)
 	{
 		Width = width;
 		Height = height;
 		Bits = new uint[width * height];
-		BitsHandle = GCHandle.Alloc(Bits, GCHandleType.Pinned);
-		Bitmap = new Bitmap(width, height, width * 4, PixelFormat.Format32bppPArgb, BitsHandle.AddrOfPinnedObject());
+		bitsHandle = GCHandle.Alloc(Bits, GCHandleType.Pinned);
+		Bitmap = new Bitmap(width, height, width * 4, PixelFormat.Format32bppPArgb, bitsHandle.AddrOfPinnedObject());
 	}
 
 	public void Dispose()
 	{
-		if (Disposed) return;
-		Disposed = true;
-		Bitmap.Dispose();
-		BitsHandle.Free();
+		if (!disposed)
+		{
+			disposed = true;
+			Bitmap.Dispose();
+			bitsHandle.Free();
+		}
 	}
 }
