@@ -1,4 +1,4 @@
-﻿
+
 namespace WLEditor
 {
 	public enum WorldPathStatusEnum

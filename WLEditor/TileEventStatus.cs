@@ -1,4 +1,4 @@
-﻿namespace WLEditor
+namespace WLEditor
 {
 	public enum TileEventStatus
 	{

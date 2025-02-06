@@ -1,4 +1,4 @@
-﻿namespace WLEditor.Toolbox
+namespace WLEditor.Toolbox
 {
 	partial class ObjectsForm
 	{
