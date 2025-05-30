@@ -310,6 +310,59 @@ namespace WLEditor
 			{ 0x5B7A, "Sector" }
 		};
 
+		readonly ComboboxItemCollection<(string, int)> warpTypes = new ComboboxItemCollection<(string, int)>
+		{
+			{ ("H", 0), "Level header" },
+			{ ("C", 0), "Checkpoint" },
+			{ ("S", 0), "Sector 00" },
+			{ ("S", 1), "Sector 01" },
+			{ ("S", 2), "Sector 02" },
+			{ ("S", 3), "Sector 03" },
+			{ ("S", 4), "Sector 04" },
+			{ ("S", 5), "Sector 05" },
+			{ ("S", 6), "Sector 06" },
+			{ ("S", 7), "Sector 07" },
+			{ ("S", 8), "Sector 08" },
+			{ ("S", 9), "Sector 09" },
+			{ ("S", 10), "Sector 10" },
+			{ ("S", 11), "Sector 11" },
+			{ ("S", 12), "Sector 12" },
+			{ ("S", 13), "Sector 13" },
+			{ ("S", 14), "Sector 14" },
+			{ ("S", 15), "Sector 15" },
+			{ ("S", 16), "Sector 16" },
+			{ ("S", 17), "Sector 17" },
+			{ ("S", 18), "Sector 18" },
+			{ ("S", 19), "Sector 19" },
+			{ ("S", 20), "Sector 20" },
+			{ ("S", 21), "Sector 21" },
+			{ ("S", 22), "Sector 22" },
+			{ ("S", 23), "Sector 23" },
+			{ ("S", 24), "Sector 24" },
+			{ ("S", 25), "Sector 25" },
+			{ ("S", 26), "Sector 26" },
+			{ ("S", 27), "Sector 27" },
+			{ ("S", 28), "Sector 28" },
+			{ ("S", 29), "Sector 29" },
+			{ ("S", 30), "Sector 30" },
+			{ ("S", 31), "Sector 31" },
+			{ ("T", 0), "Treasure A" },
+			{ ("T", 1), "Treasure B" },
+			{ ("T", 2), "Treasure C" },
+			{ ("T", 3), "Treasure D" },
+			{ ("T", 4), "Treasure E" },
+			{ ("T", 5), "Treasure F" },
+			{ ("T", 6), "Treasure G" },
+			{ ("T", 7), "Treasure H" },
+			{ ("T", 8), "Treasure I" },
+			{ ("T", 9), "Treasure J" },
+			{ ("T", 10), "Treasure K" },
+			{ ("T", 11), "Treasure L" },
+			{ ("T", 12), "Treasure M" },
+			{ ("T", 13), "Treasure N" },
+			{ ("T", 14), "Treasure O" },
+		};
+
 		void DdlEnemiesDrawItem(object sender, DrawItemEventArgs e)
 		{
 			if (!DesignMode && e.Index >= 0)
@@ -484,22 +537,35 @@ namespace WLEditor
 		{
 			ignoreEvents = true;
 
+			ddlWarpType.Items.Clear();
+			ddlWarpType.Items.AddRange(warpTypes.ToArray());
+
+			bool hasCheckpoint = Sector.GetLevelHeader(rom, currentCourseId) != Sector.GetCheckpoint(rom, currentCourseId);
+			if (!hasCheckpoint)
+			{
+				ddlWarpType.Items.RemoveAt(1);
+			}
+
+			(string, int) selectedValue;
 			if (currentTreasureId != -1)
 			{
-				ddlWarpType.SelectedIndex = 34 + treasureNames[currentTreasureId] - 'A';
+				selectedValue = ("T", treasureNames[currentTreasureId] - 'A');
 			}
 			else if (currentSector != -1)
 			{
-				ddlWarpType.SelectedIndex = 2 + currentSector;
+				selectedValue = ("S", currentSector);
 			}
 			else if (currentCheckPoint)
 			{
-				ddlWarpType.SelectedIndex = 1;
+				selectedValue = ("C", 0);
 			}
 			else
 			{
-				ddlWarpType.SelectedIndex = 0;
+				selectedValue = ("H", 0);
 			}
+
+			LoadDropdown(ddlWarpType, selectedValue);
+
 			ignoreEvents = false;
 		}
 
@@ -783,6 +849,8 @@ namespace WLEditor
 					lastFreeCheckpoint.Push(Sector.GetCheckpoint(rom, currentCourseId));
 					Sector.SaveCheckpoint(rom, currentCourseId, Sector.GetLevelHeader(rom, currentCourseId));
 				}
+
+				LoadWarpTypeDropdown();
 			}
 
 			int GetFreeCheckpoint()
@@ -992,30 +1060,24 @@ namespace WLEditor
 		{
 			if (!ignoreEvents)
 			{
-				if (ddlWarpType.SelectedIndex == 0)
+				var selectedValue = (ComboboxItem<(string Type, int Index)>)ddlWarpType.Items[ddlWarpType.SelectedIndex];
+				switch (selectedValue.Value.Type)
 				{
-					SectorLoad(sender, (-1, false, -1));
-				}
-				else if (ddlWarpType.SelectedIndex == 1)
-				{
-					bool hasCheckpoint = Sector.GetLevelHeader(rom, currentCourseId) != Sector.GetCheckpoint(rom, currentCourseId);
-					if (hasCheckpoint)
-					{
+					case "H":
+						SectorLoad(sender, (-1, false, -1));
+						break;
+
+					case "C":
 						SectorLoad(sender, (-1, true, -1));
-					}
-					else
-					{
-						MessageBox.Show("Checkpoint is not enabled in this level", Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
-						LoadWarpTypeDropdown();
-					}
-				}
-				else if (ddlWarpType.SelectedIndex < 34)
-				{
-					SectorLoad(sender, (ddlWarpType.SelectedIndex - 2, false, -1));
-				}
-				else
-				{
-					SectorLoad(sender, (-1, false, Array.IndexOf(treasureNames, (char)('A' + ddlWarpType.SelectedIndex - 34))));
+						break;
+
+					case "S":
+						SectorLoad(sender, (selectedValue.Value.Index, false, -1));
+						break;
+
+					case "T":
+						SectorLoad(sender, (-1, false, Array.IndexOf(treasureNames, (char)('A' + selectedValue.Value.Index))));
+						break;
 				}
 			}
 		}
