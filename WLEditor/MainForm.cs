@@ -328,6 +328,7 @@ namespace WLEditor
 					Level.SwitchType = Level.GetSwitchType();
 					Level.SwitchMode = 0;
 					ignoreEvents = true;
+					switchBlockToolStripMenuItem.Enabled = Level.GetSwitchType() != 0;
 					switchBlockToolStripMenuItem.Checked = false;
 					ignoreEvents = false;
 					LoadLevel();
@@ -476,21 +477,22 @@ namespace WLEditor
 		{
 			if (!ignoreEvents)
 			{
-				int switchType = Level.GetSwitchType();
-				if (switchType == 0 && !switchBlockToolStripMenuItem.Checked)
-				{
-					MessageBox.Show("There is no switch block to activate in this level", Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
-				}
+				switchBlockToolStripMenuItem.Checked = !switchBlockToolStripMenuItem.Checked;
 
-				switchBlockToolStripMenuItem.Checked = switchType != 0 && !switchBlockToolStripMenuItem.Checked;
+				int switchType = Level.GetSwitchType();
 				int switchMode = switchBlockToolStripMenuItem.Checked ? switchType : 0;
 
-				if (Level.SwitchMode != switchMode || Level.SwitchType != switchType)
-				{
-					Level.SwitchMode = switchMode;
-					Level.SwitchType = switchType;
-					LoadLevel();
-				}
+				LoadSwitchBlock(switchMode, switchType);
+			}
+		}
+
+		void LoadSwitchBlock(int switchMode, int switchType)
+		{
+			if (Level.SwitchMode != switchMode || Level.SwitchType != switchType)
+			{
+				Level.SwitchMode = switchMode;
+				Level.SwitchType = switchType;
+				LoadLevel();
 			}
 		}
 
@@ -546,6 +548,14 @@ namespace WLEditor
 			{
 				changeMode |= mode;
 				saveToolStripMenuItem.Enabled = true;
+			}
+
+			if (mode == ChangeEnum.Blocks)
+			{
+				int switchType = Level.GetSwitchType();
+				switchBlockToolStripMenuItem.Checked &= switchType != 0;
+				switchBlockToolStripMenuItem.Enabled = switchType != 0;
+				LoadSwitchBlock(switchBlockToolStripMenuItem.Checked ? switchType : 0, switchType);
 			}
 		}
 
@@ -741,7 +751,15 @@ namespace WLEditor
 
 			if (toolStrip != null)
 			{
-				toolStrip.PerformClick();
+				if (!toolStrip.Enabled)
+				{
+					SystemSounds.Exclamation.Play();
+				}
+				else
+				{
+					toolStrip.PerformClick();
+				}
+
 				return true;
 			}
 

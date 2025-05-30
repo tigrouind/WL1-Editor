@@ -203,6 +203,7 @@ namespace WLEditor
 			// 
 			// switchBlockToolStripMenuItem
 			// 
+			this.switchBlockToolStripMenuItem.Enabled = false;
 			this.switchBlockToolStripMenuItem.Name = "switchBlockToolStripMenuItem";
 			this.switchBlockToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F5;
 			this.switchBlockToolStripMenuItem.Size = new System.Drawing.Size(217, 24);
