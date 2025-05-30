@@ -751,6 +751,7 @@ namespace WLEditor
 		private void ScrollBoundaryToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			levelPictureBox.ScrollLines = (levelPictureBox.ScrollLines + 1) % 5;
+			scrollBoundaryToolStripMenuItem.Checked = levelPictureBox.ScrollLines != 0;
 			levelPictureBox.Invalidate();
 		}
 
