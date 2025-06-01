@@ -28,26 +28,26 @@ namespace WLEditor
 		public readonly static DirectBitmap Tiles8x8 = new DirectBitmap(16 * 8, 8 * 8);
 		public readonly static DirectBitmap Tiles16x16 = new DirectBitmap(16 * 8, 16 * 16);
 
-		readonly static (int, string)[] tileInfo = new (int, string)[]
+		readonly static (int Type, string Text)[] tileInfo = new (int, string)[]
 		{
 			(0, "Bonus"),
-			(0, "Block"),
-			(0, "Block"),
-			(0, "Block"),
-			(0, "Block"),
-			(0, "Block with top door"),
-			(6, "Block with bottom door"),
+			(0, "Block (dark background)"),
+			(0, "Block (dark background)"),
+			(0, "Block (light background)"),
+			(0, "Block (light background)"),
+			(0, "Block (top door)"),
+			(6, "Block (bottom door)"),
 			(0, "Jump"),
 			(1, "Conveyor belt (backward)"),
 			(1, "Conveyor belt (forward)"),
-			(0, "[!] block"),
+			(7, "[!] block"),
 			(1, "Falling platform"),
 			(2, "Ice"),
 			(2, "Ice"),
 			(2, "Ice"),
 			(3, "Hidden bonus (platform)"),
-			(0, "[!] block (unused)"),
-			(0, "[!] block"),
+			(7, "[!] block (unused)"),
+			(7, "[!] block"),
 			(1, "Disappearing platform"),
 			(1, "Disappearing platform"),
 			(0, ""),
@@ -72,9 +72,9 @@ namespace WLEditor
 			(2, "Water current (west)"),
 			(2, "Block (water)"),
 			(2, "Block (water)"),
-			(2, "Block with top door (water)"),
+			(2, "Block (top door) (water)"),
 			(2, "Coin (water)"),
-			(6, "Block with bottom door (water)"),
+			(6, "Block (bottom door) (water)"),
 			(2, "Water"),
 			(2, "Water"),
 			(2, "Water"),
@@ -429,44 +429,75 @@ namespace WLEditor
 
 		public static (int Type, string Text) GetTileInfo(byte tileIndex)
 		{
-			if ((SwitchType & 1) != 0)
-			{
-				switch (tileIndex)
-				{
-					case 0x7C:
-					case 0x27:
-					case 0x7A:
-					case 0x79:
-						return (7, "Switchable block");
-
-				}
-			}
-
-			if ((SwitchType & 2) != 0)
-			{
-				switch (tileIndex)
-				{
-					case 0x7C:
-					case 0x55:
-					case 0x7A:
-					case 0x7B:
-					case 0x59:
-					case 0x5D:
-						return (7, "Switchable block");
-				}
-			}
+			(int Type, string Text) info;
 
 			if (tileIndex < 0x28)
 			{
-				return (0, "");
+				info = (0, "");
 			}
-
-			if (tileIndex > 0x5F)
+			else if (tileIndex > 0x5F)
 			{
-				return (-1, "");
+				info = (-1, "");
+			}
+			else
+			{
+				info = tileInfo[tileIndex - 0x28];
 			}
 
-			return tileInfo[tileIndex - 0x28];
+			if (SwitchTile(tileIndex, SwitchType) != tileIndex)
+			{
+				info = (7, string.IsNullOrWhiteSpace(info.Text) ? "Switchable block" : $"{info.Text} (switchable block)");
+			}
+
+			return info;
+		}
+
+		static byte SwitchTile(byte tileIndex, int switchMode)
+		{
+			//replace tiles when a (!) block is hit
+			if ((switchMode & 1) != 0)
+			{
+				switch (tileIndex)
+				{
+					case 0x7C:
+						return 0x27;
+
+					case 0x27:
+						return 0x7C;
+
+					case 0x7A:
+						return 0x44;
+
+					case 0x79:
+						return 0x45;
+				}
+			}
+
+			if ((switchMode & 2) != 0)
+			{
+				switch (tileIndex)
+				{
+					case 0x7C:
+						return 0x55;
+
+					case 0x55:
+						return 0x7C;
+
+					case 0x7A:
+						return 0x7B;
+
+					case 0x7B:
+						return 0x7A;
+
+					case 0x59:
+						return 0x5D;
+
+					case 0x5D:
+						return 0x59;
+				}
+			}
+
+			return tileIndex;
 		}
 
 		static byte ReplaceTile(byte tileIndex)
@@ -476,57 +507,9 @@ namespace WLEditor
 				tileIndex = RemoveCollectible();
 			}
 
-			tileIndex = SwitchTile();
+			tileIndex = SwitchTile(tileIndex, SwitchMode);
 
 			return tileIndex;
-
-			//replace tiles when a (!) block is hit
-			byte SwitchTile()
-			{
-				if ((SwitchMode & 1) != 0)
-				{
-					switch (tileIndex)
-					{
-						case 0x7C:
-							return 0x27;
-
-						case 0x27:
-							return 0x7C;
-
-						case 0x7A:
-							return 0x44;
-
-						case 0x79:
-							return 0x45;
-					}
-				}
-
-				if ((SwitchMode & 2) != 0)
-				{
-					switch (tileIndex)
-					{
-						case 0x7C:
-							return 0x55;
-
-						case 0x55:
-							return 0x7C;
-
-						case 0x7A:
-							return 0x7B;
-
-						case 0x7B:
-							return 0x7A;
-
-						case 0x59:
-							return 0x5D;
-
-						case 0x5D:
-							return 0x59;
-					}
-				}
-
-				return tileIndex;
-			}
 
 			byte RemoveCollectible()
 			{
