@@ -10,9 +10,9 @@ namespace WLEditor
 
 		protected override void WndProc(ref Message m)
 		{
-			if (m.Msg == WM_MOUSEWHEEL && LOWORD((int)m.WParam) == MK_CONTROL)
+			if (m.Msg == WM_MOUSEWHEEL && LOWORD((uint)m.WParam) == MK_CONTROL)
 			{
-				int delta = SignedHIWORD((int)m.WParam);
+				int delta = SignedHIWORD((uint)m.WParam);
 				MouseWheel(this, new MouseEventArgs(MouseButtons.None, 0, 0, 0, delta));
 				return;
 			}
@@ -20,17 +20,17 @@ namespace WLEditor
 			base.WndProc(ref m);
 		}
 
-		int SignedHIWORD(int n)
+		int SignedHIWORD(uint n)
 		{
 			return unchecked((short)HIWORD(n));
 		}
 
-		int HIWORD(int n)
+		uint HIWORD(uint n)
 		{
 			return (n >> 16) & 0xFFFF;
 		}
 
-		int LOWORD(int n)
+		uint LOWORD(uint n)
 		{
 			return n & 0xffff;
 		}

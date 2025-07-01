@@ -8,7 +8,7 @@ using System.Windows.Forms;
 
 namespace WLEditor
 {
-	public class PathForm
+	public class PathForm : IDisposable
 	{
 		WorldPath[] worldData;
 		WorldPath[] overWorldData;
@@ -18,6 +18,7 @@ namespace WLEditor
 		WorldPath currentPath;
 		WorldPathDirection currentDirection;
 		int currentLevel;
+		bool disposed;
 
 		PathModeEnum pathMode;
 		public Action UpdateTitle;
@@ -979,6 +980,30 @@ namespace WLEditor
 				default:
 					return false;
 			}
+		}
+
+		public void Dispose()
+		{
+			Dispose(true);
+			GC.SuppressFinalize(this);
+		}
+
+		protected virtual void Dispose(bool disposing)
+		{
+			if (disposed)
+			{
+				return;
+			}
+
+			if (disposing)
+			{
+				pathABitmap.Dispose();
+				pathBBitmap.Dispose();
+				tilesFlag.Dispose();
+				transparentImageAttributes.Dispose();
+			}
+
+			disposed = true;
 		}
 
 		int CurrentMapX => Overworld.IsOverworld(currentWorld) ? 256 : 160;

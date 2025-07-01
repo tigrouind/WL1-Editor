@@ -658,5 +658,13 @@ namespace WLEditor
 		}
 
 		#endregion
+
+		protected override void Dispose(bool disposing)
+		{
+			if (disposing)
+			{
+				levelTiles.Dispose();
+			}
+		}
 	}
 }

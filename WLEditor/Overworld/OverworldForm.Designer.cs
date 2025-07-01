@@ -24,6 +24,11 @@ namespace WLEditor
 				if (components != null) {
 					components.Dispose();
 				}
+
+				tilesWorld8x8.Dispose();
+				tilesWorld.Dispose();
+				tilesWorldScroll.Dispose();
+				pathForm.Dispose();
 			}
 			base.Dispose(disposing);
 		}

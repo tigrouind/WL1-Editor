@@ -24,11 +24,23 @@ public class DirectBitmap : IDisposable
 
 	public void Dispose()
 	{
-		if (!disposed)
+		Dispose(true);
+		GC.SuppressFinalize(this);
+	}
+
+	protected virtual void Dispose(bool disposing)
+	{
+		if (disposed)
 		{
-			disposed = true;
+			return;
+		}
+
+		if (disposing)
+		{
 			Bitmap.Dispose();
 			bitsHandle.Free();
 		}
+
+		disposed = true;
 	}
 }

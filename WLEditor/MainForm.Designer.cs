@@ -17,6 +17,11 @@ namespace WLEditor
 				if (components != null) {
 					components.Dispose();
 				}
+
+				blocksForm.Dispose();
+				objectsForm.Dispose();
+				overworldForm.Dispose();
+				sectorForm.Dispose();
 			}
 			base.Dispose(disposing);
 		}

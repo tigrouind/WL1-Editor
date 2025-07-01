@@ -42,6 +42,8 @@ namespace WLEditor
 				{
 					components.Dispose();
 				}
+
+				TilesEnemies.Dispose();
 			}
 			base.Dispose(disposing);
 		}

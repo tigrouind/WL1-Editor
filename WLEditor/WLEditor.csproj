@@ -1,150 +1,31 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <ProjectGuid>{9AF489D5-BCAC-487E-83AE-4A3E0CBDD1CB}</ProjectGuid>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <TargetFramework>net9.0-windows</TargetFramework>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>WLEditor</RootNamespace>
-    <AssemblyName>WLEditor</AssemblyName>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
     <ApplicationIcon>icon32x32.ico</ApplicationIcon>
     <NoWin32Manifest>False</NoWin32Manifest>
-    <TargetFrameworkProfile />
-    <FileUpgradeFlags>
-    </FileUpgradeFlags>
-    <UpgradeBackupLocation>
-    </UpgradeBackupLocation>
-    <OldToolsVersion>3.5</OldToolsVersion>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Platform)' == 'AnyCPU' ">
-    <PlatformTarget>x86</PlatformTarget>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-    <OutputPath>bin\Debug\</OutputPath>
-    <DebugSymbols>True</DebugSymbols>
-    <DebugType>Full</DebugType>
-    <Optimize>False</Optimize>
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-    <OutputPath>bin\Release\</OutputPath>
-    <DebugSymbols>False</DebugSymbols>
     <DebugType>None</DebugType>
-    <Optimize>True</Optimize>
-    <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
-    <DefineConstants>TRACE</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.VisualBasic" />
-    <Reference Include="System" />
-    <Reference Include="System.Core">
+    <Reference Update="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
-    <Reference Include="System.Data" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml" />
+    <PackageReference Include="Microsoft.VisualBasic" Version="10.3.0" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ComboboxItem.cs" />
-    <Compile Include="ComboboxItemCollection.cs" />
-    <Compile Include="DirectBitmap.cs" />
-    <Compile Include="Extensions.cs" />
-    <Compile Include="Overworld\PathModeEnum.cs" />
-    <Compile Include="Rom\WorldPath\Enum\WorldPathNextEnum.cs" />
-    <Compile Include="Rom\Level.cs" />
-    <Compile Include="LevelPictureBox.cs">
+    <Compile Update="LevelPictureBox.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="MainForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="MainForm.Designer.cs">
-      <DependentUpon>MainForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="ChangeEnum.cs" />
-    <Compile Include="Overworld\EventForm.cs" />
-    <Compile Include="Rom\Overworld.cs" />
-    <Compile Include="Overworld\OverworldForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Overworld\OverworldForm.Designer.cs">
-      <DependentUpon>OverworldForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Overworld\PathForm.cs" />
-    <Compile Include="Rom\WorldPath\WorldPath.cs" />
-    <Compile Include="Rom\WorldPath\WorldPathDirection.cs" />
-    <Compile Include="Rom\WorldPath\Enum\WorldPathDirectionEnum.cs" />
-    <Compile Include="Rom\WorldPath\Enum\WorldPathProgressEnum.cs" />
-    <Compile Include="Rom\WorldPath\WorldPathSegment.cs" />
-    <Compile Include="PanelUnscrollable.cs">
+    <Compile Update="PanelUnscrollable.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Program.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Rom.cs" />
-    <Compile Include="Rom\Sector.cs" />
-    <Compile Include="Rom\WorldPath\Enum\WorldPathStatusEnum.cs" />
-    <Compile Include="Sector\EnemyInfo.cs" />
-    <Compile Include="Sector\SectorForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Sector\SectorForm.Designer.cs">
-      <DependentUpon>SectorForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Selection\ClipboardData.cs" />
-    <Compile Include="Selection\History.cs" />
-    <Compile Include="Selection\Selection.cs" />
-    <Compile Include="Selection\SelectionChange.cs" />
-    <Compile Include="Selection\SelectionEventArgs.cs" />
-    <Compile Include="Rom\Sprite.cs" />
-    <Compile Include="TileEventArgs.cs" />
-    <Compile Include="TileEventStatus.cs" />
-    <Compile Include="Toolbox\ObjectsForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Toolbox\ObjectsForm.Designer.cs">
-      <DependentUpon>ObjectsForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Toolbox\BlocksForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Toolbox\BlocksForm.Designer.cs">
-      <DependentUpon>BlocksForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Toolbox\Warp.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="app.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="MainForm.resx">
-      <DependentUpon>MainForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Overworld\OverworldForm.resx">
-      <DependentUpon>OverworldForm.Designer.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Sector\SectorForm.resx">
-      <DependentUpon>SectorForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Toolbox\ObjectsForm.resx">
-      <DependentUpon>ObjectsForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Toolbox\BlocksForm.resx">
-      <DependentUpon>BlocksForm.cs</DependentUpon>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup />
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
