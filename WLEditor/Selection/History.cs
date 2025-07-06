@@ -8,8 +8,8 @@ namespace WLEditor
 {
 	public class History
 	{
-		readonly List<List<SelectionChange>> undo = new List<List<SelectionChange>>();
-		readonly List<List<SelectionChange>> redo = new List<List<SelectionChange>>();
+		readonly List<List<SelectionChange>> undo = [];
+		readonly List<List<SelectionChange>> redo = [];
 
 		public void ClearUndo()
 		{
@@ -36,7 +36,7 @@ namespace WLEditor
 			return ApplyChanges(setTileAt, getTileAt, redo, undo);
 		}
 
-		bool ApplyChanges(Func<int, int, int, int> setTileAt, Func<int, int, int> getTileAt, List<List<SelectionChange>> source, List<List<SelectionChange>> dest)
+		static bool ApplyChanges(Func<int, int, int, int> setTileAt, Func<int, int, int> getTileAt, List<List<SelectionChange>> source, List<List<SelectionChange>> dest)
 		{
 			if (source.Count > 0)
 			{

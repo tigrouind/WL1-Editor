@@ -25,12 +25,12 @@ namespace WLEditor
 			return unchecked((short)HIWORD(n));
 		}
 
-		uint HIWORD(uint n)
+		static uint HIWORD(uint n)
 		{
 			return (n >> 16) & 0xFFFF;
 		}
 
-		uint LOWORD(uint n)
+		static uint LOWORD(uint n)
 		{
 			return n & 0xffff;
 		}

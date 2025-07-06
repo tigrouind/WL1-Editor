@@ -16,10 +16,10 @@ namespace WLEditor
 		public event EventHandler SectorChanged;
 		public event EventHandler<(int Sector, bool Checkpoint, int TreasureId)> SectorLoad;
 
-		public readonly DirectBitmap TilesEnemies = new DirectBitmap(32 * 6, 32 * 147);
+		public readonly DirectBitmap TilesEnemies = new(32 * 6, 32 * 147);
 		public readonly (Rectangle Rectangle, Point Point)[] enemiesRects = new (Rectangle, Point)[6 * 147];
-		readonly char[] treasureNames = { 'C', 'I', 'F', 'O', 'A', 'N', 'H', 'M', 'L', 'K', 'B', 'D', 'G', 'J', 'E' };
-		readonly int[] boss = { 0x4CA9, 0x460D, 0x4C0C, 0x4E34, 0x4B06, 0x4D1A, 0x527D };
+		readonly char[] treasureNames = ['C', 'I', 'F', 'O', 'A', 'N', 'H', 'M', 'L', 'K', 'B', 'D', 'G', 'J', 'E'];
+		readonly int[] boss = [0x4CA9, 0x460D, 0x4C0C, 0x4E34, 0x4B06, 0x4D1A, 0x527D];
 
 		Rom rom;
 		int currentCourseId;
@@ -32,8 +32,8 @@ namespace WLEditor
 		bool ignoreEvents;
 		bool formLoaded;
 
-		readonly Stack<int> lastFreeWarp = new Stack<int>();
-		readonly Stack<int> lastFreeCheckpoint = new Stack<int>();
+		readonly Stack<int> lastFreeWarp = new();
+		readonly Stack<int> lastFreeCheckpoint = new();
 
 		public SectorForm()
 		{
@@ -42,7 +42,7 @@ namespace WLEditor
 
 		#region Dropdown data
 
-		readonly ComboboxItemCollection<(int Bank, int TileSetB, int TileSetA, int BlockIndex, int Palette, int GUI)> tileSets = new ComboboxItemCollection<(int, int, int, int, int, int)>
+		readonly ComboboxItemCollection<(int Bank, int TileSetB, int TileSetA, int BlockIndex, int Palette, int GUI)> tileSets = new()
 		{
 			{ ( 0x03, 0x5200, 0x5400, 0x460A, 0xE1, 0x7200 ), "00   Beach 1" },
 			{ ( 0x0E, 0x4600, 0x5400, 0x4E0A, 0xE1, 0x7200 ), "01   Beach 2" },
@@ -76,158 +76,158 @@ namespace WLEditor
 		};
 
 		readonly int[][] enemyPointer =
-		{
+		[
 			//pointers referencing similar code are grouped together
-			new [] { 0x41EF },
-			new [] { 0x4208 },
-			new [] { 0x4219 },
-			new [] { 0x422A },
-			new [] { 0x423B },
-			new [] { 0x4254 },
-			new [] { 0x42A9, 0x42BA, 0x42FE, 0x4927, 0x4986, 0x49CA, 0x4BD9, 0x4D61, 0x5028, 0x5096, 0x5228 },
-			new [] { 0x42CB, 0x4997, 0x49B9 },
-			new [] { 0x42DC, 0x4464, 0x44A8, 0x45EB, 0x47B3, 0x4818, 0x4B3B, 0x4B6E, 0x4C32, 0x4E23, 0x4EEA, 0x4F60, 0x4F71, 0x4FAC, 0x506C, 0x5158, 0x51BA, 0x51F5, 0x5217, 0x52E5, 0x4D09 },
-			new [] { 0x42ED },
-			new [] { 0x430F, 0x49DB },
-			new [] { 0x4325, 0x4E95 },
-			new [] { 0x4336 },
-			new [] { 0x4347 },
-			new [] { 0x4358, 0x437A, 0x4402, 0x4413, 0x46A0, 0x486D, 0x4DE8 },
-			new [] { 0x4369, 0x4520, 0x46B1, 0x4807, 0x4FF5, 0x5147 },
-			new [] { 0x438B },
-			new [] { 0x43A4 },
-			new [] { 0x43C2 },
-			new [] { 0x43D8 },
-			new [] { 0x43F1 },
-			new [] { 0x4424 },
-			new [] { 0x443D },
-			new [] { 0x4453 },
-			new [] { 0x4475 },
-			new [] { 0x4486 },
-			new [] { 0x4497, 0x4B7F },
-			new [] { 0x44B9, 0x44E0, 0x4BA1, 0x4CF3 },
-			new [] { 0x44CF, 0x4B90, 0x4FD3, 0x4FE4 },
-			new [] { 0x44F6 },
-			new [] { 0x4507 },
-			new [] { 0x4531 },
-			new [] { 0x4542 },
-			new [] { 0x455B },
-			new [] { 0x456C },
-			new [] { 0x457D },
-			new [] { 0x4596, 0x4A1B },
-			new [] { 0x45A7 },
-			new [] { 0x45B8, 0x467E, 0x46D3, 0x4975, 0x4D9C, 0x50A7 },
-			new [] { 0x45C9, 0x50EB },
-			new [] { 0x45DA },
-			new [] { 0x45FC },
-			new [] { 0x460D },
-			new [] { 0x464C },
-			new [] { 0x4665 },
-			new [] { 0x468F },
-			new [] { 0x46C2, 0x4778, 0x4C87, 0x4C98, 0x4D72, 0x5039, 0x504A, 0x50DA },
-			new [] { 0x46E4 },
-			new [] { 0x46FD },
-			new [] { 0x4716 },
-			new [] { 0x4727 },
-			new [] { 0x473D },
-			new [] { 0x4756 },
-			new [] { 0x4767 },
-			new [] { 0x4789 },
-			new [] { 0x47A2 },
-			new [] { 0x47C4 },
-			new [] { 0x47DD },
-			new [] { 0x47F6 },
-			new [] { 0x4829, 0x5169 },
-			new [] { 0x483A },
-			new [] { 0x484B },
-			new [] { 0x485C },
-			new [] { 0x487E },
-			new [] { 0x488F },
-			new [] { 0x48A0 },
-			new [] { 0x48B1 },
-			new [] { 0x48C2 },
-			new [] { 0x48D3 },
-			new [] { 0x48EC },
-			new [] { 0x48FD },
-			new [] { 0x4916 },
-			new [] { 0x4938 },
-			new [] { 0x494E },
-			new [] { 0x495F },
-			new [] { 0x49A8 },
-			new [] { 0x49F1 },
-			new [] { 0x4A0A },
-			new [] { 0x4A2C },
-			new [] { 0x4A3D },
-			new [] { 0x4A56 },
-			new [] { 0x4A6F },
-			new [] { 0x4A88 },
-			new [] { 0x4AA1 },
-			new [] { 0x4AB2 },
-			new [] { 0x4AC3 },
-			new [] { 0x4ADC },
-			new [] { 0x4AED },
-			new [] { 0x4B06 },
-			new [] { 0x4B2A },
-			new [] { 0x4B4C },
-			new [] { 0x4B5D },
-			new [] { 0x4BB7 },
-			new [] { 0x4BC8 },
-			new [] { 0x4BEA },
-			new [] { 0x4BFB, 0x4F25, 0x4F4F },
-			new [] { 0x4C0C },
-			new [] { 0x4C43 },
-			new [] { 0x4C54 },
-			new [] { 0x4C65 },
-			new [] { 0x4C76 },
-			new [] { 0x4CA9 },
-			new [] { 0x4CE2 },
-			new [] { 0x4D1A },
-			new [] { 0x4D48 },
-			new [] { 0x4D83, 0x4DAD },
-			new [] { 0x4DC6 },
-			new [] { 0x4DD7 },
-			new [] { 0x4DF9 },
-			new [] { 0x4E12 },
-			new [] { 0x4E34 },
-			new [] { 0x4E62 },
-			new [] { 0x4E73 },
-			new [] { 0x4E84 },
-			new [] { 0x4EA6 },
-			new [] { 0x4EB7 },
-			new [] { 0x4EC8 },
-			new [] { 0x4ED9 },
-			new [] { 0x4EFB },
-			new [] { 0x4F14 },
-			new [] { 0x4F36 },
-			new [] { 0x4F82 },
-			new [] { 0x4F9B },
-			new [] { 0x4FBD },
-			new [] { 0x5006 },
-			new [] { 0x5017 },
-			new [] { 0x505B },
-			new [] { 0x507D },
-			new [] { 0x50B8, 0x526C },
-			new [] { 0x50C9 },
-			new [] { 0x50FC },
-			new [] { 0x5115 },
-			new [] { 0x512E },
-			new [] { 0x517A },
-			new [] { 0x5190 },
-			new [] { 0x51A9 },
-			new [] { 0x51CB },
-			new [] { 0x51E4 },
-			new [] { 0x5206 },
-			new [] { 0x5239 },
-			new [] { 0x524A },
-			new [] { 0x525B },
-			new [] { 0x527D },
-			new [] { 0x52AA },
-			new [] { 0x52BB },
-			new [] { 0x52CC },
-			new [] { 0x52F6 }
-		};
+			[0x41EF],
+			[0x4208],
+			[0x4219],
+			[0x422A],
+			[0x423B],
+			[0x4254],
+			[0x42A9, 0x42BA, 0x42FE, 0x4927, 0x4986, 0x49CA, 0x4BD9, 0x4D61, 0x5028, 0x5096, 0x5228],
+			[0x42CB, 0x4997, 0x49B9],
+			[0x42DC, 0x4464, 0x44A8, 0x45EB, 0x47B3, 0x4818, 0x4B3B, 0x4B6E, 0x4C32, 0x4E23, 0x4EEA, 0x4F60, 0x4F71, 0x4FAC, 0x506C, 0x5158, 0x51BA, 0x51F5, 0x5217, 0x52E5, 0x4D09],
+			[0x42ED],
+			[0x430F, 0x49DB],
+			[0x4325, 0x4E95],
+			[0x4336],
+			[0x4347],
+			[0x4358, 0x437A, 0x4402, 0x4413, 0x46A0, 0x486D, 0x4DE8],
+			[0x4369, 0x4520, 0x46B1, 0x4807, 0x4FF5, 0x5147],
+			[0x438B],
+			[0x43A4],
+			[0x43C2],
+			[0x43D8],
+			[0x43F1],
+			[0x4424],
+			[0x443D],
+			[0x4453],
+			[0x4475],
+			[0x4486],
+			[0x4497, 0x4B7F],
+			[0x44B9, 0x44E0, 0x4BA1, 0x4CF3],
+			[0x44CF, 0x4B90, 0x4FD3, 0x4FE4],
+			[0x44F6],
+			[0x4507],
+			[0x4531],
+			[0x4542],
+			[0x455B],
+			[0x456C],
+			[0x457D],
+			[0x4596, 0x4A1B],
+			[0x45A7],
+			[0x45B8, 0x467E, 0x46D3, 0x4975, 0x4D9C, 0x50A7],
+			[0x45C9, 0x50EB],
+			[0x45DA],
+			[0x45FC],
+			[0x460D],
+			[0x464C],
+			[0x4665],
+			[0x468F],
+			[0x46C2, 0x4778, 0x4C87, 0x4C98, 0x4D72, 0x5039, 0x504A, 0x50DA],
+			[0x46E4],
+			[0x46FD],
+			[0x4716],
+			[0x4727],
+			[0x473D],
+			[0x4756],
+			[0x4767],
+			[0x4789],
+			[0x47A2],
+			[0x47C4],
+			[0x47DD],
+			[0x47F6],
+			[0x4829, 0x5169],
+			[0x483A],
+			[0x484B],
+			[0x485C],
+			[0x487E],
+			[0x488F],
+			[0x48A0],
+			[0x48B1],
+			[0x48C2],
+			[0x48D3],
+			[0x48EC],
+			[0x48FD],
+			[0x4916],
+			[0x4938],
+			[0x494E],
+			[0x495F],
+			[0x49A8],
+			[0x49F1],
+			[0x4A0A],
+			[0x4A2C],
+			[0x4A3D],
+			[0x4A56],
+			[0x4A6F],
+			[0x4A88],
+			[0x4AA1],
+			[0x4AB2],
+			[0x4AC3],
+			[0x4ADC],
+			[0x4AED],
+			[0x4B06],
+			[0x4B2A],
+			[0x4B4C],
+			[0x4B5D],
+			[0x4BB7],
+			[0x4BC8],
+			[0x4BEA],
+			[0x4BFB, 0x4F25, 0x4F4F],
+			[0x4C0C],
+			[0x4C43],
+			[0x4C54],
+			[0x4C65],
+			[0x4C76],
+			[0x4CA9],
+			[0x4CE2],
+			[0x4D1A],
+			[0x4D48],
+			[0x4D83, 0x4DAD],
+			[0x4DC6],
+			[0x4DD7],
+			[0x4DF9],
+			[0x4E12],
+			[0x4E34],
+			[0x4E62],
+			[0x4E73],
+			[0x4E84],
+			[0x4EA6],
+			[0x4EB7],
+			[0x4EC8],
+			[0x4ED9],
+			[0x4EFB],
+			[0x4F14],
+			[0x4F36],
+			[0x4F82],
+			[0x4F9B],
+			[0x4FBD],
+			[0x5006],
+			[0x5017],
+			[0x505B],
+			[0x507D],
+			[0x50B8, 0x526C],
+			[0x50C9],
+			[0x50FC],
+			[0x5115],
+			[0x512E],
+			[0x517A],
+			[0x5190],
+			[0x51A9],
+			[0x51CB],
+			[0x51E4],
+			[0x5206],
+			[0x5239],
+			[0x524A],
+			[0x525B],
+			[0x527D],
+			[0x52AA],
+			[0x52BB],
+			[0x52CC],
+			[0x52F6]
+		];
 
-		readonly ComboboxItemCollection<int> tilesAnimation = new ComboboxItemCollection<int>
+		readonly ComboboxItemCollection<int> tilesAnimation = new()
 		{
 			{ 0x4000, "00   Platform" },
 			{ 0x4100, "01   Sand / plant" },
@@ -246,7 +246,7 @@ namespace WLEditor
 			{ 0x4D00, "15   Castle" }
 		};
 
-		readonly ComboboxItemCollection<int> music = new ComboboxItemCollection<int>
+		readonly ComboboxItemCollection<int> music = new()
 		{
 			{ 0x7ED5, "00   Beach 1" },
 			{ 0x7F29, "01   Beach 2" },
@@ -263,7 +263,7 @@ namespace WLEditor
 			{ 0x7F59, "12   Sherbet Land" }
 		};
 
-		readonly ComboboxItemCollection<int> animationSpeed = new ComboboxItemCollection<int>
+		readonly ComboboxItemCollection<int> animationSpeed = new()
 		{
 			{ 0x00, "None" },
 			{ 0x1F, "Slow" },
@@ -272,7 +272,7 @@ namespace WLEditor
 			{ 0x03, "Fastest" }
 		};
 
-		readonly ComboboxItemCollection<int> cameraTypes = new ComboboxItemCollection<int>
+		readonly ComboboxItemCollection<int> cameraTypes = new()
 		{
 			{ 0x00, "X scroll" },
 			{ 0x10, "X/Y scroll" },
@@ -282,26 +282,26 @@ namespace WLEditor
 			{ 0xFF, "No scroll (boss fight)" }
 		};
 
-		readonly ComboboxItemCollection<int> warioStatus = new ComboboxItemCollection<int>
+		readonly ComboboxItemCollection<int> warioStatus = new()
 		{
 			{ 0x00, "Standing" },
 			{ 0x01, "Swimming" },
 		};
 
-		readonly ComboboxItemCollection<int> warioAttributesLevel = new ComboboxItemCollection<int>
+		readonly ComboboxItemCollection<int> warioAttributesLevel = new()
 		{
 			{ 0x00, "Left facing" },
 			{ 0x20, "Right facing" },
 			{ 0xA0, "Behind background" },
 		};
 
-		readonly ComboboxItemCollection<int> warioAttributesSector = new ComboboxItemCollection<int>
+		readonly ComboboxItemCollection<int> warioAttributesSector = new()
 		{
 			{ 0x00, "Normal" },
 			{ 0x01, "Behind background" },
 		};
 
-		readonly ComboboxItemCollection<int> warps = new ComboboxItemCollection<int>
+		readonly ComboboxItemCollection<int> warps = new()
 		{
 			{ 0x5B76, "None" },
 			{ 0x5B77, "Exit map" },
@@ -310,7 +310,7 @@ namespace WLEditor
 			{ 0x5B7A, "Sector" }
 		};
 
-		readonly ComboboxItemCollection<(string, int)> warpTypes = new ComboboxItemCollection<(string, int)>
+		readonly ComboboxItemCollection<(string, int)> warpTypes = new()
 		{
 			{ ("H", 0), "Level header" },
 			{ ("C", 0), "Checkpoint" },
@@ -391,10 +391,8 @@ namespace WLEditor
 								|| item.EnemyIds[index] == 10 //moving pouncer
 								|| item.EnemyIds[index] == 71) //guragura with coin
 							{
-								using (var darkBrush = new SolidBrush(Color.FromArgb(64, 0, 0, 0)))
-								{
-									e.Graphics.FillRectangle(darkBrush, destRect);
-								}
+								using var darkBrush = new SolidBrush(Color.FromArgb(64, 0, 0, 0));
+								e.Graphics.FillRectangle(darkBrush, destRect);
 							}
 
 							var imgRect = new Rectangle(index * 32, item.Index * 32, 32, 32);
@@ -439,15 +437,13 @@ namespace WLEditor
 						text = $"{treasureNames[item.TreasureId - 1]}";
 					}
 
-					using (var format = new StringFormat())
-					using (var textBrush = new SolidBrush(e.ForeColor))
-					{
-						format.Alignment = StringAlignment.Center;
-						format.LineAlignment = StringAlignment.Center;
+					using var format = new StringFormat();
+					using var textBrush = new SolidBrush(e.ForeColor);
+					format.Alignment = StringAlignment.Center;
+					format.LineAlignment = StringAlignment.Center;
 
-						e.Graphics.DrawString(text, e.Font, textBrush,
-							new Rectangle(10, e.Bounds.Top + 16 * zoom, 0, 0), format);
-					}
+					e.Graphics.DrawString(text, e.Font, textBrush,
+						new Rectangle(10, e.Bounds.Top + 16 * zoom, 0, 0), format);
 				}
 			}
 		}
@@ -458,35 +454,35 @@ namespace WLEditor
 			{
 				formLoaded = true;
 				ddlAnimationSpeed.Items.Clear();
-				ddlAnimationSpeed.Items.AddRange(animationSpeed.ToArray());
+				ddlAnimationSpeed.Items.AddRange([.. animationSpeed]);
 
 				ddlCameraType.Items.Clear();
-				ddlCameraType.Items.AddRange(cameraTypes.ToArray());
+				ddlCameraType.Items.AddRange([.. cameraTypes]);
 
 				ddlWarioStatus.Items.Clear();
-				ddlWarioStatus.Items.AddRange(warioStatus.ToArray());
+				ddlWarioStatus.Items.AddRange([.. warioStatus]);
 
 				ddlWarioAttributesLevel.Items.Clear();
-				ddlWarioAttributesLevel.Items.AddRange(warioAttributesLevel.ToArray());
+				ddlWarioAttributesLevel.Items.AddRange([.. warioAttributesLevel]);
 
 				ddlWarioAttributesSector.Items.Clear();
-				ddlWarioAttributesSector.Items.AddRange(warioAttributesSector.ToArray());
+				ddlWarioAttributesSector.Items.AddRange([.. warioAttributesSector]);
 
 				ddlMusic.Items.Clear();
-				ddlMusic.Items.AddRange(music.ToArray());
+				ddlMusic.Items.AddRange([.. music]);
 
 				ddlWarp.Items.Clear();
-				ddlWarp.Items.AddRange(warps.ToArray());
+				ddlWarp.Items.AddRange([.. warps]);
 
 				ddlTileSet.Items.Clear();
-				ddlTileSet.Items.AddRange(tileSets.ToArray());
+				ddlTileSet.Items.AddRange([.. tileSets]);
 
 				ddlAnimation.Items.Clear();
-				ddlAnimation.Items.AddRange(tilesAnimation.ToArray());
+				ddlAnimation.Items.AddRange([.. tilesAnimation]);
 
 				Array.Clear(TilesEnemies.Bits, 0, TilesEnemies.Bits.Length);
 				ddlEnemies.Items.Clear();
-				ddlEnemies.Items.AddRange(enemyPointer.Select((x, i) => new ComboboxItem<EnemyInfo>(GetEnemyInfo(i), string.Empty))
+				ddlEnemies.Items.AddRange([.. enemyPointer.Select((x, i) => new ComboboxItem<EnemyInfo>(GetEnemyInfo(i), string.Empty))
 					.OrderBy(x => x.Value.BossId)
 					.ThenBy(x => (x.Value.TreasureId >= 1 && x.Value.TreasureId <= 15) ? treasureNames[x.Value.TreasureId - 1] : 0)
 					.ThenBy(x => x.Value.EnemyIds[0])
@@ -494,8 +490,7 @@ namespace WLEditor
 					.ThenBy(x => x.Value.EnemyIds[2])
 					.ThenBy(x => x.Value.EnemyIds[3])
 					.ThenBy(x => x.Value.EnemyIds[4])
-					.ThenBy(x => x.Value.EnemyIds[5])
-					.ToArray());
+					.ThenBy(x => x.Value.EnemyIds[5])]);
 			}
 
 			EnemyInfo GetEnemyInfo(int index)
@@ -538,7 +533,7 @@ namespace WLEditor
 			ignoreEvents = true;
 
 			ddlWarpType.Items.Clear();
-			ddlWarpType.Items.AddRange(warpTypes.ToArray());
+			ddlWarpType.Items.AddRange([.. warpTypes]);
 
 			bool hasCheckpoint = Sector.GetLevelHeader(rom, currentCourseId) != Sector.GetCheckpoint(rom, currentCourseId);
 			if (!hasCheckpoint)
@@ -596,7 +591,7 @@ namespace WLEditor
 
 		protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
 		{
-			KeyEventArgs args = new KeyEventArgs(keyData);
+			KeyEventArgs args = new(keyData);
 
 			ProcessCommandKey(this, args);
 			if (args.Handled)

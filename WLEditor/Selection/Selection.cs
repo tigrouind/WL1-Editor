@@ -7,19 +7,12 @@ using System.Windows.Forms;
 
 namespace WLEditor
 {
-	public class Selection
+	public class Selection(int tileSize)
 	{
 		int zoom;
-		readonly int tileSize;
-
 		bool selection;
 		Point selectionStart, selectionEnd;
 		public event EventHandler<SelectionEventArgs> InvalidateSelection;
-
-		public Selection(int tileSize)
-		{
-			this.tileSize = tileSize;
-		}
 
 		public void SetZoom(int zoomLevel)
 		{
@@ -30,11 +23,9 @@ namespace WLEditor
 		{
 			if (selection)
 			{
-				using (SolidBrush brush = new SolidBrush(Color.FromArgb(128, 255, 255, 0)))
-				{
-					var rect = GetSelectionRectangle();
-					g.FillRectangle(brush, rect);
-				}
+				using SolidBrush brush = new(Color.FromArgb(128, 255, 255, 0));
+				var rect = GetSelectionRectangle();
+				g.FillRectangle(brush, rect);
 			}
 		}
 
@@ -91,25 +82,23 @@ namespace WLEditor
 
 			void CopyToClipboard(Point start, Point end)
 			{
-				using (var memoryStream = new MemoryStream())
-				using (var writer = new BinaryWriter(memoryStream))
+				using var memoryStream = new MemoryStream();
+				using var writer = new BinaryWriter(memoryStream);
+				writer.Write(tileSize);
+				writer.Write(end.X - start.X + 1); //width
+				writer.Write(end.Y - start.Y + 1); //height
+
+				for (int y = start.Y; y <= end.Y; y++)
 				{
-					writer.Write(tileSize);
-					writer.Write(end.X - start.X + 1); //width
-					writer.Write(end.Y - start.Y + 1); //height
-
-					for (int y = start.Y; y <= end.Y; y++)
+					for (int x = start.X; x <= end.X; x++)
 					{
-						for (int x = start.X; x <= end.X; x++)
-						{
-							var item = getTileAt(x, y);
-							writer.Write(item.Index);
-							writer.Write(item.Tile);
-						}
+						var item = getTileAt(x, y);
+						writer.Write(item.Index);
+						writer.Write(item.Tile);
 					}
-
-					Clipboard.SetData("WLEditor", memoryStream);
 				}
+
+				Clipboard.SetData("WLEditor", memoryStream);
 			}
 		}
 
@@ -159,7 +148,7 @@ namespace WLEditor
 						{
 							foreach (var data in selectionData)
 							{
-								Point dest = new Point
+								Point dest = new()
 								{
 									X = (invertX ? start.X - tx + end.X - selectionWidth + 1 : tx) + data.Index % selectionWidth,
 									Y = (invertY ? start.Y - ty + end.Y - selectionHeight + 1 : ty) + data.Index / selectionWidth
@@ -190,20 +179,17 @@ namespace WLEditor
 				var memoryStream = (MemoryStream)Clipboard.GetData("WLEditor");
 				if (memoryStream != null)
 				{
-					using (var reader = new BinaryReader(memoryStream))
+					using var reader = new BinaryReader(memoryStream);
+					if (reader.ReadInt32() == tileSize)
 					{
-						if (reader.ReadInt32() == tileSize)
-						{
-							int selectionWidth = reader.ReadInt32();
-							int selectionHeight = reader.ReadInt32();
-							ClipboardData[] selectionData = Enumerable.Range(0, selectionWidth * selectionHeight)
-								.Select((x, i) => (Order: reader.ReadInt32(), Tile: reader.ReadInt32(), Index: i ))
-								.OrderBy(x => x.Order)   //used for ordering events
-								.Select(x => new ClipboardData { Index = x.Index, Tile = x.Tile })
-								.ToArray();
+						int selectionWidth = reader.ReadInt32();
+						int selectionHeight = reader.ReadInt32();
+						ClipboardData[] selectionData = [.. Enumerable.Range(0, selectionWidth * selectionHeight)
+							.Select((x, i) => (Order: reader.ReadInt32(), Tile: reader.ReadInt32(), Index: i))
+							.OrderBy(x => x.Order)   //used for ordering events
+							.Select(x => new ClipboardData { Index = x.Index, Tile = x.Tile })];
 
-							return (selectionWidth, selectionHeight, selectionData);
-						}
+						return (selectionWidth, selectionHeight, selectionData);
 					}
 				}
 

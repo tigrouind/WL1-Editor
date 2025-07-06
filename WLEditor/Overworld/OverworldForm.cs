@@ -17,12 +17,12 @@ namespace WLEditor
 
 		Rom rom;
 		int zoom;
-		readonly DirectBitmap tilesWorld8x8 = new DirectBitmap(16 * 8, 16 * 8);
-		readonly DirectBitmap tilesWorld = new DirectBitmap(32 * 8, 32 * 8);
-		readonly DirectBitmap tilesWorldScroll = new DirectBitmap(32 * 8, 32 * 8);
+		readonly DirectBitmap tilesWorld8x8 = new(16 * 8, 16 * 8);
+		readonly DirectBitmap tilesWorld = new(32 * 8, 32 * 8);
+		readonly DirectBitmap tilesWorldScroll = new(32 * 8, 32 * 8);
 		int currentWorld;
 
-		List<SelectionChange> changes = new List<SelectionChange>();
+		List<SelectionChange> changes = [];
 		int SelectedTile => selection2.GetCurrentTile((x, y) => x + y * 16);
 
 		bool eventMode;
@@ -38,9 +38,9 @@ namespace WLEditor
 		bool lastTileSide;
 		ChangeEnum changesFlag;
 
-		readonly Selection selection1 = new Selection(8);
-		readonly Selection selection2 = new Selection(8);
-		readonly History history = new History();
+		readonly Selection selection1 = new(8);
+		readonly Selection selection2 = new(8);
+		readonly History history = new();
 		bool selectionMode;
 
 		readonly byte[] worldTiles = new byte[32 * 32];
@@ -53,12 +53,16 @@ namespace WLEditor
 		public OverworldForm()
 		{
 			InitializeComponent();
-			eventForm = new EventForm(pictureBox1, tilesWorld8x8, selection1, history);
-			eventForm.UpdateTitle = UpdateTitle;
+			eventForm = new EventForm(pictureBox1, tilesWorld8x8, selection1, history)
+			{
+				UpdateTitle = UpdateTitle
+			};
 			eventForm.EventChanged += (s, e) => SetChanges();
 
-			pathForm = new PathForm(pictureBox1);
-			pathForm.UpdateTitle = UpdateTitle;
+			pathForm = new PathForm(pictureBox1)
+			{
+				UpdateTitle = UpdateTitle
+			};
 			pathForm.PathChanged += (s, e) => SetChanges();
 			pathForm.GetAnimationIndex = () => animationIndex;
 
@@ -66,7 +70,7 @@ namespace WLEditor
 			selection2.InvalidateSelection += (s, e) => pictureBox2.Invalidate(e.ClipRectangle);
 		}
 
-		readonly ComboboxItemCollection<(int BankA, int TileAddressA, int MaxLengthA, byte Palette, int BankB, int TileAddressB, int MaxLengthB, int UncompressedSize)> worldData = new ComboboxItemCollection<(int, int, int, byte, int, int, int, int)>
+		readonly ComboboxItemCollection<(int BankA, int TileAddressA, int MaxLengthA, byte Palette, int BankB, int TileAddressB, int MaxLengthB, int UncompressedSize)> worldData = new()
 		{
 			{ ( 0x09, 0x407A, 3477, 0xE1, 0x09, 0x6DBE, 373,  564 ), "1 Rice Beach" },
 			{ ( 0x09, 0x407A, 3477, 0xE1, 0x09, 0x74E1, 346,  564 ), "1 Rice Beach - FLOODED" },
@@ -140,7 +144,7 @@ namespace WLEditor
 			void LoadWorldCombobox()
 			{
 				WorldComboBox.Items.Clear();
-				WorldComboBox.Items.AddRange(worldData.ToArray());
+				WorldComboBox.Items.AddRange([.. worldData]);
 			}
 		}
 
@@ -237,7 +241,7 @@ namespace WLEditor
 
 				var worldInfo = worldData[currentWorld].Value;
 				if (!Overworld.SaveTiles(rom, worldInfo.BankB, worldInfo.TileAddressB,
-								worldTiles.Take(worldInfo.UncompressedSize).ToArray(), worldInfo.MaxLengthB, out message))
+								[.. worldTiles.Take(worldInfo.UncompressedSize)], worldInfo.MaxLengthB, out message))
 				{
 					MessageBox.Show(message, Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
 					return false;
@@ -271,7 +275,7 @@ namespace WLEditor
 			return true;
 		}
 
-		void CopyTilesOnTheRightSide(byte[] tileData)
+		static void CopyTilesOnTheRightSide(byte[] tileData)
 		{
 			for (int y = 0; y < tileData.Length / 32; y++)
 			{
@@ -328,7 +332,7 @@ namespace WLEditor
 
 				void Dump8x8Tile(Point dest, int tileIndex, DirectBitmap bitmap)
 				{
-					Point source = new Point((tileIndex % 16) * 8, (tileIndex / 16) * 8);
+					Point source = new((tileIndex % 16) * 8, (tileIndex / 16) * 8);
 					for (int y = 0; y < 8; y++)
 					{
 						Array.Copy(tilesWorld8x8.Bits, source.X + (source.Y + y) * tilesWorld8x8.Width,
@@ -412,7 +416,7 @@ namespace WLEditor
 
 		protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
 		{
-			KeyEventArgs args = new KeyEventArgs(keyData);
+			KeyEventArgs args = new(keyData);
 
 			if (DispatchCommandKey())
 			{
@@ -700,7 +704,7 @@ namespace WLEditor
 
 		#region Mouse
 
-		void UpdateSelection(TileEventArgs e, Selection selection)
+		static void UpdateSelection(TileEventArgs e, Selection selection)
 		{
 			if (e.Button == MouseButtons.Left)
 			{
@@ -749,7 +753,7 @@ namespace WLEditor
 			{
 				if (e.Status == TileEventStatus.MouseDown)
 				{
-					changes = new List<SelectionChange>();
+					changes = [];
 				}
 
 				if ((e.Status == TileEventStatus.MouseDown || e.Status == TileEventStatus.MouseMove) && !selection1.HasSelection && SelectedTile != -1)
@@ -919,7 +923,7 @@ namespace WLEditor
 		#region Animation
 
 		readonly (int Address, int Position)[] animationSea =
-		{
+		[
 			( 0x5B18, 208 ),
 			( 0x5B49, 209 ),
 			( 0x5B7A, 224 ),
@@ -930,12 +934,12 @@ namespace WLEditor
 			( 0x5C6F, 242 ),
 			( 0x5CA0, 243 ),
 			( 0x5CD1, 244 )
-		};
+		];
 
 		readonly (int Address, int Position)[] animationOverworld =
-		{
+		[
 			( 0x46F6, 42 )
-		};
+		];
 
 		readonly (int Address, int Position)[,] animationLava =
 		{
@@ -1137,7 +1141,7 @@ namespace WLEditor
 
 		private void ImportToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			OpenFileDialog openFile = new OpenFileDialog
+			OpenFileDialog openFile = new()
 			{
 				Filter = "Tile/Map data (*.chr, *.prg)|*.chr;*.prg"
 			};
@@ -1213,7 +1217,7 @@ namespace WLEditor
 
 		private void ExportTilesToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			SaveFileDialog saveFile = new SaveFileDialog
+			SaveFileDialog saveFile = new()
 			{
 				Filter = "Tile data (*.chr)|*.chr"
 			};
@@ -1238,7 +1242,7 @@ namespace WLEditor
 			if (result == DialogResult.OK)
 			{
 				var item = worldData[currentWorld].Value;
-				File.WriteAllBytes(saveFile.FileName, worldTiles.Take(item.UncompressedSize).ToArray());
+				File.WriteAllBytes(saveFile.FileName, [.. worldTiles.Take(item.UncompressedSize)]);
 			}
 		}
 	}

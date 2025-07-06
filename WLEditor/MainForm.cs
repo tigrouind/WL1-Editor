@@ -12,15 +12,15 @@ namespace WLEditor
 {
 	public partial class MainForm : Form
 	{
-		Rom rom = new Rom();
-		readonly BlocksForm blocksForm = new BlocksForm();
-		readonly ObjectsForm objectsForm = new ObjectsForm();
-		readonly OverworldForm overworldForm = new OverworldForm();
-		readonly SectorForm sectorForm = new SectorForm();
+		Rom rom = new();
+		readonly BlocksForm blocksForm = new();
+		readonly ObjectsForm objectsForm = new();
+		readonly OverworldForm overworldForm = new();
+		readonly SectorForm sectorForm = new();
 		Form lastFormFocus;
 
 		public readonly static string[] LevelNames =
-		{
+		[
 			"SS Teacup 1",
 			"Parsley Woods 3",
 			"Sherbet Land 2",
@@ -64,7 +64,7 @@ namespace WLEditor
 			"Syrup Castle 4",
 			"Rice Beach 6",
 			"Parsley Woods 1 - DRAINED"
-		};
+		];
 
 		int currentCourseId = -1;
 		int currentWarp = -1;
@@ -348,7 +348,7 @@ namespace WLEditor
 
 		void LoadToolStripMenuItemClick(object sender, EventArgs e)
 		{
-			OpenFileDialog openFileDialog1 = new OpenFileDialog
+			OpenFileDialog openFileDialog1 = new()
 			{
 				Filter = "GB ROM Image (*.gb)|*.gb|All Files (*.*)|*.*"
 			};
@@ -382,7 +382,7 @@ namespace WLEditor
 
 		bool LoadRom(string filePath)
 		{
-			Rom newRom = new Rom();
+			Rom newRom = new();
 			newRom.Load(filePath);
 			if (!newRom.Title.StartsWith("SUPERMARIOLAND3"))
 			{
@@ -428,7 +428,7 @@ namespace WLEditor
 					.Select(x => new ComboboxItem<int>(x.CourseId, $"{x.CourseNo:D2} {LevelNames[x.CourseId]}"))
 					.ToList();
 
-				levelComboBox.Items.AddRange(items.ToArray());
+				levelComboBox.Items.AddRange([.. items]);
 			}
 		}
 
@@ -577,20 +577,13 @@ namespace WLEditor
 				if (changeMode != ChangeEnum.None)
 				{
 					DialogResult result = MessageBox.Show("Save pending changes ?", Text, MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
-					switch (result)
+					return result switch
 					{
-						case DialogResult.Yes:
-							return SaveChanges(true) && SaveRomFile(romFilePath);
-
-						case DialogResult.No:
-							return true;
-
-						case DialogResult.Cancel:
-							return false;
-
-						default:
-							throw new NotImplementedException();
-					}
+						DialogResult.Yes => SaveChanges(true) && SaveRomFile(romFilePath),
+						DialogResult.No => true,
+						DialogResult.Cancel => false,
+						_ => throw new NotImplementedException(),
+					};
 				}
 
 				return true;
@@ -601,7 +594,7 @@ namespace WLEditor
 		{
 			if (SaveChanges(true))
 			{
-				SaveFileDialog saveFileDialog = new SaveFileDialog
+				SaveFileDialog saveFileDialog = new()
 				{
 					Filter = "GB ROM Image (*.gb)|*.gb"
 				};

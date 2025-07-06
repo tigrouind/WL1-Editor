@@ -3,19 +3,11 @@ using System.Windows.Forms;
 
 namespace WLEditor
 {
-	public class TileEventArgs : EventArgs
+	public class TileEventArgs(MouseButtons button, TileEventStatus status, int x, int y) : EventArgs
 	{
-		public readonly int TileX;
-		public readonly int TileY;
-		public readonly MouseButtons Button;
-		public readonly TileEventStatus Status;
-
-		public TileEventArgs(MouseButtons button, TileEventStatus status, int x, int y)
-		{
-			Button = button;
-			Status = status;
-			TileX = x;
-			TileY = y;
-		}
+		public readonly int TileX = x;
+		public readonly int TileY = y;
+		public readonly MouseButtons Button = button;
+		public readonly TileEventStatus Status = status;
 	}
 }

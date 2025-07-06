@@ -7,11 +7,11 @@ namespace WLEditor
 {
 	public class Overworld
 	{
-		static readonly uint[] paletteColors = { 0xFFFFFFFF, 0xFFAAAAAA, 0xFF555555, 0xFF000000 };
-		static readonly int[] directions = { 0xF0, 0xFE, 0xE0, 0xEE };
+		static readonly uint[] paletteColors = [0xFFFFFFFF, 0xFFAAAAAA, 0xFF555555, 0xFF000000];
+		static readonly int[] directions = [0xF0, 0xFE, 0xE0, 0xEE];
 
 		static readonly (int X, int Y)[] flagsPosition =
-		{
+		[
 			( 0x56F6, 0x56E9 ),
 			( 0x571A, 0x570D ),
 			( 0x5739, 0x572C ),
@@ -19,10 +19,10 @@ namespace WLEditor
 			( 0x575D, 0x5750 ),
 			( 0x57A5, 0x5798 ),
 			( 0x57C4, 0x57B7 ),
-		};
+		];
 
 		static readonly int[] music =
-		{
+		[
 			0x6204,
 			0,
 			0x78AE,
@@ -33,10 +33,10 @@ namespace WLEditor
 			0x7A9A,
 			0,
 			0x4D55,
-		};
+		];
 
 		static readonly byte[] musicTracks =
-		{
+		[
 			0x15,
 			0x13,
 			0x14,
@@ -45,32 +45,32 @@ namespace WLEditor
 			0x1F,
 			0x1D,
 			0x02
-		};
+		];
 
 		static readonly int[] overWorldNextDir =
-		{
+		[
 			0x40A4,
 			0x40B4,
 			0x40C1,
 			0x40CC,
 			0x40DA,
 			0x40E5
-		};
+		];
 
 		static readonly (int StartPositionAddress, int StartFunctionAddress, int FirstLevelAddress, WorldPathNextEnum Exit)[][] startPositionData =
-		{
-			new [] { ( 0x5558, 0x6075, 0x41CF, WorldPathNextEnum.Overworld) },
-			new [] { ( 0x5558, 0x6075, 0x41CF, WorldPathNextEnum.Overworld) },
-			new [] { ( 0x554C, 0x0000, 0x41DF, WorldPathNextEnum.Overworld), ( 0x5552, 0x6095, 0x41EF, WorldPathNextEnum.Sherbet) },
-			new [] { ( 0x5527, 0x608D, 0x422F, WorldPathNextEnum.Teapot) },
-			new [] { ( 0x553F, 0x607D, 0x41FF, WorldPathNextEnum.Overworld) },
-			new [] { ( 0x552D, 0x6089, 0x421F, WorldPathNextEnum.Overworld) },
-			new [] { ( 0x5533, 0x6085, 0x420F, WorldPathNextEnum.Overworld) },
-			new [] { ( 0x5539, 0x6081, 0x423F, WorldPathNextEnum.Overworld) }
-		};
+		[
+			[( 0x5558, 0x6075, 0x41CF, WorldPathNextEnum.Overworld)],
+			[( 0x5558, 0x6075, 0x41CF, WorldPathNextEnum.Overworld)],
+			[( 0x554C, 0x0000, 0x41DF, WorldPathNextEnum.Overworld), ( 0x5552, 0x6095, 0x41EF, WorldPathNextEnum.Sherbet)],
+			[( 0x5527, 0x608D, 0x422F, WorldPathNextEnum.Teapot)],
+			[( 0x553F, 0x607D, 0x41FF, WorldPathNextEnum.Overworld)],
+			[( 0x552D, 0x6089, 0x421F, WorldPathNextEnum.Overworld)],
+			[( 0x5533, 0x6085, 0x420F, WorldPathNextEnum.Overworld)],
+			[( 0x5539, 0x6081, 0x423F, WorldPathNextEnum.Overworld)]
+		];
 
 		public static readonly WorldPathProgressEnum[] ProgressFlags =
-		{
+		[
 			WorldPathProgressEnum.None,
 			WorldPathProgressEnum.Level1,
 			WorldPathProgressEnum.Level2,
@@ -80,7 +80,7 @@ namespace WLEditor
 			WorldPathProgressEnum.Level6,
 			WorldPathProgressEnum.Level7,
 			WorldPathProgressEnum.Level8
-		};
+		];
 
 		public static bool HasPaths(int world) => world != 8 && world != 1 && world < 10;
 
@@ -124,7 +124,7 @@ namespace WLEditor
 
 		static IEnumerable<byte> RLECompressTiles(byte[] tilesdata)
 		{
-			List<byte> result = new List<byte>();
+			List<byte> result = [];
 			int current = 0;
 			while (current < tilesdata.Length)
 			{
@@ -189,7 +189,7 @@ namespace WLEditor
 
 		public static void Dump8x8Tiles(Rom rom, int bank, int tileAddress, DirectBitmap bitmap, byte palette)
 		{
-			Level.Dump8x8Tiles(Dump8x8Tiles(rom, bank, tileAddress).Skip(128 * 16).ToArray(), bitmap, 256, 0, palette, paletteColors, false);
+			Level.Dump8x8Tiles([.. Dump8x8Tiles(rom, bank, tileAddress).Skip(128 * 16)], bitmap, 256, 0, palette, paletteColors, false);
 		}
 
 		public static void Dump8x8TilesUncompressed(Rom rom, int bank, int tileAddress, int tiles, int pos, DirectBitmap bitmap, byte palette)
@@ -209,12 +209,12 @@ namespace WLEditor
 
 		public static byte[] RLECompressMapTiles(byte[] data)
 		{
-			return RLECompressTiles(data).Append((byte)0).ToArray();
+			return [.. RLECompressTiles(data), (byte)0];
 		}
 
 		public static byte[] RLECompress8x8Tiles(byte[] data)
 		{
-			return RLECompressTiles(Unzip(data).ToArray()).ToArray();
+			return [.. RLECompressTiles([.. Unzip(data)])];
 		}
 
 		public static bool Save8x8Tiles(Rom rom, int bank, int address, byte[] data, int compressedSize, out string message)
@@ -294,7 +294,7 @@ namespace WLEditor
 		public static bool SaveTiles(Rom rom, int bank, int address, byte[] data, int maxSize, out string errorMessage)
 		{
 			rom.SetBank(bank);
-			var compressedData = RLECompressMapTiles(data.Select(x => (byte)(x ^ 0x80)).ToArray());
+			var compressedData = RLECompressMapTiles([.. data.Select(x => (byte)(x ^ 0x80))]);
 
 			if (compressedData.Length > maxSize)
 			{
@@ -342,7 +342,7 @@ namespace WLEditor
 				result.Add(eventItem);
 			}
 
-			return result.ToArray();
+			return [.. result];
 		}
 
 		public static bool SaveEvents(Rom rom, List<(int X, int Y, byte Index)>[] events,
@@ -443,7 +443,7 @@ namespace WLEditor
 					var direction = new WorldPathDirection
 					{
 						Progress = WorldPathProgressEnum.None,
-						Path = new List<WorldPathSegment>(),
+						Path = [],
 						Next = overWorld ? WorldPathNextEnum.TeapotOverworld : WorldPathNextEnum.Overworld
 					};
 
@@ -486,12 +486,12 @@ namespace WLEditor
 		public static bool SavePaths(Rom rom, WorldPath[] pathData, int currentWorld, out string errorMessage)
 		{
 			(int, int)[] duplicates =
-			{
+			[
 				( 7, 23 ),  // rice beach 1 / flooded
 				( 14, 36 ), // rice beach 3 / flooded
 				( 5, 10 ),  // mt teapot 4 / crushed
 				( 38, 42 ), // parsley woods 1 / flooded
-			};
+			];
 
 			bool overWorld = IsOverworld(currentWorld);
 			if (!overWorld)
@@ -692,7 +692,7 @@ namespace WLEditor
 				result.Add((x, y));
 			}
 
-			return result.ToArray();
+			return [.. result];
 		}
 
 		public static void SaveFlags(Rom rom, (int X, int Y)[] items)
@@ -819,12 +819,12 @@ namespace WLEditor
 				{
 					//screen side
 					int[] functions =
-					{
+					[
 						0x60A7, //left
 						0x60AF, //right
 						0x609F, //top
 						0x6097  //bottom
-					};
+					];
 
 					//jump relative address (jr)
 					rom.WriteByte(startFunctionAddress + 1, (byte)((functions[side] - startFunctionAddress) - 2));
@@ -839,7 +839,7 @@ namespace WLEditor
 
 			int FindClosestSide(int x, int y)
 			{
-				int[] borders = { x, 160 - x, y, 144 - y };
+				int[] borders = [x, 160 - x, y, 144 - y];
 				int bestSide = -1, min = int.MaxValue;
 
 				for (int i = 0; i < borders.Length; i++)
@@ -910,7 +910,7 @@ namespace WLEditor
 			}
 			else
 			{
-				int[] worldIndex = { 0, 0, 1, 5, 2, 3, 4, 6 };
+				int[] worldIndex = [0, 0, 1, 5, 2, 3, 4, 6];
 				int world = worldIndex[currentWorld];
 
 				int firstLevel = GetFirstLevel(pathData, levels, isSpecialExit, WorldPathNextEnum.Overworld);

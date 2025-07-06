@@ -21,27 +21,25 @@ namespace WLEditor.Toolbox
 		{
 			if (Level.LevelData != null && !DesignMode)
 			{
-				StringFormat format = new StringFormat
+				StringFormat format = new()
 				{
 					LineAlignment = StringAlignment.Center,
 					Alignment = StringAlignment.Center
 				};
 
-				using (Brush brush = new SolidBrush(Color.FromArgb(128, 255, 255, 0)))
-				using (Pen pen = new Pen(Color.White, 1.5f * zoom))
-				using (Font font = new Font("Arial", 8 * zoom))
+				using Brush brush = new SolidBrush(Color.FromArgb(128, 255, 255, 0));
+				using Pen pen = new(Color.White, 1.5f * zoom);
+				using Font font = new("Arial", 8 * zoom);
+				e.Graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
+				e.Graphics.PixelOffsetMode = PixelOffsetMode.Half;
+				e.Graphics.FillRectangle(LevelPictureBox.EnemyBrush, 0, 0, Width, Height);
+
+				for (int index = 0; index < 16; index++)
 				{
-					e.Graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
-					e.Graphics.PixelOffsetMode = PixelOffsetMode.Half;
-					e.Graphics.FillRectangle(LevelPictureBox.EnemyBrush, 0, 0, Width, Height);
-
-					for (int index = 0; index < 16; index++)
-					{
-						DrawTile(e.ClipRectangle, pen, font, format, index);
-					}
-
-					e.Graphics.FillRectangle(brush, (CurrentObject % 4) * 32 * zoom, (CurrentObject / 4) * 32 * zoom, 32 * zoom, 32 * zoom);
+					DrawTile(e.ClipRectangle, pen, font, format, index);
 				}
+
+				e.Graphics.FillRectangle(brush, (CurrentObject % 4) * 32 * zoom, (CurrentObject / 4) * 32 * zoom, 32 * zoom, 32 * zoom);
 			}
 
 			void DrawTile(Rectangle clipRectangle, Pen pen, Font font, StringFormat format, int index)
@@ -49,7 +47,7 @@ namespace WLEditor.Toolbox
 				int x = (index % 4) * 32;
 				int y = (index / 4) * 32;
 
-				Rectangle destRect = new Rectangle(x * zoom, y * zoom, 32 * zoom, 32 * zoom);
+				Rectangle destRect = new(x * zoom, y * zoom, 32 * zoom, 32 * zoom);
 				if (destRect.IntersectsWith(clipRectangle))
 				{
 					if (index == 0)
@@ -96,7 +94,7 @@ namespace WLEditor.Toolbox
 
 		protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
 		{
-			KeyEventArgs args = new KeyEventArgs(keyData);
+			KeyEventArgs args = new(keyData);
 
 			ProcessCommandKey(this, args);
 			if (args.Handled)

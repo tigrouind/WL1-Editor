@@ -11,7 +11,7 @@ namespace WLEditor
 			rom.SetBank(0xC);
 			int header = rom.ReadWord((checkPoint ? 0x45B6 : 0x4560) + course * 2);
 
-			Warp warp = new Warp
+			Warp warp = new()
 			{
 				Bank = rom.ReadByte(header + 0),
 				TileSetB = rom.ReadWord(header + 1),
@@ -120,7 +120,7 @@ namespace WLEditor
 		{
 			rom.SetBank(0xC);
 
-			Warp warpInfo = new Warp();
+			Warp warpInfo = new();
 
 			if (warp <= 0x5B5E || warp >= 0x5B7A)
 			{
@@ -270,17 +270,11 @@ namespace WLEditor
 			return FindClosest(sector, warioX, warioY, (px, py) =>
 			{
 				int block = Level.LevelData[px + py * 256 + 0x1000];
-				switch (block)
+				return block switch
 				{
-					case 0x2E:
-					case 0x48:
-					case 0x4B:
-					case 0x54:
-						return true;
-
-					default:
-						return false;
-				}
+					0x2E or 0x48 or 0x4B or 0x54 => true,
+					_ => false,
+				};
 			});
 		}
 

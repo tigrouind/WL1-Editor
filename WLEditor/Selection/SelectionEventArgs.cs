@@ -3,12 +3,8 @@ using System.Drawing;
 
 namespace WLEditor
 {
-	public class SelectionEventArgs : EventArgs
+	public class SelectionEventArgs(Rectangle rectangle) : EventArgs
 	{
-		public readonly Rectangle ClipRectangle;
-		public SelectionEventArgs(Rectangle rectangle)
-		{
-			ClipRectangle = rectangle;
-		}
+		public readonly Rectangle ClipRectangle = rectangle;
 	}
 }

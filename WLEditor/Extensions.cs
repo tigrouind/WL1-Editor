@@ -33,34 +33,32 @@ namespace WLEditor
 				Func<TKey, IEnumerable<TSource>, TResult> resultSelector)
 		{
 			var comparer = EqualityComparer<TKey>.Default;
-			using (var enumerator = source.GetEnumerator())
+			using var enumerator = source.GetEnumerator();
+			if (enumerator.MoveNext())
 			{
-				if (enumerator.MoveNext())
-				{
-					List<TSource> buffer = new List<TSource>
-					{
+				List<TSource> buffer =
+				[
 						enumerator.Current
-					};
+					];
 
-					TKey lastKey = selector(enumerator.Current);
+				TKey lastKey = selector(enumerator.Current);
 
-					while (enumerator.MoveNext())
+				while (enumerator.MoveNext())
+				{
+					TSource currentItem = enumerator.Current;
+					TKey currentKey = selector(currentItem);
+
+					if (!comparer.Equals(lastKey, currentKey))
 					{
-						TSource currentItem = enumerator.Current;
-						TKey currentKey = selector(currentItem);
-
-						if (!comparer.Equals(lastKey, currentKey))
-						{
-							yield return resultSelector(lastKey, buffer);
-							buffer = new List<TSource>();
-							lastKey = currentKey;
-						}
-
-						buffer.Add(currentItem);
+						yield return resultSelector(lastKey, buffer);
+						buffer = [];
+						lastKey = currentKey;
 					}
 
-					yield return resultSelector(lastKey, buffer);
+					buffer.Add(currentItem);
 				}
+
+				yield return resultSelector(lastKey, buffer);
 			}
 		}
 

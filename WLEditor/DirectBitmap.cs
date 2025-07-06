@@ -32,15 +32,12 @@ public class DirectBitmap : IDisposable
 	{
 		if (disposed)
 		{
-			return;
+			disposed = true;
+			if (disposing)
+			{
+				Bitmap.Dispose();
+				bitsHandle.Free();
+			}
 		}
-
-		if (disposing)
-		{
-			Bitmap.Dispose();
-			bitsHandle.Free();
-		}
-
-		disposed = true;
 	}
 }

@@ -7,7 +7,7 @@ namespace WLEditor
 {
 	public static class Level
 	{
-		readonly static uint[] paletteColors = { 0xFFFFFFFF, 0xFFAAAAAA, 0xFF555555, 0xFF000000 };
+		readonly static uint[] paletteColors = [0xFFFFFFFF, 0xFFAAAAAA, 0xFF555555, 0xFF000000];
 
 		public readonly static byte[] LevelData = new byte[0x3000];
 		public readonly static byte[] ObjectsData = new byte[0x2000];
@@ -25,11 +25,11 @@ namespace WLEditor
 		public static int SwitchMode;
 		public static int SwitchType;
 
-		public readonly static DirectBitmap Tiles8x8 = new DirectBitmap(16 * 8, 8 * 8);
-		public readonly static DirectBitmap Tiles16x16 = new DirectBitmap(16 * 8, 16 * 16);
+		public readonly static DirectBitmap Tiles8x8 = new(16 * 8, 8 * 8);
+		public readonly static DirectBitmap Tiles16x16 = new(16 * 8, 16 * 16);
 
-		readonly static (int Type, string Text)[] tileInfo = new (int, string)[]
-		{
+		readonly static (int Type, string Text)[] tileInfo =
+		[
 			(0, "Bonus"),
 			(0, "Block (dark background)"),
 			(0, "Block (dark background)"),
@@ -86,7 +86,7 @@ namespace WLEditor
 			(5, "Damage"),
 			(5, "Damage"),
 			(5, "Damage")
-		};
+		];
 
 		public static void DumpBlocks(Rom rom, int course)
 		{
@@ -212,37 +212,35 @@ namespace WLEditor
 
 			void DumpAnimated16x16Tiles(uint defaultColor)
 			{
-				using (Graphics g = Graphics.FromImage(Tiles16x16.Bitmap))
+				using Graphics g = Graphics.FromImage(Tiles16x16.Bitmap);
+				for (int y = 0; y < 16; y++)
 				{
-					for (int y = 0; y < 16; y++)
+					for (int x = 0; x < 8; x++)
 					{
-						for (int x = 0; x < 8; x++)
-						{
-							byte tileIndex = (byte)(x + y * 8);
-							tileIndex = ReplaceTile(tileIndex);
-							DumpAnimated16x16Tile(x, y, tileIndex);
-						}
+						byte tileIndex = (byte)(x + y * 8);
+						tileIndex = ReplaceTile(tileIndex);
+						DumpAnimated16x16Tile(x, y, tileIndex);
 					}
+				}
 
-					void DumpAnimated16x16Tile(int x, int y, byte tileIndex)
+				void DumpAnimated16x16Tile(int x, int y, byte tileIndex)
+				{
+					for (int k = 0; k < 2; k++)
 					{
-						for (int k = 0; k < 2; k++)
+						for (int j = 0; j < 2; j++)
 						{
-							for (int j = 0; j < 2; j++)
+							int subTileIndex = animated8x8Tiles[(x + y * 8) * 4 + k * 2 + j];
+							if (subTileIndex != -1)
 							{
-								int subTileIndex = animated8x8Tiles[(x + y * 8) * 4 + k * 2 + j];
-								if (subTileIndex != -1)
-								{
-									Point dest = new Point(j * 8 + x * 16, k * 8 + y * 16);
-									Dump8x8Tile(dest, subTileIndex, defaultColor);
+								Point dest = new(j * 8 + x * 16, k * 8 + y * 16);
+								Dump8x8Tile(dest, subTileIndex, defaultColor);
 
-									if (ShowColliders)
+								if (ShowColliders)
+								{
+									int specialTile = GetTileInfo(tileIndex).Type;
+									if (specialTile != -1)
 									{
-										int specialTile = GetTileInfo(tileIndex).Type;
-										if (specialTile != -1)
-										{
-											g.FillRectangle(LevelPictureBox.TransparentBrushes[specialTile], new Rectangle(dest, new Size(8, 8)));
-										}
+										g.FillRectangle(LevelPictureBox.TransparentBrushes[specialTile], new Rectangle(dest, new Size(8, 8)));
 									}
 								}
 							}
@@ -253,56 +251,54 @@ namespace WLEditor
 
 			void Dump16x16Tiles(int tileindexaddress, uint defaultColor)
 			{
-				using (Graphics g = Graphics.FromImage(Tiles16x16.Bitmap))
+				using Graphics g = Graphics.FromImage(Tiles16x16.Bitmap);
+				for (int y = 0; y < 16; y++)
 				{
-					for (int y = 0; y < 16; y++)
+					for (int x = 0; x < 8; x++)
 					{
-						for (int x = 0; x < 8; x++)
-						{
-							byte tileIndex = (byte)(x + y * 8);
-							byte newTileIndex = ReplaceTile(tileIndex);
+						byte tileIndex = (byte)(x + y * 8);
+						byte newTileIndex = ReplaceTile(tileIndex);
 
-							bool isAnimatedTile = Dump16x16Tile(x, y, newTileIndex);
-							Animated16x16Tiles[tileIndex] = isAnimatedTile;
+						bool isAnimatedTile = Dump16x16Tile(x, y, newTileIndex);
+						Animated16x16Tiles[tileIndex] = isAnimatedTile;
+					}
+				}
+
+				bool Dump16x16Tile(int x, int y, byte tileIndex)
+				{
+					bool isAnimatedTile = false;
+					for (int k = 0; k < 2; k++)
+					{
+						for (int j = 0; j < 2; j++)
+						{
+							byte subTileIndex = rom.ReadByte(tileindexaddress + tileIndex * 4 + k * 2 + j);
+
+							if (((SwitchMode & 2) != 0 && tileIndex == 0x32)
+								|| ((SwitchMode & 1) != 0 && tileIndex == 0x39)
+								|| ((SwitchMode & 4) != 0 && tileIndex == 0x38)) //[!] block
+							{
+								subTileIndex = (byte)(4 + k * 2 + j);
+							}
+
+							bool isAnimated = subTileIndex >= (2 * 16) && subTileIndex < (2 * 16 + 4);
+							isAnimatedTile |= isAnimated;
+							animated8x8Tiles[(x + y * 8) * 4 + k * 2 + j] = isAnimated ? subTileIndex : -1;
+
+							Point dest = new(j * 8 + x * 16, k * 8 + y * 16);
+							Dump8x8Tile(dest, subTileIndex, defaultColor);
 						}
 					}
 
-					bool Dump16x16Tile(int x, int y, byte tileIndex)
+					if (ShowColliders)
 					{
-						bool isAnimatedTile = false;
-						for (int k = 0; k < 2; k++)
+						int specialTile = GetTileInfo(tileIndex).Type;
+						if (specialTile != -1)
 						{
-							for (int j = 0; j < 2; j++)
-							{
-								byte subTileIndex = rom.ReadByte(tileindexaddress + tileIndex * 4 + k * 2 + j);
-
-								if (((SwitchMode & 2) != 0 && tileIndex == 0x32)
-									|| ((SwitchMode & 1) != 0 && tileIndex == 0x39)
-									|| ((SwitchMode & 4) != 0 && tileIndex == 0x38)) //[!] block
-								{
-									subTileIndex = (byte)(4 + k * 2 + j);
-								}
-
-								bool isAnimated = subTileIndex >= (2 * 16) && subTileIndex < (2 * 16 + 4);
-								isAnimatedTile |= isAnimated;
-								animated8x8Tiles[(x + y * 8) * 4 + k * 2 + j] = isAnimated ? subTileIndex : -1;
-
-								Point dest = new Point(j * 8 + x * 16, k * 8 + y * 16);
-								Dump8x8Tile(dest, subTileIndex, defaultColor);
-							}
+							g.FillRectangle(LevelPictureBox.TransparentBrushes[specialTile], new Rectangle(x * 16, y * 16, 16, 16));
 						}
-
-						if (ShowColliders)
-						{
-							int specialTile = GetTileInfo(tileIndex).Type;
-							if (specialTile != -1)
-							{
-								g.FillRectangle(LevelPictureBox.TransparentBrushes[specialTile], new Rectangle(x * 16, y * 16, 16, 16));
-							}
-						}
-
-						return isAnimatedTile;
 					}
+
+					return isAnimatedTile;
 				}
 			}
 		}
@@ -353,7 +349,7 @@ namespace WLEditor
 		{
 			if (subTileIndex < 128)
 			{
-				Point source = new Point((subTileIndex % 16) * 8, (subTileIndex / 16) * 8);
+				Point source = new((subTileIndex % 16) * 8, (subTileIndex / 16) * 8);
 				for (int y = 0; y < 8; y++)
 				{
 					Array.Copy(Tiles8x8.Bits, source.X + (source.Y + y) * Tiles8x8.Width, Tiles16x16.Bits, dest.X + (dest.Y + y) * Tiles16x16.Width, 8);
@@ -380,32 +376,30 @@ namespace WLEditor
 
 		public static void Dump8x8Tiles(IEnumerable<byte> data, DirectBitmap bitmap, int tiles, int pos, byte palette, uint[] customPalette, bool transparency)
 		{
-			using (var enumerator = data.GetEnumerator())
+			using var enumerator = data.GetEnumerator();
+			for (int n = 0; n < tiles; n++)
 			{
-				for (int n = 0; n < tiles; n++)
+				int tilePosX = ((n + pos) % 16) * 8;
+				int tilePosY = ((n + pos) / 16) * 8;
+
+				for (int y = 0; y < 8; y++)
 				{
-					int tilePosX = ((n + pos) % 16) * 8;
-					int tilePosY = ((n + pos) / 16) * 8;
+					enumerator.MoveNext();
+					byte data0 = enumerator.Current;
+					enumerator.MoveNext();
+					byte data1 = enumerator.Current;
+					int destIndex = tilePosX + (y + tilePosY) * Tiles8x8.Width;
 
-					for (int y = 0; y < 8; y++)
+					for (int x = 0; x < 8; x++)
 					{
-						enumerator.MoveNext();
-						byte data0 = enumerator.Current;
-						enumerator.MoveNext();
-						byte data1 = enumerator.Current;
-						int destIndex = tilePosX + (y + tilePosY) * Tiles8x8.Width;
+						int pixelA = (data0 >> (7 - x)) & 0x1;
+						int pixelB = (data1 >> (7 - x)) & 0x1;
+						int pixel = pixelA + pixelB * 2;
 
-						for (int x = 0; x < 8; x++)
+						if (!transparency || pixel != 0)
 						{
-							int pixelA = (data0 >> (7 - x)) & 0x1;
-							int pixelB = (data1 >> (7 - x)) & 0x1;
-							int pixel = pixelA + pixelB * 2;
-
-							if (!transparency || pixel != 0)
-							{
-								int palindex = (palette >> pixel * 2) & 0x3;
-								bitmap.Bits[destIndex + x] = customPalette[palindex];
-							}
+							int palindex = (palette >> pixel * 2) & 0x3;
+							bitmap.Bits[destIndex + x] = customPalette[palindex];
 						}
 					}
 				}
@@ -457,44 +451,28 @@ namespace WLEditor
 			//replace tiles when a (!) block is hit
 			if ((switchMode & 1) != 0)
 			{
-				switch (tileIndex)
+				return tileIndex switch
 				{
-					case 0x7C:
-						return 0x27;
-
-					case 0x27:
-						return 0x7C;
-
-					case 0x7A:
-						return 0x44;
-
-					case 0x79:
-						return 0x45;
-				}
+					0x7C => 0x27,
+					0x27 => 0x7C,
+					0x7A => 0x44,
+					0x79 => 0x45,
+					_ => tileIndex
+				};
 			}
 
 			if ((switchMode & 2) != 0)
 			{
-				switch (tileIndex)
+				return tileIndex switch
 				{
-					case 0x7C:
-						return 0x55;
-
-					case 0x55:
-						return 0x7C;
-
-					case 0x7A:
-						return 0x7B;
-
-					case 0x7B:
-						return 0x7A;
-
-					case 0x59:
-						return 0x5D;
-
-					case 0x5D:
-						return 0x59;
-				}
+					0x7C => 0x55,
+					0x55 => 0x7C,
+					0x7A => 0x7B,
+					0x7B => 0x7A,
+					0x59 => 0x5D,
+					0x5D => 0x59,
+					_ => tileIndex
+				};
 			}
 
 			return tileIndex;
@@ -513,44 +491,18 @@ namespace WLEditor
 
 			byte RemoveCollectible()
 			{
-				switch (tileIndex)
+				return tileIndex switch
 				{
-					case 0x29: //block
-					case 0x2A: //block
-					case 0x46: //coin
-					case 0x33: //platform
-						return 0x7F;
-
-					case 0x2B: //block
-					case 0x2C: //block
-					case 0x47: //coin
-						return 0x7E;
-
-					case 0x2E: //block with door
-						return 0x48;
-
-					case 0x2D: //block with door
-						return 0x7D;
-
-					case 0x37: //bonus
-					case 0x49: //bonus (hidden)
-					case 0x28: //bonus (hidden)
-					case 0x4A: //bonus (hidden water)
-						return 0x3C;
-
-					case 0x51: //block (water)
-					case 0x50: //block (water)
-					case 0x53: //coin (water)
-						return 0x58;
-
-					case 0x52: //block with door (water)
-						return 0x5B;
-
-					case 0x54: //block with door (water)
-						return 0x4B;
-				}
-
-				return tileIndex;
+					0x29 or 0x2A or 0x46 or 0x33 => 0x7F,//block
+					0x2B or 0x2C or 0x47 => 0x7E,//block
+					0x2E => 0x48,//block with door
+					0x2D => 0x7D,//block with door
+					0x37 or 0x49 or 0x28 or 0x4A => 0x3C,//bonus
+					0x51 or 0x50 or 0x53 => 0x58,//block (water)
+					0x52 => 0x5B,//block with door (water)
+					0x54 => 0x4B,//block with door (water)
+					_ => tileIndex,
+				};
 			}
 		}
 
@@ -776,7 +728,7 @@ namespace WLEditor
 				{
 					rom.WriteWord(0x4199 + i * 2, (ushort)startPos);
 
-					byte[] data = RLECompressObjects(enemyData[i]).ToArray();
+					byte[] data = [.. RLECompressObjects(enemyData[i])];
 					rom.WriteBytes(startPos, data);
 					startPos += data.Length;
 				}
@@ -787,7 +739,7 @@ namespace WLEditor
 
 			IEnumerable<byte> RLECompressObjects(byte[] data)
 			{
-				byte[] halfData = RLECompressObjectsHelper().ToArray();
+				byte[] halfData = [.. RLECompressObjectsHelper()];
 
 				int current = 0;
 				while (current < halfData.Length)

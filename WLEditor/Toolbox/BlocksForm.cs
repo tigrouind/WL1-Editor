@@ -11,7 +11,7 @@ namespace WLEditor.Toolbox
 
 		int lastTile = -1;
 		int zoom;
-		readonly Selection selection = new Selection(16);
+		readonly Selection selection = new(16);
 
 		public BlocksForm()
 		{
@@ -117,7 +117,7 @@ namespace WLEditor.Toolbox
 
 		protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
 		{
-			KeyEventArgs args = new KeyEventArgs(keyData);
+			KeyEventArgs args = new(keyData);
 
 			switch (keyData)
 			{
