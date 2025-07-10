@@ -11,8 +11,6 @@ namespace WLEditor
 		private System.Windows.Forms.CheckBox checkBoxRight;
 		private System.Windows.Forms.CheckBox checkBoxLeft;
 		private System.Windows.Forms.Label labScroll;
-		private System.Windows.Forms.ComboBox ddlTileSet;
-		private System.Windows.Forms.Label labTileSet;
 		private System.Windows.Forms.Label labEnemies;
 		private System.Windows.Forms.ComboBox ddlEnemies;
 		private System.Windows.Forms.Label labCamera;
@@ -60,10 +58,8 @@ namespace WLEditor
 			checkBoxRight = new System.Windows.Forms.CheckBox();
 			checkBoxLeft = new System.Windows.Forms.CheckBox();
 			labScroll = new System.Windows.Forms.Label();
-			ddlTileSet = new System.Windows.Forms.ComboBox();
 			labAnimation = new System.Windows.Forms.Label();
 			ddlAnimation = new System.Windows.Forms.ComboBox();
-			labTileSet = new System.Windows.Forms.Label();
 			ddlAnimationSpeed = new System.Windows.Forms.ComboBox();
 			cmdCalculatePos = new System.Windows.Forms.Button();
 			txbCameraX = new System.Windows.Forms.NumericUpDown();
@@ -81,7 +77,11 @@ namespace WLEditor
 			panelCamera = new System.Windows.Forms.Panel();
 			labWarioStatusLevel = new System.Windows.Forms.Label();
 			ddlWarioStatus = new System.Windows.Forms.ComboBox();
-			panelTileset = new System.Windows.Forms.Panel();
+			panelEnemy = new System.Windows.Forms.Panel();
+			panelTileSet = new System.Windows.Forms.Panel();
+			ddlTileSet = new System.Windows.Forms.ComboBox();
+			pictureBox = new System.Windows.Forms.PictureBox();
+			labTileSet = new System.Windows.Forms.Label();
 			labWarioStatusSector = new System.Windows.Forms.Label();
 			ddlWarioAttributesSector = new System.Windows.Forms.ComboBox();
 			panelMusic = new System.Windows.Forms.Panel();
@@ -101,7 +101,9 @@ namespace WLEditor
 			((System.ComponentModel.ISupportInitialize)txbWarioY).BeginInit();
 			((System.ComponentModel.ISupportInitialize)txbWarioX).BeginInit();
 			panelCamera.SuspendLayout();
-			panelTileset.SuspendLayout();
+			panelEnemy.SuspendLayout();
+			panelTileSet.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)pictureBox).BeginInit();
 			panelMusic.SuspendLayout();
 			panelStatusLevel.SuspendLayout();
 			panelStatusSector.SuspendLayout();
@@ -139,7 +141,7 @@ namespace WLEditor
 			checkBoxRight.Location = new System.Drawing.Point(189, 5);
 			checkBoxRight.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
 			checkBoxRight.Name = "checkBoxRight";
-			checkBoxRight.Size = new System.Drawing.Size(68, 31);
+			checkBoxRight.Size = new System.Drawing.Size(68, 26);
 			checkBoxRight.TabIndex = 2;
 			checkBoxRight.Text = "Right";
 			checkBoxRight.UseVisualStyleBackColor = true;
@@ -150,7 +152,7 @@ namespace WLEditor
 			checkBoxLeft.Location = new System.Drawing.Point(118, 5);
 			checkBoxLeft.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
 			checkBoxLeft.Name = "checkBoxLeft";
-			checkBoxLeft.Size = new System.Drawing.Size(63, 31);
+			checkBoxLeft.Size = new System.Drawing.Size(63, 25);
 			checkBoxLeft.TabIndex = 1;
 			checkBoxLeft.Text = "Left";
 			checkBoxLeft.UseVisualStyleBackColor = true;
@@ -158,28 +160,17 @@ namespace WLEditor
 			// 
 			// labScroll
 			// 
-			labScroll.Location = new System.Drawing.Point(-4, 2);
+			labScroll.Location = new System.Drawing.Point(-4, 5);
 			labScroll.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
 			labScroll.Name = "labScroll";
-			labScroll.Size = new System.Drawing.Size(106, 31);
+			labScroll.Size = new System.Drawing.Size(106, 25);
 			labScroll.TabIndex = 10;
 			labScroll.Text = "Camera limits";
 			labScroll.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
-			// ddlTileSet
-			// 
-			ddlTileSet.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			ddlTileSet.FormattingEnabled = true;
-			ddlTileSet.Location = new System.Drawing.Point(113, 12);
-			ddlTileSet.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-			ddlTileSet.Name = "ddlTileSet";
-			ddlTileSet.Size = new System.Drawing.Size(392, 28);
-			ddlTileSet.TabIndex = 4;
-			ddlTileSet.SelectedIndexChanged += DdlTileSetSelectedIndexChanged;
-			// 
 			// labAnimation
 			// 
-			labAnimation.Location = new System.Drawing.Point(6, 49);
+			labAnimation.Location = new System.Drawing.Point(7, 39);
 			labAnimation.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
 			labAnimation.Name = "labAnimation";
 			labAnimation.Size = new System.Drawing.Size(96, 28);
@@ -191,28 +182,18 @@ namespace WLEditor
 			// 
 			ddlAnimation.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			ddlAnimation.FormattingEnabled = true;
-			ddlAnimation.Location = new System.Drawing.Point(113, 48);
+			ddlAnimation.Location = new System.Drawing.Point(114, 38);
 			ddlAnimation.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
 			ddlAnimation.Name = "ddlAnimation";
 			ddlAnimation.Size = new System.Drawing.Size(191, 28);
 			ddlAnimation.TabIndex = 5;
 			ddlAnimation.SelectedIndexChanged += DdlAnimationSelectedIndexChanged;
 			// 
-			// labTileSet
-			// 
-			labTileSet.Location = new System.Drawing.Point(41, 12);
-			labTileSet.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-			labTileSet.Name = "labTileSet";
-			labTileSet.Size = new System.Drawing.Size(61, 28);
-			labTileSet.TabIndex = 14;
-			labTileSet.Text = "Tile set";
-			labTileSet.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			// 
 			// ddlAnimationSpeed
 			// 
 			ddlAnimationSpeed.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			ddlAnimationSpeed.FormattingEnabled = true;
-			ddlAnimationSpeed.Location = new System.Drawing.Point(313, 48);
+			ddlAnimationSpeed.Location = new System.Drawing.Point(314, 38);
 			ddlAnimationSpeed.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
 			ddlAnimationSpeed.Name = "ddlAnimationSpeed";
 			ddlAnimationSpeed.Size = new System.Drawing.Size(192, 28);
@@ -221,7 +202,7 @@ namespace WLEditor
 			// 
 			// cmdCalculatePos
 			// 
-			cmdCalculatePos.Location = new System.Drawing.Point(264, 47);
+			cmdCalculatePos.Location = new System.Drawing.Point(264, 43);
 			cmdCalculatePos.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
 			cmdCalculatePos.Name = "cmdCalculatePos";
 			cmdCalculatePos.Size = new System.Drawing.Size(243, 71);
@@ -232,7 +213,7 @@ namespace WLEditor
 			// 
 			// txbCameraX
 			// 
-			txbCameraX.Location = new System.Drawing.Point(113, 90);
+			txbCameraX.Location = new System.Drawing.Point(113, 84);
 			txbCameraX.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
 			txbCameraX.Maximum = new decimal(new int[] { 511, 0, 0, 0 });
 			txbCameraX.Name = "txbCameraX";
@@ -242,7 +223,7 @@ namespace WLEditor
 			// 
 			// labEnemies
 			// 
-			labEnemies.Location = new System.Drawing.Point(17, 87);
+			labEnemies.Location = new System.Drawing.Point(17, 6);
 			labEnemies.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
 			labEnemies.Name = "labEnemies";
 			labEnemies.Size = new System.Drawing.Size(85, 38);
@@ -252,7 +233,7 @@ namespace WLEditor
 			// 
 			// labWario
 			// 
-			labWario.Location = new System.Drawing.Point(14, 49);
+			labWario.Location = new System.Drawing.Point(14, 44);
 			labWario.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
 			labWario.Name = "labWario";
 			labWario.Size = new System.Drawing.Size(88, 31);
@@ -262,7 +243,7 @@ namespace WLEditor
 			// 
 			// txbCameraY
 			// 
-			txbCameraY.Location = new System.Drawing.Point(189, 90);
+			txbCameraY.Location = new System.Drawing.Point(189, 84);
 			txbCameraY.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
 			txbCameraY.Maximum = new decimal(new int[] { 63, 0, 0, 0 });
 			txbCameraY.Name = "txbCameraY";
@@ -274,7 +255,7 @@ namespace WLEditor
 			// 
 			ddlCameraType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			ddlCameraType.FormattingEnabled = true;
-			ddlCameraType.Location = new System.Drawing.Point(113, 12);
+			ddlCameraType.Location = new System.Drawing.Point(113, 7);
 			ddlCameraType.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
 			ddlCameraType.Name = "ddlCameraType";
 			ddlCameraType.Size = new System.Drawing.Size(392, 28);
@@ -283,7 +264,7 @@ namespace WLEditor
 			// 
 			// txbWarioY
 			// 
-			txbWarioY.Location = new System.Drawing.Point(189, 51);
+			txbWarioY.Location = new System.Drawing.Point(189, 46);
 			txbWarioY.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
 			txbWarioY.Maximum = new decimal(new int[] { 63, 0, 0, 0 });
 			txbWarioY.Name = "txbWarioY";
@@ -293,10 +274,10 @@ namespace WLEditor
 			// 
 			// labCameraType
 			// 
-			labCameraType.Location = new System.Drawing.Point(6, 12);
+			labCameraType.Location = new System.Drawing.Point(0, 7);
 			labCameraType.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
 			labCameraType.Name = "labCameraType";
-			labCameraType.Size = new System.Drawing.Size(96, 28);
+			labCameraType.Size = new System.Drawing.Size(102, 28);
 			labCameraType.TabIndex = 28;
 			labCameraType.Text = "Camera type";
 			labCameraType.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -308,7 +289,7 @@ namespace WLEditor
 			ddlEnemies.FormattingEnabled = true;
 			ddlEnemies.IntegralHeight = false;
 			ddlEnemies.ItemHeight = 32;
-			ddlEnemies.Location = new System.Drawing.Point(113, 87);
+			ddlEnemies.Location = new System.Drawing.Point(113, 6);
 			ddlEnemies.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
 			ddlEnemies.Name = "ddlEnemies";
 			ddlEnemies.Size = new System.Drawing.Size(392, 38);
@@ -318,7 +299,7 @@ namespace WLEditor
 			// 
 			// labCamera
 			// 
-			labCamera.Location = new System.Drawing.Point(7, 89);
+			labCamera.Location = new System.Drawing.Point(7, 83);
 			labCamera.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
 			labCamera.Name = "labCamera";
 			labCamera.Size = new System.Drawing.Size(95, 28);
@@ -328,7 +309,7 @@ namespace WLEditor
 			// 
 			// txbWarioX
 			// 
-			txbWarioX.Location = new System.Drawing.Point(113, 51);
+			txbWarioX.Location = new System.Drawing.Point(113, 46);
 			txbWarioX.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
 			txbWarioX.Maximum = new decimal(new int[] { 511, 0, 0, 0 });
 			txbWarioX.Name = "txbWarioX";
@@ -371,10 +352,10 @@ namespace WLEditor
 			panelCamera.Controls.Add(txbWarioX);
 			panelCamera.Controls.Add(ddlCameraType);
 			panelCamera.Controls.Add(cmdCalculatePos);
-			panelCamera.Location = new System.Drawing.Point(0, 206);
+			panelCamera.Location = new System.Drawing.Point(0, 242);
 			panelCamera.Margin = new System.Windows.Forms.Padding(0);
 			panelCamera.Name = "panelCamera";
-			panelCamera.Size = new System.Drawing.Size(511, 123);
+			panelCamera.Size = new System.Drawing.Size(511, 119);
 			panelCamera.TabIndex = 3;
 			// 
 			// labWarioStatusLevel
@@ -398,22 +379,63 @@ namespace WLEditor
 			ddlWarioStatus.TabIndex = 29;
 			ddlWarioStatus.SelectedIndexChanged += DdlWarioStatus_SelectedIndexChanged;
 			// 
-			// panelTileset
+			// panelEnemy
 			// 
-			panelTileset.AutoSize = true;
-			panelTileset.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			panelTileset.Controls.Add(ddlTileSet);
-			panelTileset.Controls.Add(labTileSet);
-			panelTileset.Controls.Add(ddlAnimation);
-			panelTileset.Controls.Add(labEnemies);
-			panelTileset.Controls.Add(labAnimation);
-			panelTileset.Controls.Add(ddlEnemies);
-			panelTileset.Controls.Add(ddlAnimationSpeed);
-			panelTileset.Location = new System.Drawing.Point(0, 76);
-			panelTileset.Margin = new System.Windows.Forms.Padding(0);
-			panelTileset.Name = "panelTileset";
-			panelTileset.Size = new System.Drawing.Size(509, 130);
-			panelTileset.TabIndex = 2;
+			panelEnemy.AutoSize = true;
+			panelEnemy.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			panelEnemy.Controls.Add(labEnemies);
+			panelEnemy.Controls.Add(ddlEnemies);
+			panelEnemy.Location = new System.Drawing.Point(0, 193);
+			panelEnemy.Margin = new System.Windows.Forms.Padding(0);
+			panelEnemy.Name = "panelEnemy";
+			panelEnemy.Size = new System.Drawing.Size(509, 49);
+			panelEnemy.TabIndex = 2;
+			// 
+			// panelTileSet
+			// 
+			panelTileSet.AutoSize = true;
+			panelTileSet.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			panelTileSet.Controls.Add(ddlAnimation);
+			panelTileSet.Controls.Add(ddlTileSet);
+			panelTileSet.Controls.Add(labAnimation);
+			panelTileSet.Controls.Add(pictureBox);
+			panelTileSet.Controls.Add(labTileSet);
+			panelTileSet.Controls.Add(ddlAnimationSpeed);
+			panelTileSet.Location = new System.Drawing.Point(0, 76);
+			panelTileSet.Margin = new System.Windows.Forms.Padding(0);
+			panelTileSet.Name = "panelTileSet";
+			panelTileSet.Size = new System.Drawing.Size(510, 117);
+			panelTileSet.TabIndex = 43;
+			// 
+			// ddlTileSet
+			// 
+			ddlTileSet.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			ddlTileSet.FormattingEnabled = true;
+			ddlTileSet.Location = new System.Drawing.Point(114, 5);
+			ddlTileSet.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+			ddlTileSet.Name = "ddlTileSet";
+			ddlTileSet.Size = new System.Drawing.Size(391, 28);
+			ddlTileSet.TabIndex = 4;
+			ddlTileSet.SelectedIndexChanged += DdlTileSetSelectedIndexChanged;
+			// 
+			// pictureBox
+			// 
+			pictureBox.Location = new System.Drawing.Point(115, 73);
+			pictureBox.Name = "pictureBox";
+			pictureBox.Size = new System.Drawing.Size(163, 41);
+			pictureBox.TabIndex = 42;
+			pictureBox.TabStop = false;
+			pictureBox.Paint += PictureBoxTileSet_Paint;
+			// 
+			// labTileSet
+			// 
+			labTileSet.Location = new System.Drawing.Point(41, 5);
+			labTileSet.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+			labTileSet.Name = "labTileSet";
+			labTileSet.Size = new System.Drawing.Size(61, 28);
+			labTileSet.TabIndex = 14;
+			labTileSet.Text = "Tile set";
+			labTileSet.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// labWarioStatusSector
 			// 
@@ -453,7 +475,7 @@ namespace WLEditor
 			checkBoxCheckpoint.Location = new System.Drawing.Point(118, 5);
 			checkBoxCheckpoint.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
 			checkBoxCheckpoint.Name = "checkBoxCheckpoint";
-			checkBoxCheckpoint.Size = new System.Drawing.Size(14, 31);
+			checkBoxCheckpoint.Size = new System.Drawing.Size(14, 25);
 			checkBoxCheckpoint.TabIndex = 48;
 			checkBoxCheckpoint.CheckedChanged += CheckBoxCheckpoint_CheckedChanged;
 			// 
@@ -499,7 +521,7 @@ namespace WLEditor
 			panelWarp.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			panelWarp.Controls.Add(labWarp);
 			panelWarp.Controls.Add(ddlWarp);
-			panelWarp.Location = new System.Drawing.Point(0, 158);
+			panelWarp.Location = new System.Drawing.Point(0, 147);
 			panelWarp.Margin = new System.Windows.Forms.Padding(0);
 			panelWarp.Name = "panelWarp";
 			panelWarp.Size = new System.Drawing.Size(513, 38);
@@ -520,7 +542,7 @@ namespace WLEditor
 			flowLayoutPanel1.Location = new System.Drawing.Point(11, 12);
 			flowLayoutPanel1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
 			flowLayoutPanel1.Name = "flowLayoutPanel1";
-			flowLayoutPanel1.Size = new System.Drawing.Size(519, 535);
+			flowLayoutPanel1.Size = new System.Drawing.Size(519, 556);
 			flowLayoutPanel1.TabIndex = 46;
 			// 
 			// ddlWarpType
@@ -545,15 +567,15 @@ namespace WLEditor
 			panelCheckpoint.Location = new System.Drawing.Point(0, 76);
 			panelCheckpoint.Margin = new System.Windows.Forms.Padding(0);
 			panelCheckpoint.Name = "panelCheckpoint";
-			panelCheckpoint.Size = new System.Drawing.Size(136, 41);
+			panelCheckpoint.Size = new System.Drawing.Size(136, 35);
 			panelCheckpoint.TabIndex = 49;
 			// 
 			// label1
 			// 
-			label1.Location = new System.Drawing.Point(12, 6);
+			label1.Location = new System.Drawing.Point(12, 4);
 			label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
 			label1.Name = "label1";
-			label1.Size = new System.Drawing.Size(90, 26);
+			label1.Size = new System.Drawing.Size(90, 25);
 			label1.TabIndex = 11;
 			label1.Text = "Checkpoint";
 			label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -565,10 +587,10 @@ namespace WLEditor
 			panelScroll.Controls.Add(checkBoxRight);
 			panelScroll.Controls.Add(labScroll);
 			panelScroll.Controls.Add(checkBoxLeft);
-			panelScroll.Location = new System.Drawing.Point(0, 117);
+			panelScroll.Location = new System.Drawing.Point(0, 111);
 			panelScroll.Margin = new System.Windows.Forms.Padding(0);
 			panelScroll.Name = "panelScroll";
-			panelScroll.Size = new System.Drawing.Size(261, 41);
+			panelScroll.Size = new System.Drawing.Size(261, 36);
 			panelScroll.TabIndex = 48;
 			// 
 			// flowLayoutPanel2
@@ -578,14 +600,15 @@ namespace WLEditor
 			flowLayoutPanel2.BackColor = System.Drawing.SystemColors.Control;
 			flowLayoutPanel2.Controls.Add(panelStatusLevel);
 			flowLayoutPanel2.Controls.Add(panelStatusSector);
-			flowLayoutPanel2.Controls.Add(panelTileset);
+			flowLayoutPanel2.Controls.Add(panelTileSet);
+			flowLayoutPanel2.Controls.Add(panelEnemy);
 			flowLayoutPanel2.Controls.Add(panelCamera);
 			flowLayoutPanel2.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
 			flowLayoutPanel2.ForeColor = System.Drawing.SystemColors.ControlText;
-			flowLayoutPanel2.Location = new System.Drawing.Point(4, 201);
+			flowLayoutPanel2.Location = new System.Drawing.Point(4, 190);
 			flowLayoutPanel2.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
 			flowLayoutPanel2.Name = "flowLayoutPanel2";
-			flowLayoutPanel2.Size = new System.Drawing.Size(511, 329);
+			flowLayoutPanel2.Size = new System.Drawing.Size(511, 361);
 			flowLayoutPanel2.TabIndex = 48;
 			// 
 			// SectorForm
@@ -612,7 +635,9 @@ namespace WLEditor
 			((System.ComponentModel.ISupportInitialize)txbWarioY).EndInit();
 			((System.ComponentModel.ISupportInitialize)txbWarioX).EndInit();
 			panelCamera.ResumeLayout(false);
-			panelTileset.ResumeLayout(false);
+			panelEnemy.ResumeLayout(false);
+			panelTileSet.ResumeLayout(false);
+			((System.ComponentModel.ISupportInitialize)pictureBox).EndInit();
 			panelMusic.ResumeLayout(false);
 			panelStatusLevel.ResumeLayout(false);
 			panelStatusSector.ResumeLayout(false);
@@ -629,7 +654,7 @@ namespace WLEditor
 		}
 
 		private System.Windows.Forms.Panel panelCamera;
-		private System.Windows.Forms.Panel panelTileset;
+		private System.Windows.Forms.Panel panelEnemy;
 		private System.Windows.Forms.Panel panelMusic;
 		private System.Windows.Forms.Panel panelStatusLevel;
 		private System.Windows.Forms.Panel panelStatusSector;
@@ -646,5 +671,9 @@ namespace WLEditor
 		private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel2;
 		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.Panel panelCheckpoint;
+		private System.Windows.Forms.Panel panelTileSet;
+		private System.Windows.Forms.ComboBox ddlTileSet;
+		private System.Windows.Forms.PictureBox pictureBox;
+		private System.Windows.Forms.Label labTileSet;
 	}
 }
