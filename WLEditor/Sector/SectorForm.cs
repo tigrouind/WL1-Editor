@@ -20,6 +20,7 @@ namespace WLEditor
 		public readonly (Rectangle Rectangle, Point Point)[] enemiesRects = new (Rectangle, Point)[6 * 147];
 		readonly char[] treasureNames = ['C', 'I', 'F', 'O', 'A', 'N', 'H', 'M', 'L', 'K', 'B', 'D', 'G', 'J', 'E'];
 		readonly int[] boss = [0x4CA9, 0x460D, 0x4C0C, 0x4E34, 0x4B06, 0x4D1A, 0x527D];
+		public PictureBox PictureBox => pictureBox;
 
 		Rom rom;
 		int currentCourseId;
@@ -523,7 +524,7 @@ namespace WLEditor
 			panelCheckpoint.Visible = panelMusic.Visible = currentSector == -1 && currentTreasureId == -1 && !currentCheckPoint;
 			panelStatusLevel.Visible = currentSector == -1 && currentTreasureId == -1;
 			panelStatusSector.Visible = validWarp || currentTreasureId != -1;
-			panelTileset.Visible = panelCamera.Visible = currentSector == -1 || validWarp;
+			panelEnemy.Visible = panelTileSet.Visible = panelCamera.Visible = currentSector == -1 || validWarp;
 
 			flowLayoutPanel1.ResumeLayout();
 		}
@@ -587,6 +588,9 @@ namespace WLEditor
 			ddlEnemies.DropDownWidth = 20 + zoom * 32 * 5 + SystemInformation.VerticalScrollBarWidth;
 			ddlEnemies.ItemHeight = zoom * 32;
 			labEnemies.Height = zoom * 32;
+
+			pictureBox.Size = new Size(zoom * 16 * 8, zoom * 6 * 8);
+			pictureBox.Invalidate();
 		}
 
 		protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
@@ -686,6 +690,8 @@ namespace WLEditor
 				currentWarp.Palette,
 				currentWarp.GUI
 			));
+			pictureBox.Invalidate();
+
 			LoadDropdown(ddlAnimation, currentWarp.TileAnimation);
 			LoadDropdown(ddlAnimationSpeed, currentWarp.AnimationSpeed);
 			LoadDropdownAny<EnemyInfo>(ddlEnemies, currentWarp.Enemy, x => x.EnemyPointers);
@@ -881,6 +887,7 @@ namespace WLEditor
 				currentWarp.GUI = item.Value.GUI;
 				currentWarp.BlockIndex = item.Value.BlockIndex;
 				currentWarp.Palette = item.Value.Palette;
+				pictureBox.Invalidate();
 
 				SaveWarp();
 				Setchanges();
@@ -893,6 +900,7 @@ namespace WLEditor
 			{
 				var item = (ComboboxItem<int>)ddlAnimation.SelectedItem;
 				currentWarp.TileAnimation = item.Value;
+				pictureBox.Invalidate();
 
 				SaveWarp();
 				Setchanges();
@@ -905,6 +913,7 @@ namespace WLEditor
 			{
 				var item = (ComboboxItem<int>)ddlAnimationSpeed.SelectedItem;
 				currentWarp.AnimationSpeed = item.Value;
+				pictureBox.Invalidate();
 
 				SaveWarp();
 				Setchanges();
@@ -1145,5 +1154,14 @@ namespace WLEditor
 		}
 
 		#endregion
+
+		private void PictureBoxTileSet_Paint(object sender, PaintEventArgs e)
+		{
+			e.Graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
+			e.Graphics.PixelOffsetMode = PixelOffsetMode.Half;
+			e.Graphics.DrawImage(Level.Tiles8x8.Bitmap,
+				new Rectangle(0, 0, 16 * 8 * zoom, 6 * 8 * zoom),
+				new Rectangle(0, 2 * 8, 16 * 8, 6 * 8), GraphicsUnit.Pixel);
+		}
 	}
 }

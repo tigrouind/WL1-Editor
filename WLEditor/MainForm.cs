@@ -837,6 +837,11 @@ namespace WLEditor
 				{
 					blocksForm.PictureBox.Invalidate();
 				}
+
+				if (sectorForm.Visible)
+				{
+					sectorForm.PictureBox.Invalidate();
+				}
 			}
 		}
 
