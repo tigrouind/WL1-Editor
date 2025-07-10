@@ -55,587 +55,576 @@ namespace WLEditor
 		/// </summary>
 		private void InitializeComponent()
 		{
-			this.labWarp = new System.Windows.Forms.Label();
-			this.ddlWarp = new System.Windows.Forms.ComboBox();
-			this.checkBoxRight = new System.Windows.Forms.CheckBox();
-			this.checkBoxLeft = new System.Windows.Forms.CheckBox();
-			this.labScroll = new System.Windows.Forms.Label();
-			this.ddlTileSet = new System.Windows.Forms.ComboBox();
-			this.labAnimation = new System.Windows.Forms.Label();
-			this.ddlAnimation = new System.Windows.Forms.ComboBox();
-			this.labTileSet = new System.Windows.Forms.Label();
-			this.ddlAnimationSpeed = new System.Windows.Forms.ComboBox();
-			this.cmdCalculatePos = new System.Windows.Forms.Button();
-			this.txbCameraX = new System.Windows.Forms.NumericUpDown();
-			this.labEnemies = new System.Windows.Forms.Label();
-			this.labWario = new System.Windows.Forms.Label();
-			this.txbCameraY = new System.Windows.Forms.NumericUpDown();
-			this.ddlCameraType = new System.Windows.Forms.ComboBox();
-			this.txbWarioY = new System.Windows.Forms.NumericUpDown();
-			this.labCameraType = new System.Windows.Forms.Label();
-			this.ddlEnemies = new System.Windows.Forms.ComboBox();
-			this.labCamera = new System.Windows.Forms.Label();
-			this.txbWarioX = new System.Windows.Forms.NumericUpDown();
-			this.labMusic = new System.Windows.Forms.Label();
-			this.ddlMusic = new System.Windows.Forms.ComboBox();
-			this.panelCamera = new System.Windows.Forms.Panel();
-			this.labWarioStatusLevel = new System.Windows.Forms.Label();
-			this.ddlWarioStatus = new System.Windows.Forms.ComboBox();
-			this.panelTileset = new System.Windows.Forms.Panel();
-			this.labWarioStatusSector = new System.Windows.Forms.Label();
-			this.ddlWarioAttributesSector = new System.Windows.Forms.ComboBox();
-			this.panelMusic = new System.Windows.Forms.Panel();
-			this.checkBoxCheckpoint = new System.Windows.Forms.CheckBox();
-			this.panelStatusLevel = new System.Windows.Forms.Panel();
-			this.ddlWarioAttributesLevel = new System.Windows.Forms.ComboBox();
-			this.panelStatusSector = new System.Windows.Forms.Panel();
-			this.panelWarp = new System.Windows.Forms.Panel();
-			this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
-			this.ddlWarpType = new System.Windows.Forms.ComboBox();
-			this.panelScroll = new System.Windows.Forms.Panel();
-			this.flowLayoutPanel2 = new System.Windows.Forms.FlowLayoutPanel();
-			((System.ComponentModel.ISupportInitialize)(this.txbCameraX)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.txbCameraY)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.txbWarioY)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.txbWarioX)).BeginInit();
-			this.panelCamera.SuspendLayout();
-			this.panelTileset.SuspendLayout();
-			this.panelMusic.SuspendLayout();
-			this.panelStatusLevel.SuspendLayout();
-			this.panelStatusSector.SuspendLayout();
-			this.panelWarp.SuspendLayout();
-			this.flowLayoutPanel1.SuspendLayout();
-			this.panelScroll.SuspendLayout();
-			this.flowLayoutPanel2.SuspendLayout();
-			this.SuspendLayout();
+			labWarp = new System.Windows.Forms.Label();
+			ddlWarp = new System.Windows.Forms.ComboBox();
+			checkBoxRight = new System.Windows.Forms.CheckBox();
+			checkBoxLeft = new System.Windows.Forms.CheckBox();
+			labScroll = new System.Windows.Forms.Label();
+			ddlTileSet = new System.Windows.Forms.ComboBox();
+			labAnimation = new System.Windows.Forms.Label();
+			ddlAnimation = new System.Windows.Forms.ComboBox();
+			labTileSet = new System.Windows.Forms.Label();
+			ddlAnimationSpeed = new System.Windows.Forms.ComboBox();
+			cmdCalculatePos = new System.Windows.Forms.Button();
+			txbCameraX = new System.Windows.Forms.NumericUpDown();
+			labEnemies = new System.Windows.Forms.Label();
+			labWario = new System.Windows.Forms.Label();
+			txbCameraY = new System.Windows.Forms.NumericUpDown();
+			ddlCameraType = new System.Windows.Forms.ComboBox();
+			txbWarioY = new System.Windows.Forms.NumericUpDown();
+			labCameraType = new System.Windows.Forms.Label();
+			ddlEnemies = new System.Windows.Forms.ComboBox();
+			labCamera = new System.Windows.Forms.Label();
+			txbWarioX = new System.Windows.Forms.NumericUpDown();
+			labMusic = new System.Windows.Forms.Label();
+			ddlMusic = new System.Windows.Forms.ComboBox();
+			panelCamera = new System.Windows.Forms.Panel();
+			labWarioStatusLevel = new System.Windows.Forms.Label();
+			ddlWarioStatus = new System.Windows.Forms.ComboBox();
+			panelTileset = new System.Windows.Forms.Panel();
+			labWarioStatusSector = new System.Windows.Forms.Label();
+			ddlWarioAttributesSector = new System.Windows.Forms.ComboBox();
+			panelMusic = new System.Windows.Forms.Panel();
+			checkBoxCheckpoint = new System.Windows.Forms.CheckBox();
+			panelStatusLevel = new System.Windows.Forms.Panel();
+			ddlWarioAttributesLevel = new System.Windows.Forms.ComboBox();
+			panelStatusSector = new System.Windows.Forms.Panel();
+			panelWarp = new System.Windows.Forms.Panel();
+			flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
+			ddlWarpType = new System.Windows.Forms.ComboBox();
+			panelCheckpoint = new System.Windows.Forms.Panel();
+			label1 = new System.Windows.Forms.Label();
+			panelScroll = new System.Windows.Forms.Panel();
+			flowLayoutPanel2 = new System.Windows.Forms.FlowLayoutPanel();
+			((System.ComponentModel.ISupportInitialize)txbCameraX).BeginInit();
+			((System.ComponentModel.ISupportInitialize)txbCameraY).BeginInit();
+			((System.ComponentModel.ISupportInitialize)txbWarioY).BeginInit();
+			((System.ComponentModel.ISupportInitialize)txbWarioX).BeginInit();
+			panelCamera.SuspendLayout();
+			panelTileset.SuspendLayout();
+			panelMusic.SuspendLayout();
+			panelStatusLevel.SuspendLayout();
+			panelStatusSector.SuspendLayout();
+			panelWarp.SuspendLayout();
+			flowLayoutPanel1.SuspendLayout();
+			panelCheckpoint.SuspendLayout();
+			panelScroll.SuspendLayout();
+			flowLayoutPanel2.SuspendLayout();
+			SuspendLayout();
 			// 
 			// labWarp
 			// 
-			this.labWarp.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.labWarp.Location = new System.Drawing.Point(9, 2);
-			this.labWarp.Name = "labWarp";
-			this.labWarp.Size = new System.Drawing.Size(67, 20);
-			this.labWarp.TabIndex = 4;
-			this.labWarp.Text = "Target";
-			this.labWarp.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			labWarp.Location = new System.Drawing.Point(13, 3);
+			labWarp.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+			labWarp.Name = "labWarp";
+			labWarp.Size = new System.Drawing.Size(89, 31);
+			labWarp.TabIndex = 4;
+			labWarp.Text = "Target";
+			labWarp.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// ddlWarp
 			// 
-			this.ddlWarp.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.ddlWarp.DropDownWidth = 300;
-			this.ddlWarp.FormattingEnabled = true;
-			this.ddlWarp.Location = new System.Drawing.Point(88, 3);
-			this.ddlWarp.Name = "ddlWarp";
-			this.ddlWarp.Size = new System.Drawing.Size(295, 21);
-			this.ddlWarp.TabIndex = 3;
-			this.ddlWarp.SelectedIndexChanged += new System.EventHandler(this.DdlWarpSelectedIndexChanged);
+			ddlWarp.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			ddlWarp.DropDownWidth = 300;
+			ddlWarp.FormattingEnabled = true;
+			ddlWarp.Location = new System.Drawing.Point(117, 5);
+			ddlWarp.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+			ddlWarp.Name = "ddlWarp";
+			ddlWarp.Size = new System.Drawing.Size(392, 28);
+			ddlWarp.TabIndex = 3;
+			ddlWarp.SelectedIndexChanged += DdlWarpSelectedIndexChanged;
 			// 
 			// checkBoxRight
 			// 
-			this.checkBoxRight.Location = new System.Drawing.Point(138, 3);
-			this.checkBoxRight.Name = "checkBoxRight";
-			this.checkBoxRight.Size = new System.Drawing.Size(51, 20);
-			this.checkBoxRight.TabIndex = 2;
-			this.checkBoxRight.Text = "Right";
-			this.checkBoxRight.UseVisualStyleBackColor = true;
-			this.checkBoxRight.CheckedChanged += new System.EventHandler(this.CheckBoxRightCheckedChanged);
+			checkBoxRight.Location = new System.Drawing.Point(189, 5);
+			checkBoxRight.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+			checkBoxRight.Name = "checkBoxRight";
+			checkBoxRight.Size = new System.Drawing.Size(68, 31);
+			checkBoxRight.TabIndex = 2;
+			checkBoxRight.Text = "Right";
+			checkBoxRight.UseVisualStyleBackColor = true;
+			checkBoxRight.CheckedChanged += CheckBoxRightCheckedChanged;
 			// 
 			// checkBoxLeft
 			// 
-			this.checkBoxLeft.Location = new System.Drawing.Point(85, 3);
-			this.checkBoxLeft.Name = "checkBoxLeft";
-			this.checkBoxLeft.Size = new System.Drawing.Size(47, 20);
-			this.checkBoxLeft.TabIndex = 1;
-			this.checkBoxLeft.Text = "Left";
-			this.checkBoxLeft.UseVisualStyleBackColor = true;
-			this.checkBoxLeft.CheckedChanged += new System.EventHandler(this.CheckBoxLeftCheckedChanged);
+			checkBoxLeft.Location = new System.Drawing.Point(118, 5);
+			checkBoxLeft.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+			checkBoxLeft.Name = "checkBoxLeft";
+			checkBoxLeft.Size = new System.Drawing.Size(63, 31);
+			checkBoxLeft.TabIndex = 1;
+			checkBoxLeft.Text = "Left";
+			checkBoxLeft.UseVisualStyleBackColor = true;
+			checkBoxLeft.CheckedChanged += CheckBoxLeftCheckedChanged;
 			// 
 			// labScroll
 			// 
-			this.labScroll.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.labScroll.Location = new System.Drawing.Point(8, 1);
-			this.labScroll.Name = "labScroll";
-			this.labScroll.Size = new System.Drawing.Size(71, 20);
-			this.labScroll.TabIndex = 10;
-			this.labScroll.Text = "Camera limits";
-			this.labScroll.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			labScroll.Location = new System.Drawing.Point(-4, 2);
+			labScroll.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+			labScroll.Name = "labScroll";
+			labScroll.Size = new System.Drawing.Size(106, 31);
+			labScroll.TabIndex = 10;
+			labScroll.Text = "Camera limits";
+			labScroll.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// ddlTileSet
 			// 
-			this.ddlTileSet.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.ddlTileSet.FormattingEnabled = true;
-			this.ddlTileSet.Location = new System.Drawing.Point(85, 11);
-			this.ddlTileSet.Name = "ddlTileSet";
-			this.ddlTileSet.Size = new System.Drawing.Size(295, 21);
-			this.ddlTileSet.TabIndex = 4;
-			this.ddlTileSet.SelectedIndexChanged += new System.EventHandler(this.DdlTileSetSelectedIndexChanged);
+			ddlTileSet.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			ddlTileSet.FormattingEnabled = true;
+			ddlTileSet.Location = new System.Drawing.Point(113, 12);
+			ddlTileSet.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+			ddlTileSet.Name = "ddlTileSet";
+			ddlTileSet.Size = new System.Drawing.Size(392, 28);
+			ddlTileSet.TabIndex = 4;
+			ddlTileSet.SelectedIndexChanged += DdlTileSetSelectedIndexChanged;
 			// 
 			// labAnimation
 			// 
-			this.labAnimation.Location = new System.Drawing.Point(6, 38);
-			this.labAnimation.Name = "labAnimation";
-			this.labAnimation.Size = new System.Drawing.Size(72, 18);
-			this.labAnimation.TabIndex = 41;
-			this.labAnimation.Text = "Animation";
-			this.labAnimation.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			labAnimation.Location = new System.Drawing.Point(6, 49);
+			labAnimation.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+			labAnimation.Name = "labAnimation";
+			labAnimation.Size = new System.Drawing.Size(96, 28);
+			labAnimation.TabIndex = 41;
+			labAnimation.Text = "Animation";
+			labAnimation.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// ddlAnimation
 			// 
-			this.ddlAnimation.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.ddlAnimation.FormattingEnabled = true;
-			this.ddlAnimation.Location = new System.Drawing.Point(85, 37);
-			this.ddlAnimation.Name = "ddlAnimation";
-			this.ddlAnimation.Size = new System.Drawing.Size(144, 21);
-			this.ddlAnimation.TabIndex = 5;
-			this.ddlAnimation.SelectedIndexChanged += new System.EventHandler(this.DdlAnimationSelectedIndexChanged);
+			ddlAnimation.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			ddlAnimation.FormattingEnabled = true;
+			ddlAnimation.Location = new System.Drawing.Point(113, 48);
+			ddlAnimation.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+			ddlAnimation.Name = "ddlAnimation";
+			ddlAnimation.Size = new System.Drawing.Size(191, 28);
+			ddlAnimation.TabIndex = 5;
+			ddlAnimation.SelectedIndexChanged += DdlAnimationSelectedIndexChanged;
 			// 
 			// labTileSet
 			// 
-			this.labTileSet.Location = new System.Drawing.Point(32, 12);
-			this.labTileSet.Name = "labTileSet";
-			this.labTileSet.Size = new System.Drawing.Size(46, 18);
-			this.labTileSet.TabIndex = 14;
-			this.labTileSet.Text = "Tile set";
-			this.labTileSet.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			labTileSet.Location = new System.Drawing.Point(41, 12);
+			labTileSet.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+			labTileSet.Name = "labTileSet";
+			labTileSet.Size = new System.Drawing.Size(61, 28);
+			labTileSet.TabIndex = 14;
+			labTileSet.Text = "Tile set";
+			labTileSet.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// ddlAnimationSpeed
 			// 
-			this.ddlAnimationSpeed.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.ddlAnimationSpeed.FormattingEnabled = true;
-			this.ddlAnimationSpeed.Location = new System.Drawing.Point(235, 37);
-			this.ddlAnimationSpeed.Name = "ddlAnimationSpeed";
-			this.ddlAnimationSpeed.Size = new System.Drawing.Size(145, 21);
-			this.ddlAnimationSpeed.TabIndex = 6;
-			this.ddlAnimationSpeed.SelectedIndexChanged += new System.EventHandler(this.DdlAnimationSpeedSelectedIndexChanged);
+			ddlAnimationSpeed.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			ddlAnimationSpeed.FormattingEnabled = true;
+			ddlAnimationSpeed.Location = new System.Drawing.Point(313, 48);
+			ddlAnimationSpeed.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+			ddlAnimationSpeed.Name = "ddlAnimationSpeed";
+			ddlAnimationSpeed.Size = new System.Drawing.Size(192, 28);
+			ddlAnimationSpeed.TabIndex = 6;
+			ddlAnimationSpeed.SelectedIndexChanged += DdlAnimationSpeedSelectedIndexChanged;
 			// 
 			// cmdCalculatePos
 			// 
-			this.cmdCalculatePos.Location = new System.Drawing.Point(198, 44);
-			this.cmdCalculatePos.Name = "cmdCalculatePos";
-			this.cmdCalculatePos.Size = new System.Drawing.Size(182, 46);
-			this.cmdCalculatePos.TabIndex = 13;
-			this.cmdCalculatePos.Text = "Recalculate";
-			this.cmdCalculatePos.UseVisualStyleBackColor = true;
-			this.cmdCalculatePos.Click += new System.EventHandler(this.CmdCalculatePosClick);
+			cmdCalculatePos.Location = new System.Drawing.Point(264, 47);
+			cmdCalculatePos.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+			cmdCalculatePos.Name = "cmdCalculatePos";
+			cmdCalculatePos.Size = new System.Drawing.Size(243, 71);
+			cmdCalculatePos.TabIndex = 13;
+			cmdCalculatePos.Text = "Recalculate";
+			cmdCalculatePos.UseVisualStyleBackColor = true;
+			cmdCalculatePos.Click += CmdCalculatePosClick;
 			// 
 			// txbCameraX
 			// 
-			this.txbCameraX.Location = new System.Drawing.Point(85, 70);
-			this.txbCameraX.Maximum = new decimal(new int[] {
-            511,
-            0,
-            0,
-            0});
-			this.txbCameraX.Name = "txbCameraX";
-			this.txbCameraX.Size = new System.Drawing.Size(50, 20);
-			this.txbCameraX.TabIndex = 11;
-			this.txbCameraX.ValueChanged += new System.EventHandler(this.TxbCameraXValueChanged);
+			txbCameraX.Location = new System.Drawing.Point(113, 90);
+			txbCameraX.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+			txbCameraX.Maximum = new decimal(new int[] { 511, 0, 0, 0 });
+			txbCameraX.Name = "txbCameraX";
+			txbCameraX.Size = new System.Drawing.Size(67, 27);
+			txbCameraX.TabIndex = 11;
+			txbCameraX.ValueChanged += TxbCameraXValueChanged;
 			// 
 			// labEnemies
 			// 
-			this.labEnemies.Location = new System.Drawing.Point(14, 65);
-			this.labEnemies.Name = "labEnemies";
-			this.labEnemies.Size = new System.Drawing.Size(64, 38);
-			this.labEnemies.TabIndex = 16;
-			this.labEnemies.Text = "Enemy";
-			this.labEnemies.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			labEnemies.Location = new System.Drawing.Point(17, 87);
+			labEnemies.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+			labEnemies.Name = "labEnemies";
+			labEnemies.Size = new System.Drawing.Size(85, 38);
+			labEnemies.TabIndex = 16;
+			labEnemies.Text = "Objects";
+			labEnemies.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// labWario
 			// 
-			this.labWario.Location = new System.Drawing.Point(10, 44);
-			this.labWario.Name = "labWario";
-			this.labWario.Size = new System.Drawing.Size(66, 20);
-			this.labWario.TabIndex = 19;
-			this.labWario.Text = "Wario X / Y";
-			this.labWario.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			labWario.Location = new System.Drawing.Point(14, 49);
+			labWario.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+			labWario.Name = "labWario";
+			labWario.Size = new System.Drawing.Size(88, 31);
+			labWario.TabIndex = 19;
+			labWario.Text = "Wario X / Y";
+			labWario.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// txbCameraY
 			// 
-			this.txbCameraY.Location = new System.Drawing.Point(142, 70);
-			this.txbCameraY.Maximum = new decimal(new int[] {
-            63,
-            0,
-            0,
-            0});
-			this.txbCameraY.Name = "txbCameraY";
-			this.txbCameraY.Size = new System.Drawing.Size(50, 20);
-			this.txbCameraY.TabIndex = 12;
-			this.txbCameraY.ValueChanged += new System.EventHandler(this.TxbCameraYValueChanged);
+			txbCameraY.Location = new System.Drawing.Point(189, 90);
+			txbCameraY.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+			txbCameraY.Maximum = new decimal(new int[] { 63, 0, 0, 0 });
+			txbCameraY.Name = "txbCameraY";
+			txbCameraY.Size = new System.Drawing.Size(67, 27);
+			txbCameraY.TabIndex = 12;
+			txbCameraY.ValueChanged += TxbCameraYValueChanged;
 			// 
 			// ddlCameraType
 			// 
-			this.ddlCameraType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.ddlCameraType.FormattingEnabled = true;
-			this.ddlCameraType.Location = new System.Drawing.Point(85, 15);
-			this.ddlCameraType.Name = "ddlCameraType";
-			this.ddlCameraType.Size = new System.Drawing.Size(295, 21);
-			this.ddlCameraType.TabIndex = 8;
-			this.ddlCameraType.SelectedIndexChanged += new System.EventHandler(this.DdlCameraTypeSelectedIndexChanged);
+			ddlCameraType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			ddlCameraType.FormattingEnabled = true;
+			ddlCameraType.Location = new System.Drawing.Point(113, 12);
+			ddlCameraType.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+			ddlCameraType.Name = "ddlCameraType";
+			ddlCameraType.Size = new System.Drawing.Size(392, 28);
+			ddlCameraType.TabIndex = 8;
+			ddlCameraType.SelectedIndexChanged += DdlCameraTypeSelectedIndexChanged;
 			// 
 			// txbWarioY
 			// 
-			this.txbWarioY.Location = new System.Drawing.Point(142, 43);
-			this.txbWarioY.Maximum = new decimal(new int[] {
-            63,
-            0,
-            0,
-            0});
-			this.txbWarioY.Name = "txbWarioY";
-			this.txbWarioY.Size = new System.Drawing.Size(50, 20);
-			this.txbWarioY.TabIndex = 10;
-			this.txbWarioY.ValueChanged += new System.EventHandler(this.TxbWarioYValueChanged);
+			txbWarioY.Location = new System.Drawing.Point(189, 51);
+			txbWarioY.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+			txbWarioY.Maximum = new decimal(new int[] { 63, 0, 0, 0 });
+			txbWarioY.Name = "txbWarioY";
+			txbWarioY.Size = new System.Drawing.Size(67, 27);
+			txbWarioY.TabIndex = 10;
+			txbWarioY.ValueChanged += TxbWarioYValueChanged;
 			// 
 			// labCameraType
 			// 
-			this.labCameraType.Location = new System.Drawing.Point(14, 16);
-			this.labCameraType.Name = "labCameraType";
-			this.labCameraType.Size = new System.Drawing.Size(66, 18);
-			this.labCameraType.TabIndex = 28;
-			this.labCameraType.Text = "Camera type";
-			this.labCameraType.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			labCameraType.Location = new System.Drawing.Point(6, 12);
+			labCameraType.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+			labCameraType.Name = "labCameraType";
+			labCameraType.Size = new System.Drawing.Size(96, 28);
+			labCameraType.TabIndex = 28;
+			labCameraType.Text = "Camera type";
+			labCameraType.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// ddlEnemies
 			// 
-			this.ddlEnemies.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
-			this.ddlEnemies.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.ddlEnemies.FormattingEnabled = true;
-			this.ddlEnemies.IntegralHeight = false;
-			this.ddlEnemies.ItemHeight = 32;
-			this.ddlEnemies.Location = new System.Drawing.Point(85, 65);
-			this.ddlEnemies.Name = "ddlEnemies";
-			this.ddlEnemies.Size = new System.Drawing.Size(295, 38);
-			this.ddlEnemies.TabIndex = 7;
-			this.ddlEnemies.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.DdlEnemiesDrawItem);
-			this.ddlEnemies.SelectedIndexChanged += new System.EventHandler(this.DdlEnemiesSelectedIndexChanged);
+			ddlEnemies.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
+			ddlEnemies.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			ddlEnemies.FormattingEnabled = true;
+			ddlEnemies.IntegralHeight = false;
+			ddlEnemies.ItemHeight = 32;
+			ddlEnemies.Location = new System.Drawing.Point(113, 87);
+			ddlEnemies.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+			ddlEnemies.Name = "ddlEnemies";
+			ddlEnemies.Size = new System.Drawing.Size(392, 38);
+			ddlEnemies.TabIndex = 7;
+			ddlEnemies.DrawItem += DdlEnemiesDrawItem;
+			ddlEnemies.SelectedIndexChanged += DdlEnemiesSelectedIndexChanged;
 			// 
 			// labCamera
 			// 
-			this.labCamera.Location = new System.Drawing.Point(5, 70);
-			this.labCamera.Name = "labCamera";
-			this.labCamera.Size = new System.Drawing.Size(71, 18);
-			this.labCamera.TabIndex = 20;
-			this.labCamera.Text = "Camera X / Y";
-			this.labCamera.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			labCamera.Location = new System.Drawing.Point(7, 89);
+			labCamera.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+			labCamera.Name = "labCamera";
+			labCamera.Size = new System.Drawing.Size(95, 28);
+			labCamera.TabIndex = 20;
+			labCamera.Text = "Camera X / Y";
+			labCamera.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// txbWarioX
 			// 
-			this.txbWarioX.Location = new System.Drawing.Point(85, 43);
-			this.txbWarioX.Maximum = new decimal(new int[] {
-            511,
-            0,
-            0,
-            0});
-			this.txbWarioX.Name = "txbWarioX";
-			this.txbWarioX.Size = new System.Drawing.Size(50, 20);
-			this.txbWarioX.TabIndex = 9;
-			this.txbWarioX.ValueChanged += new System.EventHandler(this.TxbWarioXValueChanged);
+			txbWarioX.Location = new System.Drawing.Point(113, 51);
+			txbWarioX.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+			txbWarioX.Maximum = new decimal(new int[] { 511, 0, 0, 0 });
+			txbWarioX.Name = "txbWarioX";
+			txbWarioX.Size = new System.Drawing.Size(67, 27);
+			txbWarioX.TabIndex = 9;
+			txbWarioX.ValueChanged += TxbWarioXValueChanged;
 			// 
 			// labMusic
 			// 
-			this.labMusic.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.labMusic.Location = new System.Drawing.Point(30, 3);
-			this.labMusic.Name = "labMusic";
-			this.labMusic.Size = new System.Drawing.Size(47, 20);
-			this.labMusic.TabIndex = 14;
-			this.labMusic.Text = "Music";
-			this.labMusic.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			labMusic.Location = new System.Drawing.Point(39, 3);
+			labMusic.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+			labMusic.Name = "labMusic";
+			labMusic.Size = new System.Drawing.Size(63, 31);
+			labMusic.TabIndex = 14;
+			labMusic.Text = "Music";
+			labMusic.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// ddlMusic
 			// 
-			this.ddlMusic.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.ddlMusic.DropDownWidth = 300;
-			this.ddlMusic.FormattingEnabled = true;
-			this.ddlMusic.Location = new System.Drawing.Point(85, 3);
-			this.ddlMusic.Name = "ddlMusic";
-			this.ddlMusic.Size = new System.Drawing.Size(298, 21);
-			this.ddlMusic.TabIndex = 0;
-			this.ddlMusic.SelectedIndexChanged += new System.EventHandler(this.DdlMusicSelectedIndexChanged);
+			ddlMusic.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			ddlMusic.DropDownWidth = 300;
+			ddlMusic.FormattingEnabled = true;
+			ddlMusic.Location = new System.Drawing.Point(118, 5);
+			ddlMusic.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+			ddlMusic.Name = "ddlMusic";
+			ddlMusic.Size = new System.Drawing.Size(392, 28);
+			ddlMusic.TabIndex = 0;
+			ddlMusic.SelectedIndexChanged += DdlMusicSelectedIndexChanged;
 			// 
 			// panelCamera
 			// 
-			this.panelCamera.AutoSize = true;
-			this.panelCamera.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.panelCamera.Controls.Add(this.labCameraType);
-			this.panelCamera.Controls.Add(this.txbWarioY);
-			this.panelCamera.Controls.Add(this.txbCameraX);
-			this.panelCamera.Controls.Add(this.labWario);
-			this.panelCamera.Controls.Add(this.labCamera);
-			this.panelCamera.Controls.Add(this.txbCameraY);
-			this.panelCamera.Controls.Add(this.txbWarioX);
-			this.panelCamera.Controls.Add(this.ddlCameraType);
-			this.panelCamera.Controls.Add(this.cmdCalculatePos);
-			this.panelCamera.Location = new System.Drawing.Point(0, 160);
-			this.panelCamera.Margin = new System.Windows.Forms.Padding(0);
-			this.panelCamera.Name = "panelCamera";
-			this.panelCamera.Size = new System.Drawing.Size(383, 93);
-			this.panelCamera.TabIndex = 3;
+			panelCamera.AutoSize = true;
+			panelCamera.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			panelCamera.Controls.Add(labCameraType);
+			panelCamera.Controls.Add(txbWarioY);
+			panelCamera.Controls.Add(txbCameraX);
+			panelCamera.Controls.Add(labWario);
+			panelCamera.Controls.Add(labCamera);
+			panelCamera.Controls.Add(txbCameraY);
+			panelCamera.Controls.Add(txbWarioX);
+			panelCamera.Controls.Add(ddlCameraType);
+			panelCamera.Controls.Add(cmdCalculatePos);
+			panelCamera.Location = new System.Drawing.Point(0, 206);
+			panelCamera.Margin = new System.Windows.Forms.Padding(0);
+			panelCamera.Name = "panelCamera";
+			panelCamera.Size = new System.Drawing.Size(511, 123);
+			panelCamera.TabIndex = 3;
 			// 
 			// labWarioStatusLevel
 			// 
-			this.labWarioStatusLevel.Location = new System.Drawing.Point(11, 4);
-			this.labWarioStatusLevel.Name = "labWarioStatusLevel";
-			this.labWarioStatusLevel.Size = new System.Drawing.Size(66, 18);
-			this.labWarioStatusLevel.TabIndex = 30;
-			this.labWarioStatusLevel.Text = "Wario status";
-			this.labWarioStatusLevel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			labWarioStatusLevel.Location = new System.Drawing.Point(7, 6);
+			labWarioStatusLevel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+			labWarioStatusLevel.Name = "labWarioStatusLevel";
+			labWarioStatusLevel.Size = new System.Drawing.Size(95, 28);
+			labWarioStatusLevel.TabIndex = 30;
+			labWarioStatusLevel.Text = "Wario status";
+			labWarioStatusLevel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// ddlWarioStatus
 			// 
-			this.ddlWarioStatus.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.ddlWarioStatus.FormattingEnabled = true;
-			this.ddlWarioStatus.Location = new System.Drawing.Point(239, 3);
-			this.ddlWarioStatus.Name = "ddlWarioStatus";
-			this.ddlWarioStatus.Size = new System.Drawing.Size(141, 21);
-			this.ddlWarioStatus.TabIndex = 29;
-			this.ddlWarioStatus.SelectedIndexChanged += new System.EventHandler(this.DdlWarioStatus_SelectedIndexChanged);
+			ddlWarioStatus.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			ddlWarioStatus.FormattingEnabled = true;
+			ddlWarioStatus.Location = new System.Drawing.Point(319, 5);
+			ddlWarioStatus.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+			ddlWarioStatus.Name = "ddlWarioStatus";
+			ddlWarioStatus.Size = new System.Drawing.Size(187, 28);
+			ddlWarioStatus.TabIndex = 29;
+			ddlWarioStatus.SelectedIndexChanged += DdlWarioStatus_SelectedIndexChanged;
 			// 
 			// panelTileset
 			// 
-			this.panelTileset.AutoSize = true;
-			this.panelTileset.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.panelTileset.Controls.Add(this.ddlTileSet);
-			this.panelTileset.Controls.Add(this.labTileSet);
-			this.panelTileset.Controls.Add(this.ddlAnimation);
-			this.panelTileset.Controls.Add(this.labEnemies);
-			this.panelTileset.Controls.Add(this.labAnimation);
-			this.panelTileset.Controls.Add(this.ddlEnemies);
-			this.panelTileset.Controls.Add(this.ddlAnimationSpeed);
-			this.panelTileset.Location = new System.Drawing.Point(0, 54);
-			this.panelTileset.Margin = new System.Windows.Forms.Padding(0);
-			this.panelTileset.Name = "panelTileset";
-			this.panelTileset.Size = new System.Drawing.Size(383, 106);
-			this.panelTileset.TabIndex = 2;
+			panelTileset.AutoSize = true;
+			panelTileset.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			panelTileset.Controls.Add(ddlTileSet);
+			panelTileset.Controls.Add(labTileSet);
+			panelTileset.Controls.Add(ddlAnimation);
+			panelTileset.Controls.Add(labEnemies);
+			panelTileset.Controls.Add(labAnimation);
+			panelTileset.Controls.Add(ddlEnemies);
+			panelTileset.Controls.Add(ddlAnimationSpeed);
+			panelTileset.Location = new System.Drawing.Point(0, 76);
+			panelTileset.Margin = new System.Windows.Forms.Padding(0);
+			panelTileset.Name = "panelTileset";
+			panelTileset.Size = new System.Drawing.Size(509, 130);
+			panelTileset.TabIndex = 2;
 			// 
 			// labWarioStatusSector
 			// 
-			this.labWarioStatusSector.Location = new System.Drawing.Point(11, 4);
-			this.labWarioStatusSector.Name = "labWarioStatusSector";
-			this.labWarioStatusSector.Size = new System.Drawing.Size(66, 18);
-			this.labWarioStatusSector.TabIndex = 33;
-			this.labWarioStatusSector.Text = "Wario status";
-			this.labWarioStatusSector.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			labWarioStatusSector.Location = new System.Drawing.Point(6, 6);
+			labWarioStatusSector.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+			labWarioStatusSector.Name = "labWarioStatusSector";
+			labWarioStatusSector.Size = new System.Drawing.Size(96, 28);
+			labWarioStatusSector.TabIndex = 33;
+			labWarioStatusSector.Text = "Wario status";
+			labWarioStatusSector.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// ddlWarioAttributesSector
 			// 
-			this.ddlWarioAttributesSector.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.ddlWarioAttributesSector.FormattingEnabled = true;
-			this.ddlWarioAttributesSector.Location = new System.Drawing.Point(85, 3);
-			this.ddlWarioAttributesSector.Name = "ddlWarioAttributesSector";
-			this.ddlWarioAttributesSector.Size = new System.Drawing.Size(295, 21);
-			this.ddlWarioAttributesSector.TabIndex = 32;
-			this.ddlWarioAttributesSector.SelectedIndexChanged += new System.EventHandler(this.DdlWarioAttributesSector_SelectedIndexChanged);
+			ddlWarioAttributesSector.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			ddlWarioAttributesSector.FormattingEnabled = true;
+			ddlWarioAttributesSector.Location = new System.Drawing.Point(113, 5);
+			ddlWarioAttributesSector.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+			ddlWarioAttributesSector.Name = "ddlWarioAttributesSector";
+			ddlWarioAttributesSector.Size = new System.Drawing.Size(392, 28);
+			ddlWarioAttributesSector.TabIndex = 32;
+			ddlWarioAttributesSector.SelectedIndexChanged += DdlWarioAttributesSector_SelectedIndexChanged;
 			// 
 			// panelMusic
 			// 
-			this.panelMusic.AutoSize = true;
-			this.panelMusic.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.panelMusic.Controls.Add(this.ddlMusic);
-			this.panelMusic.Controls.Add(this.labMusic);
-			this.panelMusic.Location = new System.Drawing.Point(0, 27);
-			this.panelMusic.Margin = new System.Windows.Forms.Padding(0);
-			this.panelMusic.Name = "panelMusic";
-			this.panelMusic.Size = new System.Drawing.Size(386, 27);
-			this.panelMusic.TabIndex = 0;
+			panelMusic.AutoSize = true;
+			panelMusic.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			panelMusic.Controls.Add(ddlMusic);
+			panelMusic.Controls.Add(labMusic);
+			panelMusic.Location = new System.Drawing.Point(0, 38);
+			panelMusic.Margin = new System.Windows.Forms.Padding(0);
+			panelMusic.Name = "panelMusic";
+			panelMusic.Size = new System.Drawing.Size(514, 38);
+			panelMusic.TabIndex = 0;
 			// 
 			// checkBoxCheckpoint
 			// 
-			this.checkBoxCheckpoint.Location = new System.Drawing.Point(3, 57);
-			this.checkBoxCheckpoint.Name = "checkBoxCheckpoint";
-			this.checkBoxCheckpoint.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-			this.checkBoxCheckpoint.Size = new System.Drawing.Size(96, 20);
-			this.checkBoxCheckpoint.TabIndex = 48;
-			this.checkBoxCheckpoint.Text = "Checkpoint";
-			this.checkBoxCheckpoint.CheckedChanged += new System.EventHandler(this.CheckBoxCheckpoint_CheckedChanged);
+			checkBoxCheckpoint.Location = new System.Drawing.Point(118, 5);
+			checkBoxCheckpoint.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+			checkBoxCheckpoint.Name = "checkBoxCheckpoint";
+			checkBoxCheckpoint.Size = new System.Drawing.Size(14, 31);
+			checkBoxCheckpoint.TabIndex = 48;
+			checkBoxCheckpoint.CheckedChanged += CheckBoxCheckpoint_CheckedChanged;
 			// 
 			// panelStatusLevel
 			// 
-			this.panelStatusLevel.AutoSize = true;
-			this.panelStatusLevel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.panelStatusLevel.Controls.Add(this.ddlWarioAttributesLevel);
-			this.panelStatusLevel.Controls.Add(this.labWarioStatusLevel);
-			this.panelStatusLevel.Controls.Add(this.ddlWarioStatus);
-			this.panelStatusLevel.Location = new System.Drawing.Point(0, 0);
-			this.panelStatusLevel.Margin = new System.Windows.Forms.Padding(0);
-			this.panelStatusLevel.Name = "panelStatusLevel";
-			this.panelStatusLevel.Size = new System.Drawing.Size(383, 27);
-			this.panelStatusLevel.TabIndex = 0;
+			panelStatusLevel.AutoSize = true;
+			panelStatusLevel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			panelStatusLevel.Controls.Add(ddlWarioAttributesLevel);
+			panelStatusLevel.Controls.Add(labWarioStatusLevel);
+			panelStatusLevel.Controls.Add(ddlWarioStatus);
+			panelStatusLevel.Location = new System.Drawing.Point(0, 0);
+			panelStatusLevel.Margin = new System.Windows.Forms.Padding(0);
+			panelStatusLevel.Name = "panelStatusLevel";
+			panelStatusLevel.Size = new System.Drawing.Size(510, 38);
+			panelStatusLevel.TabIndex = 0;
 			// 
 			// ddlWarioAttributesLevel
 			// 
-			this.ddlWarioAttributesLevel.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.ddlWarioAttributesLevel.FormattingEnabled = true;
-			this.ddlWarioAttributesLevel.Location = new System.Drawing.Point(85, 3);
-			this.ddlWarioAttributesLevel.Name = "ddlWarioAttributesLevel";
-			this.ddlWarioAttributesLevel.Size = new System.Drawing.Size(148, 21);
-			this.ddlWarioAttributesLevel.TabIndex = 31;
-			this.ddlWarioAttributesLevel.SelectedIndexChanged += new System.EventHandler(this.DdlWarioAttributesLevel_SelectedIndexChanged);
+			ddlWarioAttributesLevel.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			ddlWarioAttributesLevel.FormattingEnabled = true;
+			ddlWarioAttributesLevel.Location = new System.Drawing.Point(113, 5);
+			ddlWarioAttributesLevel.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+			ddlWarioAttributesLevel.Name = "ddlWarioAttributesLevel";
+			ddlWarioAttributesLevel.Size = new System.Drawing.Size(196, 28);
+			ddlWarioAttributesLevel.TabIndex = 31;
+			ddlWarioAttributesLevel.SelectedIndexChanged += DdlWarioAttributesLevel_SelectedIndexChanged;
 			// 
 			// panelStatusSector
 			// 
-			this.panelStatusSector.AutoSize = true;
-			this.panelStatusSector.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.panelStatusSector.Controls.Add(this.ddlWarioAttributesSector);
-			this.panelStatusSector.Controls.Add(this.labWarioStatusSector);
-			this.panelStatusSector.Location = new System.Drawing.Point(0, 27);
-			this.panelStatusSector.Margin = new System.Windows.Forms.Padding(0);
-			this.panelStatusSector.Name = "panelStatusSector";
-			this.panelStatusSector.Size = new System.Drawing.Size(383, 27);
-			this.panelStatusSector.TabIndex = 0;
+			panelStatusSector.AutoSize = true;
+			panelStatusSector.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			panelStatusSector.Controls.Add(ddlWarioAttributesSector);
+			panelStatusSector.Controls.Add(labWarioStatusSector);
+			panelStatusSector.Location = new System.Drawing.Point(0, 38);
+			panelStatusSector.Margin = new System.Windows.Forms.Padding(0);
+			panelStatusSector.Name = "panelStatusSector";
+			panelStatusSector.Size = new System.Drawing.Size(509, 38);
+			panelStatusSector.TabIndex = 0;
 			// 
 			// panelWarp
 			// 
-			this.panelWarp.AutoSize = true;
-			this.panelWarp.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.panelWarp.Controls.Add(this.labWarp);
-			this.panelWarp.Controls.Add(this.ddlWarp);
-			this.panelWarp.Location = new System.Drawing.Point(0, 106);
-			this.panelWarp.Margin = new System.Windows.Forms.Padding(0);
-			this.panelWarp.Name = "panelWarp";
-			this.panelWarp.Size = new System.Drawing.Size(386, 27);
-			this.panelWarp.TabIndex = 1;
+			panelWarp.AutoSize = true;
+			panelWarp.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			panelWarp.Controls.Add(labWarp);
+			panelWarp.Controls.Add(ddlWarp);
+			panelWarp.Location = new System.Drawing.Point(0, 158);
+			panelWarp.Margin = new System.Windows.Forms.Padding(0);
+			panelWarp.Name = "panelWarp";
+			panelWarp.Size = new System.Drawing.Size(513, 38);
+			panelWarp.TabIndex = 1;
 			// 
 			// flowLayoutPanel1
 			// 
-			this.flowLayoutPanel1.AutoSize = true;
-			this.flowLayoutPanel1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.flowLayoutPanel1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(223)))), ((int)(((byte)(207)))), ((int)(((byte)(192)))));
-			this.flowLayoutPanel1.Controls.Add(this.ddlWarpType);
-			this.flowLayoutPanel1.Controls.Add(this.panelMusic);
-			this.flowLayoutPanel1.Controls.Add(this.checkBoxCheckpoint);
-			this.flowLayoutPanel1.Controls.Add(this.panelScroll);
-			this.flowLayoutPanel1.Controls.Add(this.panelWarp);
-			this.flowLayoutPanel1.Controls.Add(this.flowLayoutPanel2);
-			this.flowLayoutPanel1.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
-			this.flowLayoutPanel1.Location = new System.Drawing.Point(8, 8);
-			this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-			this.flowLayoutPanel1.Size = new System.Drawing.Size(389, 392);
-			this.flowLayoutPanel1.TabIndex = 46;
+			flowLayoutPanel1.AutoSize = true;
+			flowLayoutPanel1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			flowLayoutPanel1.BackColor = System.Drawing.Color.FromArgb(223, 207, 192);
+			flowLayoutPanel1.Controls.Add(ddlWarpType);
+			flowLayoutPanel1.Controls.Add(panelMusic);
+			flowLayoutPanel1.Controls.Add(panelCheckpoint);
+			flowLayoutPanel1.Controls.Add(panelScroll);
+			flowLayoutPanel1.Controls.Add(panelWarp);
+			flowLayoutPanel1.Controls.Add(flowLayoutPanel2);
+			flowLayoutPanel1.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
+			flowLayoutPanel1.Location = new System.Drawing.Point(11, 12);
+			flowLayoutPanel1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+			flowLayoutPanel1.Name = "flowLayoutPanel1";
+			flowLayoutPanel1.Size = new System.Drawing.Size(519, 535);
+			flowLayoutPanel1.TabIndex = 46;
 			// 
 			// ddlWarpType
 			// 
-			this.ddlWarpType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.ddlWarpType.FormattingEnabled = true;
-			this.ddlWarpType.ImeMode = System.Windows.Forms.ImeMode.On;
-			this.ddlWarpType.Items.AddRange(new object[] {
-            "Level header",
-            "Checkpoint",
-            "Sector 00",
-            "Sector 01",
-            "Sector 02",
-            "Sector 03",
-            "Sector 04",
-            "Sector 05",
-            "Sector 06",
-            "Sector 07",
-            "Sector 08",
-            "Sector 09",
-            "Sector 10",
-            "Sector 11",
-            "Sector 12",
-            "Sector 13",
-            "Sector 14",
-            "Sector 15",
-            "Sector 16",
-            "Sector 17",
-            "Sector 18",
-            "Sector 19",
-            "Sector 20",
-            "Sector 21",
-            "Sector 22",
-            "Sector 23",
-            "Sector 24",
-            "Sector 25",
-            "Sector 26",
-            "Sector 27",
-            "Sector 28",
-            "Sector 29",
-            "Sector 30",
-            "Sector 31",
-            "Treasure A",
-            "Treasure B",
-            "Treasure C",
-            "Treasure D",
-            "Treasure E",
-            "Treasure F",
-            "Treasure G",
-            "Treasure H",
-            "Treasure I",
-            "Treasure J",
-            "Treasure K",
-            "Treasure L",
-            "Treasure M",
-            "Treasure N",
-            "Treasure O"});
-			this.ddlWarpType.Location = new System.Drawing.Point(3, 3);
-			this.ddlWarpType.Name = "ddlWarpType";
-			this.ddlWarpType.Size = new System.Drawing.Size(383, 21);
-			this.ddlWarpType.TabIndex = 47;
-			this.ddlWarpType.SelectedIndexChanged += new System.EventHandler(this.DdlWarpType_SelectedIndexChanged);
+			ddlWarpType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			ddlWarpType.FormattingEnabled = true;
+			ddlWarpType.ImeMode = System.Windows.Forms.ImeMode.On;
+			ddlWarpType.Items.AddRange(new object[] { "Level header", "Checkpoint", "Sector 00", "Sector 01", "Sector 02", "Sector 03", "Sector 04", "Sector 05", "Sector 06", "Sector 07", "Sector 08", "Sector 09", "Sector 10", "Sector 11", "Sector 12", "Sector 13", "Sector 14", "Sector 15", "Sector 16", "Sector 17", "Sector 18", "Sector 19", "Sector 20", "Sector 21", "Sector 22", "Sector 23", "Sector 24", "Sector 25", "Sector 26", "Sector 27", "Sector 28", "Sector 29", "Sector 30", "Sector 31", "Treasure A", "Treasure B", "Treasure C", "Treasure D", "Treasure E", "Treasure F", "Treasure G", "Treasure H", "Treasure I", "Treasure J", "Treasure K", "Treasure L", "Treasure M", "Treasure N", "Treasure O" });
+			ddlWarpType.Location = new System.Drawing.Point(4, 5);
+			ddlWarpType.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+			ddlWarpType.Name = "ddlWarpType";
+			ddlWarpType.Size = new System.Drawing.Size(509, 28);
+			ddlWarpType.TabIndex = 47;
+			ddlWarpType.SelectedIndexChanged += DdlWarpType_SelectedIndexChanged;
+			// 
+			// panelCheckpoint
+			// 
+			panelCheckpoint.AutoSize = true;
+			panelCheckpoint.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			panelCheckpoint.Controls.Add(checkBoxCheckpoint);
+			panelCheckpoint.Controls.Add(label1);
+			panelCheckpoint.Location = new System.Drawing.Point(0, 76);
+			panelCheckpoint.Margin = new System.Windows.Forms.Padding(0);
+			panelCheckpoint.Name = "panelCheckpoint";
+			panelCheckpoint.Size = new System.Drawing.Size(136, 41);
+			panelCheckpoint.TabIndex = 49;
+			// 
+			// label1
+			// 
+			label1.Location = new System.Drawing.Point(12, 6);
+			label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+			label1.Name = "label1";
+			label1.Size = new System.Drawing.Size(90, 26);
+			label1.TabIndex = 11;
+			label1.Text = "Checkpoint";
+			label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// panelScroll
 			// 
-			this.panelScroll.AutoSize = true;
-			this.panelScroll.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.panelScroll.Controls.Add(this.checkBoxRight);
-			this.panelScroll.Controls.Add(this.labScroll);
-			this.panelScroll.Controls.Add(this.checkBoxLeft);
-			this.panelScroll.Location = new System.Drawing.Point(0, 80);
-			this.panelScroll.Margin = new System.Windows.Forms.Padding(0);
-			this.panelScroll.Name = "panelScroll";
-			this.panelScroll.Size = new System.Drawing.Size(192, 26);
-			this.panelScroll.TabIndex = 48;
+			panelScroll.AutoSize = true;
+			panelScroll.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			panelScroll.Controls.Add(checkBoxRight);
+			panelScroll.Controls.Add(labScroll);
+			panelScroll.Controls.Add(checkBoxLeft);
+			panelScroll.Location = new System.Drawing.Point(0, 117);
+			panelScroll.Margin = new System.Windows.Forms.Padding(0);
+			panelScroll.Name = "panelScroll";
+			panelScroll.Size = new System.Drawing.Size(261, 41);
+			panelScroll.TabIndex = 48;
 			// 
 			// flowLayoutPanel2
 			// 
-			this.flowLayoutPanel2.AutoSize = true;
-			this.flowLayoutPanel2.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.flowLayoutPanel2.BackColor = System.Drawing.SystemColors.Control;
-			this.flowLayoutPanel2.Controls.Add(this.panelStatusLevel);
-			this.flowLayoutPanel2.Controls.Add(this.panelStatusSector);
-			this.flowLayoutPanel2.Controls.Add(this.panelTileset);
-			this.flowLayoutPanel2.Controls.Add(this.panelCamera);
-			this.flowLayoutPanel2.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
-			this.flowLayoutPanel2.ForeColor = System.Drawing.SystemColors.ControlText;
-			this.flowLayoutPanel2.Location = new System.Drawing.Point(3, 136);
-			this.flowLayoutPanel2.Name = "flowLayoutPanel2";
-			this.flowLayoutPanel2.Size = new System.Drawing.Size(383, 253);
-			this.flowLayoutPanel2.TabIndex = 48;
+			flowLayoutPanel2.AutoSize = true;
+			flowLayoutPanel2.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			flowLayoutPanel2.BackColor = System.Drawing.SystemColors.Control;
+			flowLayoutPanel2.Controls.Add(panelStatusLevel);
+			flowLayoutPanel2.Controls.Add(panelStatusSector);
+			flowLayoutPanel2.Controls.Add(panelTileset);
+			flowLayoutPanel2.Controls.Add(panelCamera);
+			flowLayoutPanel2.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
+			flowLayoutPanel2.ForeColor = System.Drawing.SystemColors.ControlText;
+			flowLayoutPanel2.Location = new System.Drawing.Point(4, 201);
+			flowLayoutPanel2.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+			flowLayoutPanel2.Name = "flowLayoutPanel2";
+			flowLayoutPanel2.Size = new System.Drawing.Size(511, 329);
+			flowLayoutPanel2.TabIndex = 48;
 			// 
 			// SectorForm
 			// 
-			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.AutoSize = true;
-			this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.ClientSize = new System.Drawing.Size(416, 418);
-			this.Controls.Add(this.flowLayoutPanel1);
-			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
-			this.MaximizeBox = false;
-			this.MinimizeBox = false;
-			this.Name = "SectorForm";
-			this.Padding = new System.Windows.Forms.Padding(5);
-			this.ShowIcon = false;
-			this.ShowInTaskbar = false;
-			this.Text = "Sectors / Level header";
-			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.SectorFormFormClosing);
-			this.VisibleChanged += new System.EventHandler(this.SectorFormVisibleChanged);
-			((System.ComponentModel.ISupportInitialize)(this.txbCameraX)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.txbCameraY)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.txbWarioY)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.txbWarioX)).EndInit();
-			this.panelCamera.ResumeLayout(false);
-			this.panelTileset.ResumeLayout(false);
-			this.panelMusic.ResumeLayout(false);
-			this.panelStatusLevel.ResumeLayout(false);
-			this.panelStatusSector.ResumeLayout(false);
-			this.panelWarp.ResumeLayout(false);
-			this.flowLayoutPanel1.ResumeLayout(false);
-			this.flowLayoutPanel1.PerformLayout();
-			this.panelScroll.ResumeLayout(false);
-			this.flowLayoutPanel2.ResumeLayout(false);
-			this.flowLayoutPanel2.PerformLayout();
-			this.ResumeLayout(false);
-			this.PerformLayout();
+			AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
+			AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+			AutoSize = true;
+			AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			ClientSize = new System.Drawing.Size(555, 643);
+			Controls.Add(flowLayoutPanel1);
+			FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
+			Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+			MaximizeBox = false;
+			MinimizeBox = false;
+			Name = "SectorForm";
+			Padding = new System.Windows.Forms.Padding(7, 8, 7, 8);
+			ShowIcon = false;
+			ShowInTaskbar = false;
+			Text = "Sectors / Level header";
+			FormClosing += SectorFormFormClosing;
+			VisibleChanged += SectorFormVisibleChanged;
+			((System.ComponentModel.ISupportInitialize)txbCameraX).EndInit();
+			((System.ComponentModel.ISupportInitialize)txbCameraY).EndInit();
+			((System.ComponentModel.ISupportInitialize)txbWarioY).EndInit();
+			((System.ComponentModel.ISupportInitialize)txbWarioX).EndInit();
+			panelCamera.ResumeLayout(false);
+			panelTileset.ResumeLayout(false);
+			panelMusic.ResumeLayout(false);
+			panelStatusLevel.ResumeLayout(false);
+			panelStatusSector.ResumeLayout(false);
+			panelWarp.ResumeLayout(false);
+			flowLayoutPanel1.ResumeLayout(false);
+			flowLayoutPanel1.PerformLayout();
+			panelCheckpoint.ResumeLayout(false);
+			panelScroll.ResumeLayout(false);
+			flowLayoutPanel2.ResumeLayout(false);
+			flowLayoutPanel2.PerformLayout();
+			ResumeLayout(false);
+			PerformLayout();
 
 		}
 
@@ -655,5 +644,7 @@ namespace WLEditor
 		private System.Windows.Forms.ComboBox ddlWarioAttributesSector;
 		private System.Windows.Forms.Panel panelScroll;
 		private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel2;
+		private System.Windows.Forms.Label label1;
+		private System.Windows.Forms.Panel panelCheckpoint;
 	}
 }
