@@ -520,7 +520,7 @@ namespace WLEditor
 
 			bool validWarp = currentSector != -1 && Sector.GetWarp(rom, currentCourseId, currentSector) >= 0x5B7A;
 			panelScroll.Visible = panelWarp.Visible = currentSector != -1;
-			checkBoxCheckpoint.Visible = panelMusic.Visible = currentSector == -1 && currentTreasureId == -1 && !currentCheckPoint;
+			panelCheckpoint.Visible = panelMusic.Visible = currentSector == -1 && currentTreasureId == -1 && !currentCheckPoint;
 			panelStatusLevel.Visible = currentSector == -1 && currentTreasureId == -1;
 			panelStatusSector.Visible = validWarp || currentTreasureId != -1;
 			panelTileset.Visible = panelCamera.Visible = currentSector == -1 || validWarp;
