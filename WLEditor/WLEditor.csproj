@@ -13,12 +13,10 @@
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <DebugType>None</DebugType>
   </PropertyGroup>
-  <ItemGroup>
-    <Reference Update="System.Core">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
-    <PackageReference Include="Microsoft.VisualBasic" Version="10.3.0" />
-  </ItemGroup>
+  <PropertyGroup>    
+    <AssemblyVersion>0.88.*</AssemblyVersion>    
+	<Deterministic>False</Deterministic>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Update="LevelPictureBox.cs">
       <SubType>Component</SubType>
