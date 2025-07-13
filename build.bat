@@ -1,10 +1,11 @@
 @echo off
 
-"%ProgramFiles%\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\msbuild.exe" /p:Configuration=Release ".\WLEditor.sln" /t:Rebuild
+rd /s/q ".\WLEditor\bin\Release\net9.0-windows\"
+
+dotnet build -c Release ".\WLEditor.sln"
 if %ERRORLEVEL% NEQ 0 pause
 
 "%PROGRAMFILES%\7-Zip\7z" a -tzip "WLEditor.zip" ^
- ".\WLEditor\bin\Release\WLEditor.exe" ^
- ".\WLEditor\bin\Release\WLEditor.exe.config" ^
+ ".\WLEditor\bin\Release\net9.0-windows\*" ^
  "-mx=9"
 if %ERRORLEVEL% NEQ 0 pause 
