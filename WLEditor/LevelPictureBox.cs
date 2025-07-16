@@ -357,20 +357,27 @@ namespace WLEditor
 		public void InvalidateObject(int tileIndex, int currentObject, int previousObject)
 		{
 			using Region r = new(new Rectangle((tileIndex % 256) * 16 * zoom, (tileIndex / 256) * 16 * zoom, 16 * zoom, 16 * zoom));
-			AddEnemyRegion(r, previousObject);
-			AddEnemyRegion(r, currentObject);
+
+			var previous = GetEnemyRectangle(tileIndex, previousObject, zoom);
+			if (previous != Rectangle.Empty) r.Union(previous);
+
+			var current = GetEnemyRectangle(tileIndex, currentObject, zoom);
+			if (current != Rectangle.Empty) r.Union(current);
+
 			Invalidate(r);
 
-			void AddEnemyRegion(Region region, int enemyIndex)
+			static Rectangle GetEnemyRectangle(int tileIndex, int enemyIndex, int zoom = 1)
 			{
 				if (enemyIndex >= 1 && enemyIndex <= 6)
 				{
 					var (enemyRect, enemyOffset) = Sprite.LoadedSprites[enemyIndex - 1];
-					if (enemyRect != Rectangle.Empty)
-					{
-						region.Union(new Rectangle(((tileIndex % 256) * 16 + enemyOffset.X) * zoom, ((tileIndex / 256) * 16 + enemyOffset.Y) * zoom, enemyRect.Width * zoom, enemyRect.Height * zoom));
-					}
+					return new Rectangle(
+						(tileIndex % 256 * 16 + enemyOffset.X) * zoom,
+						(tileIndex / 256 * 16 + enemyOffset.Y) * zoom,
+						enemyRect.Width * zoom, enemyRect.Height * zoom);
 				}
+
+				return Rectangle.Empty;
 			}
 		}
 
