@@ -487,16 +487,16 @@ namespace WLEditor
 
 		#region Selection
 
-		public void CopySelection()
+		public ClipboardData CopySelection(ClipboardType type = ClipboardType.TILE_16x16)
 		{
-			selection.CopySelection(CopyTileAt);
+			return selection.CopySelection(CopyTileAt, type);
 		}
 
-		public bool PasteSelection()
+		public bool PasteSelection(ClipboardType type = ClipboardType.TILE_16x16)
 		{
 			if (selection.HasSelection)
 			{
-				history.AddChanges(selection.PasteSelection(PasteTileAt));
+				history.AddChanges(selection.PasteSelection(PasteTileAt, type));
 				RaiseTileMoveEvent();
 				Invalidate();
 				return true;
@@ -509,7 +509,7 @@ namespace WLEditor
 		{
 			if (selection.HasSelection)
 			{
-				selection.CopySelection(CopyTileAt);
+				selection.CopySelection(CopyTileAt, ClipboardType.TILE_16x16);
 				history.AddChanges(selection.DeleteSelection(SetTileAt, GetEmptyTile()));
 
 				RaiseTileMoveEvent();
@@ -560,9 +560,9 @@ namespace WLEditor
 			return data; //no changes
 		}
 
-		ClipboardData CopyTileAt(int x, int y)
+		ClipboardTile CopyTileAt(int x, int y)
 		{
-			return new ClipboardData { Tile = GetTileAt(x, y) };
+			return new ClipboardTile { Tile = GetTileAt(x, y) };
 		}
 
 		int GetTileAt(int x, int y)

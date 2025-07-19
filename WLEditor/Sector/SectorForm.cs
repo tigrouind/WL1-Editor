@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
+using System.Numerics;
 using System.Windows.Forms;
 
 namespace WLEditor
@@ -32,9 +33,6 @@ namespace WLEditor
 		int zoom;
 		bool ignoreEvents;
 		bool formLoaded;
-
-		readonly Stack<int> lastFreeWarp = new();
-		readonly Stack<int> lastFreeCheckpoint = new();
 
 		public SectorForm()
 		{
@@ -783,7 +781,7 @@ namespace WLEditor
 					}
 					else
 					{
-						warp = GetFreeWarp();
+						warp = Sector.GetFreeWarp(rom);
 						if (warp == -1)
 						{
 							MessageBox.Show("No more warps available.\r\nPlease free a warp in another sector (any level)", Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -794,11 +792,7 @@ namespace WLEditor
 				}
 				else
 				{
-					int previousWarp = Sector.GetWarp(rom, currentCourseId, currentSector);
-					if (previousWarp >= 0x5B7A)
-					{
-						lastFreeWarp.Push(previousWarp);
-					}
+					Sector.FreeWarp(rom, currentCourseId, currentSector);
 				}
 
 				Sector.SaveWarp(rom, currentCourseId, currentSector, warp);
@@ -806,26 +800,6 @@ namespace WLEditor
 
 				Setchanges();
 				SetControlsVisibility();
-			}
-
-			int GetFreeWarp()
-			{
-				var used = Sector.GetWarpUsage(rom);
-				var all = Enumerable.Range(0, 370)
-					.Select(x => 0x5B7A + x * 24);
-
-				var free = all
-					.Except(used)
-					.ToArray();
-
-				if (lastFreeWarp.Count > 0 && free.Contains(lastFreeWarp.Peek()))
-				{
-					return lastFreeWarp.Pop();
-				}
-
-				return free
-					.DefaultIfEmpty(-1)
-					.First();
 			}
 		}
 
@@ -835,7 +809,7 @@ namespace WLEditor
 			{
 				if (checkBoxCheckpoint.Checked)
 				{
-					int header = GetFreeCheckpoint();
+					int header = Sector.GetFreeCheckpoint(rom, currentCourseId);
 					if (header == -1)
 					{
 						MessageBox.Show("No more checkpoint headers.\r\nPlease free a checkpoint in another level", Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -847,32 +821,10 @@ namespace WLEditor
 				}
 				else
 				{
-					lastFreeCheckpoint.Push(Sector.GetCheckpoint(rom, currentCourseId));
-					Sector.SaveCheckpoint(rom, currentCourseId, Sector.GetLevelHeader(rom, currentCourseId));
+					Sector.FreeCheckpoint(rom, currentCourseId);
 				}
 
 				LoadWarpTypeDropdown();
-			}
-
-			int GetFreeCheckpoint()
-			{
-				int header = Sector.GetLevelHeader(rom, currentCourseId);
-				var used = Sector.GetLevelHeaderUsage(rom);
-				var all = Enumerable.Range(0, 77)
-					.Select(x => 0x460C + x * 30);
-
-				var free = all
-					.Except(used)
-					.ToArray();
-
-				if (lastFreeCheckpoint.Count > 0 && free.Contains(lastFreeCheckpoint.Peek()))
-				{
-					return lastFreeCheckpoint.Pop();
-				}
-
-				return free
-					.DefaultIfEmpty(-1)
-					.First();
 			}
 		}
 

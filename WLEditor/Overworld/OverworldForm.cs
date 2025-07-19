@@ -500,7 +500,7 @@ namespace WLEditor
 					if (!pathMode)
 					{
 						var selection = selectionMode ? selection1 : selection2;
-						selection.CopySelection(CopyTileAt);
+						selection.CopySelection(CopyTileAt, ClipboardType.TILE_8x8);
 						selection.ClearSelection();
 					}
 				}
@@ -511,7 +511,7 @@ namespace WLEditor
 					{
 						if (selection1.HasSelection)
 						{
-							history.AddChanges(selection1.PasteSelection(PasteTileAt));
+							history.AddChanges(selection1.PasteSelection(PasteTileAt, ClipboardType.TILE_8x8));
 							UpdateTitle();
 							pictureBox1.Invalidate();
 							SetChanges();
@@ -538,7 +538,7 @@ namespace WLEditor
 						int tile = GetEmptyTile();
 						if (selection1.HasSelection)
 						{
-							selection1.CopySelection(CopyTileAt);
+							selection1.CopySelection(CopyTileAt, ClipboardType.TILE_8x8);
 							history.AddChanges(selection1.DeleteSelection(SetTileAt, GetEmptyTile()));
 
 							UpdateTitle();
@@ -568,20 +568,20 @@ namespace WLEditor
 					}
 				}
 
-				ClipboardData CopyTileAt(int x, int y)
+				ClipboardTile CopyTileAt(int x, int y)
 				{
 					if (selectionMode)
 					{
 						if (eventMode)
 						{
 							int index = eventForm.FindEvent(x, y);
-							return new ClipboardData { Index = index, Tile = eventForm.GetEvent(index) };
+							return new ClipboardTile { Order = index, Tile = eventForm.GetEvent(index) };
 						}
 
-						return new ClipboardData { Tile = GetTileAt(x, y) };
+						return new ClipboardTile { Tile = GetTileAt(x, y) };
 					}
 
-					return new ClipboardData { Tile = (x + y * 16) };
+					return new ClipboardTile { Tile = (x + y * 16) };
 				}
 
 				int GetEmptyTile()

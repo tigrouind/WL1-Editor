@@ -6,6 +6,9 @@ namespace WLEditor
 {
 	public static class Sector
 	{
+		static readonly Stack<int> lastFreeWarp = new();
+		static readonly Stack<int> lastFreeCheckpoint = new();
+
 		public static Warp GetLevelHeader(Rom rom, int course, bool checkPoint)
 		{
 			rom.SetBank(0xC);
@@ -189,6 +192,68 @@ namespace WLEditor
 					}
 				}
 			}
+		}
+
+		public static int GetFreeWarp(Rom rom)
+		{
+			var used = GetWarpUsage(rom);
+			var all = Enumerable.Range(0, 370)
+				.Select(x => 0x5B7A + x * 24);
+
+			var free = all
+				.Except(used)
+				.ToArray();
+
+			if (lastFreeWarp.Count > 0 && free.Contains(lastFreeWarp.Peek())) //reuse last free warp if possible
+			{
+				return lastFreeWarp.Pop();
+			}
+
+			return free
+				.DefaultIfEmpty(-1)
+				.First();
+		}
+
+		public static void FreeWarp(Rom rom, int currentCourseId, int sector)
+		{
+			int warp = GetWarp(rom, currentCourseId, sector);
+			if (warp >= 0x5B7A) //sector
+			{
+				lastFreeWarp.Push(warp); //reuse it later
+			}
+
+			SaveWarp(rom, currentCourseId, sector, 0x5B76); //remove warp
+		}
+
+		public static void FreeCheckpoint(Rom rom, int currentCourseId)
+		{
+			int checkPoint = GetCheckpoint(rom, currentCourseId);
+			if (checkPoint != GetLevelHeader(rom, currentCourseId))
+			{
+				lastFreeCheckpoint.Push(checkPoint);
+				SaveCheckpoint(rom, currentCourseId, GetLevelHeader(rom, currentCourseId));
+			}
+		}
+
+		public static int GetFreeCheckpoint(Rom rom, int currentCourseId)
+		{
+			int header = GetLevelHeader(rom, currentCourseId);
+			var used = GetLevelHeaderUsage(rom);
+			var all = Enumerable.Range(0, 77)
+				.Select(x => 0x460C + x * 30);
+
+			var free = all
+				.Except(used)
+				.ToArray();
+
+			if (lastFreeCheckpoint.Count > 0 && free.Contains(lastFreeCheckpoint.Peek()))
+			{
+				return lastFreeCheckpoint.Pop();
+			}
+
+			return free
+				.DefaultIfEmpty(-1)
+				.First();
 		}
 
 		public static IEnumerable<int> GetLevelHeaderUsage(Rom rom)

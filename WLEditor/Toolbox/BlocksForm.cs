@@ -122,7 +122,7 @@ namespace WLEditor.Toolbox
 			switch (keyData)
 			{
 				case Keys.Control | Keys.C:
-					selection.CopySelection((x, y) => new ClipboardData() { Tile = x + y * 8 });
+					selection.CopySelection((x, y) => new ClipboardTile() { Tile = x + y * 8 }, ClipboardType.TILE_16x16);
 					selection.ClearSelection();
 					return true;
 			}

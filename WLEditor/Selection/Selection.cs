@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 
 namespace WLEditor
 {
@@ -63,12 +64,12 @@ namespace WLEditor
 				selection.Height * tileSize * zoom);
 		}
 
-		public bool CopySelection(Func<int, int, ClipboardData> getTileAt)
+		public ClipboardData CopySelection(Func<int, int, ClipboardTile> getTileAt, ClipboardType type)
 		{
 			if (selection)
 			{
 				var selection = GetSelection();
-				var items = new List<ClipboardData>();
+				var items = new List<ClipboardTile>();
 				for (int y = selection.Top; y < selection.Bottom; y++)
 				{
 					for (int x = selection.Left; x < selection.Right; x++)
@@ -78,11 +79,18 @@ namespace WLEditor
 					}
 				}
 
-				Clipboard.CopyToClipboard(tileSize, selection.Width, selection.Height, items);
-				return true;
+				var data = new ClipboardData
+				{
+					TileWidth = selection.Width,
+					TileHeight = selection.Height,
+					Tiles = [.. items.Select(x => new ClipboardTile { Tile = x.Tile, Order = x.Order })]
+				};
+
+				Clipboard.Copy(data, type);
+				return data;
 			}
 
-			return false;
+			return null;
 		}
 
 		public List<SelectionChange> DeleteSelection(Func<int, int, int, int> setTileAt, int emptyTile)
@@ -111,35 +119,41 @@ namespace WLEditor
 			return null;
 		}
 
-		public List<SelectionChange> PasteSelection(Func<int, int, int, int> setTileAt)
+		public List<SelectionChange> PasteSelection(Func<int, int, int, int> setTileAt, ClipboardType type)
 		{
 			if (selection)
 			{
-				var (width, height, selectionData) = Clipboard.GetDataFromClipboard(tileSize);
 				var changes = new List<SelectionChange>();
 
-				if (selectionData != null && width > 0 && height > 0)
+				var data = Clipboard.Paste(type);
+				if (data != null && data.TileWidth > 0 && data.TileHeight > 0)
 				{
+					var items = data.Tiles
+							.Select((x, i) => (x.Tile, x.Order, Index: i))
+							.OrderBy(x => x.Order)   //used for ordering events
+							.Select(x => (x.Tile, x.Index))
+							.ToArray();
+
 					bool invertX = selectionStart.X > selectionEnd.X;
 					bool invertY = selectionStart.Y > selectionEnd.Y;
 
 					var selection = GetSelection();
 
-					for (int ty = selection.Top; ty < selection.Bottom; ty += height)
+					for (int ty = selection.Top; ty < selection.Bottom; ty += data.TileHeight)
 					{
-						for (int tx = selection.Left; tx < selection.Right; tx += width)
+						for (int tx = selection.Left; tx < selection.Right; tx += data.TileWidth)
 						{
-							foreach (var data in selectionData)
+							foreach (var item in items)
 							{
 								Point dest = new()
 								{
-									X = (invertX ? selection.Left - tx + selection.Right - width : tx) + data.Index % width,
-									Y = (invertY ? selection.Top - ty + selection.Bottom - height : ty) + data.Index / width
+									X = (invertX ? selection.Left - tx + selection.Right - data.TileWidth : tx) + item.Index % data.TileWidth,
+									Y = (invertY ? selection.Top - ty + selection.Bottom - data.TileHeight : ty) + item.Index / data.TileWidth
 								};
 
 								if (selection.Contains(dest) || selection.Size == new Size(1, 1))
 								{
-									int tile = data.Tile;
+									int tile = item.Tile;
 									int previous = setTileAt(dest.X, dest.Y, tile);
 									if (previous != tile)
 									{

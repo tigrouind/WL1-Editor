@@ -1,8 +1,8 @@
 namespace WLEditor
 {
-	public class ClipboardData
+	public class ClipboardTile
 	{
-		public int Index;
 		public int Tile;
+		public int Order;
 	}
 }
