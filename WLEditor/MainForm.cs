@@ -413,6 +413,8 @@ namespace WLEditor
 			overworldToolStripMenuItem.Enabled = true;
 			sectorsToolStripMenuItem.Enabled = true;
 			saveAsToolStripMenuItem.Enabled = true;
+			copyLevelToolStripMenuItem.Enabled = true;
+			pasteLevelToolStripMenuItem.Enabled = true;
 			levelComboBox.Visible = true;
 			LevelPanel.Visible = true;
 			return true;
@@ -849,6 +851,138 @@ namespace WLEditor
 		{
 			timer.Enabled = animationToolStripMenuItem.Checked;
 			overworldForm.ResetTimer();
+		}
+
+		#endregion
+
+		#region Sectors
+
+		private void CopyLevelToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			//copy tiles
+			levelPictureBox.StartSelection(0, 0);
+			levelPictureBox.SetSelection(255, 31);
+			levelPictureBox.CopySelection(false);
+			levelPictureBox.ClearSelection();
+
+			//warps
+			bool hasCheckpoint = Sector.GetLevelHeader(rom, currentCourseId) != Sector.GetCheckpoint(rom, currentCourseId);
+			Clipboard.Data.LevelHeader = Sector.GetLevelHeader(rom, currentCourseId, false);
+			Clipboard.Data.Checkpoint = hasCheckpoint ? Sector.GetLevelHeader(rom, currentCourseId, true) : null;
+			Clipboard.Data.Warps = GetWarps().ToArray();
+			Clipboard.Data.Scroll = Enumerable.Range(0, 32).Select(x => (byte)Sector.GetScroll(rom, currentCourseId, x)).ToArray();
+			Clipboard.Data.Music = Sector.GetMusic(rom, currentCourseId);
+
+			Clipboard.Copy();
+
+			IEnumerable<(int WarpType, Warp Warp)> GetWarps()
+			{
+				for (int i = 0; i < 32; i++)
+				{
+					int warp = Sector.GetWarp(rom, currentCourseId, i);
+					yield return (warp, warp >= 0x5B7A ? Sector.GetWarp(rom, warp) : null);
+				}
+			}
+		}
+
+		private void PasteLevelToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			if (!Clipboard.Paste())
+			{
+				MessageBox.Show("No data in clipboard", Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+				return;
+			}
+
+			var (levelHeader, checkpoint, warps, scroll, music) = (Clipboard.Data.LevelHeader, Clipboard.Data.Checkpoint, Clipboard.Data.Warps, Clipboard.Data.Scroll, Clipboard.Data.Music);
+			if (!CheckFree())
+			{
+				return;
+			}
+
+			//tiles
+			levelPictureBox.StartSelection(0, 0);
+			levelPictureBox.PasteSelection();
+
+			Sector.SaveLevelHeader(rom, currentCourseId, false, levelHeader);
+			Sector.SaveMusic(rom, currentCourseId, music);
+			SetCheckpoint(checkpoint);
+			SetWarps(warps);
+			SetScroll(scroll);
+
+			//reload
+			LoadLevel();
+			sectorForm.LoadSector(currentCourseId, levelPictureBox.CurrentSector, treasureId, checkPoint);
+			SetChanges(ChangeEnum.Blocks);
+			SetChanges(ChangeEnum.Sectors);
+
+			bool CheckFree()
+			{
+				bool hasCheckpoint = Sector.GetLevelHeader(rom, currentCourseId) != Sector.GetCheckpoint(rom, currentCourseId);
+				if (checkpoint != null && !hasCheckpoint)
+				{
+					int header = Sector.GetFreeCheckpoint(rom, currentCourseId);
+					if (header == -1)
+					{
+						MessageBox.Show("No more checkpoint available.\r\nPlease a checkpoint in another level", Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+						return false;
+					}
+				}
+
+				int free = 370 - Sector.GetWarpUsage(rom).Count() +
+					Enumerable.Range(0, 32)
+						.Select(x => Sector.GetWarp(rom, currentCourseId, x))
+						.Count(x => x >= 0x5B7A); //warps in current level
+				int warpsNeeded = warps.Count(x => x.WarpType >= 0x5B7A);
+
+				if (free < warpsNeeded)
+				{
+					MessageBox.Show($"No more warps available.\r\nPlease free {warpsNeeded - free} warp(s) in another level", Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+					return false;
+				}
+
+				return true;
+			}
+
+			void SetWarps((int WarpType, Warp Warp)[] warps)
+			{
+				for (int i = 31; i >= 0; i--) //remove all warps
+				{
+					Sector.FreeWarp(rom, currentCourseId, i);
+				}
+
+				foreach (var (index, warp) in warps.Select((x, i) => (Index: i, Warp: x)))
+				{
+					if (warp.WarpType >= 0x5B7A) //sector
+					{
+						var freeWarp = Sector.GetFreeWarp(rom);
+						Sector.SaveWarp(rom, freeWarp, warp.Warp);
+						Sector.SaveWarp(rom, currentCourseId, index, freeWarp);
+					}
+					else //exit or none
+					{
+						Sector.SaveWarp(rom, currentCourseId, index, warp.WarpType);
+					}
+				}
+			}
+
+			void SetCheckpoint(Warp checkpoint)
+			{
+				Sector.FreeCheckpoint(rom, currentCourseId);
+				if (checkpoint != null)
+				{
+					int header = Sector.GetFreeCheckpoint(rom, currentCourseId);
+					Sector.SaveCheckpoint(rom, currentCourseId, header);
+					Sector.SaveLevelHeader(rom, currentCourseId, true, checkpoint);
+				}
+			}
+
+			void SetScroll(byte[] scroll)
+			{
+				for (int i = 0; i < 32; i++)
+				{
+					Sector.SaveScroll(rom, currentCourseId, i, scroll[i]);
+				}
+			}
 		}
 
 		#endregion

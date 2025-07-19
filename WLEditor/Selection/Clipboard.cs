@@ -1,52 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text.Json;
 
 namespace WLEditor
 {
 	public class Clipboard
 	{
-		public static void CopyToClipboard( int tileSize, int width, int height,List<ClipboardData> data)
+		static readonly JsonSerializerOptions options = new() { IncludeFields = true };
+
+		public static ClipboardData Data = new();
+
+		public static void Copy()
 		{
-			using var memoryStream = new MemoryStream();
-			using var writer = new BinaryWriter(memoryStream);
-			writer.Write(tileSize);
-			writer.Write(width); //width
-			writer.Write(height); //height
-
-			foreach(var item in data)
-			{
-				writer.Write(item.Index);
-				writer.Write(item.Tile);
-			}
-
-			System.Windows.Forms.Clipboard.SetData("WLEditor", memoryStream);
+			System.Windows.Forms.Clipboard.SetData("WLEditor", JsonSerializer.Serialize(Data, options));
+			Data = new();
 		}
 
-		public static (int width, int height, ClipboardData[] data) GetDataFromClipboard(int tileSize)
+		public static bool Paste()
 		{
-			var memoryStream = (MemoryStream)System.Windows.Forms.Clipboard.GetData("WLEditor");
-			if (memoryStream != null)
+			var json = (string)System.Windows.Forms.Clipboard.GetData("WLEditor");
+			if (!string.IsNullOrEmpty(json))
 			{
-				using var reader = new BinaryReader(memoryStream);
-				if (reader.ReadInt32() == tileSize)
-				{
-					int selectionWidth = reader.ReadInt32();
-					int selectionHeight = reader.ReadInt32();
-					ClipboardData[] selectionData = [.. Enumerable.Range(0, selectionWidth * selectionHeight)
-							.Select((x, i) => (Order: reader.ReadInt32(), Tile: reader.ReadInt32(), Index: i))
-							.OrderBy(x => x.Order)   //used for ordering events
-							.Select(x => new ClipboardData { Index = x.Index, Tile = x.Tile })];
-
-					return (selectionWidth, selectionHeight, selectionData);
-				}
+				Data = JsonSerializer.Deserialize<ClipboardData>(json, options);
+				return true;
 			}
-
-			return (0, 0, null);
+			else
+			{
+				Data = new();
+				return false;
+			}
 		}
 	}
 }

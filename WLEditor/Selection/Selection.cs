@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 
 namespace WLEditor
 {
@@ -63,12 +64,12 @@ namespace WLEditor
 				selection.Height * tileSize * zoom);
 		}
 
-		public bool CopySelection(Func<int, int, ClipboardData> getTileAt)
+		public bool CopySelection(Func<int, int, ClipboardItems> getTileAt, bool clipboardCopy = true)
 		{
 			if (selection)
 			{
 				var selection = GetSelection();
-				var items = new List<ClipboardData>();
+				var items = new List<ClipboardItems>();
 				for (int y = selection.Top; y < selection.Bottom; y++)
 				{
 					for (int x = selection.Left; x < selection.Right; x++)
@@ -78,7 +79,15 @@ namespace WLEditor
 					}
 				}
 
-				Clipboard.CopyToClipboard(tileSize, selection.Width, selection.Height, items);
+				Clipboard.Data.TileSize = tileSize;
+				Clipboard.Data.Width = selection.Width;
+				Clipboard.Data.Height = selection.Height;
+				Clipboard.Data.Items = [.. items
+					.Select((x, i) => (Order: x.Index, x.Tile, Index: i))
+					.OrderBy(x => x.Order)   //used for ordering events
+					.Select(x => new ClipboardItems { Index = x.Index, Tile = x.Tile })];
+
+				if (clipboardCopy) Clipboard.Copy();
 				return true;
 			}
 
@@ -115,10 +124,11 @@ namespace WLEditor
 		{
 			if (selection)
 			{
-				var (width, height, selectionData) = Clipboard.GetDataFromClipboard(tileSize);
+				Clipboard.Paste();
+				var (width, height, items) = (Clipboard.Data.Width, Clipboard.Data.Height, Clipboard.Data.Items);
 				var changes = new List<SelectionChange>();
 
-				if (selectionData != null && width > 0 && height > 0)
+				if (items != null && width > 0 && height > 0)
 				{
 					bool invertX = selectionStart.X > selectionEnd.X;
 					bool invertY = selectionStart.Y > selectionEnd.Y;
@@ -129,7 +139,7 @@ namespace WLEditor
 					{
 						for (int tx = selection.Left; tx < selection.Right; tx += width)
 						{
-							foreach (var data in selectionData)
+							foreach (var data in items)
 							{
 								Point dest = new()
 								{

@@ -568,20 +568,20 @@ namespace WLEditor
 					}
 				}
 
-				ClipboardData CopyTileAt(int x, int y)
+				ClipboardItems CopyTileAt(int x, int y)
 				{
 					if (selectionMode)
 					{
 						if (eventMode)
 						{
 							int index = eventForm.FindEvent(x, y);
-							return new ClipboardData { Index = index, Tile = eventForm.GetEvent(index) };
+							return new ClipboardItems { Index = index, Tile = eventForm.GetEvent(index) };
 						}
 
-						return new ClipboardData { Tile = GetTileAt(x, y) };
+						return new ClipboardItems { Tile = GetTileAt(x, y) };
 					}
 
-					return new ClipboardData { Tile = (x + y * 16) };
+					return new ClipboardItems { Tile = (x + y * 16) };
 				}
 
 				int GetEmptyTile()

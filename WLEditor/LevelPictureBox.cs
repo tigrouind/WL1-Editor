@@ -487,9 +487,9 @@ namespace WLEditor
 
 		#region Selection
 
-		public void CopySelection()
+		public void CopySelection(bool clipboardCopy = true)
 		{
-			selection.CopySelection(CopyTileAt);
+			selection.CopySelection(CopyTileAt,  clipboardCopy);
 		}
 
 		public bool PasteSelection()
@@ -560,9 +560,9 @@ namespace WLEditor
 			return data; //no changes
 		}
 
-		ClipboardData CopyTileAt(int x, int y)
+		ClipboardItems CopyTileAt(int x, int y)
 		{
-			return new ClipboardData { Tile = GetTileAt(x, y) };
+			return new ClipboardItems { Tile = GetTileAt(x, y) };
 		}
 
 		int GetTileAt(int x, int y)
