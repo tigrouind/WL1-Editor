@@ -11,6 +11,10 @@ You need to install [.NET Desktop Runtime 9.0](https://dotnet.microsoft.com/en-u
 ## Emulator 🎮
 Using [BGB](https://bgb.bircd.org/) is recommended. This [ram map](https://datacrystal.tcrf.net/wiki/Wario_Land:_Super_Mario_Land_3/RAM_map) can be used to quickly skip through levels. The most useful addresses are **A375** (writing 01 will finish a level instantaneously) and **A80B-A814** (write FF in all range to have everything on the map marked has completed). To edit the memory, press <kbd>Esc</kbd> (this will open the debugger) then <kbd>Ctrl</kbd> + <kbd>G</kbd>, enter the address you want to edit, then press <kbd>Enter</kbd>.
 
+## Showcase
+Here is projects made using that utility (I will gladly add your ROM hack to this list)
+- [Jet Wario Land](https://www.romhacking.net/hacks/9057/)
+
 ## How to use
 - Click on <kbd>File</kbd> > <kbd>Load</kbd>
 - Select a valid WL1 rom.
