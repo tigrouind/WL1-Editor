@@ -57,23 +57,10 @@ namespace WLEditor
 		{
 			if (Overworld.IsOverworld(currentWorld))
 			{
-				return GetPathMode();
-			}
-			else
-			{
-				return $"Course {levelToCourseId[currentLevel]:D2} - {GetPathMode()}";
+				return string.Empty;
 			}
 
-			string GetPathMode()
-			{
-				return pathMode switch
-				{
-					PathModeEnum.None => "Normal path",
-					PathModeEnum.Water => "Water path",
-					PathModeEnum.Invisible => "Invisible path",
-					_ => throw new NotSupportedException(),
-				};
-			}
+			return $"Course {levelToCourseId[currentLevel]:D2}";
 		}
 
 		void SetChanges()
@@ -225,7 +212,7 @@ namespace WLEditor
 
 				case Keys.M:
 					pathMode = (PathModeEnum)(((int)pathMode + 1) % 3);
-					UpdateTitle();
+					Invalidate();
 					return true;
 
 				case Keys.E:
@@ -667,6 +654,7 @@ namespace WLEditor
 					using var format = new StringFormat();
 					using var font = new Font("Arial", 5.0f * zoom);
 					using var pen = new Pen(Color.Black, zoom * 2.0f);
+					using var brush = new SolidBrush(Color.Black);
 					format.LineAlignment = StringAlignment.Center;
 					format.Alignment = StringAlignment.Center;
 
@@ -683,8 +671,9 @@ namespace WLEditor
 
 						using (GraphicsPath path = RoundedRect(dest, zoom * 2))
 						{
+							brush.Color = pathColors[(selected && currentDirection == null ? (int)pathMode : 0) + (selected ? 0 : 3)];
 							gPathB.DrawPath(pen, path);
-							gPathA.FillPath(selected ? Brushes.Lime : Brushes.MediumSeaGreen, path);
+							gPathA.FillPath(brush, path);
 						}
 
 						if (!TransparentPath)
@@ -699,6 +688,7 @@ namespace WLEditor
 					using var format = new StringFormat();
 					using var font = new Font("Arial", 5.0f * zoom);
 					using var penBorder = new Pen(Color.Black, zoom * 2.0f);
+					using var brush = new SolidBrush(Color.Black);
 					format.LineAlignment = StringAlignment.Center;
 					format.Alignment = StringAlignment.Center;
 
@@ -706,6 +696,11 @@ namespace WLEditor
 							.OrderBy(x => x == currentDirection))
 					{
 						var (nextX, nextY) = GetPathPosition(currentPath, dir);
+
+						var lastPath = dir.Path[^1..].FirstOrDefault(x =>
+							x.Status == WorldPathStatusEnum.WaterFront ||
+							x.Status == WorldPathStatusEnum.WaterBack ||
+							x.Status == WorldPathStatusEnum.Invisible);
 
 						int exitX = Math.Max(0, Math.Min(nextX, CurrentMapX - 8));
 						int exitY = Math.Max(0, Math.Min(nextY, CurrentMapY - 8));
@@ -716,8 +711,9 @@ namespace WLEditor
 
 						using (GraphicsPath path = RoundedRect(dest, zoom * 2))
 						{
+							brush.Color = pathColors[(selected ? (int)pathMode : (lastPath != null ? (int)GroupPath(lastPath.Status) : 0)) + (selected ? 0 : 3)];
 							gPathB.DrawPath(penBorder, path);
-							gPathA.FillPath(selected ? Brushes.Lime : Brushes.MediumSeaGreen, path);
+							gPathA.FillPath(brush, path);
 						}
 
 						if (!TransparentPath)
@@ -744,7 +740,7 @@ namespace WLEditor
 							GetPathPosition(path, ref startX, ref startY);
 							points.Add(new Point((startX + 4) * zoom, (startY + 4) * zoom));
 
-							Color color = pathColors[(int)GroupPath(path.Status) + (selected ? 0 : 3)];
+							var color = pathColors[(int)GroupPath(path.Status) + (selected ? 0 : 3)];
 							colors.Add(color);
 						}
 
