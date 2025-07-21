@@ -249,6 +249,12 @@ namespace WLEditor
 					return true;
 			}
 
+			if ((keyCode >= Keys.A && keyCode <= Keys.Z)
+				|| (keyCode >= Keys.D0 && keyCode <= Keys.D9))
+			{
+				return true;
+			}
+
 			return false;
 
 			#region Commands
