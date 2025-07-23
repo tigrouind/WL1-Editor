@@ -463,15 +463,13 @@ namespace WLEditor
 
 		void CollidersToolStripMenuItemClick(object sender, EventArgs e)
 		{
-			bool value = collidersToolStripMenuItem.Checked;
-			Level.ShowColliders = value;
+			Level.ShowColliders = collidersToolStripMenuItem.Checked;
 			LoadLevel();
 		}
 
 		void CollectiblesToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			bool value = collectiblesToolStripMenuItem.Checked;
-			Level.ShowCollectibles = value;
+			Level.ShowCollectibles = collectiblesToolStripMenuItem.Checked;
 			LoadLevel();
 		}
 
