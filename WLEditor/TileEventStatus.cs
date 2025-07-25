@@ -5,6 +5,7 @@ namespace WLEditor
 		None,
 		MouseDown,
 		MouseMove,
-		MouseUp
+		MouseUp,
+		MouseWheel
 	}
 }

@@ -59,12 +59,10 @@ namespace WLEditor
 			};
 			eventForm.EventChanged += (s, e) => SetChanges();
 
-			pathForm = new PathForm(pictureBox1)
-			{
-				UpdateTitle = UpdateTitle
-			};
+			pathForm = new PathForm(pictureBox1);
 			pathForm.PathChanged += (s, e) => SetChanges();
 			pathForm.GetAnimationIndex = () => animationIndex;
+			pictureBox1.MouseWheel += PictureBox1MouseWheel;
 
 			selection1.InvalidateSelection += (s, e) => pictureBox1.Invalidate(e.ClipRectangle);
 			selection2.InvalidateSelection += (s, e) => pictureBox2.Invalidate(e.ClipRectangle);
@@ -727,6 +725,11 @@ namespace WLEditor
 			int tilePosY = e.Location.Y / 8 / zoom;
 			int tilePos = tilePosX + tilePosY * 32;
 
+			if (pathMode)
+			{
+				pathForm.MouseEvent(e, status);
+			}
+
 			if ((e.Button == MouseButtons.Left || e.Button == MouseButtons.Right) && !pathMode)
 			{
 				if (tilePos != currentTile)
@@ -789,6 +792,14 @@ namespace WLEditor
 					pictureBox1.Invalidate(new Rectangle(x * 8 * zoom, y * 8 * zoom, 8 * zoom, 8 * zoom));
 					SetChanges();
 				}
+			}
+		}
+
+		void PictureBox1MouseWheel(object sender, MouseEventArgs e)
+		{
+			if (pictureBox1.ClientRectangle.Contains(e.Location))
+			{
+				PictureBox1MouseEvent(e, TileEventStatus.MouseWheel);
 			}
 		}
 
@@ -1243,6 +1254,16 @@ namespace WLEditor
 			{
 				var item = worldData[currentWorld].Value;
 				File.WriteAllBytes(saveFile.FileName, [.. worldTiles.Take(item.UncompressedSize)]);
+			}
+		}
+
+		private void WorldComboBox_KeyDown(object sender, KeyEventArgs e)
+		{
+			if ((e.KeyCode >= Keys.A && e.KeyCode <= Keys.Z)
+				|| (e.KeyCode >= Keys.D0 && e.KeyCode <= Keys.D9))
+			{
+				e.Handled = true;
+				e.SuppressKeyPress = true;
 			}
 		}
 	}
