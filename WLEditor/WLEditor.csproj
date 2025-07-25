@@ -13,8 +13,8 @@
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <DebugType>None</DebugType>
   </PropertyGroup>
-  <PropertyGroup>    
-    <AssemblyVersion>0.88.*</AssemblyVersion>    
+  <PropertyGroup>
+    <AssemblyVersion>0.89.*</AssemblyVersion>
 	<Deterministic>False</Deterministic>
   </PropertyGroup>
   <ItemGroup>
