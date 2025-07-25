@@ -21,7 +21,6 @@ namespace WLEditor
 		bool disposed;
 
 		PathModeEnum pathMode;
-		public Action UpdateTitle;
 		const int gridSnap = 4;
 		readonly ImageAttributes transparentImageAttributes = GetTransparentImageAttributes();
 		public bool TransparentPath;
@@ -29,6 +28,7 @@ namespace WLEditor
 		int zoom;
 		int currentWorld;
 		readonly DirectBitmap tilesFlag = new(16 * 8, 1 * 8);
+		int allowedDirection;
 
 		Bitmap pathABitmap, pathBBitmap;
 		bool bitmapCache;
@@ -52,6 +52,14 @@ namespace WLEditor
 		readonly Color[] pathColors = [Color.Lime, Color.Red, Color.Blue, Color.MediumSeaGreen, Color.Brown, Color.SteelBlue];
 
 		public event EventHandler PathChanged;
+
+		#region Mouse events
+
+		bool selectedLevel = false, selectedPath = false;
+		int selectedFlag = -1;
+		(int X, int Y) dragOffset, dragPosition;
+
+		#endregion
 
 		public string GetTitle()
 		{
@@ -131,24 +139,213 @@ namespace WLEditor
 			box.Invalidate();
 		}
 
+		public void MouseEvent(MouseEventArgs e, TileEventStatus status)
+		{
+			switch (status)
+			{
+				case TileEventStatus.MouseDown:
+					if (!MouseDown(e))
+					{
+						return;
+					}
+					break;
+
+				case TileEventStatus.MouseMove:
+					if (!MouseMove(e))
+					{
+						return;
+					}
+					break;
+
+				case TileEventStatus.MouseUp:
+					MouseUp();
+					break;
+
+
+				case TileEventStatus.MouseWheel:
+					MouseWheel(e);
+					break;
+
+			}
+
+			bool MouseDown(MouseEventArgs e)
+			{
+				dragOffset = (e.Location.X, e.Location.Y);
+
+				//select flag
+				if (Overworld.IsOverworld(currentWorld) && currentLevel != 7)
+				{
+					selectedFlag = flags.FindIndex(x => Math.Max(Math.Abs(x.X + 8 - e.Location.X / zoom), Math.Abs(x.Y + 8 - e.Location.Y / zoom)) <= 8);
+					if (selectedFlag != -1 && currentLevel == selectedFlag)
+					{
+						dragPosition = (flags[selectedFlag].X, flags[selectedFlag].Y);
+						return false;
+					}
+				}
+
+				//select path
+				if (e.Button != MouseButtons.Right)
+				{
+					var item = PathData[currentLevel];
+					foreach (var dir in item.Directions.Where(x => x.Path.Count > 0))
+					{
+						var (X, Y) = GetPathPosition(item, dir);
+						if (Math.Max(Math.Abs(Math.Max(0, Math.Min(X, CurrentMapX - 8)) + 4 - e.Location.X / zoom),
+									Math.Abs(Math.Max(0, Math.Min(Y, CurrentMapY - 8)) + 4 - e.Location.Y / zoom)) <= 4)
+						{
+							if (currentDirection != dir)
+							{
+								currentDirection = dir;
+								pathMode = PathModeEnum.None;
+								Invalidate();
+							}
+
+							allowedDirection = 0;
+							dragPosition = GetPathPosition(item, currentDirection);
+							selectedPath = true;
+							return false;
+						}
+					}
+				}
+
+				//deselect path
+				if (currentDirection != null)
+				{
+					currentDirection = null;
+					pathMode = PathModeEnum.None;
+					Invalidate();
+				}
+
+				//select level
+				int level = levels[currentWorld]
+						.Select(x => (int?)x)
+						.FirstOrDefault(x => Math.Max(Math.Abs(PathData[x.Value].X + 4 - e.Location.X / zoom),
+						Math.Abs(PathData[x.Value].Y + 4 - e.Location.Y / zoom)) <= 4) ?? -1;
+
+				if (level != -1)
+				{
+					if (level != currentLevel)
+					{
+						currentLevel = level;
+						currentPath = PathData[currentLevel];
+						pathMode = PathModeEnum.None;
+						Invalidate();
+					}
+
+					if (currentDirection != null)
+					{
+						currentDirection = null;
+						Invalidate();
+					}
+
+					allowedDirection = 0;
+					dragPosition = (currentPath.X, currentPath.Y);
+					selectedLevel = true;
+					return false;
+				}
+
+				return true;
+			}
+
+			bool MouseMove(MouseEventArgs e)
+			{
+				//move level
+				if (selectedLevel && e.Button == MouseButtons.Right)
+				{
+					int tilePosX = ((e.Location.X - dragOffset.X) / zoom + dragPosition.X + gridSnap / 2) / gridSnap;
+					int tilePosY = ((e.Location.Y - dragOffset.Y) / zoom + dragPosition.Y + gridSnap / 2) / gridSnap;
+					(int X, int Y) = (tilePosX * gridSnap, tilePosY * gridSnap);
+
+					if ((X, Y) != (currentPath.X, currentPath.Y))
+					{
+						(currentPath.X, currentPath.Y) = (X, Y);
+						MoveLevel();
+						BindPaths();
+						Invalidate();
+						SetChanges();
+					}
+
+					return false;
+				}
+
+				//add or remove paths
+				if (selectedPath || selectedLevel)
+				{
+					var item = PathData[currentLevel];
+					var target = currentDirection == null ? (item.X, item.Y) : GetPathPosition(item, currentDirection);
+					int newPosX = ((e.Location.X - dragOffset.X) / zoom + dragPosition.X + gridSnap / 2) / gridSnap;
+					int newPosY = ((e.Location.Y - dragOffset.Y) / zoom + dragPosition.Y + gridSnap / 2) / gridSnap;
+
+					AddPaths(newPosX - target.X / gridSnap, newPosY - target.Y / gridSnap);
+					BindPaths();
+					Invalidate();
+					SetChanges();
+				}
+
+				//move flag
+				if (selectedFlag != -1 && currentLevel == selectedFlag)
+				{
+					int tilePosX = ((e.Location.X - dragOffset.X) / zoom + dragPosition.X + gridSnap / 2) / gridSnap;
+					int tilePosY = ((e.Location.Y - dragOffset.Y) / zoom + dragPosition.Y + gridSnap / 2) / gridSnap;
+					var newPos = (tilePosX * gridSnap, tilePosY * gridSnap);
+
+					if (newPos != flags[selectedFlag])
+					{
+						flags[selectedFlag] = newPos;
+						Invalidate();
+						SetChanges();
+					}
+				}
+
+				return true;
+			}
+
+			void MouseUp()
+			{
+				selectedLevel = false;
+				selectedPath = false;
+				selectedFlag = -1;
+			}
+
+			void MouseWheel(MouseEventArgs e)
+			{
+				if ((Control.ModifierKeys & Keys.Alt) == Keys.Alt)
+				{
+					//set exit
+					if (currentDirection != null && IsSpecialExit(currentDirection.Next))
+					{
+						SetExit(Math.Sign(e.Delta));
+						Invalidate();
+						SetChanges();
+					}
+				}
+				else if ((Control.ModifierKeys & Keys.Shift) == Keys.Shift)
+				{
+					//set progress
+					if (currentDirection != null)
+					{
+						SetProgress(Math.Sign(e.Delta));
+						Invalidate();
+						SetChanges();
+					}
+				}
+				else
+				{
+					//set pathmode
+					pathMode = (PathModeEnum)(((int)pathMode + 1) % 3);
+					Invalidate();
+					SetChanges();
+				}
+			}
+		}
+
 		public bool ProcessPathKey(Keys key)
 		{
 			var keyCode = key & Keys.KeyCode;
 			switch (key)
 			{
-				case Keys.PageUp:
-					NextLevel();
-					UpdateTitle();
-					return true;
-
-				case Keys.PageDown:
-					PreviousLevel();
-					UpdateTitle();
-					return true;
-
 				case Keys.Shift | Keys.Delete:
 					RemoveAllPaths();
-					UpdateTitle();
 
 					Invalidate();
 					SetChanges();
@@ -159,76 +356,6 @@ namespace WLEditor
 					{
 						RemovePath();
 						BindPaths();
-						UpdateTitle();
-
-						Invalidate();
-						SetChanges();
-					}
-					return true;
-
-				case Keys.Up:
-				case Keys.Down:
-				case Keys.Left:
-				case Keys.Right:
-					ChangeDirection();
-					UpdateTitle();
-					Invalidate();
-					return true;
-
-				case Keys.Up | Keys.Control:
-				case Keys.Down | Keys.Control:
-				case Keys.Left | Keys.Control:
-				case Keys.Right | Keys.Control:
-					MoveLevel();
-					BindPaths();
-
-					Invalidate();
-					SetChanges();
-					return true;
-
-				case Keys.Up | Keys.Alt:
-				case Keys.Down | Keys.Alt:
-				case Keys.Left | Keys.Alt:
-				case Keys.Right | Keys.Alt:
-					if (Overworld.IsOverworld(currentWorld) && currentLevel != 7)
-					{
-						MoveFlag();
-
-						Invalidate();
-						SetChanges();
-					}
-					return true;
-
-				case Keys.Up | Keys.Shift:
-				case Keys.Down | Keys.Shift:
-				case Keys.Left | Keys.Shift:
-				case Keys.Right | Keys.Shift:
-					AddPath();
-					BindPaths();
-
-					Invalidate();
-					SetChanges();
-					return true;
-
-				case Keys.M:
-					pathMode = (PathModeEnum)(((int)pathMode + 1) % 3);
-					Invalidate();
-					return true;
-
-				case Keys.E:
-					if (currentDirection != null && IsSpecialExit(currentDirection.Next))
-					{
-						SetExit();
-
-						Invalidate();
-						SetChanges();
-					}
-					return true;
-
-				case Keys.P:
-					if (currentDirection != null)
-					{
-						SetProgress();
 
 						Invalidate();
 						SetChanges();
@@ -236,264 +363,224 @@ namespace WLEditor
 					return true;
 			}
 
-			if ((keyCode >= Keys.A && keyCode <= Keys.Z)
-				|| (keyCode >= Keys.D0 && keyCode <= Keys.D9))
+			switch (keyCode)
 			{
-				return true;
+				case Keys.Up:
+					MouseEvent(new MouseEventArgs(MouseButtons.None, 0, 0, 0, 1), TileEventStatus.MouseWheel);
+					return true;
+
+				case Keys.Down:
+					MouseEvent(new MouseEventArgs(MouseButtons.None, 0, 0, 0, -1), TileEventStatus.MouseWheel);
+					return true;
 			}
 
 			return false;
+		}
 
-			#region Commands
-
-			void AddPath()
+		void SetProgress(int delta)
+		{
+			int progress = Array.IndexOf(Overworld.ProgressFlags, currentDirection.Progress);
+			if (progress != -1)
 			{
-				//set direction if needed
-				currentDirection ??= currentPath.Directions[(int)GetDirection()];
-
-				UnbindPath(currentDirection);
-
-				//check previous step
-				WorldPathDirectionEnum newDir = GetDirection();
-				WorldPathDirectionEnum previousDir = currentDirection.Path.Count > 0 ? currentDirection.Path.Last().Direction : (WorldPathDirectionEnum)(-1);
-
-				if (previousDir == newDir && GroupPath(currentDirection.Path.Last().Status) == pathMode && currentDirection.Path.Last().Steps < (256 - gridSnap))
+				currentDirection.Progress = Overworld.ProgressFlags[(progress + delta + Overworld.ProgressFlags.Length) % Overworld.ProgressFlags.Length];
+				var reverseDir = GetReverseWorldPathDir(currentDirection);
+				if (reverseDir != null)
 				{
-					currentDirection.Path.Last().Steps += gridSnap;
+					reverseDir.Progress = currentDirection.Progress;
 				}
-				else if (previousDir == GetReverseDir(newDir))
+			}
+		}
+
+		void SetExit(int delta)
+		{
+			RemoveReversePath(currentDirection);
+			if (Overworld.IsOverworld(currentWorld))
+			{
+				currentDirection.Next = WorldPathNextEnum.TeapotOverworld;
+			}
+			else
+			{
+				WorldPathNextEnum[] exits = [WorldPathNextEnum.Overworld, WorldPathNextEnum.Sherbet, WorldPathNextEnum.Teapot];
+				int next = Array.IndexOf(exits, currentDirection.Next);
+				currentDirection.Next = exits[(next + delta + exits.Length) % exits.Length];
+			}
+		}
+
+		void MoveLevel()
+		{
+			foreach (var dir in currentPath.Directions)
+			{
+				UnbindPath(dir);
+			}
+
+			//unbind paths linked to that level
+			foreach (int level in levels[currentWorld])
+			{
+				foreach (var dir in PathData[level].Directions)
 				{
-					if (currentDirection.Path.Last().Steps > gridSnap)
+					if (dir.Next == (WorldPathNextEnum)currentLevel)
 					{
-						currentDirection.Path.Last().Steps -= gridSnap;
+						UnbindPath(dir);
 					}
-					else
+				}
+			}
+		}
+
+		void AddPaths(int x, int y)
+		{
+			while ((x, y) != (0, 0))
+			{
+				WorldPathDirectionEnum direction;
+				if (x != 0)
+				{
+					direction = x > 0 ? WorldPathDirectionEnum.Right : WorldPathDirectionEnum.Left;
+					x -= Math.Sign(x);
+					if (allowedDirection != 2) //prevent changing direction
 					{
-						RemovePath();
+						allowedDirection = 1;
+						AddPath(direction);
 					}
 				}
 				else
 				{
-					WorldPathStatusEnum status = GetStatus();
-
-					currentDirection.Path.Add(new WorldPathSegment
+					direction = y > 0 ? WorldPathDirectionEnum.Down : WorldPathDirectionEnum.Up;
+					y -= Math.Sign(y);
+					if (allowedDirection != 1) //prevent changing direction
 					{
-						Direction = newDir,
-						Status = PathForm.GetStatus(newDir, status),
-						Steps = gridSnap
-					});
-				}
-
-				WorldPathStatusEnum GetStatus()
-				{
-					WorldPathStatusEnum status = WorldPathStatusEnum.None;
-					switch (pathMode)
-					{
-						case PathModeEnum.Invisible:
-							status = WorldPathStatusEnum.Invisible;
-							break;
-
-						case PathModeEnum.Water:
-							status = WorldPathStatusEnum.WaterFront;
-							break;
+						allowedDirection = 2;
+						AddPath(direction);
 					}
-
-					return status;
 				}
 			}
+		}
 
-			void RemovePath()
+		void AddPath(WorldPathDirectionEnum newDir)
+		{
+			//set direction if needed
+			if (currentDirection == null)
 			{
-				UnbindPath(currentDirection);
-				currentDirection.Path.RemoveAt(currentDirection.Path.Count - 1);
-
-				if (currentDirection.Path.Count == 0)
+				var dir = currentPath.Directions[(int)newDir];
+				if (dir.Path.Any())
 				{
-					currentDirection.Progress = WorldPathProgressEnum.None;
-					currentDirection = null;
-					pathMode = PathModeEnum.None;
+					return; //don't allow to change direction to a non empty path
+				}
+
+				currentDirection = dir;
+			}
+
+			UnbindPath(currentDirection);
+
+			//check previous step
+			WorldPathDirectionEnum previousDir = currentDirection.Path.Count > 0 ? currentDirection.Path.Last().Direction : (WorldPathDirectionEnum)(-1);
+
+			if (previousDir == newDir && GroupPath(currentDirection.Path.Last().Status) == pathMode && currentDirection.Path.Last().Steps < (256 - gridSnap))
+			{
+				currentDirection.Path.Last().Steps += gridSnap;
+			}
+			else if (previousDir == GetReverseDir(newDir))
+			{
+				if (currentDirection.Path.Last().Steps > gridSnap)
+				{
+					currentDirection.Path.Last().Steps -= gridSnap;
 				}
 				else
 				{
-					pathMode = GroupPath(currentDirection.Path.Last().Status);
+					allowedDirection = 0;
+					RemovePath();
 				}
 			}
-
-			void RemoveAllPaths()
+			else
 			{
-				foreach (var dir in currentPath.Directions)
+				WorldPathStatusEnum status = GetStatus();
+
+				currentDirection.Path.Add(new WorldPathSegment
 				{
-					UnbindPath(dir);
-					dir.Path.Clear();
-					dir.Progress = WorldPathProgressEnum.None;
+					Direction = newDir,
+					Status = PathForm.GetStatus(newDir, status),
+					Steps = gridSnap
+				});
+			}
+
+			WorldPathStatusEnum GetStatus()
+			{
+				WorldPathStatusEnum status = WorldPathStatusEnum.None;
+				switch (pathMode)
+				{
+					case PathModeEnum.Invisible:
+						status = WorldPathStatusEnum.Invisible;
+						break;
+
+					case PathModeEnum.Water:
+						status = WorldPathStatusEnum.WaterFront;
+						break;
 				}
 
+				return status;
+			}
+		}
+
+		void RemovePath()
+		{
+			UnbindPath(currentDirection);
+			currentDirection.Path.RemoveAt(currentDirection.Path.Count - 1);
+
+			if (currentDirection.Path.Count == 0)
+			{
+				currentDirection.Progress = WorldPathProgressEnum.None;
 				currentDirection = null;
 				pathMode = PathModeEnum.None;
 			}
-
-			void SetProgress()
+			else
 			{
-				int progress = Array.IndexOf(Overworld.ProgressFlags, currentDirection.Progress);
-				if (progress != -1)
+				pathMode = GroupPath(currentDirection.Path.Last().Status);
+			}
+		}
+
+		void RemoveAllPaths()
+		{
+			foreach (var dir in currentPath.Directions)
+			{
+				UnbindPath(dir);
+				dir.Path.Clear();
+				dir.Progress = WorldPathProgressEnum.None;
+			}
+
+			currentDirection = null;
+			pathMode = PathModeEnum.None;
+		}
+
+		void BindPaths()
+		{
+			var levelPositions = new Dictionary<int, int>();
+			foreach (var level in levels[currentWorld])
+			{
+				levelPositions[PathData[level].X + PathData[level].Y * 256] = level;
+			}
+
+			foreach (var level in levels[currentWorld])
+			{
+				var item = PathData[level];
+				foreach (var dir in item.Directions.Where(x => x.Path.Count > 0))
 				{
-					currentDirection.Progress = Overworld.ProgressFlags[(progress + 1) % Overworld.ProgressFlags.Length];
-					var reverseDir = GetReverseWorldPathDir(currentDirection);
-					if (reverseDir != null)
+					var (posX, posY) = GetPathPosition(item, dir);
+
+					if (levelPositions.TryGetValue(posX + posY * 256, out int nextLevel))
 					{
-						reverseDir.Progress = currentDirection.Progress;
-					}
-				}
-			}
-
-			void SetExit()
-			{
-				RemoveReversePath(currentDirection);
-				if (Overworld.IsOverworld(currentWorld))
-				{
-					currentDirection.Next = WorldPathNextEnum.TeapotOverworld;
-				}
-				else
-				{
-					WorldPathNextEnum[] exits = [WorldPathNextEnum.Overworld, WorldPathNextEnum.Sherbet, WorldPathNextEnum.Teapot];
-					int next = Array.IndexOf(exits, currentDirection.Next);
-					currentDirection.Next = exits[(next + 1) % exits.Length];
-				}
-			}
-
-			void MoveItem(ref int x, ref int y, int border)
-			{
-				//align on grid
-				int posX = x / gridSnap * gridSnap;
-				int posY = y / gridSnap * gridSnap;
-
-				switch (keyCode)
-				{
-					case Keys.Up:
-						y = Math.Max(posY - gridSnap, 0);
-						break;
-
-					case Keys.Down:
-						y = Math.Min(posY + gridSnap, CurrentMapY - border);
-						break;
-
-					case Keys.Left:
-						x = Math.Max(posX - gridSnap, 0);
-						break;
-
-					case Keys.Right:
-						x = Math.Min(posX + gridSnap, CurrentMapX - border);
-						break;
-				}
-			}
-
-			void MoveFlag()
-			{
-				var item = flags[currentLevel];
-				MoveItem(ref item.X, ref item.Y, 16);
-				flags[currentLevel] = item;
-			}
-
-			void MoveLevel()
-			{
-				MoveItem(ref currentPath.X, ref currentPath.Y, 8);
-
-				foreach (var dir in currentPath.Directions)
-				{
-					UnbindPath(dir);
-				}
-
-				//unbind paths linked to that level
-				foreach (int level in levels[currentWorld])
-				{
-					foreach (var dir in PathData[level].Directions)
-					{
-						if (dir.Next == (WorldPathNextEnum)currentLevel)
+						if (dir.Next != (WorldPathNextEnum)nextLevel)
 						{
-							UnbindPath(dir);
+							dir.Next = (WorldPathNextEnum)nextLevel;
+							CreateReversePath(dir, (WorldPathNextEnum)level);
 						}
 					}
 				}
 			}
 
-			void ChangeDirection()
+			void CreateReversePath(WorldPathDirection dir, WorldPathNextEnum next)
 			{
-				var newDir = GetDirection();
-				currentDirection = currentPath.Directions[(int)newDir];
-
-				if (currentDirection.Path.Count > 0)
+				var reverseDir = GetReverseWorldPathDir(dir);
+				if (reverseDir != null && reverseDir != dir)
 				{
-					pathMode = GroupPath(currentDirection.Path.Last().Status);
-				}
-				else
-				{
-					currentDirection = null;
-					pathMode = PathModeEnum.None;
-				}
-			}
-
-			void NextLevel()
-			{
-				int level = Array.IndexOf(levels[currentWorld], currentLevel);
-				if (level < levels[currentWorld].Length - 1)
-				{
-					currentDirection = null;
-					currentLevel = levels[currentWorld][level + 1];
-					currentPath = PathData[currentLevel];
-
-					pathMode = PathModeEnum.None;
-					Invalidate();
-				}
-			}
-
-			void PreviousLevel()
-			{
-				int level = Array.IndexOf(levels[currentWorld], currentLevel);
-				if (level > 0)
-				{
-					currentDirection = null;
-					currentLevel = levels[currentWorld][level - 1];
-					currentPath = PathData[currentLevel];
-
-					pathMode = PathModeEnum.None;
-					Invalidate();
-				}
-			}
-
-			#endregion
-
-			void BindPaths()
-			{
-				var levelPositions = new Dictionary<int, int>();
-				foreach (var level in levels[currentWorld])
-				{
-					levelPositions[PathData[level].X + PathData[level].Y * 256] = level;
-				}
-
-				foreach (var level in levels[currentWorld])
-				{
-					var item = PathData[level];
-					foreach (var dir in item.Directions.Where(x => x.Path.Count > 0))
-					{
-						var (posX, posY) = GetPathPosition(item, dir);
-
-						if (levelPositions.TryGetValue(posX + posY * 256, out int nextLevel))
-						{
-							if (dir.Next != (WorldPathNextEnum)nextLevel)
-							{
-								dir.Next = (WorldPathNextEnum)nextLevel;
-								CreateReversePath(dir, (WorldPathNextEnum)level);
-							}
-						}
-					}
-				}
-
-				void CreateReversePath(WorldPathDirection dir, WorldPathNextEnum next)
-				{
-					var reverseDir = GetReverseWorldPathDir(dir);
-					if (reverseDir != null && reverseDir != dir)
-					{
-						reverseDir.Path = [.. dir.Path.AsEnumerable().Reverse()
+					reverseDir.Path = [.. dir.Path.AsEnumerable().Reverse()
 							.Select(x => new WorldPathSegment
 							{
 								Status = GetStatus(GetReverseDir(x.Direction), x.Status),
@@ -501,70 +588,57 @@ namespace WLEditor
 								Steps = x.Steps
 							})];
 
-						reverseDir.Next = next;
-						reverseDir.Progress = dir.Progress;
-					}
+					reverseDir.Next = next;
+					reverseDir.Progress = dir.Progress;
 				}
 			}
-
-			void UnbindPath(WorldPathDirection dir)
-			{
-				if (dir.Path.Count == 0 || !IsSpecialExit(dir.Next))
-				{
-					RemoveReversePath(dir);
-					dir.Next = Overworld.IsOverworld(currentWorld) ? WorldPathNextEnum.TeapotOverworld : WorldPathNextEnum.Overworld;
-				}
-			}
-
-			WorldPathDirectionEnum GetDirection()
-			{
-				return keyCode switch
-				{
-					Keys.Right => WorldPathDirectionEnum.Right,
-					Keys.Left => WorldPathDirectionEnum.Left,
-					Keys.Up => WorldPathDirectionEnum.Up,
-					Keys.Down => WorldPathDirectionEnum.Down,
-					_ => throw new InvalidOperationException(),
-				};
-			}
-
-			#region Reverse
-
-			WorldPathDirectionEnum GetReverseDir(WorldPathDirectionEnum dir)
-			{
-				return dir switch
-				{
-					WorldPathDirectionEnum.Right => WorldPathDirectionEnum.Left,
-					WorldPathDirectionEnum.Left => WorldPathDirectionEnum.Right,
-					WorldPathDirectionEnum.Up => WorldPathDirectionEnum.Down,
-					WorldPathDirectionEnum.Down => WorldPathDirectionEnum.Up,
-					_ => throw new InvalidOperationException(),
-				};
-			}
-
-			WorldPathDirection GetReverseWorldPathDir(WorldPathDirection dir)
-			{
-				if (dir.Path.Count > 0 && !IsSpecialExit(dir.Next))
-				{
-					WorldPathDirectionEnum reverseDir = GetReverseDir(dir.Path.Last().Direction);
-					return PathData[(int)dir.Next].Directions[(int)reverseDir];
-				}
-
-				return null;
-			}
-
-			void RemoveReversePath(WorldPathDirection dir)
-			{
-				var reverseDir = GetReverseWorldPathDir(dir);
-				if (reverseDir != null && reverseDir != dir && dir == GetReverseWorldPathDir(reverseDir))
-				{
-					reverseDir.Path.Clear();
-					reverseDir.Progress = WorldPathProgressEnum.None;
-				}
-			}
-
-			#endregion
 		}
+
+		void UnbindPath(WorldPathDirection dir)
+		{
+			if (dir.Path.Count == 0 || !IsSpecialExit(dir.Next))
+			{
+				RemoveReversePath(dir);
+				dir.Next = Overworld.IsOverworld(currentWorld) ? WorldPathNextEnum.TeapotOverworld : WorldPathNextEnum.Overworld;
+			}
+		}
+
+		#region Reverse
+
+		static WorldPathDirectionEnum GetReverseDir(WorldPathDirectionEnum dir)
+		{
+			return dir switch
+			{
+				WorldPathDirectionEnum.Right => WorldPathDirectionEnum.Left,
+				WorldPathDirectionEnum.Left => WorldPathDirectionEnum.Right,
+				WorldPathDirectionEnum.Up => WorldPathDirectionEnum.Down,
+				WorldPathDirectionEnum.Down => WorldPathDirectionEnum.Up,
+				_ => throw new InvalidOperationException(),
+			};
+		}
+
+		WorldPathDirection GetReverseWorldPathDir(WorldPathDirection dir)
+		{
+			if (dir.Path.Count > 0 && !IsSpecialExit(dir.Next))
+			{
+				WorldPathDirectionEnum reverseDir = GetReverseDir(dir.Path.Last().Direction);
+				return PathData[(int)dir.Next].Directions[(int)reverseDir];
+			}
+
+			return null;
+		}
+
+		void RemoveReversePath(WorldPathDirection dir)
+		{
+			var reverseDir = GetReverseWorldPathDir(dir);
+			if (reverseDir != null && reverseDir != dir && dir == GetReverseWorldPathDir(reverseDir))
+			{
+				reverseDir.Path.Clear();
+				reverseDir.Progress = WorldPathProgressEnum.None;
+			}
+		}
+
+		#endregion
 
 		static WorldPathStatusEnum GetStatus(WorldPathDirectionEnum newDir, WorldPathStatusEnum status)
 		{
@@ -613,6 +687,7 @@ namespace WLEditor
 				{
 					g.DrawImage(pathBBitmap, 0, 0);
 				}
+
 			}
 
 			void DrawFlag()
@@ -653,6 +728,7 @@ namespace WLEditor
 				{
 					using var format = new StringFormat();
 					using var font = new Font("Arial", 5.0f * zoom);
+					using var fontBold = new Font(font.FontFamily, font.Size, FontStyle.Bold);
 					using var pen = new Pen(Color.Black, zoom * 2.0f);
 					using var brush = new SolidBrush(Color.Black);
 					format.LineAlignment = StringAlignment.Center;
@@ -678,7 +754,7 @@ namespace WLEditor
 
 						if (!TransparentPath)
 						{
-							gPathA.DrawString((Array.IndexOf(levels[currentWorld], level) + 1).ToString(), font, Brushes.Black, dest, format);
+							gPathA.DrawString((Array.IndexOf(levels[currentWorld], level) + 1).ToString(), currentPath == item ? fontBold : font, Brushes.Black, dest, format);
 						}
 					}
 				}
@@ -884,7 +960,7 @@ namespace WLEditor
 
 		#endregion
 
-		(int posX, int posY) GetPathPosition(WorldPath level, WorldPathDirection direction)
+		static (int X, int Y) GetPathPosition(WorldPath level, WorldPathDirection direction)
 		{
 			int posX = level.X;
 			int posY = level.Y;
@@ -919,7 +995,7 @@ namespace WLEditor
 			}
 		}
 
-		bool IsSpecialExit(WorldPathNextEnum next)
+		static bool IsSpecialExit(WorldPathNextEnum next)
 		{
 			return next switch
 			{
