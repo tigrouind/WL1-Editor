@@ -1,4 +1,6 @@
 
+
+
 # WLEditor
 This a level editor for Super Mario Land 3 / WarioLand 1 (1993).
 You need to install [.NET Desktop Runtime 9.0](https://dotnet.microsoft.com/en-us/download/dotnet/9.0) to run it.
@@ -11,9 +13,9 @@ You need to install [.NET Desktop Runtime 9.0](https://dotnet.microsoft.com/en-u
 ## Emulator 🎮
 Using [BGB](https://bgb.bircd.org/) is recommended. This [ram map](https://datacrystal.tcrf.net/wiki/Wario_Land:_Super_Mario_Land_3/RAM_map) can be used to quickly skip through levels. The most useful addresses are **A375** (writing 01 will finish a level instantaneously) and **A80B-A814** (write FF in all range to have everything on the map marked has completed). To edit the memory, press <kbd>Esc</kbd> (this will open the debugger) then <kbd>Ctrl</kbd> + <kbd>G</kbd>, enter the address you want to edit, then press <kbd>Enter</kbd>.
 
-## Showcase
-Here is projects made using that utility (I will gladly add your ROM hack to this list)
-- [Jet Wario Land](https://www.romhacking.net/hacks/9057/)
+## Showcase 🏆
+Here are the projects made using that utility (I will gladly add your ROM hack to this list)
+- [Jet Wario Land (Gumpy Function)](https://www.romhacking.net/hacks/9057/)
 
 ## How to use
 - Click on <kbd>File</kbd> > <kbd>Load</kbd>
@@ -54,13 +56,13 @@ This is a powerful feature. Here is an overview of possibilities:
 - Fill / erase a given block.
 - Repeat a pattern.
 
-How to :
+### How to
 1. <kbd>Left-click</kbd> on a tile, hold left mouse button and drag cursor to create a selection (eg: a 3x3 block). Release mouse button. A yellow rectangle should appear.
 2. Press <kbd>Ctrl-C</kbd> / <kbd>Ctrl-X</kbd> to copy / cut selection.
 3. <kbd>Left-click</kbd> somewhere else (eg: a 1x1 block is selected).
 4. Press <kbd>Ctrl-V</kbd> to paste selection at that position. 
 
-Tips :
+###  Tips
 - If you paste result into a selection bigger than what has been copied, pattern will be repeated.
 - You can delete what is under selection by pressing <kbd>Delete</kbd> key.
 - You can undo or redo changes with <kbd>Ctrl-Z</kbd> / <kbd>Ctrl-Y</kbd>.
@@ -72,7 +74,7 @@ If you click on a sector already selected, it will unselected sector and show le
 
 Enemy sets specify which enemies will be loaded for a given warp (up to 6 enemies loaded). Some enemy sets are specific to some places (eg: boss or treasure room, ...).
 
-Tips : 
+### Tips 
 - 🟥 Red items are boss enemies sets.
 - 🟨 Yellow items are related to treasure rooms. 
 - ⬜ Grey items :
@@ -105,24 +107,36 @@ When such a warp is loaded, if the treasure has already been collected, the game
 | <kbd>Ctrl</kbd> + <kbd>Z</kbd> <br> <kbd>Ctrl</kbd> + <kbd>Y</kbd> | Undo / redo changes.
 | <kbd>Delete</kbd> | Clear what is currently under selection.
 
-Tips : 
+#### Tips
 It's possible to edit tiles/map in an external tool (eg: YY-CHR, Tilemap Studio, ...) using the export/import functionality : <kbd>Edit</kbd> > <kbd>Tile data</kbd>.
 
 ### Editing paths 🏞
+#### Levels
 | Key | Description |
 | :-: | - |
-| <kbd>Page-Up</kbd> <br> <kbd>Page-Down</kbd> | Select a level.
-| <kbd>Ctrl</kbd> + <kbd>↑<br>← ↓ →</kbd> | Move current level. Position will be aligned on a 4 x 4 grid.
-| <kbd>↑<br>← ↓ →</kbd> | Select a direction (N/S/E/W). Path in current direction is highlighted.
-| <kbd>Shift</kbd> +  <kbd>↑<br>← ↓ →</kbd> | Add a new path segment in that direction. 
-| <kbd>Alt</kbd> + <kbd>↑<br>← ↓ →</kbd> | Move overworld completion flag.
+| <kbd>Right-click</kbd> <br> <kbd>Left-click</kbd> | Select a level.
+| <kbd>Right click</kbd> + <kbd>drag</kbd> | Move current level. Position will be aligned on a 4 x 4 grid.
+
+#### Paths
+| Key | Description |
+| :-: | - |
+| <kbd>Left click</kbd> | Select a path (must click at the end of the path).
+| <kbd>Left click</kbd> + <kbd>drag</kbd> | Add or remove new path segments (must drag from a level or from the end of the path). 
 | <kbd>Delete</kbd> | Delete last path segment.
 | <kbd>Shift</kbd> + <kbd>Delete</kbd> | Delete all paths in all directions.
-| <kbd>M</kbd> | Change path mode. This will only be set for new paths.<br>Green = normal path.<br>Red = player won't be visible when walking on such paths.<br>Blue = underwater.
-| <kbd>P</kbd> | Set [progress](#progress-) required to take current path. A direction must be selected.<br>A number is shown near level to indicate progression required.<br>Nothing shown means no progress is required.
-| <kbd>E</kbd> | Set end of path exit target.<br>🅞 = Overworld.<br>🅢 = Sherbet Land.<br>🅣 = Mt Teapot.
+| <kbd>Mouse wheel</kbd> | Change path mode. This will only be set for new paths.<br>🟩 = normal path.<br>🟥 = player won't be visible when walking on such paths.<br>🟦 = underwater.
+| <kbd>Shift</kbd> + <kbd>Mouse wheel</kbd> | Set [progress](#progress-) required to take current path. A path must be selected.<br>A number is shown near level to indicate progression required.<br>Nothing shown means no progress is required.
+| <kbd>Alt</kbd> + <kbd>Mouse wheel</kbd>| Set end of path exit target.<br>🅞 = Overworld.<br>🅢 = Sherbet Land.<br>🅣 = Mt Teapot.
+| <kbd>Ctrl</kbd> + <kbd>Z</kbd> <br> <kbd>Ctrl</kbd> + <kbd>Y</kbd> | Undo / redo changes.
 
-Tips : 
+#### Flags
+| Key | Description |
+| :-: | - |
+| <kbd>Left-click</kbd> + <kbd>drag</kbd> | Move world completion flag.
+
+
+
+#### Tips
 - Path last segment must end up exactly at same position as level to be connected. It might be necessary to move level to align it on the grid.
 - Events should be edited to match paths. If you don't want to bother with events, remove all events and hardcode paths in map.
 - It you are planning to do a new overworld map, it's easier to delete all events and paths first.
@@ -141,7 +155,7 @@ Tips :
 | <kbd>Ctrl</kbd> + <kbd>Z</kbd> <br> <kbd>Ctrl</kbd> + <kbd>Y</kbd> | Undo / redo changes.
 | <kbd>Delete</kbd> | Clear what is currently under selection.
 
-Tips : 
+#### Tips
 - Tiles in amber are tiles related to current event.
 - Tiles in cyan are current event tiles already applied.
 - Tile 0x7F (which is rightmost tile of the middle row) cannot be used in events because it's a marker. It's a limitation of the game engine.
