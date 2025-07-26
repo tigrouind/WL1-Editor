@@ -53,6 +53,14 @@ namespace WLEditor
 
 		public event EventHandler PathChanged;
 
+		#region Undo / redo
+
+		readonly Stack<PathHistory> undo = [];
+		readonly Stack<PathHistory> redo = [];
+		bool stateSaved;
+
+		#endregion
+
 		#region Mouse events
 
 		bool selectedLevel = false, selectedPath = false;
@@ -129,6 +137,8 @@ namespace WLEditor
 			currentDirection = null;
 			pathMode = PathModeEnum.None;
 			bitmapCache = false;
+			redo.Clear();
+			undo.Clear();
 		}
 
 		#region Commands
@@ -161,16 +171,15 @@ namespace WLEditor
 					MouseUp();
 					break;
 
-
 				case TileEventStatus.MouseWheel:
 					MouseWheel(e);
 					break;
-
 			}
 
 			bool MouseDown(MouseEventArgs e)
 			{
 				dragOffset = (e.Location.X, e.Location.Y);
+				stateSaved = false;
 
 				//select flag
 				if (Overworld.IsOverworld(currentWorld) && currentLevel != 7)
@@ -226,6 +235,7 @@ namespace WLEditor
 				{
 					if (level != currentLevel)
 					{
+						SaveState();
 						currentLevel = level;
 						currentPath = PathData[currentLevel];
 						pathMode = PathModeEnum.None;
@@ -258,6 +268,7 @@ namespace WLEditor
 
 					if ((X, Y) != (currentPath.X, currentPath.Y))
 					{
+						SaveStateOnce();
 						(currentPath.X, currentPath.Y) = (X, Y);
 						MoveLevel();
 						BindPaths();
@@ -276,6 +287,7 @@ namespace WLEditor
 					int newPosX = ((e.Location.X - dragOffset.X) / zoom + dragPosition.X + gridSnap / 2) / gridSnap;
 					int newPosY = ((e.Location.Y - dragOffset.Y) / zoom + dragPosition.Y + gridSnap / 2) / gridSnap;
 
+					SaveStateOnce();
 					AddPaths(newPosX - target.X / gridSnap, newPosY - target.Y / gridSnap);
 					BindPaths();
 					Invalidate();
@@ -291,6 +303,7 @@ namespace WLEditor
 
 					if (newPos != flags[selectedFlag])
 					{
+						SaveStateOnce();
 						flags[selectedFlag] = newPos;
 						Invalidate();
 						SetChanges();
@@ -314,6 +327,7 @@ namespace WLEditor
 					//set exit
 					if (currentDirection != null && IsSpecialExit(currentDirection.Next))
 					{
+						SaveState();
 						SetExit(Math.Sign(e.Delta));
 						Invalidate();
 						SetChanges();
@@ -324,6 +338,7 @@ namespace WLEditor
 					//set progress
 					if (currentDirection != null)
 					{
+						SaveState();
 						SetProgress(Math.Sign(e.Delta));
 						Invalidate();
 						SetChanges();
@@ -345,15 +360,20 @@ namespace WLEditor
 			switch (key)
 			{
 				case Keys.Shift | Keys.Delete:
-					RemoveAllPaths();
+					if (currentPath.Directions.Any(x => x.Path.Any()))
+					{
+						SaveState();
+						RemoveAllPaths();
 
-					Invalidate();
-					SetChanges();
+						Invalidate();
+						SetChanges();
+					}
 					return true;
 
 				case Keys.Delete:
-					if (currentDirection != null)
+					if (currentDirection != null && currentDirection.Path.Any())
 					{
+						SaveState();
 						RemovePath();
 						BindPaths();
 
@@ -361,6 +381,29 @@ namespace WLEditor
 						SetChanges();
 					}
 					return true;
+
+				case Keys.Control | Keys.Z:
+					ApplyChanges(undo, redo);
+					return true;
+
+				case Keys.Control | Keys.Y:
+					ApplyChanges(redo, undo);
+					return true;
+			}
+
+			void ApplyChanges(Stack<PathHistory> source, Stack<PathHistory> dest)
+			{
+				if (source.Any())
+				{
+					var data = source.Pop();
+					dest.Push(Serialize());
+					Deserialize(data);
+
+					pathMode = PathModeEnum.None;
+					currentPath = PathData[currentLevel];
+					currentDirection = null;
+					Invalidate();
+				}
 			}
 
 			switch (keyCode)
@@ -376,6 +419,42 @@ namespace WLEditor
 
 			return false;
 		}
+
+		#region Undo/redo
+
+		void SaveStateOnce()
+		{
+			if (!stateSaved)
+			{
+				stateSaved = true;
+				SaveState();
+			}
+		}
+
+		void SaveState()
+		{
+			undo.Push(Serialize());
+			redo.Clear();
+		}
+
+		PathHistory Serialize()
+		{
+			return Cloner.Clone(new PathHistory
+			{
+				WorldData = PathData[currentLevel],
+				CurrentLevel = currentLevel,
+				Flags = flags
+			});
+		}
+
+		void Deserialize(PathHistory data)
+		{
+			PathData[data.CurrentLevel] = data.WorldData;
+			currentLevel = data.CurrentLevel;
+			flags = data.Flags;
+		}
+
+		#endregion
 
 		void SetProgress(int delta)
 		{
@@ -767,6 +846,7 @@ namespace WLEditor
 					using var brush = new SolidBrush(Color.Black);
 					format.LineAlignment = StringAlignment.Center;
 					format.Alignment = StringAlignment.Center;
+					var paths = new[] { "O", "S", "T", "T" };
 
 					foreach (var dir in currentPath.Directions.Where(x => x.Path.Count > 0 && IsSpecialExit(x.Next))
 							.OrderBy(x => x == currentDirection))
@@ -794,7 +874,7 @@ namespace WLEditor
 
 						if (!TransparentPath)
 						{
-							gPathA.DrawString(new[] { "O", "S", "T", "T" }[Array.IndexOf(flags, dir.Next)], font, Brushes.Black, dest, format);
+							gPathA.DrawString(paths[Array.IndexOf(flags, dir.Next)], font, Brushes.Black, dest, format);
 						}
 					}
 				}
