@@ -1,15 +1,12 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace WLEditor
 {
 	public class History
 	{
-		readonly List<List<SelectionChange>> undo = [];
-		readonly List<List<SelectionChange>> redo = [];
+		readonly Stack<List<SelectionChange>> undo = [];
+		readonly Stack<List<SelectionChange>> redo = [];
 
 		public void ClearUndo()
 		{
@@ -21,7 +18,7 @@ namespace WLEditor
 		{
 			if (changes.Count > 0)
 			{
-				undo.Add(changes);
+				undo.Push(changes);
 				redo.Clear();
 			}
 		}
@@ -36,19 +33,19 @@ namespace WLEditor
 			return ApplyChanges(setTileAt, getTileAt, redo, undo);
 		}
 
-		static bool ApplyChanges(Func<int, int, int, int> setTileAt, Func<int, int, int> getTileAt, List<List<SelectionChange>> source, List<List<SelectionChange>> dest)
+		static bool ApplyChanges(Func<int, int, int, int> setTileAt, Func<int, int, int> getTileAt, Stack<List<SelectionChange>> source, Stack<List<SelectionChange>> dest)
 		{
 			if (source.Count > 0)
 			{
 				var changes = new List<SelectionChange>();
-				foreach (var tile in source.Last())
+				foreach (var tile in source.Peek())
 				{
 					changes.Add(new SelectionChange { X = tile.X, Y = tile.Y, Data = getTileAt(tile.X, tile.Y) });
 					setTileAt(tile.X, tile.Y, tile.Data);
 				}
 
-				source.RemoveAt(source.Count - 1);
-				dest.Add(changes);
+				source.Pop();
+				dest.Push(changes);
 				return true;
 			}
 
