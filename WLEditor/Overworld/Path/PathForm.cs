@@ -184,7 +184,7 @@ namespace WLEditor
 				//select flag
 				if (Overworld.IsOverworld(currentWorld) && currentLevel != 7)
 				{
-					selectedFlag = flags.FindIndex(x => Math.Max(Math.Abs(x.X + 8 - e.Location.X / zoom), Math.Abs(x.Y + 8 - e.Location.Y / zoom)) <= 8);
+					selectedFlag = flags.FindIndex(pos => GetDistance(e.X, e.Y, pos.X + 8, pos.Y + 8) <= 8);
 					if (selectedFlag != -1 && currentLevel == selectedFlag)
 					{
 						dragPosition = (flags[selectedFlag].X, flags[selectedFlag].Y);
@@ -192,46 +192,31 @@ namespace WLEditor
 					}
 				}
 
-				//select path
+				//check level
+				int level = levels[currentWorld]
+						.Select(x => (int?)x)
+						.FirstOrDefault(x => GetDistance(e.X, e.Y, PathData[x.Value].X + 4, PathData[x.Value].Y + 4) <= 4) ?? -1;
+
+				//check paths
+				var dirs = new List<WorldPathDirection>();
+				var item = PathData[currentLevel];
 				if (e.Button != MouseButtons.Right)
 				{
-					var item = PathData[currentLevel];
+					//get all possible dirs
 					foreach (var dir in item.Directions.Where(x => x.Path.Count > 0))
 					{
-						var (X, Y) = GetPathPosition(item, dir);
-						if (Math.Max(Math.Abs(Math.Max(0, Math.Min(X, CurrentMapX - 8)) + 4 - e.Location.X / zoom),
-									Math.Abs(Math.Max(0, Math.Min(Y, CurrentMapY - 8)) + 4 - e.Location.Y / zoom)) <= 4)
+						var endPath = GetPathPosition(item, dir);
+						if (GetPathPositions(item, dir).Any(pos => GetDistance(e.X, e.Y, pos.X + 4, pos.Y + 4) <= 2)
+							|| GetDistance(e.X, e.Y, endPath.X + 4, endPath.Y + 4) <= 4)
 						{
-							if (currentDirection != dir)
-							{
-								currentDirection = dir;
-								pathMode = PathModeEnum.None;
-								Invalidate();
-							}
-
-							allowedDirection = 0;
-							dragPosition = GetPathPosition(item, currentDirection);
-							selectedPath = true;
-							return false;
+							dirs.Add(dir);
 						}
 					}
 				}
 
-				//deselect path
-				if (currentDirection != null)
-				{
-					currentDirection = null;
-					pathMode = PathModeEnum.None;
-					Invalidate();
-				}
-
 				//select level
-				int level = levels[currentWorld]
-						.Select(x => (int?)x)
-						.FirstOrDefault(x => Math.Max(Math.Abs(PathData[x.Value].X + 4 - e.Location.X / zoom),
-						Math.Abs(PathData[x.Value].Y + 4 - e.Location.Y / zoom)) <= 4) ?? -1;
-
-				if (level != -1)
+				if (level != -1
+					&& !dirs.Any(dir => GetPathPosition(item, dir) == (PathData[level].X, PathData[level].Y))) //don't select level if sharing position with current path
 				{
 					if (level != currentLevel)
 					{
@@ -254,7 +239,45 @@ namespace WLEditor
 					return false;
 				}
 
+				//select path
+				if (dirs.Any())
+				{
+					var dir = dirs.Contains(currentDirection) ? currentDirection : dirs.First(); //only allow dir change if new path is not is the list of possible paths
+					if (dir != currentDirection)
+					{
+						currentDirection = dirs.First();
+						pathMode = PathModeEnum.None;
+						Invalidate();
+					}
+
+					var (X, Y) = GetPathPosition(item, dir);
+					if (GetDistance(e.X, e.Y, X + 4, Y + 4) <= 4) //only allow drag if end of path is selected
+					{
+						allowedDirection = 0;
+						dragPosition = GetPathPosition(item, currentDirection);
+						selectedPath = true;
+					}
+					return false;
+				}
+
+				//deselect path
+				if (currentDirection != null)
+				{
+					currentDirection = null;
+					pathMode = PathModeEnum.None;
+					Invalidate();
+				}
+
+
+
 				return true;
+
+				int GetDistance(int mouseX, int mouseY, int x, int y)
+				{
+					return Math.Max(
+						Math.Abs(Math.Max(0, Math.Min(x, CurrentMapX)) * zoom - mouseX),
+						Math.Abs(Math.Max(0, Math.Min(y, CurrentMapY)) * zoom - mouseY)) / zoom;
+				}
 			}
 
 			bool MouseMove(MouseEventArgs e)
@@ -262,8 +285,7 @@ namespace WLEditor
 				//move level
 				if (selectedLevel && e.Button == MouseButtons.Right)
 				{
-					int tilePosX = ((e.Location.X - dragOffset.X) / zoom + dragPosition.X + gridSnap / 2) / gridSnap;
-					int tilePosY = ((e.Location.Y - dragOffset.Y) / zoom + dragPosition.Y + gridSnap / 2) / gridSnap;
+					(var tilePosX, var tilePosY) = GetSnapPosition(e.X, e.Y);
 					(int X, int Y) = (tilePosX * gridSnap, tilePosY * gridSnap);
 
 					if ((X, Y) != (currentPath.X, currentPath.Y))
@@ -284,8 +306,7 @@ namespace WLEditor
 				{
 					var item = PathData[currentLevel];
 					var target = currentDirection == null ? (item.X, item.Y) : GetPathPosition(item, currentDirection);
-					int newPosX = ((e.Location.X - dragOffset.X) / zoom + dragPosition.X + gridSnap / 2) / gridSnap;
-					int newPosY = ((e.Location.Y - dragOffset.Y) / zoom + dragPosition.Y + gridSnap / 2) / gridSnap;
+					(var newPosX, var newPosY) = GetSnapPosition(e.X, e.Y);
 
 					SaveStateOnce();
 					AddPaths(newPosX - target.X / gridSnap, newPosY - target.Y / gridSnap);
@@ -297,8 +318,7 @@ namespace WLEditor
 				//move flag
 				if (selectedFlag != -1 && currentLevel == selectedFlag)
 				{
-					int tilePosX = ((e.Location.X - dragOffset.X) / zoom + dragPosition.X + gridSnap / 2) / gridSnap;
-					int tilePosY = ((e.Location.Y - dragOffset.Y) / zoom + dragPosition.Y + gridSnap / 2) / gridSnap;
+					(var tilePosX, var tilePosY) = GetSnapPosition(e.X, e.Y);
 					var newPos = (tilePosX * gridSnap, tilePosY * gridSnap);
 
 					if (newPos != flags[selectedFlag])
@@ -311,6 +331,13 @@ namespace WLEditor
 				}
 
 				return true;
+
+				(int x, int y) GetSnapPosition(int x, int y)
+				{
+					int newPosX = ((x - dragOffset.X) / zoom + dragPosition.X + gridSnap / 2) / gridSnap;
+					int newPosY = ((y - dragOffset.Y) / zoom + dragPosition.Y + gridSnap / 2) / gridSnap;
+					return (newPosX, newPosY);
+				}
 			}
 
 			void MouseUp()
@@ -893,7 +920,7 @@ namespace WLEditor
 						points.Add(new Point((startX + 4) * zoom, (startY + 4) * zoom));
 						foreach (var path in dirs.Path)
 						{
-							GetPathPosition(path, ref startX, ref startY);
+							(startX, startY) = GetPathPosition(path, startX, startY);
 							points.Add(new Point((startX + 4) * zoom, (startY + 4) * zoom));
 
 							var color = pathColors[(int)GroupPath(path.Status) + (selected ? 0 : 3)];
@@ -1047,13 +1074,32 @@ namespace WLEditor
 
 			foreach (var path in direction.Path)
 			{
-				GetPathPosition(path, ref posX, ref posY);
+				(posX, posY) = GetPathPosition(path, posX, posY);
 			}
 
 			return (posX, posY);
 		}
 
-		static void GetPathPosition(WorldPathSegment path, ref int posX, ref int posY)
+		static IEnumerable<(int X, int Y)> GetPathPositions(WorldPath level, WorldPathDirection direction)
+		{
+			int posX = level.X;
+			int posY = level.Y;
+
+			foreach (var path in direction.Path)
+			{
+				(int X, int Y) = GetPathPosition(path, posX, posY);
+				while (X != posX || Y != posY)
+				{
+					posX += Math.Sign(X - posX);
+					posY += Math.Sign(Y - posY);
+					yield return (posX, posY);
+				}
+			}
+
+			yield return (posX, posY);
+		}
+
+		static (int X, int Y) GetPathPosition(WorldPathSegment path, int posX, int posY)
 		{
 			switch (path.Direction)
 			{
@@ -1073,6 +1119,8 @@ namespace WLEditor
 					posY += path.Steps;
 					break;
 			}
+
+			return (posX, posY);
 		}
 
 		static bool IsSpecialExit(WorldPathNextEnum next)
