@@ -28,39 +28,40 @@ namespace WLEditor.Toolbox
 		/// </summary>
 		private void InitializeComponent()
 		{
-			this.pictureBox = new System.Windows.Forms.PictureBox();
-			((System.ComponentModel.ISupportInitialize)(this.pictureBox)).BeginInit();
-			this.SuspendLayout();
+			pictureBox = new System.Windows.Forms.PictureBox();
+			((System.ComponentModel.ISupportInitialize)pictureBox).BeginInit();
+			SuspendLayout();
 			// 
 			// pictureBox
 			// 
-			this.pictureBox.Location = new System.Drawing.Point(0, 0);
-			this.pictureBox.Margin = new System.Windows.Forms.Padding(0);
-			this.pictureBox.Name = "pictureBox";
-			this.pictureBox.Size = new System.Drawing.Size(68, 66);
-			this.pictureBox.TabIndex = 0;
-			this.pictureBox.TabStop = false;
-			this.pictureBox.Paint += new System.Windows.Forms.PaintEventHandler(this.PictureBoxPaint);
-			this.pictureBox.MouseDown += new System.Windows.Forms.MouseEventHandler(this.PictureBoxMouseDown);
+			pictureBox.Location = new System.Drawing.Point(0, 0);
+			pictureBox.Margin = new System.Windows.Forms.Padding(0);
+			pictureBox.Name = "pictureBox";
+			pictureBox.Size = new System.Drawing.Size(91, 102);
+			pictureBox.TabIndex = 0;
+			pictureBox.TabStop = false;
+			pictureBox.Paint += PictureBoxPaint;
+			pictureBox.MouseDown += PictureBoxMouseDown;
 			// 
 			// ObjectsForm
 			// 
-			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.AutoSize = true;
-			this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.ClientSize = new System.Drawing.Size(128, 99);
-			this.Controls.Add(this.pictureBox);
-			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
-			this.MaximizeBox = false;
-			this.MinimizeBox = false;
-			this.Name = "ObjectsForm";
-			this.ShowIcon = false;
-			this.ShowInTaskbar = false;
-			this.Text = "Objects";
-			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ObjectsFormClosing);
-			((System.ComponentModel.ISupportInitialize)(this.pictureBox)).EndInit();
-			this.ResumeLayout(false);
+			AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
+			AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+			AutoSize = true;
+			AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			ClientSize = new System.Drawing.Size(191, 173);
+			Controls.Add(pictureBox);
+			FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
+			Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+			MaximizeBox = false;
+			MinimizeBox = false;
+			Name = "ObjectsForm";
+			ShowIcon = false;
+			ShowInTaskbar = false;
+			Text = "Objects";
+			FormClosing += ObjectsFormClosing;
+			((System.ComponentModel.ISupportInitialize)pictureBox).EndInit();
+			ResumeLayout(false);
 
 		}
 
