@@ -1,12 +1,20 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 
 namespace WLEditor
 {
-	public class Cloner //do not allow cycles
+	public class Cloner
 	{
-		public static T Clone<T>(T source)
+		readonly Dictionary<object, object> instances = [];
+
+		public T Clone<T>(T source)
 		{
+			if (instances.TryGetValue(source, out var clone))
+			{
+				return (T)clone;
+			}
+
 			var sourceType = source.GetType();
 			if (sourceType.IsArray)
 			{
@@ -20,6 +28,7 @@ namespace WLEditor
 				var type = sourceType.GetElementType();
 				var array = source as Array;
 				var clonedArray = Array.CreateInstance(type, array.Length);
+				instances.Add(source, clonedArray);
 
 				for (int i = 0; i < array.Length; i++)
 				{
@@ -36,6 +45,7 @@ namespace WLEditor
 			object CloneObject()
 			{
 				var target = Activator.CreateInstance(sourceType);
+				instances.Add(source, target);
 				foreach (var item in sourceType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
 				{
 					var value = item.GetValue(source);
@@ -50,7 +60,7 @@ namespace WLEditor
 
 			object CloneField(object value, Type type)
 			{
-				if (type.IsValueType || type.IsEnum || type == typeof(string))
+				if (type.IsValueType || type == typeof(string))
 				{
 					return value;
 				}

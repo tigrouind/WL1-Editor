@@ -466,7 +466,8 @@ namespace WLEditor
 
 		PathHistory Serialize()
 		{
-			return Cloner.Clone(new PathHistory
+			var cloner = new Cloner();
+			return cloner.Clone(new PathHistory
 			{
 				WorldData = PathData[currentLevel],
 				CurrentLevel = currentLevel,
