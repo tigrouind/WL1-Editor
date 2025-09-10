@@ -3,7 +3,7 @@
 
 # WLEditor
 This a level editor for Super Mario Land 3 / WarioLand 1 (1993).
-You need to install [.NET Desktop Runtime 9.0](https://dotnet.microsoft.com/en-us/download/dotnet/9.0) to run it.
+You need to install [.NET Desktop Runtime 9.0](https://dotnet.microsoft.com/en-us/download/dotnet/9.0) to run it. Unless you are a developer, you don't need the SDK, the runtime Windows x64 version is enough.
 
 ## Features
 - Edit levels (tiles / enemies / sectors / warps)
