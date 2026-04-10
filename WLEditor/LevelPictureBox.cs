@@ -22,6 +22,7 @@ namespace WLEditor
 		readonly Selection selection = new(16);
 		readonly History history = new();
 		List<SelectionChange> changes = [];
+		public History History => history;
 
 		public event EventHandler<TileEventArgs> TileMouseDown;
 		public event EventHandler<TileEventArgs> TileMouseMove;

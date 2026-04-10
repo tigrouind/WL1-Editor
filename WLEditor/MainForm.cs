@@ -87,6 +87,7 @@ namespace WLEditor
 			levelPictureBox.TileMouseDown += LevelPictureBoxTileMouseDown;
 			levelPictureBox.SectorChanged += LevelPictureBoxSectorChanged;
 			levelPictureBox.GetSourceSector = x => Sector.GetSourceSector(rom, currentCourseId, x);
+			levelPictureBox.History.Change += OnHistoryChange;
 
 			blocksForm.MouseWheel += LevelPanelMouseWheel;
 			blocksForm.FormClosing += BlocksFormClosing;
@@ -294,6 +295,12 @@ namespace WLEditor
 			}
 
 			#endregion
+		}
+
+		public void OnHistoryChange(object sender, EventArgs e)
+		{
+			redoToolStripMenuItem.Enabled = levelPictureBox.History.CanRedo;
+			undoToolStripMenuItem.Enabled = levelPictureBox.History.CanUndo;
 		}
 
 		#region Load
@@ -718,23 +725,25 @@ namespace WLEditor
 
 					levelPictureBox.ClearSelection();
 					return true;
-
-				case Keys.Control | Keys.Z:
-					if (levelPictureBox.Undo())
-					{
-						SetChanges(ChangeEnum.Blocks);
-					}
-					return true;
-
-				case Keys.Control | Keys.Y:
-					if (levelPictureBox.Redo())
-					{
-						SetChanges(ChangeEnum.Blocks);
-					}
-					return true;
 			}
 
 			return DispatchShortcut(keyData);
+		}
+
+		void UndoToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			if (levelPictureBox.Undo())
+			{
+				SetChanges(ChangeEnum.Blocks);
+			}
+		}
+
+		void RedoToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			if (levelPictureBox.Redo())
+			{
+				SetChanges(ChangeEnum.Blocks);
+			}
 		}
 
 		bool DispatchShortcut(Keys keyData)
@@ -985,5 +994,6 @@ namespace WLEditor
 		}
 
 		#endregion
+
 	}
 }

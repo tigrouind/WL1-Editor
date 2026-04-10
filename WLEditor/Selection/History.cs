@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace WLEditor
 {
@@ -8,10 +9,15 @@ namespace WLEditor
 		readonly Stack<List<SelectionChange>> undo = [];
 		readonly Stack<List<SelectionChange>> redo = [];
 
+		public bool CanUndo => undo.Any();
+		public bool CanRedo => redo.Any();
+		public EventHandler Change;
+
 		public void ClearUndo()
 		{
 			redo.Clear();
 			undo.Clear();
+			HistoryChange();
 		}
 
 		public void AddChanges(List<SelectionChange> changes)
@@ -20,6 +26,7 @@ namespace WLEditor
 			{
 				undo.Push(changes);
 				redo.Clear();
+				HistoryChange();
 			}
 		}
 
@@ -33,7 +40,7 @@ namespace WLEditor
 			return ApplyChanges(setTileAt, getTileAt, redo, undo);
 		}
 
-		static bool ApplyChanges(Func<int, int, int, int> setTileAt, Func<int, int, int> getTileAt, Stack<List<SelectionChange>> source, Stack<List<SelectionChange>> dest)
+		bool ApplyChanges(Func<int, int, int, int> setTileAt, Func<int, int, int> getTileAt, Stack<List<SelectionChange>> source, Stack<List<SelectionChange>> dest)
 		{
 			if (source.Count > 0)
 			{
@@ -46,10 +53,16 @@ namespace WLEditor
 
 				source.Pop();
 				dest.Push(changes);
+				HistoryChange();
 				return true;
 			}
 
 			return false;
+		}
+
+		void HistoryChange()
+		{
+			Change?.Invoke(this, EventArgs.Empty);
 		}
 	}
 }

@@ -5,7 +5,6 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 
 namespace WLEditor
@@ -63,6 +62,7 @@ namespace WLEditor
 			pathForm.PathChanged += (s, e) => SetChanges();
 			pathForm.GetAnimationIndex = () => animationIndex;
 			pictureBox1.MouseWheel += PictureBox1MouseWheel;
+			history.Change += OnHistoryChange;
 
 			selection1.InvalidateSelection += (s, e) => pictureBox1.Invalidate(e.ClipRectangle);
 			selection2.InvalidateSelection += (s, e) => pictureBox2.Invalidate(e.ClipRectangle);
@@ -458,14 +458,6 @@ namespace WLEditor
 					case Keys.Delete:
 						DeleteSelection();
 						return true;
-
-					case Keys.Control | Keys.Z:
-						Undo();
-						return true;
-
-					case Keys.Control | Keys.Y:
-						Redo();
-						return true;
 				}
 
 				if (eventMode || pathMode)
@@ -590,36 +582,6 @@ namespace WLEditor
 					}
 
 					return Level.GetEmptyTile(tilesWorld8x8.Bits, 8, 16);
-				}
-
-				#endregion
-
-				#region Undo
-
-				void Undo()
-				{
-					if (!pathMode)
-					{
-						if (history.Undo(SetTileAt, GetTileAt))
-						{
-							UpdateTitle();
-							pictureBox1.Invalidate();
-							SetChanges();
-						}
-					}
-				}
-
-				void Redo()
-				{
-					if (!pathMode)
-					{
-						if (history.Redo(SetTileAt, GetTileAt))
-						{
-							UpdateTitle();
-							pictureBox1.Invalidate();
-							SetChanges();
-						}
-					}
 				}
 
 				#endregion
@@ -1226,7 +1188,7 @@ namespace WLEditor
 			base.OnDragDrop(e);
 		}
 
-		private void ExportTilesToolStripMenuItem_Click(object sender, EventArgs e)
+		void ExportTilesToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			SaveFileDialog saveFile = new()
 			{
@@ -1242,7 +1204,7 @@ namespace WLEditor
 			}
 		}
 
-		private void ExportMapToolStripMenuItem_Click(object sender, EventArgs e)
+		void ExportMapToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			var saveFile = new SaveFileDialog
 			{
@@ -1257,7 +1219,7 @@ namespace WLEditor
 			}
 		}
 
-		private void WorldComboBox_KeyDown(object sender, KeyEventArgs e)
+		void WorldComboBox_KeyDown(object sender, KeyEventArgs e)
 		{
 			if ((e.KeyCode >= Keys.A && e.KeyCode <= Keys.Z)
 				|| (e.KeyCode >= Keys.D0 && e.KeyCode <= Keys.D9))
@@ -1266,5 +1228,51 @@ namespace WLEditor
 				e.SuppressKeyPress = true;
 			}
 		}
+
+		#region Undo
+
+		public void OnHistoryChange(object sender, EventArgs e)
+		{
+			undoToolStripMenuItem.Enabled = history.CanUndo;
+			redoToolStripMenuItem.Enabled = history.CanRedo;
+		}
+
+		void Undo()
+		{
+			if (!pathMode)
+			{
+				if (history.Undo(SetTileAt, GetTileAt))
+				{
+					UpdateTitle();
+					pictureBox1.Invalidate();
+					SetChanges();
+				}
+			}
+		}
+
+		void Redo()
+		{
+			if (!pathMode)
+			{
+				if (history.Redo(SetTileAt, GetTileAt))
+				{
+					UpdateTitle();
+					pictureBox1.Invalidate();
+					SetChanges();
+				}
+			}
+		}
+
+		void RedoToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			Redo();
+		}
+
+		void UndoToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			Undo();
+		}
+
+		#endregion
 	}
 }

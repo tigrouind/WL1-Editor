@@ -42,6 +42,9 @@ namespace WLEditor
 			saveAsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			undoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			redoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			toolStripMenuItem3 = new System.Windows.Forms.ToolStripSeparator();
 			copyLevelToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			pasteLevelToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			viewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -143,10 +146,33 @@ namespace WLEditor
 			// 
 			// editToolStripMenuItem
 			// 
-			editToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { copyLevelToolStripMenuItem, pasteLevelToolStripMenuItem });
+			editToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { undoToolStripMenuItem, redoToolStripMenuItem, toolStripMenuItem3, copyLevelToolStripMenuItem, pasteLevelToolStripMenuItem });
 			editToolStripMenuItem.Name = "editToolStripMenuItem";
 			editToolStripMenuItem.Size = new System.Drawing.Size(47, 24);
 			editToolStripMenuItem.Text = "Edit";
+			// 
+			// undoToolStripMenuItem
+			// 
+			undoToolStripMenuItem.Enabled = false;
+			undoToolStripMenuItem.Name = "undoToolStripMenuItem";
+			undoToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Z;
+			undoToolStripMenuItem.Size = new System.Drawing.Size(180, 24);
+			undoToolStripMenuItem.Text = "Undo";
+			undoToolStripMenuItem.Click += UndoToolStripMenuItem_Click;
+			// 
+			// redoToolStripMenuItem
+			// 
+			redoToolStripMenuItem.Enabled = false;
+			redoToolStripMenuItem.Name = "redoToolStripMenuItem";
+			redoToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Y;
+			redoToolStripMenuItem.Size = new System.Drawing.Size(180, 24);
+			redoToolStripMenuItem.Text = "Redo";
+			redoToolStripMenuItem.Click += RedoToolStripMenuItem_Click;
+			// 
+			// toolStripMenuItem3
+			// 
+			toolStripMenuItem3.Name = "toolStripMenuItem3";
+			toolStripMenuItem3.Size = new System.Drawing.Size(177, 6);
 			// 
 			// copyLevelToolStripMenuItem
 			// 
@@ -477,5 +503,8 @@ namespace WLEditor
 		private System.Windows.Forms.ToolStripMenuItem editToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem copyLevelToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem pasteLevelToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem undoToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem redoToolStripMenuItem;
+		private System.Windows.Forms.ToolStripSeparator toolStripMenuItem3;
 	}
 }

@@ -49,6 +49,9 @@ namespace WLEditor
 			toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
 			menuStrip1 = new System.Windows.Forms.MenuStrip();
 			editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			undoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			redoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
 			musicToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			tileDataToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			importToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -168,16 +171,39 @@ namespace WLEditor
 			// 
 			// editToolStripMenuItem
 			// 
-			editToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { musicToolStripMenuItem, tileDataToolStripMenuItem });
+			editToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { undoToolStripMenuItem, redoToolStripMenuItem, toolStripMenuItem1, musicToolStripMenuItem, tileDataToolStripMenuItem });
 			editToolStripMenuItem.Name = "editToolStripMenuItem";
 			editToolStripMenuItem.Size = new System.Drawing.Size(47, 24);
 			editToolStripMenuItem.Text = "Edit";
+			// 
+			// undoToolStripMenuItem
+			// 
+			undoToolStripMenuItem.Enabled = false;
+			undoToolStripMenuItem.Name = "undoToolStripMenuItem";
+			undoToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Z;
+			undoToolStripMenuItem.Size = new System.Drawing.Size(180, 24);
+			undoToolStripMenuItem.Text = "Undo";
+			undoToolStripMenuItem.Click += UndoToolStripMenuItem_Click;
+			// 
+			// redoToolStripMenuItem
+			// 
+			redoToolStripMenuItem.Enabled = false;
+			redoToolStripMenuItem.Name = "redoToolStripMenuItem";
+			redoToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Y;
+			redoToolStripMenuItem.Size = new System.Drawing.Size(180, 24);
+			redoToolStripMenuItem.Text = "Redo";
+			redoToolStripMenuItem.Click += RedoToolStripMenuItem_Click;
+			// 
+			// toolStripMenuItem1
+			// 
+			toolStripMenuItem1.Name = "toolStripMenuItem1";
+			toolStripMenuItem1.Size = new System.Drawing.Size(177, 6);
 			// 
 			// musicToolStripMenuItem
 			// 
 			musicToolStripMenuItem.Name = "musicToolStripMenuItem";
 			musicToolStripMenuItem.ShortcutKeyDisplayString = "";
-			musicToolStripMenuItem.Size = new System.Drawing.Size(179, 24);
+			musicToolStripMenuItem.Size = new System.Drawing.Size(180, 24);
 			musicToolStripMenuItem.Text = "Change music...";
 			musicToolStripMenuItem.Click += MusicToolStripMenuItem_Click;
 			// 
@@ -185,7 +211,7 @@ namespace WLEditor
 			// 
 			tileDataToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { importToolStripMenuItem, exportTilesToolStripMenuItem, exportMapToolStripMenuItem });
 			tileDataToolStripMenuItem.Name = "tileDataToolStripMenuItem";
-			tileDataToolStripMenuItem.Size = new System.Drawing.Size(179, 24);
+			tileDataToolStripMenuItem.Size = new System.Drawing.Size(180, 24);
 			tileDataToolStripMenuItem.Text = "Tile data";
 			// 
 			// importToolStripMenuItem
@@ -300,5 +326,8 @@ namespace WLEditor
 		private System.Windows.Forms.ToolStripMenuItem importToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem exportTilesToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem exportMapToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem redoToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem undoToolStripMenuItem;
+		private System.Windows.Forms.ToolStripSeparator toolStripMenuItem1;
 	}
 }
