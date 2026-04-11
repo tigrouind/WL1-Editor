@@ -127,6 +127,10 @@ namespace WLEditor
 			if (!formLoaded && rom != null)
 			{
 				formLoaded = true;
+				copyToolStripMenuItem.Enabled = true;
+				cutToolStripMenuItem.Enabled = true;
+				deleteToolStripMenuItem.Enabled = true;
+
 				LoadWorldCombobox();
 
 				ignoreEvents = true;
@@ -441,25 +445,6 @@ namespace WLEditor
 					return true;
 				}
 
-				switch (keyData)
-				{
-					case Keys.Control | Keys.C:
-						CopySelection();
-						return true;
-
-					case Keys.Control | Keys.V:
-						PasteSelection();
-						return true;
-
-					case Keys.Control | Keys.X:
-						CutSelection();
-						return true;
-
-					case Keys.Delete:
-						DeleteSelection();
-						return true;
-				}
-
 				if (eventMode || pathMode)
 				{
 					switch (keyData & Keys.KeyCode)
@@ -482,109 +467,6 @@ namespace WLEditor
 				}
 
 				return false;
-
-				#region Selection
-
-				void CopySelection()
-				{
-					if (!pathMode)
-					{
-						var selection = selectionMode ? selection1 : selection2;
-						selection.CopySelection(CopyTileAt, ClipboardType.TILE_8x8);
-						selection.ClearSelection();
-					}
-				}
-
-				void PasteSelection()
-				{
-					if (!pathMode && selectionMode)
-					{
-						if (selection1.HasSelection)
-						{
-							history.AddChanges(selection1.PasteSelection(PasteTileAt, ClipboardType.TILE_8x8));
-							UpdateTitle();
-							pictureBox1.Invalidate();
-							SetChanges();
-						}
-
-						selection1.ClearSelection();
-					}
-
-					int PasteTileAt(int x, int y, int data)
-					{
-						if (x < CurrentMapX && y < CurrentMapY && data != -1)
-						{
-							return SetTileAt(x, y, data);
-						}
-
-						return data; //no changes
-					}
-				}
-
-				void CutSelection()
-				{
-					if (!pathMode && selectionMode)
-					{
-						int tile = GetEmptyTile();
-						if (selection1.HasSelection)
-						{
-							selection1.CopySelection(CopyTileAt, ClipboardType.TILE_8x8);
-							history.AddChanges(selection1.DeleteSelection(SetTileAt, GetEmptyTile()));
-
-							UpdateTitle();
-							pictureBox1.Invalidate();
-							SetChanges();
-						}
-
-						selection1.ClearSelection();
-					}
-				}
-
-				void DeleteSelection()
-				{
-					if (!pathMode && selectionMode)
-					{
-						int tile = GetEmptyTile();
-						if (selection1.HasSelection)
-						{
-							history.AddChanges(selection1.DeleteSelection(SetTileAt, GetEmptyTile()));
-
-							UpdateTitle();
-							pictureBox1.Invalidate();
-							SetChanges();
-						}
-
-						selection1.ClearSelection();
-					}
-				}
-
-				ClipboardTile CopyTileAt(int x, int y)
-				{
-					if (selectionMode)
-					{
-						if (eventMode)
-						{
-							int index = eventForm.FindEvent(x, y);
-							return new ClipboardTile { Order = index, Tile = eventForm.GetEvent(index) };
-						}
-
-						return new ClipboardTile { Tile = GetTileAt(x, y) };
-					}
-
-					return new ClipboardTile { Tile = (x + y * 16) };
-				}
-
-				int GetEmptyTile()
-				{
-					if (eventMode)
-					{
-						return -1;
-					}
-
-					return Level.GetEmptyTile(tilesWorld8x8.Bits, 8, 16);
-				}
-
-				#endregion
 
 				bool DispatchShortcut()
 				{
@@ -1271,6 +1153,134 @@ namespace WLEditor
 		void UndoToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			Undo();
+		}
+
+		#endregion
+
+		#region Copy/Cut/Paste
+
+		public void ClipboardChange(object sender, EventArgs e)
+		{
+			pasteToolStripMenuItem.Enabled = Clipboard.HasData(ClipboardType.TILE_8x8);
+		}
+
+		private void CutToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			CutSelection();
+		}
+
+		private void CopyToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			CopySelection();
+		}
+
+		private void PasteToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			PasteSelection();
+		}
+
+		void DeleteToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			DeleteSelection();
+		}
+
+		void CopySelection()
+		{
+			if (!pathMode)
+			{
+				var selection = selectionMode ? selection1 : selection2;
+				selection.CopySelection(CopyTileAt, ClipboardType.TILE_8x8);
+				selection.ClearSelection();
+			}
+		}
+
+		void PasteSelection()
+		{
+			if (!pathMode && selectionMode)
+			{
+				if (selection1.HasSelection)
+				{
+					history.AddChanges(selection1.PasteSelection(PasteTileAt, ClipboardType.TILE_8x8));
+					UpdateTitle();
+					pictureBox1.Invalidate();
+					SetChanges();
+				}
+
+				selection1.ClearSelection();
+			}
+
+			int PasteTileAt(int x, int y, int data)
+			{
+				if (x < CurrentMapX && y < CurrentMapY && data != -1)
+				{
+					return SetTileAt(x, y, data);
+				}
+
+				return data; //no changes
+			}
+		}
+
+		void CutSelection()
+		{
+			if (!pathMode && selectionMode)
+			{
+				int tile = GetEmptyTile();
+				if (selection1.HasSelection)
+				{
+					selection1.CopySelection(CopyTileAt, ClipboardType.TILE_8x8);
+					history.AddChanges(selection1.DeleteSelection(SetTileAt, GetEmptyTile()));
+
+					UpdateTitle();
+					pictureBox1.Invalidate();
+					SetChanges();
+				}
+
+				selection1.ClearSelection();
+			}
+		}
+
+		ClipboardTile CopyTileAt(int x, int y)
+		{
+			if (selectionMode)
+			{
+				if (eventMode)
+				{
+					int index = eventForm.FindEvent(x, y);
+					return new ClipboardTile { Order = index, Tile = eventForm.GetEvent(index) };
+				}
+
+				return new ClipboardTile { Tile = GetTileAt(x, y) };
+			}
+
+			return new ClipboardTile { Tile = (x + y * 16) };
+		}
+
+		int GetEmptyTile()
+		{
+			if (eventMode)
+			{
+				return -1;
+			}
+
+			return Level.GetEmptyTile(tilesWorld8x8.Bits, 8, 16);
+		}
+
+		void DeleteSelection()
+		{
+			if (!pathMode && selectionMode)
+			{
+				int tile = GetEmptyTile();
+				if (selection1.HasSelection)
+				{
+					history.AddChanges(selection1.DeleteSelection(SetTileAt, GetEmptyTile()));
+
+					UpdateTitle();
+					pictureBox1.Invalidate();
+					SetChanges();
+				}
+
+				selection1.ClearSelection();
+			}
 		}
 
 		#endregion

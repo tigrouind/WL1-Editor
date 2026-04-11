@@ -109,7 +109,12 @@ namespace WLEditor
 			sectorForm.SectorChanged += SectorFormSectorChanged;
 			sectorForm.SectorLoad += SectorFormSectorLoad;
 
-			clipboardChange.Change += (s, e) => pasteLevelToolStripMenuItem.Enabled = Clipboard.HasData(ClipboardType.LEVEL);
+			clipboardChange.Change += (s, e) =>
+			{
+				pasteLevelToolStripMenuItem.Enabled = Clipboard.HasData(ClipboardType.LEVEL);
+				pasteToolStripMenuItem.Enabled = Clipboard.HasData(ClipboardType.TILE_16x16);
+				overworldForm.ClipboardChange(this, EventArgs.Empty);
+			};
 			HandleDestroyed += (s, e) => clipboardChange.Dispose();
 
 			SetZoomLevel(2);
@@ -424,6 +429,9 @@ namespace WLEditor
 			sectorsToolStripMenuItem.Enabled = true;
 			saveAsToolStripMenuItem.Enabled = true;
 			copyLevelToolStripMenuItem.Enabled = true;
+			copyToolStripMenuItem.Enabled = true;
+			cutToolStripMenuItem.Enabled = true;
+			deleteToolStripMenuItem.Enabled = true;
 			levelComboBox.Visible = true;
 			LevelPanel.Visible = true;
 			return true;
@@ -695,38 +703,6 @@ namespace WLEditor
 				case Keys.Control | Keys.OemMinus:
 					zoomOutToolStripMenuItem.PerformClick();
 					return true;
-
-				case Keys.Control | Keys.C:
-					levelPictureBox.CopySelection();
-					levelPictureBox.ClearSelection();
-					return true;
-
-				case Keys.Control | Keys.V:
-					if (levelPictureBox.PasteSelection())
-					{
-						SetChanges(ChangeEnum.Blocks);
-					}
-
-					levelPictureBox.ClearSelection();
-					return true;
-
-				case Keys.Control | Keys.X:
-					if (levelPictureBox.CutSelection())
-					{
-						SetChanges(ChangeEnum.Blocks);
-					}
-
-					levelPictureBox.ClearSelection();
-					return true;
-
-				case Keys.Delete:
-					if (levelPictureBox.DeleteSelection())
-					{
-						SetChanges(ChangeEnum.Blocks);
-					}
-
-					levelPictureBox.ClearSelection();
-					return true;
 			}
 
 			return DispatchShortcut(keyData);
@@ -746,6 +722,42 @@ namespace WLEditor
 			{
 				SetChanges(ChangeEnum.Blocks);
 			}
+		}
+
+		void CopyToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			levelPictureBox.CopySelection();
+			levelPictureBox.ClearSelection();
+		}
+
+		void PasteToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			if (levelPictureBox.PasteSelection())
+			{
+				SetChanges(ChangeEnum.Blocks);
+			}
+
+			levelPictureBox.ClearSelection();
+		}
+
+		void DeleteToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			if (levelPictureBox.DeleteSelection())
+			{
+				SetChanges(ChangeEnum.Blocks);
+			}
+
+			levelPictureBox.ClearSelection();
+		}
+
+		void CutToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			if (levelPictureBox.CutSelection())
+			{
+				SetChanges(ChangeEnum.Blocks);
+			}
+
+			levelPictureBox.ClearSelection();
 		}
 
 		bool DispatchShortcut(Keys keyData)
@@ -884,6 +896,5 @@ namespace WLEditor
 		}
 
 		#endregion
-
 	}
 }

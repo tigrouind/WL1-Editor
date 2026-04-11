@@ -44,6 +44,11 @@ namespace WLEditor
 			editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			undoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			redoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			toolStripMenuItem4 = new System.Windows.Forms.ToolStripSeparator();
+			cutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			copyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			pasteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			toolStripMenuItem3 = new System.Windows.Forms.ToolStripSeparator();
 			copyLevelToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			pasteLevelToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -146,7 +151,7 @@ namespace WLEditor
 			// 
 			// editToolStripMenuItem
 			// 
-			editToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { undoToolStripMenuItem, redoToolStripMenuItem, toolStripMenuItem3, copyLevelToolStripMenuItem, pasteLevelToolStripMenuItem });
+			editToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { undoToolStripMenuItem, redoToolStripMenuItem, toolStripMenuItem4, cutToolStripMenuItem, copyToolStripMenuItem, pasteToolStripMenuItem, deleteToolStripMenuItem, toolStripMenuItem3, copyLevelToolStripMenuItem, pasteLevelToolStripMenuItem });
 			editToolStripMenuItem.Name = "editToolStripMenuItem";
 			editToolStripMenuItem.Size = new System.Drawing.Size(47, 24);
 			editToolStripMenuItem.Text = "Edit";
@@ -156,7 +161,7 @@ namespace WLEditor
 			undoToolStripMenuItem.Enabled = false;
 			undoToolStripMenuItem.Name = "undoToolStripMenuItem";
 			undoToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Z;
-			undoToolStripMenuItem.Size = new System.Drawing.Size(180, 24);
+			undoToolStripMenuItem.Size = new System.Drawing.Size(200, 24);
 			undoToolStripMenuItem.Text = "Undo";
 			undoToolStripMenuItem.Click += UndoToolStripMenuItem_Click;
 			// 
@@ -165,20 +170,61 @@ namespace WLEditor
 			redoToolStripMenuItem.Enabled = false;
 			redoToolStripMenuItem.Name = "redoToolStripMenuItem";
 			redoToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Y;
-			redoToolStripMenuItem.Size = new System.Drawing.Size(180, 24);
+			redoToolStripMenuItem.Size = new System.Drawing.Size(200, 24);
 			redoToolStripMenuItem.Text = "Redo";
 			redoToolStripMenuItem.Click += RedoToolStripMenuItem_Click;
+			// 
+			// toolStripMenuItem4
+			// 
+			toolStripMenuItem4.Name = "toolStripMenuItem4";
+			toolStripMenuItem4.Size = new System.Drawing.Size(197, 6);
+			// 
+			// cutToolStripMenuItem
+			// 
+			cutToolStripMenuItem.Enabled = false;
+			cutToolStripMenuItem.Name = "cutToolStripMenuItem";
+			cutToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.X;
+			cutToolStripMenuItem.Size = new System.Drawing.Size(200, 24);
+			cutToolStripMenuItem.Text = "Cut";
+			cutToolStripMenuItem.Click += CutToolStripMenuItem_Click;
+			// 
+			// copyToolStripMenuItem
+			// 
+			copyToolStripMenuItem.Enabled = false;
+			copyToolStripMenuItem.Name = "copyToolStripMenuItem";
+			copyToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.C;
+			copyToolStripMenuItem.Size = new System.Drawing.Size(200, 24);
+			copyToolStripMenuItem.Text = "Copy";
+			copyToolStripMenuItem.Click += CopyToolStripMenuItem_Click;
+			// 
+			// pasteToolStripMenuItem
+			// 
+			pasteToolStripMenuItem.Enabled = false;
+			pasteToolStripMenuItem.Name = "pasteToolStripMenuItem";
+			pasteToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.V;
+			pasteToolStripMenuItem.Size = new System.Drawing.Size(200, 24);
+			pasteToolStripMenuItem.Text = "Paste";
+			pasteToolStripMenuItem.Click += PasteToolStripMenuItem_Click;
+			// 
+			// deleteToolStripMenuItem
+			// 
+			deleteToolStripMenuItem.Enabled = false;
+			deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
+			deleteToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Delete;
+			deleteToolStripMenuItem.Size = new System.Drawing.Size(200, 24);
+			deleteToolStripMenuItem.Text = "Delete";
+			deleteToolStripMenuItem.Click += DeleteToolStripMenuItem_Click;
 			// 
 			// toolStripMenuItem3
 			// 
 			toolStripMenuItem3.Name = "toolStripMenuItem3";
-			toolStripMenuItem3.Size = new System.Drawing.Size(177, 6);
+			toolStripMenuItem3.Size = new System.Drawing.Size(197, 6);
 			// 
 			// copyLevelToolStripMenuItem
 			// 
 			copyLevelToolStripMenuItem.Enabled = false;
 			copyLevelToolStripMenuItem.Name = "copyLevelToolStripMenuItem";
-			copyLevelToolStripMenuItem.Size = new System.Drawing.Size(180, 24);
+			copyLevelToolStripMenuItem.Size = new System.Drawing.Size(200, 24);
 			copyLevelToolStripMenuItem.Text = "Copy level";
 			copyLevelToolStripMenuItem.Click += CopyLevelToolStripMenuItem_Click;
 			// 
@@ -186,7 +232,7 @@ namespace WLEditor
 			// 
 			pasteLevelToolStripMenuItem.Enabled = false;
 			pasteLevelToolStripMenuItem.Name = "pasteLevelToolStripMenuItem";
-			pasteLevelToolStripMenuItem.Size = new System.Drawing.Size(180, 24);
+			pasteLevelToolStripMenuItem.Size = new System.Drawing.Size(200, 24);
 			pasteLevelToolStripMenuItem.Text = "Paste level";
 			pasteLevelToolStripMenuItem.Click += PasteLevelToolStripMenuItem_Click;
 			// 
@@ -506,5 +552,10 @@ namespace WLEditor
 		private System.Windows.Forms.ToolStripMenuItem undoToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem redoToolStripMenuItem;
 		private System.Windows.Forms.ToolStripSeparator toolStripMenuItem3;
+		private System.Windows.Forms.ToolStripSeparator toolStripMenuItem4;
+		private System.Windows.Forms.ToolStripMenuItem copyToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem pasteToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem cutToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem deleteToolStripMenuItem;
 	}
 }

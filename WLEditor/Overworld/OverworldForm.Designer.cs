@@ -51,6 +51,10 @@ namespace WLEditor
 			editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			undoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			redoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			toolStripMenuItem2 = new System.Windows.Forms.ToolStripSeparator();
+			cutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			copyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			pasteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
 			musicToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			tileDataToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -62,6 +66,7 @@ namespace WLEditor
 			eventModeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			pathModeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			transparentPathToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			tableLayoutPanel1.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
 			((System.ComponentModel.ISupportInitialize)pictureBox2).BeginInit();
@@ -171,7 +176,7 @@ namespace WLEditor
 			// 
 			// editToolStripMenuItem
 			// 
-			editToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { undoToolStripMenuItem, redoToolStripMenuItem, toolStripMenuItem1, musicToolStripMenuItem, tileDataToolStripMenuItem });
+			editToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { undoToolStripMenuItem, redoToolStripMenuItem, toolStripMenuItem2, cutToolStripMenuItem, copyToolStripMenuItem, pasteToolStripMenuItem, deleteToolStripMenuItem, toolStripMenuItem1, musicToolStripMenuItem, tileDataToolStripMenuItem });
 			editToolStripMenuItem.Name = "editToolStripMenuItem";
 			editToolStripMenuItem.Size = new System.Drawing.Size(47, 24);
 			editToolStripMenuItem.Text = "Edit";
@@ -181,7 +186,7 @@ namespace WLEditor
 			undoToolStripMenuItem.Enabled = false;
 			undoToolStripMenuItem.Name = "undoToolStripMenuItem";
 			undoToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Z;
-			undoToolStripMenuItem.Size = new System.Drawing.Size(180, 24);
+			undoToolStripMenuItem.Size = new System.Drawing.Size(200, 24);
 			undoToolStripMenuItem.Text = "Undo";
 			undoToolStripMenuItem.Click += UndoToolStripMenuItem_Click;
 			// 
@@ -190,20 +195,52 @@ namespace WLEditor
 			redoToolStripMenuItem.Enabled = false;
 			redoToolStripMenuItem.Name = "redoToolStripMenuItem";
 			redoToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Y;
-			redoToolStripMenuItem.Size = new System.Drawing.Size(180, 24);
+			redoToolStripMenuItem.Size = new System.Drawing.Size(200, 24);
 			redoToolStripMenuItem.Text = "Redo";
 			redoToolStripMenuItem.Click += RedoToolStripMenuItem_Click;
+			// 
+			// toolStripMenuItem2
+			// 
+			toolStripMenuItem2.Name = "toolStripMenuItem2";
+			toolStripMenuItem2.Size = new System.Drawing.Size(197, 6);
+			// 
+			// cutToolStripMenuItem
+			// 
+			cutToolStripMenuItem.Enabled = false;
+			cutToolStripMenuItem.Name = "cutToolStripMenuItem";
+			cutToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.X;
+			cutToolStripMenuItem.Size = new System.Drawing.Size(200, 24);
+			cutToolStripMenuItem.Text = "Cut";
+			cutToolStripMenuItem.Click += CutToolStripMenuItem_Click;
+			// 
+			// copyToolStripMenuItem
+			// 
+			copyToolStripMenuItem.Enabled = false;
+			copyToolStripMenuItem.Name = "copyToolStripMenuItem";
+			copyToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.C;
+			copyToolStripMenuItem.Size = new System.Drawing.Size(200, 24);
+			copyToolStripMenuItem.Text = "Copy";
+			copyToolStripMenuItem.Click += CopyToolStripMenuItem_Click;
+			// 
+			// pasteToolStripMenuItem
+			// 
+			pasteToolStripMenuItem.Enabled = false;
+			pasteToolStripMenuItem.Name = "pasteToolStripMenuItem";
+			pasteToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.V;
+			pasteToolStripMenuItem.Size = new System.Drawing.Size(200, 24);
+			pasteToolStripMenuItem.Text = "Paste";
+			pasteToolStripMenuItem.Click += PasteToolStripMenuItem_Click;
 			// 
 			// toolStripMenuItem1
 			// 
 			toolStripMenuItem1.Name = "toolStripMenuItem1";
-			toolStripMenuItem1.Size = new System.Drawing.Size(177, 6);
+			toolStripMenuItem1.Size = new System.Drawing.Size(197, 6);
 			// 
 			// musicToolStripMenuItem
 			// 
 			musicToolStripMenuItem.Name = "musicToolStripMenuItem";
 			musicToolStripMenuItem.ShortcutKeyDisplayString = "";
-			musicToolStripMenuItem.Size = new System.Drawing.Size(180, 24);
+			musicToolStripMenuItem.Size = new System.Drawing.Size(200, 24);
 			musicToolStripMenuItem.Text = "Change music...";
 			musicToolStripMenuItem.Click += MusicToolStripMenuItem_Click;
 			// 
@@ -211,7 +248,7 @@ namespace WLEditor
 			// 
 			tileDataToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { importToolStripMenuItem, exportTilesToolStripMenuItem, exportMapToolStripMenuItem });
 			tileDataToolStripMenuItem.Name = "tileDataToolStripMenuItem";
-			tileDataToolStripMenuItem.Size = new System.Drawing.Size(180, 24);
+			tileDataToolStripMenuItem.Size = new System.Drawing.Size(200, 24);
 			tileDataToolStripMenuItem.Text = "Tile data";
 			// 
 			// importToolStripMenuItem
@@ -278,6 +315,15 @@ namespace WLEditor
 			transparentPathToolStripMenuItem.Text = "Transparent paths";
 			transparentPathToolStripMenuItem.Click += TransparentPathToolStripMenuItem_Click;
 			// 
+			// deleteToolStripMenuItem
+			// 
+			deleteToolStripMenuItem.Enabled = false;
+			deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
+			deleteToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Delete;
+			deleteToolStripMenuItem.Size = new System.Drawing.Size(200, 24);
+			deleteToolStripMenuItem.Text = "Delete";
+			deleteToolStripMenuItem.Click += DeleteToolStripMenuItem_Click;
+			// 
 			// OverworldForm
 			// 
 			AllowDrop = true;
@@ -329,5 +375,10 @@ namespace WLEditor
 		private System.Windows.Forms.ToolStripMenuItem redoToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem undoToolStripMenuItem;
 		private System.Windows.Forms.ToolStripSeparator toolStripMenuItem1;
+		private System.Windows.Forms.ToolStripMenuItem copyToolStripMenuItem;
+		private System.Windows.Forms.ToolStripSeparator toolStripMenuItem2;
+		private System.Windows.Forms.ToolStripMenuItem cutToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem pasteToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem deleteToolStripMenuItem;
 	}
 }
