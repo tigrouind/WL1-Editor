@@ -87,7 +87,8 @@ namespace WLEditor
 			levelPictureBox.TileMouseDown += LevelPictureBoxTileMouseDown;
 			levelPictureBox.SectorChanged += LevelPictureBoxSectorChanged;
 			levelPictureBox.GetSourceSector = x => Sector.GetSourceSector(rom, currentCourseId, x);
-			levelPictureBox.History.Change += OnHistoryChange;
+			levelPictureBox.History.Changed += OnHistoryChange;
+			levelPictureBox.SelectionChanged += OnSelectionChanged;
 
 			blocksForm.MouseWheel += LevelPanelMouseWheel;
 			blocksForm.FormClosing += BlocksFormClosing;
@@ -111,9 +112,8 @@ namespace WLEditor
 
 			clipboardChange.Change += (s, e) =>
 			{
-				pasteLevelToolStripMenuItem.Enabled = Clipboard.HasData(ClipboardType.LEVEL);
-				pasteToolStripMenuItem.Enabled = Clipboard.HasData(ClipboardType.TILE_16x16);
-				overworldForm.ClipboardChange(this, EventArgs.Empty);
+				OnSelectionChanged(s, e);
+				overworldForm.OnSelectionChanged(s, e);
 			};
 			HandleDestroyed += (s, e) => clipboardChange.Dispose();
 
@@ -305,6 +305,14 @@ namespace WLEditor
 			#endregion
 		}
 
+		public void OnSelectionChanged(object sender, EventArgs e)
+		{
+			cutToolStripMenuItem.Enabled = levelPictureBox.HasSelection;
+			copyToolStripMenuItem.Enabled = levelPictureBox.HasSelection;
+			deleteToolStripMenuItem.Enabled = levelPictureBox.HasSelection;
+			pasteToolStripMenuItem.Enabled = (levelPictureBox.HasSelection && Clipboard.HasData(ClipboardType.TILE_16x16)) || Clipboard.HasData(ClipboardType.LEVEL);
+		}
+
 		public void OnHistoryChange(object sender, EventArgs e)
 		{
 			redoToolStripMenuItem.Enabled = levelPictureBox.History.CanRedo;
@@ -428,9 +436,7 @@ namespace WLEditor
 			overworldToolStripMenuItem.Enabled = true;
 			sectorsToolStripMenuItem.Enabled = true;
 			saveAsToolStripMenuItem.Enabled = true;
-			copyLevelToolStripMenuItem.Enabled = true;
-			copyToolStripMenuItem.Enabled = true;
-			cutToolStripMenuItem.Enabled = true;
+			selectAllToolStripMenuItem.Enabled = true;
 			deleteToolStripMenuItem.Enabled = true;
 			levelComboBox.Visible = true;
 			LevelPanel.Visible = true;
@@ -726,18 +732,39 @@ namespace WLEditor
 
 		void CopyToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			levelPictureBox.CopySelection();
-			levelPictureBox.ClearSelection();
+			if (levelPictureBox.AllSelected)
+			{
+				LevelCopy.Copy(rom, currentCourseId, levelPictureBox);
+			}
+			else
+			{
+				levelPictureBox.CopySelection();
+				levelPictureBox.ClearSelection();
+			}
 		}
 
 		void PasteToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			if (levelPictureBox.PasteSelection())
+			if (Clipboard.HasData(ClipboardType.LEVEL))
 			{
-				SetChanges(ChangeEnum.Blocks);
+				if (LevelCopy.Paste(rom, currentCourseId, levelPictureBox, Text))
+				{
+					//reload
+					LoadLevel();
+					sectorForm.LoadSector(currentCourseId, levelPictureBox.CurrentSector, treasureId, checkPoint);
+					SetChanges(ChangeEnum.Blocks);
+					SetChanges(ChangeEnum.Sectors);
+				}
 			}
+			else
+			{
+				if (levelPictureBox.PasteSelection())
+				{
+					SetChanges(ChangeEnum.Blocks);
+				}
 
-			levelPictureBox.ClearSelection();
+				levelPictureBox.ClearSelection();
+			}
 		}
 
 		void DeleteToolStripMenuItem_Click(object sender, EventArgs e)
@@ -748,6 +775,12 @@ namespace WLEditor
 			}
 
 			levelPictureBox.ClearSelection();
+		}
+
+		void SelectAllToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			levelPictureBox.StartSelection(0, 0);
+			levelPictureBox.SetSelection(255, 31);
 		}
 
 		void CutToolStripMenuItem_Click(object sender, EventArgs e)
@@ -876,25 +909,5 @@ namespace WLEditor
 
 		#endregion
 
-		#region Sectors
-
-		private void CopyLevelToolStripMenuItem_Click(object sender, EventArgs e)
-		{
-			LevelCopy.Copy(rom, currentCourseId, levelPictureBox);
-		}
-
-		private void PasteLevelToolStripMenuItem_Click(object sender, EventArgs e)
-		{
-			if (LevelCopy.Paste(rom, currentCourseId, levelPictureBox, Text))
-			{
-				//reload
-				LoadLevel();
-				sectorForm.LoadSector(currentCourseId, levelPictureBox.CurrentSector, treasureId, checkPoint);
-				SetChanges(ChangeEnum.Blocks);
-				SetChanges(ChangeEnum.Sectors);
-			}
-		}
-
-		#endregion
 	}
 }

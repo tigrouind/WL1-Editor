@@ -48,10 +48,8 @@ namespace WLEditor
 			cutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			copyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			pasteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			selectAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			toolStripMenuItem3 = new System.Windows.Forms.ToolStripSeparator();
-			copyLevelToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			pasteLevelToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			viewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			regionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			objectsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -151,7 +149,7 @@ namespace WLEditor
 			// 
 			// editToolStripMenuItem
 			// 
-			editToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { undoToolStripMenuItem, redoToolStripMenuItem, toolStripMenuItem4, cutToolStripMenuItem, copyToolStripMenuItem, pasteToolStripMenuItem, deleteToolStripMenuItem, toolStripMenuItem3, copyLevelToolStripMenuItem, pasteLevelToolStripMenuItem });
+			editToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { undoToolStripMenuItem, redoToolStripMenuItem, toolStripMenuItem4, cutToolStripMenuItem, copyToolStripMenuItem, pasteToolStripMenuItem, selectAllToolStripMenuItem, deleteToolStripMenuItem });
 			editToolStripMenuItem.Name = "editToolStripMenuItem";
 			editToolStripMenuItem.Size = new System.Drawing.Size(47, 24);
 			editToolStripMenuItem.Text = "Edit";
@@ -206,6 +204,15 @@ namespace WLEditor
 			pasteToolStripMenuItem.Text = "Paste";
 			pasteToolStripMenuItem.Click += PasteToolStripMenuItem_Click;
 			// 
+			// selectAllToolStripMenuItem
+			// 
+			selectAllToolStripMenuItem.Enabled = false;
+			selectAllToolStripMenuItem.Name = "selectAllToolStripMenuItem";
+			selectAllToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.A;
+			selectAllToolStripMenuItem.Size = new System.Drawing.Size(200, 24);
+			selectAllToolStripMenuItem.Text = "Select All";
+			selectAllToolStripMenuItem.Click += SelectAllToolStripMenuItem_Click;
+			// 
 			// deleteToolStripMenuItem
 			// 
 			deleteToolStripMenuItem.Enabled = false;
@@ -214,27 +221,6 @@ namespace WLEditor
 			deleteToolStripMenuItem.Size = new System.Drawing.Size(200, 24);
 			deleteToolStripMenuItem.Text = "Delete";
 			deleteToolStripMenuItem.Click += DeleteToolStripMenuItem_Click;
-			// 
-			// toolStripMenuItem3
-			// 
-			toolStripMenuItem3.Name = "toolStripMenuItem3";
-			toolStripMenuItem3.Size = new System.Drawing.Size(197, 6);
-			// 
-			// copyLevelToolStripMenuItem
-			// 
-			copyLevelToolStripMenuItem.Enabled = false;
-			copyLevelToolStripMenuItem.Name = "copyLevelToolStripMenuItem";
-			copyLevelToolStripMenuItem.Size = new System.Drawing.Size(200, 24);
-			copyLevelToolStripMenuItem.Text = "Copy level";
-			copyLevelToolStripMenuItem.Click += CopyLevelToolStripMenuItem_Click;
-			// 
-			// pasteLevelToolStripMenuItem
-			// 
-			pasteLevelToolStripMenuItem.Enabled = false;
-			pasteLevelToolStripMenuItem.Name = "pasteLevelToolStripMenuItem";
-			pasteLevelToolStripMenuItem.Size = new System.Drawing.Size(200, 24);
-			pasteLevelToolStripMenuItem.Text = "Paste level";
-			pasteLevelToolStripMenuItem.Click += PasteLevelToolStripMenuItem_Click;
 			// 
 			// viewToolStripMenuItem
 			// 
@@ -328,35 +314,35 @@ namespace WLEditor
 			zoom100ToolStripMenuItem.Checked = true;
 			zoom100ToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
 			zoom100ToolStripMenuItem.Name = "zoom100ToolStripMenuItem";
-			zoom100ToolStripMenuItem.Size = new System.Drawing.Size(186, 24);
+			zoom100ToolStripMenuItem.Size = new System.Drawing.Size(235, 24);
 			zoom100ToolStripMenuItem.Text = "100%";
 			zoom100ToolStripMenuItem.Click += Zoom100ToolStripMenuItemClick;
 			// 
 			// zoom200ToolStripMenuItem
 			// 
 			zoom200ToolStripMenuItem.Name = "zoom200ToolStripMenuItem";
-			zoom200ToolStripMenuItem.Size = new System.Drawing.Size(186, 24);
+			zoom200ToolStripMenuItem.Size = new System.Drawing.Size(235, 24);
 			zoom200ToolStripMenuItem.Text = "200%";
 			zoom200ToolStripMenuItem.Click += Zoom200ToolStripMenuItemClick;
 			// 
 			// zoom300ToolStripMenuItem
 			// 
 			zoom300ToolStripMenuItem.Name = "zoom300ToolStripMenuItem";
-			zoom300ToolStripMenuItem.Size = new System.Drawing.Size(186, 24);
+			zoom300ToolStripMenuItem.Size = new System.Drawing.Size(235, 24);
 			zoom300ToolStripMenuItem.Text = "300%";
 			zoom300ToolStripMenuItem.Click += Zoom300ToolStripMenuItemClick;
 			// 
 			// zoom400ToolStripMenuItem
 			// 
 			zoom400ToolStripMenuItem.Name = "zoom400ToolStripMenuItem";
-			zoom400ToolStripMenuItem.Size = new System.Drawing.Size(186, 24);
+			zoom400ToolStripMenuItem.Size = new System.Drawing.Size(235, 24);
 			zoom400ToolStripMenuItem.Text = "400%";
 			zoom400ToolStripMenuItem.Click += Zoom400ToolStripMenuItemClick;
 			// 
 			// toolStripMenuItem1
 			// 
 			toolStripMenuItem1.Name = "toolStripMenuItem1";
-			toolStripMenuItem1.Size = new System.Drawing.Size(183, 6);
+			toolStripMenuItem1.Size = new System.Drawing.Size(232, 6);
 			// 
 			// zoomInToolStripMenuItem
 			// 
@@ -371,7 +357,7 @@ namespace WLEditor
 			zoomOutToolStripMenuItem.Enabled = false;
 			zoomOutToolStripMenuItem.Name = "zoomOutToolStripMenuItem";
 			zoomOutToolStripMenuItem.ShortcutKeyDisplayString = "Ctrl -";
-			zoomOutToolStripMenuItem.Size = new System.Drawing.Size(186, 24);
+			zoomOutToolStripMenuItem.Size = new System.Drawing.Size(235, 24);
 			zoomOutToolStripMenuItem.Text = "Zoom out";
 			zoomOutToolStripMenuItem.Click += ZoomOutToolStripMenuItemClick;
 			// 
@@ -547,15 +533,13 @@ namespace WLEditor
 		private System.Windows.Forms.ToolStripMenuItem scrollBoundaryToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem objectsFormToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem editToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem copyLevelToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem pasteLevelToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem undoToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem redoToolStripMenuItem;
-		private System.Windows.Forms.ToolStripSeparator toolStripMenuItem3;
 		private System.Windows.Forms.ToolStripSeparator toolStripMenuItem4;
 		private System.Windows.Forms.ToolStripMenuItem copyToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem pasteToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem cutToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem deleteToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem selectAllToolStripMenuItem;
 	}
 }

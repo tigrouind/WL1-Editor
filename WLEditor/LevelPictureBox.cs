@@ -27,6 +27,7 @@ namespace WLEditor
 		public event EventHandler<TileEventArgs> TileMouseDown;
 		public event EventHandler<TileEventArgs> TileMouseMove;
 		public event EventHandler SectorChanged;
+		public event EventHandler SelectionChanged;
 		public Func<int, int> GetSourceSector;
 
 		public readonly static Brush[] TransparentBrushes =
@@ -46,6 +47,7 @@ namespace WLEditor
 		public LevelPictureBox()
 		{
 			selection.InvalidateSelection += (s, e) => Invalidate(e.ClipRectangle);
+			selection.SelectionChanged += (s, e) => SelectionChanged?.Invoke(this, EventArgs.Empty);
 		}
 
 		protected override void OnPaint(PaintEventArgs e)
@@ -548,6 +550,8 @@ namespace WLEditor
 		{
 			selection.SetSelection(x, y);
 		}
+
+		public bool AllSelected => selection.AllSelected;
 
 		public bool HasSelection => selection.HasSelection;
 

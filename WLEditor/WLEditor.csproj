@@ -14,7 +14,7 @@
     <DebugType>None</DebugType>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyVersion>0.89.*</AssemblyVersion>
+    <AssemblyVersion>0.90.*</AssemblyVersion>
 	<Deterministic>False</Deterministic>
   </PropertyGroup>
   <ItemGroup>

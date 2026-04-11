@@ -11,7 +11,7 @@ namespace WLEditor
 
 		public bool CanUndo => undo.Any();
 		public bool CanRedo => redo.Any();
-		public EventHandler Change;
+		public EventHandler Changed;
 
 		public void ClearUndo()
 		{
@@ -62,7 +62,7 @@ namespace WLEditor
 
 		void HistoryChange()
 		{
-			Change?.Invoke(this, EventArgs.Empty);
+			Changed?.Invoke(this, EventArgs.Empty);
 		}
 	}
 }

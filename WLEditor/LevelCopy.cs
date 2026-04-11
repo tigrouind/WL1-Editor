@@ -41,8 +41,8 @@ namespace WLEditor
 			var data = Clipboard.Paste(ClipboardType.LEVEL);
 			if (data == null //should never happen
 				|| !CheckFree()
-				|| MessageBox.Show("Are you sure you want to erase current level ?\r\n" +
-					"This action can't be undone.", text, MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation) != DialogResult.Yes)
+				|| MessageBox.Show("Are you sure you want to paste all blocks into current level ?\r\n" +
+					"This will replace all of it's content. This action can't be undone.", text, MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation) != DialogResult.Yes)
 			{
 				return false;
 			}

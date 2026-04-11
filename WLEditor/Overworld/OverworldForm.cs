@@ -62,10 +62,13 @@ namespace WLEditor
 			pathForm.PathChanged += (s, e) => SetChanges();
 			pathForm.GetAnimationIndex = () => animationIndex;
 			pictureBox1.MouseWheel += PictureBox1MouseWheel;
-			history.Change += OnHistoryChange;
+			history.Changed += OnHistoryChange;
 
 			selection1.InvalidateSelection += (s, e) => pictureBox1.Invalidate(e.ClipRectangle);
 			selection2.InvalidateSelection += (s, e) => pictureBox2.Invalidate(e.ClipRectangle);
+
+			selection1.SelectionChanged += OnSelectionChanged;
+			selection2.SelectionChanged += OnSelectionChanged;
 		}
 
 		readonly ComboboxItemCollection<(int BankA, int TileAddressA, int MaxLengthA, byte Palette, int BankB, int TileAddressB, int MaxLengthB, int UncompressedSize)> worldData = new()
@@ -127,9 +130,8 @@ namespace WLEditor
 			if (!formLoaded && rom != null)
 			{
 				formLoaded = true;
-				copyToolStripMenuItem.Enabled = true;
-				cutToolStripMenuItem.Enabled = true;
 				deleteToolStripMenuItem.Enabled = true;
+				selectAllToolStripMenuItem.Enabled = true;
 
 				LoadWorldCombobox();
 
@@ -1159,9 +1161,13 @@ namespace WLEditor
 
 		#region Copy/Cut/Paste
 
-		public void ClipboardChange(object sender, EventArgs e)
+		public void OnSelectionChanged(object sender, EventArgs e)
 		{
-			pasteToolStripMenuItem.Enabled = Clipboard.HasData(ClipboardType.TILE_8x8);
+			bool hasSelection = selection1.HasSelection || selection2.HasSelection;
+			copyToolStripMenuItem.Enabled = hasSelection;
+			cutToolStripMenuItem.Enabled = hasSelection;
+			deleteToolStripMenuItem.Enabled = hasSelection;
+			pasteToolStripMenuItem.Enabled = Clipboard.HasData(ClipboardType.TILE_8x8) && hasSelection;
 		}
 
 		private void CutToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1182,6 +1188,28 @@ namespace WLEditor
 		void DeleteToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			DeleteSelection();
+		}
+
+		void SelectAllToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			SelectAll();
+		}
+
+		void SelectAll()
+		{
+			if (!pathMode)
+			{
+				if (selectionMode)
+				{
+					selection1.StartSelection(0, 0);
+					selection1.SetSelection(31, 31);
+				}
+				else
+				{
+					selection2.StartSelection(0, 0);
+					selection2.SetSelection(15, 15);
+				}
+			}
 		}
 
 		void CopySelection()
@@ -1222,20 +1250,24 @@ namespace WLEditor
 
 		void CutSelection()
 		{
-			if (!pathMode && selectionMode)
+			if (!pathMode)
 			{
-				int tile = GetEmptyTile();
-				if (selection1.HasSelection)
-				{
-					selection1.CopySelection(CopyTileAt, ClipboardType.TILE_8x8);
-					history.AddChanges(selection1.DeleteSelection(SetTileAt, GetEmptyTile()));
+				var selection = selectionMode ? selection1 : selection2;
+				var pictureBox = selectionMode ? pictureBox1 : pictureBox2;
 
-					UpdateTitle();
-					pictureBox1.Invalidate();
-					SetChanges();
+				if (selection.HasSelection)
+				{
+					selection.CopySelection(CopyTileAt, ClipboardType.TILE_8x8);
+					if (selectionMode)
+					{
+						history.AddChanges(selection.DeleteSelection(SetTileAt, GetEmptyTile()));
+						UpdateTitle();
+						pictureBox.Invalidate();
+						SetChanges();
+					}
 				}
 
-				selection1.ClearSelection();
+				selection.ClearSelection();
 			}
 		}
 
@@ -1267,19 +1299,26 @@ namespace WLEditor
 
 		void DeleteSelection()
 		{
-			if (!pathMode && selectionMode)
+			if (!pathMode)
 			{
-				int tile = GetEmptyTile();
-				if (selection1.HasSelection)
+				if (selectionMode)
 				{
-					history.AddChanges(selection1.DeleteSelection(SetTileAt, GetEmptyTile()));
+					int tile = GetEmptyTile();
+					if (selection1.HasSelection)
+					{
+						history.AddChanges(selection1.DeleteSelection(SetTileAt, GetEmptyTile()));
 
-					UpdateTitle();
-					pictureBox1.Invalidate();
-					SetChanges();
+						UpdateTitle();
+						pictureBox1.Invalidate();
+						SetChanges();
+					}
+
+					selection1.ClearSelection();
 				}
-
-				selection1.ClearSelection();
+				else
+				{
+					selection2.ClearSelection();
+				}
 			}
 		}
 
