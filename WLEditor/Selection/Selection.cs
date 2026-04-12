@@ -11,7 +11,6 @@ namespace WLEditor
 		bool selection;
 		Point selectionStart, selectionEnd;
 		public event EventHandler<SelectionEventArgs> InvalidateSelection;
-		public event EventHandler SelectionChanged;
 
 		public void SetZoom(int zoomLevel)
 		{
@@ -28,7 +27,7 @@ namespace WLEditor
 			}
 		}
 
-		Rectangle GetSelection()
+		public Rectangle GetSelection()
 		{
 			int startX = Math.Min(selectionStart.X, selectionEnd.X);
 			int startY = Math.Min(selectionStart.Y, selectionEnd.Y);
@@ -182,7 +181,6 @@ namespace WLEditor
 			selectionStart = new Point(x, y);
 			selectionEnd = new Point(x, y);
 			selection = true;
-			SelectionChanged?.Invoke(this, EventArgs.Empty);
 
 			Invalidate();
 		}
@@ -193,7 +191,6 @@ namespace WLEditor
 			{
 				Invalidate();
 				selectionEnd = new Point(x, y);
-				SelectionChanged?.Invoke(this, EventArgs.Empty);
 				Invalidate();
 			}
 		}
@@ -203,7 +200,6 @@ namespace WLEditor
 			if (selection)
 			{
 				selection = false;
-				SelectionChanged?.Invoke(this, EventArgs.Empty);
 				Invalidate();
 			}
 		}

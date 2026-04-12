@@ -39,7 +39,7 @@ namespace WLEditor
 
 		readonly Selection selection1 = new(8);
 		readonly Selection selection2 = new(8);
-		readonly History history = new();
+		public readonly History history = new();
 		bool selectionMode;
 
 		readonly byte[] worldTiles = new byte[32 * 32];
@@ -52,7 +52,7 @@ namespace WLEditor
 		public OverworldForm()
 		{
 			InitializeComponent();
-			eventForm = new EventForm(pictureBox1, tilesWorld8x8, selection1, history)
+			eventForm = new EventForm(pictureBox1, tilesWorld8x8, selection1)
 			{
 				UpdateTitle = UpdateTitle
 			};
@@ -62,13 +62,9 @@ namespace WLEditor
 			pathForm.PathChanged += (s, e) => SetChanges();
 			pathForm.GetAnimationIndex = () => animationIndex;
 			pictureBox1.MouseWheel += PictureBox1MouseWheel;
-			history.Changed += OnHistoryChange;
 
 			selection1.InvalidateSelection += (s, e) => pictureBox1.Invalidate(e.ClipRectangle);
 			selection2.InvalidateSelection += (s, e) => pictureBox2.Invalidate(e.ClipRectangle);
-
-			selection1.SelectionChanged += OnSelectionChanged;
-			selection2.SelectionChanged += OnSelectionChanged;
 		}
 
 		readonly ComboboxItemCollection<(int BankA, int TileAddressA, int MaxLengthA, byte Palette, int BankB, int TileAddressB, int MaxLengthB, int UncompressedSize)> worldData = new()
@@ -103,6 +99,26 @@ namespace WLEditor
 			{ ( 0x1F, 0x53C8, 5430, 0xE1, 0x1F, 0x727B, 344, 948 ), "End 6" }
 		};
 
+		public void ApplicationIdle(object sender, EventArgs e)
+		{
+			bool hasSelection = selection1.HasSelection || selection2.HasSelection;
+
+			copyToolStripMenuItem.Enabled = hasSelection;
+			cutToolStripMenuItem.Enabled = hasSelection;
+			pasteToolStripMenuItem.Enabled = Clipboard.HasData(ClipboardType.TILE_8x8) && hasSelection;
+
+			deleteToolStripMenuItem.Enabled = hasSelection || (pathMode && pathForm.CanDelete) || (eventMode && eventForm.CanDelete);
+			deleteAllToolStripMenuItem.Enabled = (pathMode && pathForm.CanDeleteAll) || (eventMode && eventForm.CanDeleteAll);
+
+			undoToolStripMenuItem.Enabled = pathForm.History.CanUndo || eventForm.History.CanUndo || history.CanUndo;
+			redoToolStripMenuItem.Enabled = pathForm.History.CanRedo || eventForm.History.CanRedo || history.CanRedo;
+
+			previousEventToolStripMenuItem.Enabled = eventMode && eventForm.CanPreviousEvent;
+			nextEventToolStripMenuItem.Enabled = eventMode && eventForm.CanNextEvent;
+			previousStepToolStripMenuItem.Enabled = eventMode && eventForm.CanPreviousStep;
+			nextStepToolStripMenuItem.Enabled = eventMode && eventForm.CanNextStep;
+		}
+
 		public void LoadRom(Rom rom)
 		{
 			this.rom = rom;
@@ -131,8 +147,6 @@ namespace WLEditor
 			{
 				formLoaded = true;
 				deleteToolStripMenuItem.Enabled = true;
-				selectAllToolStripMenuItem.Enabled = true;
-
 				LoadWorldCombobox();
 
 				ignoreEvents = true;
@@ -185,6 +199,8 @@ namespace WLEditor
 			}
 
 			history.ClearUndo();
+			eventForm.History.Clear();
+			pathForm.History.Clear();
 
 			UpdateTitle();
 			ClearAllTiles();
@@ -602,6 +618,7 @@ namespace WLEditor
 			{
 				if (e.Status == TileEventStatus.MouseDown)
 				{
+					eventForm.History.ClearSaveStateOnce();
 					changes = [];
 				}
 
@@ -1115,28 +1132,17 @@ namespace WLEditor
 
 		#region Undo
 
-		public void OnHistoryChange(object sender, EventArgs e)
+		void RedoToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			undoToolStripMenuItem.Enabled = history.CanUndo;
-			redoToolStripMenuItem.Enabled = history.CanRedo;
-		}
-
-		void Undo()
-		{
-			if (!pathMode)
+			if (pathMode)
 			{
-				if (history.Undo(SetTileAt, GetTileAt))
-				{
-					UpdateTitle();
-					pictureBox1.Invalidate();
-					SetChanges();
-				}
+				pathForm.History.Redo();
 			}
-		}
-
-		void Redo()
-		{
-			if (!pathMode)
+			else if (eventMode)
+			{
+				eventForm.History.Redo();
+			}
+			else
 			{
 				if (history.Redo(SetTileAt, GetTileAt))
 				{
@@ -1147,72 +1153,56 @@ namespace WLEditor
 			}
 		}
 
-		void RedoToolStripMenuItem_Click(object sender, EventArgs e)
-		{
-			Redo();
-		}
-
 		void UndoToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			Undo();
+			if (pathMode)
+			{
+				pathForm.History.Undo();
+			}
+			else if (eventMode)
+			{
+				eventForm.History.Undo();
+			}
+			else
+			{
+				if (history.Undo(SetTileAt, GetTileAt))
+				{
+					UpdateTitle();
+					pictureBox1.Invalidate();
+					SetChanges();
+				}
+			}
 		}
 
 		#endregion
 
 		#region Copy/Cut/Paste
 
-		public void OnSelectionChanged(object sender, EventArgs e)
-		{
-			bool hasSelection = selection1.HasSelection || selection2.HasSelection;
-			copyToolStripMenuItem.Enabled = hasSelection;
-			cutToolStripMenuItem.Enabled = hasSelection;
-			deleteToolStripMenuItem.Enabled = hasSelection;
-			pasteToolStripMenuItem.Enabled = Clipboard.HasData(ClipboardType.TILE_8x8) && hasSelection;
-		}
-
-		private void CutToolStripMenuItem_Click(object sender, EventArgs e)
-		{
-			CutSelection();
-		}
-
-		private void CopyToolStripMenuItem_Click(object sender, EventArgs e)
-		{
-			CopySelection();
-		}
-
-		private void PasteToolStripMenuItem_Click(object sender, EventArgs e)
-		{
-			PasteSelection();
-		}
-
-		void DeleteToolStripMenuItem_Click(object sender, EventArgs e)
-		{
-			DeleteSelection();
-		}
-
-		void SelectAllToolStripMenuItem_Click(object sender, EventArgs e)
-		{
-			SelectAll();
-		}
-
-		void SelectAll()
+		void CutToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			if (!pathMode)
 			{
-				if (selectionMode)
+				var selection = selectionMode ? selection1 : selection2;
+				var pictureBox = selectionMode ? pictureBox1 : pictureBox2;
+
+				if (selection.HasSelection)
 				{
-					selection1.StartSelection(0, 0);
-					selection1.SetSelection(31, 31);
+					selection.CopySelection(CopyTileAt, ClipboardType.TILE_8x8);
+					if (selectionMode)
+					{
+						eventForm.History.ClearSaveStateOnce();
+						history.AddChanges(selection.DeleteSelection(SetTileAt, GetEmptyTile()));
+						UpdateTitle();
+						pictureBox.Invalidate();
+						SetChanges();
+					}
 				}
-				else
-				{
-					selection2.StartSelection(0, 0);
-					selection2.SetSelection(15, 15);
-				}
+
+				selection.ClearSelection();
 			}
 		}
 
-		void CopySelection()
+		void CopyToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			if (!pathMode)
 			{
@@ -1222,12 +1212,13 @@ namespace WLEditor
 			}
 		}
 
-		void PasteSelection()
+		void PasteToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			if (!pathMode && selectionMode)
 			{
 				if (selection1.HasSelection)
 				{
+					eventForm.History.ClearSaveStateOnce();
 					history.AddChanges(selection1.PasteSelection(PasteTileAt, ClipboardType.TILE_8x8));
 					UpdateTitle();
 					pictureBox1.Invalidate();
@@ -1248,26 +1239,31 @@ namespace WLEditor
 			}
 		}
 
-		void CutSelection()
+		void DeleteToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			if (!pathMode)
+			if (eventMode)
 			{
-				var selection = selectionMode ? selection1 : selection2;
-				var pictureBox = selectionMode ? pictureBox1 : pictureBox2;
+				eventForm.Delete();
+			}
+			else if (pathMode)
+			{
+				pathForm.Delete();
+			}
+			else
+			{
+				DeleteSelection();
+			}
+		}
 
-				if (selection.HasSelection)
-				{
-					selection.CopySelection(CopyTileAt, ClipboardType.TILE_8x8);
-					if (selectionMode)
-					{
-						history.AddChanges(selection.DeleteSelection(SetTileAt, GetEmptyTile()));
-						UpdateTitle();
-						pictureBox.Invalidate();
-						SetChanges();
-					}
-				}
-
-				selection.ClearSelection();
+		private void DeleteAllToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			if (eventMode)
+			{
+				eventForm.DeleteAll();
+			}
+			else if (pathMode)
+			{
+				pathForm.DeleteAll();
 			}
 		}
 
@@ -1320,6 +1316,30 @@ namespace WLEditor
 					selection2.ClearSelection();
 				}
 			}
+		}
+
+		#endregion
+
+		#region Steps / Events 
+
+		void PreviousEventToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			eventForm.PreviousEvent();
+		}
+
+		void NextEventToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			eventForm.NextEvent();
+		}
+
+		void PreviousStepToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			eventForm.PreviousStep();
+		}
+
+		void NextStepToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			eventForm.NextStep();
 		}
 
 		#endregion
