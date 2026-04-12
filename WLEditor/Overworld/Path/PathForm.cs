@@ -8,8 +8,9 @@ using System.Windows.Forms;
 
 namespace WLEditor
 {
-	public class PathForm(PictureBox box) : IDisposable
+	public class PathForm : IDisposable
 	{
+		readonly PictureBox box;
 		WorldPath[] worldData;
 		WorldPath[] overWorldData;
 		int[] levelToCourseId;
@@ -53,13 +54,13 @@ namespace WLEditor
 
 		public event EventHandler PathChanged;
 
-		#region Undo / redo
+		public readonly HistorySaveState<PathHistory> History;
 
-		readonly Stack<PathHistory> undo = [];
-		readonly Stack<PathHistory> redo = [];
-		bool stateSaved;
-
-		#endregion
+		public PathForm(PictureBox box)
+		{
+			this.box = box;
+			History = new(Serialize, Deserialize);
+		}
 
 		#region Mouse events
 
@@ -137,8 +138,7 @@ namespace WLEditor
 			currentDirection = null;
 			pathMode = PathModeEnum.None;
 			bitmapCache = false;
-			redo.Clear();
-			undo.Clear();
+			History.Clear();
 		}
 
 		#region Commands
@@ -179,7 +179,7 @@ namespace WLEditor
 			bool MouseDown(MouseEventArgs e)
 			{
 				dragOffset = (e.Location.X, e.Location.Y);
-				stateSaved = false;
+				History.ClearSaveStateOnce();
 
 				//select flag
 				if (Overworld.IsOverworld(currentWorld) && currentLevel != 7)
@@ -220,7 +220,7 @@ namespace WLEditor
 				{
 					if (level != currentLevel)
 					{
-						SaveState();
+						History.SaveState();
 						currentLevel = level;
 						currentPath = PathData[currentLevel];
 						pathMode = PathModeEnum.None;
@@ -290,7 +290,7 @@ namespace WLEditor
 
 					if ((X, Y) != (currentPath.X, currentPath.Y))
 					{
-						SaveStateOnce();
+						History.SaveStateOnce();
 						(currentPath.X, currentPath.Y) = (X, Y);
 						MoveLevel();
 						BindPaths();
@@ -308,7 +308,7 @@ namespace WLEditor
 					var target = currentDirection == null ? (item.X, item.Y) : GetPathPosition(item, currentDirection);
 					(var newPosX, var newPosY) = GetSnapPosition(e.X, e.Y);
 
-					SaveStateOnce();
+					History.SaveStateOnce();
 					AddPaths(newPosX - target.X / gridSnap, newPosY - target.Y / gridSnap);
 					BindPaths();
 					Invalidate();
@@ -323,7 +323,7 @@ namespace WLEditor
 
 					if (newPos != flags[selectedFlag])
 					{
-						SaveStateOnce();
+						History.SaveStateOnce();
 						flags[selectedFlag] = newPos;
 						Invalidate();
 						SetChanges();
@@ -354,7 +354,7 @@ namespace WLEditor
 					//set exit
 					if (currentDirection != null && IsSpecialExit(currentDirection.Next))
 					{
-						SaveState();
+						History.SaveState();
 						SetExit(Math.Sign(e.Delta));
 						Invalidate();
 						SetChanges();
@@ -365,7 +365,7 @@ namespace WLEditor
 					//set progress
 					if (currentDirection != null)
 					{
-						SaveState();
+						History.SaveState();
 						SetProgress(Math.Sign(e.Delta));
 						Invalidate();
 						SetChanges();
@@ -384,54 +384,6 @@ namespace WLEditor
 		public bool ProcessPathKey(Keys key)
 		{
 			var keyCode = key & Keys.KeyCode;
-			switch (key)
-			{
-				case Keys.Shift | Keys.Delete:
-					if (currentPath.Directions.Any(x => x.Path.Any()))
-					{
-						SaveState();
-						RemoveAllPaths();
-
-						Invalidate();
-						SetChanges();
-					}
-					return true;
-
-				case Keys.Delete:
-					if (currentDirection != null && currentDirection.Path.Any())
-					{
-						SaveState();
-						RemovePath();
-						BindPaths();
-
-						Invalidate();
-						SetChanges();
-					}
-					return true;
-
-				case Keys.Control | Keys.Z:
-					ApplyChanges(undo, redo);
-					return true;
-
-				case Keys.Control | Keys.Y:
-					ApplyChanges(redo, undo);
-					return true;
-			}
-
-			void ApplyChanges(Stack<PathHistory> source, Stack<PathHistory> dest)
-			{
-				if (source.Any())
-				{
-					var data = source.Pop();
-					dest.Push(Serialize());
-					Deserialize(data);
-
-					pathMode = PathModeEnum.None;
-					currentPath = PathData[currentLevel];
-					currentDirection = null;
-					Invalidate();
-				}
-			}
 
 			switch (keyCode)
 			{
@@ -447,22 +399,36 @@ namespace WLEditor
 			return false;
 		}
 
-		#region Undo/redo
+		public bool CanDelete => currentDirection != null && currentDirection.Path.Any();
 
-		void SaveStateOnce()
+		public void Delete()
 		{
-			if (!stateSaved)
+			if (currentDirection != null && currentDirection.Path.Any())
 			{
-				stateSaved = true;
-				SaveState();
+				History.SaveState();
+				RemovePath();
+				BindPaths();
+
+				Invalidate();
+				SetChanges();
 			}
 		}
 
-		void SaveState()
+		public bool CanDeleteAll => currentPath.Directions.Any(x => x.Path.Any());
+
+		public void DeleteAll()
 		{
-			undo.Push(Serialize());
-			redo.Clear();
+			if (currentPath.Directions.Any(x => x.Path.Any()))
+			{
+				History.SaveState();
+				RemoveAllPaths();
+
+				Invalidate();
+				SetChanges();
+			}
 		}
+
+		#region Undo / Redo
 
 		PathHistory Serialize()
 		{
@@ -480,6 +446,11 @@ namespace WLEditor
 			PathData[data.CurrentLevel] = data.WorldData;
 			currentLevel = data.CurrentLevel;
 			flags = data.Flags;
+
+			pathMode = PathModeEnum.None;
+			currentPath = PathData[currentLevel];
+			currentDirection = null;
+			Invalidate();
 		}
 
 		#endregion

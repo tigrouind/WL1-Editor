@@ -11,13 +11,11 @@ namespace WLEditor
 
 		public bool CanUndo => undo.Any();
 		public bool CanRedo => redo.Any();
-		public EventHandler Changed;
 
 		public void ClearUndo()
 		{
 			redo.Clear();
 			undo.Clear();
-			HistoryChange();
 		}
 
 		public void AddChanges(List<SelectionChange> changes)
@@ -26,7 +24,6 @@ namespace WLEditor
 			{
 				undo.Push(changes);
 				redo.Clear();
-				HistoryChange();
 			}
 		}
 
@@ -53,16 +50,10 @@ namespace WLEditor
 
 				source.Pop();
 				dest.Push(changes);
-				HistoryChange();
 				return true;
 			}
 
 			return false;
-		}
-
-		void HistoryChange()
-		{
-			Changed?.Invoke(this, EventArgs.Empty);
 		}
 	}
 }

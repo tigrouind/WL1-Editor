@@ -16,7 +16,6 @@ namespace WLEditor
 		readonly ObjectsForm objectsForm = new();
 		readonly OverworldForm overworldForm = new();
 		readonly SectorForm sectorForm = new();
-		readonly ClipboardChange clipboardChange = new();
 		Form lastFormFocus;
 
 		public readonly static string[] LevelNames =
@@ -87,8 +86,6 @@ namespace WLEditor
 			levelPictureBox.TileMouseDown += LevelPictureBoxTileMouseDown;
 			levelPictureBox.SectorChanged += LevelPictureBoxSectorChanged;
 			levelPictureBox.GetSourceSector = x => Sector.GetSourceSector(rom, currentCourseId, x);
-			levelPictureBox.History.Changed += OnHistoryChange;
-			levelPictureBox.SelectionChanged += OnSelectionChanged;
 
 			blocksForm.MouseWheel += LevelPanelMouseWheel;
 			blocksForm.FormClosing += BlocksFormClosing;
@@ -109,13 +106,6 @@ namespace WLEditor
 			sectorForm.ProcessCommandKey += ProcessSubFormCommand;
 			sectorForm.SectorChanged += SectorFormSectorChanged;
 			sectorForm.SectorLoad += SectorFormSectorLoad;
-
-			clipboardChange.Change += (s, e) =>
-			{
-				OnSelectionChanged(s, e);
-				overworldForm.OnSelectionChanged(s, e);
-			};
-			HandleDestroyed += (s, e) => clipboardChange.Dispose();
 
 			SetZoomLevel(2);
 
@@ -305,18 +295,17 @@ namespace WLEditor
 			#endregion
 		}
 
-		public void OnSelectionChanged(object sender, EventArgs e)
+		public void ApplicationIdle(object sender, EventArgs e)
 		{
 			cutToolStripMenuItem.Enabled = levelPictureBox.HasSelection;
 			copyToolStripMenuItem.Enabled = levelPictureBox.HasSelection;
 			deleteToolStripMenuItem.Enabled = levelPictureBox.HasSelection;
 			pasteToolStripMenuItem.Enabled = (levelPictureBox.HasSelection && Clipboard.HasData(ClipboardType.TILE_16x16)) || Clipboard.HasData(ClipboardType.LEVEL);
-		}
 
-		public void OnHistoryChange(object sender, EventArgs e)
-		{
 			redoToolStripMenuItem.Enabled = levelPictureBox.History.CanRedo;
 			undoToolStripMenuItem.Enabled = levelPictureBox.History.CanUndo;
+
+			overworldForm.ApplicationIdle(sender, e);
 		}
 
 		#region Load

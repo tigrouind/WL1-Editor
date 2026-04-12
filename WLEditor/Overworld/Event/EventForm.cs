@@ -6,17 +6,30 @@ using System.Windows.Forms;
 
 namespace WLEditor
 {
-	public class EventForm(PictureBox pictureBox, DirectBitmap tilesWorld8x8, Selection selection, History history)
+	public class EventForm
 	{
 		List<(int X, int Y, byte Index)>[] worldEvents;
 		List<(int X, int Y, byte Index)> worldEvent;
 		int eventStep;
+		public readonly HistorySaveState<EventHistory> History;
+		readonly PictureBox pictureBox;
+		readonly DirectBitmap tilesWorld8x8;
+		readonly Selection selection;
 
 		int zoom;
 		int currentWorld;
 
 		public event EventHandler EventChanged;
 		public Action UpdateTitle;
+
+		public EventForm(PictureBox pictureBox, DirectBitmap tilesWorld8x8, Selection selection)
+		{
+			this.pictureBox = pictureBox;
+			this.tilesWorld8x8 = tilesWorld8x8;
+			this.selection = selection;
+
+			History = new(Serialize, Deserialize);
+		}
 
 		readonly (int MaxSize, int[][] Offsets)[] events =
 		[
@@ -119,130 +132,175 @@ namespace WLEditor
 
 		#region Commands
 
-		public bool ProcessEventKey(Keys keyData)
+		public bool ProcessEventKey(Keys key)
 		{
+			var keyData = key & Keys.KeyCode;
 			switch (keyData)
 			{
 				case Keys.PageUp:
-					if (worldEvent != worldEvents[^1])
-					{
-						NextEvent();
-						eventStep = 0;
-					}
-					else
-					{
-						eventStep = worldEvent.Count;
-					}
-
-					history.ClearUndo();
-					UpdateTitle();
-					pictureBox.Invalidate();
+					NextEvent();
 					return true;
 
 				case Keys.PageDown:
-					if (worldEvent != worldEvents[0])
-					{
-						PreviousEvent();
-						eventStep = 0;
-					}
-					else
-					{
-						eventStep = 0;
-					}
-
-					history.ClearUndo();
-					UpdateTitle();
-					pictureBox.Invalidate();
+					PreviousEvent();
 					return true;
 
 				case Keys.Home:
-					if (eventStep < worldEvent.Count)
-					{
-						eventStep++;
-					}
-					else if (worldEvent != worldEvents[^1])
-					{
-						NextEvent();
-						eventStep = 0;
-						history.ClearUndo();
-					}
-
-					UpdateTitle();
-					pictureBox.Invalidate();
+					NextStep();
 					return true;
 
 				case Keys.End:
-					if (eventStep > 0)
-					{
-						eventStep--;
-					}
-					else if (worldEvent != worldEvents[0])
-					{
-						PreviousEvent();
-						eventStep = worldEvent.Count;
-						history.ClearUndo();
-					}
-
-					UpdateTitle();
-					pictureBox.Invalidate();
-					return true;
-
-				case Keys.Delete:
-					if (!selection.HasSelection)
-					{
-						if (eventStep > 0)
-						{
-							var (x, y, Index) = worldEvent[eventStep - 1];
-							var changes = new List<SelectionChange>
-							{
-								new() { X = x, Y = y, Data = Index }
-							};
-							history.AddChanges(changes);
-
-							worldEvent.RemoveAt(eventStep - 1);
-							eventStep--;
-
-							pictureBox.Invalidate();
-							UpdateTitle();
-							SetChanges();
-						}
-
-						return true;
-					}
-					break;
-
-				case Keys.Delete | Keys.Shift:
-					if (worldEvent.Count > 0)
-					{
-						var changes = new List<SelectionChange>();
-						foreach (var (x, y, Index) in worldEvent)
-						{
-							changes.Add(new SelectionChange { X = x, Y = y, Data = Index });
-						}
-						history.AddChanges(changes);
-
-						worldEvent.Clear();
-						eventStep = 0;
-
-						pictureBox.Invalidate();
-						UpdateTitle();
-						SetChanges();
-					}
+					PreviousStep();
 					return true;
 			}
 
 			return false;
+		}
 
-			void PreviousEvent()
+		#endregion
+
+		#region Events
+
+		public bool CanPreviousEvent => worldEvent != worldEvents[0] || eventStep > 0;
+		public bool CanNextEvent => worldEvent != worldEvents[^1] || eventStep < worldEvent.Count;
+		public bool CanPreviousStep => eventStep > 0 || worldEvent != worldEvents[0];
+		public bool CanNextStep => eventStep < worldEvent.Count || worldEvent != worldEvents[^1];
+
+		public void PreviousEvent()
+		{
+			if (worldEvent != worldEvents[0])
 			{
-				int eventId = Array.IndexOf(worldEvents, worldEvent);
-				worldEvent = worldEvents[eventId - 1];
+				History.SaveState();
+				PreviousEventInternal();
+				eventStep = 0;
+			}
+			else
+			{
+				History.SaveState();
+				eventStep = 0;
 			}
 
-			void NextEvent()
+			UpdateTitle();
+			pictureBox.Invalidate();
+		}
+
+		public void NextEvent()
+		{
+			if (worldEvent != worldEvents[^1])
 			{
-				int eventId = Array.IndexOf(worldEvents, worldEvent);
-				worldEvent = worldEvents[eventId + 1];
+				History.SaveState();
+				NextEventInternal();
+				eventStep = 0;
+			}
+			else
+			{
+				History.SaveState();
+				eventStep = worldEvent.Count;
+			}
+
+			UpdateTitle();
+			pictureBox.Invalidate();
+		}
+
+		public void NextStep()
+		{
+			if (eventStep < worldEvent.Count)
+			{
+				History.SaveState();
+				eventStep++;
+			}
+			else if (worldEvent != worldEvents[^1])
+			{
+				History.SaveState();
+				NextEventInternal();
+				eventStep = 0;
+			}
+
+			UpdateTitle();
+			pictureBox.Invalidate();
+		}
+
+		public void PreviousStep()
+		{
+			if (eventStep > 0)
+			{
+				History.SaveState();
+				eventStep--;
+			}
+			else if (worldEvent != worldEvents[0])
+			{
+				History.SaveState();
+				PreviousEventInternal();
+				eventStep = worldEvent.Count;
+			}
+
+			UpdateTitle();
+			pictureBox.Invalidate();
+		}
+
+		void PreviousEventInternal()
+		{
+			int eventId = Array.IndexOf(worldEvents, worldEvent);
+			worldEvent = worldEvents[eventId - 1];
+		}
+
+		void NextEventInternal()
+		{
+			int eventId = Array.IndexOf(worldEvents, worldEvent);
+			worldEvent = worldEvents[eventId + 1];
+		}
+
+		#endregion
+
+		public bool CanDelete => eventStep > 0;
+		public bool CanDeleteAll => worldEvent.Count > 0;
+
+		public void Delete()
+		{
+			if (selection.HasSelection)
+			{
+				var rect = selection.GetSelection();
+				var events = worldEvent.Where(x => rect.Contains(x.X, x.Y)).ToArray();
+				if (events.Any())
+				{
+					History.SaveState();
+
+					eventStep -= events.Count(x => worldEvent.IndexOf(x) < eventStep);
+					worldEvent.RemoveAll(x => events.Contains(x));
+
+					pictureBox.Invalidate();
+					UpdateTitle();
+					SetChanges();
+				}
+
+				selection.ClearSelection();
+			}
+			else if (eventStep > 0)
+			{
+				History.SaveState();
+				var (x, y, Index) = worldEvent[eventStep - 1];
+
+				worldEvent.RemoveAt(eventStep - 1);
+				eventStep--;
+
+				pictureBox.Invalidate();
+				UpdateTitle();
+				SetChanges();
+			}
+		}
+
+		public void DeleteAll()
+		{
+			if (worldEvent.Count > 0)
+			{
+				History.SaveState();
+
+				worldEvent.Clear();
+				eventStep = 0;
+
+				pictureBox.Invalidate();
+				UpdateTitle();
+				SetChanges();
 			}
 		}
 
@@ -266,12 +324,14 @@ namespace WLEditor
 			int index = worldEvent.FindIndex(x => x.X == posx && x.Y == posy);
 			if (index == -1)
 			{
+				History.SaveStateOnce();
 				worldEvent.Insert(eventStep, (posx, posy, tileData));
 				eventStep++;
 			}
 			else
 			{
-				worldEvent[index] = (posx, posy, tileData);
+				History.SaveStateOnce();
+				worldEvent[index] = (posx, posy, tileData); //update
 			}
 
 			pictureBox.Invalidate();
@@ -283,6 +343,7 @@ namespace WLEditor
 			int index = worldEvent.FindIndex(x => x.X == posx && x.Y == posy);
 			if (index >= 0)
 			{
+				History.SaveStateOnce();
 				worldEvent.RemoveAt(index);
 				if (index <= (eventStep - 1))
 				{
@@ -293,8 +354,6 @@ namespace WLEditor
 				UpdateTitle();
 			}
 		}
-
-		#endregion
 
 		public void DrawEvents(Graphics graphics, bool drawRects = true)
 		{
@@ -335,5 +394,30 @@ namespace WLEditor
 				}
 			}
 		}
+
+		#region Undo / redo
+
+		EventHistory Serialize()
+		{
+			var cloner = new Cloner();
+			return cloner.Clone(new EventHistory
+			{
+				WorldEvent = [.. worldEvent],
+				WorldEventIndex = Array.IndexOf(worldEvents, worldEvent),
+				EventStep = eventStep
+			});
+		}
+
+		void Deserialize(EventHistory history)
+		{
+			worldEvent = [.. history.WorldEvent];
+			worldEvents[history.WorldEventIndex] = worldEvent;
+			eventStep = history.EventStep;
+
+			UpdateTitle();
+			pictureBox.Invalidate();
+		}
+
+		#endregion
 	}
 }
