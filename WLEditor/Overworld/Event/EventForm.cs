@@ -173,11 +173,13 @@ namespace WLEditor
 				History.SaveState();
 				PreviousEventInternal();
 				eventStep = 0;
+				History.Commit();
 			}
 			else
 			{
 				History.SaveState();
 				eventStep = 0;
+				History.Commit();
 			}
 
 			UpdateTitle();
@@ -191,11 +193,13 @@ namespace WLEditor
 				History.SaveState();
 				NextEventInternal();
 				eventStep = 0;
+				History.Commit();
 			}
 			else
 			{
 				History.SaveState();
 				eventStep = worldEvent.Count;
+				History.Commit();
 			}
 
 			UpdateTitle();
@@ -208,12 +212,14 @@ namespace WLEditor
 			{
 				History.SaveState();
 				eventStep++;
+				History.Commit();
 			}
 			else if (worldEvent != worldEvents[^1])
 			{
 				History.SaveState();
 				NextEventInternal();
 				eventStep = 0;
+				History.Commit();
 			}
 
 			UpdateTitle();
@@ -226,12 +232,14 @@ namespace WLEditor
 			{
 				History.SaveState();
 				eventStep--;
+				History.Commit();
 			}
 			else if (worldEvent != worldEvents[0])
 			{
 				History.SaveState();
 				PreviousEventInternal();
 				eventStep = worldEvent.Count;
+				History.Commit();
 			}
 
 			UpdateTitle();
@@ -268,6 +276,8 @@ namespace WLEditor
 					eventStep -= events.Count(x => worldEvent.IndexOf(x) < eventStep);
 					worldEvent.RemoveAll(x => events.Contains(x));
 
+					History.Commit();
+
 					pictureBox.Invalidate();
 					UpdateTitle();
 					SetChanges();
@@ -283,6 +293,8 @@ namespace WLEditor
 				worldEvent.RemoveAt(eventStep - 1);
 				eventStep--;
 
+				History.Commit();
+
 				pictureBox.Invalidate();
 				UpdateTitle();
 				SetChanges();
@@ -297,6 +309,8 @@ namespace WLEditor
 
 				worldEvent.Clear();
 				eventStep = 0;
+
+				History.Commit();
 
 				pictureBox.Invalidate();
 				UpdateTitle();
@@ -399,13 +413,12 @@ namespace WLEditor
 
 		EventHistory Serialize()
 		{
-			var cloner = new Cloner();
-			return cloner.Clone(new EventHistory
+			return new EventHistory
 			{
 				WorldEvent = [.. worldEvent],
 				WorldEventIndex = Array.IndexOf(worldEvents, worldEvent),
 				EventStep = eventStep
-			});
+			};
 		}
 
 		void Deserialize(EventHistory history)

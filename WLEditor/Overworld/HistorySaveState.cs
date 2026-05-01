@@ -33,14 +33,25 @@ namespace WLEditor
 		{
 			if (source.Any())
 			{
-				dest.Push(serialize());
+				var cloner = new Cloner();
+				dest.Push(cloner.Clone(serialize()));
 				deserialize(source.Pop());
+			}
+		}
+
+		public void Commit()
+		{
+			var equality = new Equality();
+			if (undo.Any() && equality.Equals(serialize(), undo.Peek()))
+			{
+				undo.Pop();
 			}
 		}
 
 		public void SaveState()
 		{
-			undo.Push(serialize());
+			var cloner = new Cloner();
+			undo.Push(cloner.Clone(serialize()));
 			redo.Clear();
 		}
 

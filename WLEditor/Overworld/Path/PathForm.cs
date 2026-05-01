@@ -224,6 +224,8 @@ namespace WLEditor
 						currentLevel = level;
 						currentPath = PathData[currentLevel];
 						pathMode = PathModeEnum.None;
+						History.Commit();
+
 						Invalidate();
 					}
 
@@ -345,6 +347,7 @@ namespace WLEditor
 				selectedLevel = false;
 				selectedPath = false;
 				selectedFlag = -1;
+				History.Commit();
 			}
 
 			void MouseWheel(MouseEventArgs e)
@@ -356,6 +359,8 @@ namespace WLEditor
 					{
 						History.SaveState();
 						SetExit(Math.Sign(e.Delta));
+						History.Commit();
+
 						Invalidate();
 						SetChanges();
 					}
@@ -367,6 +372,8 @@ namespace WLEditor
 					{
 						History.SaveState();
 						SetProgress(Math.Sign(e.Delta));
+						History.Commit();
+
 						Invalidate();
 						SetChanges();
 					}
@@ -408,6 +415,7 @@ namespace WLEditor
 				History.SaveState();
 				RemovePath();
 				BindPaths();
+				History.Commit();
 
 				Invalidate();
 				SetChanges();
@@ -422,6 +430,7 @@ namespace WLEditor
 			{
 				History.SaveState();
 				RemoveAllPaths();
+				History.Commit();
 
 				Invalidate();
 				SetChanges();
@@ -432,13 +441,12 @@ namespace WLEditor
 
 		PathHistory Serialize()
 		{
-			var cloner = new Cloner();
-			return cloner.Clone(new PathHistory
+			return new PathHistory
 			{
 				WorldData = PathData[currentLevel],
 				CurrentLevel = currentLevel,
 				Flags = flags
-			});
+			};
 		}
 
 		void Deserialize(PathHistory data)

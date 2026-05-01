@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 
@@ -21,6 +22,16 @@ namespace WLEditor
 				return (T)CloneArray();
 			}
 
+			if (source is IList)
+			{
+				return (T)CloneList();
+			}
+
+			if (sourceType.IsValueType || sourceType == typeof(string))
+			{
+				return source;
+			}
+
 			return (T)CloneObject();
 
 			object CloneArray()
@@ -32,42 +43,45 @@ namespace WLEditor
 
 				for (int i = 0; i < array.Length; i++)
 				{
-					var value = array.GetValue(i);
-					if (value != null)
+					var item = array.GetValue(i);
+					if (item != null)
 					{
-						clonedArray.SetValue(CloneField(value, type), i);
+						clonedArray.SetValue(Clone(item), i);
 					}
 				}
 
 				return clonedArray;
 			}
 
+			object CloneList()
+			{
+				var type = sourceType.GetGenericArguments()[0];
+				var list = source as IList;
+				var clonedList = (IList)Activator.CreateInstance(sourceType, list.Count);
+				instances.Add(source, clonedList);
+
+				foreach (var item in list)
+				{
+					clonedList.Add(item == null ? null : Clone(item));
+				}
+				return clonedList;
+			}
+
 			object CloneObject()
 			{
 				var target = Activator.CreateInstance(sourceType);
 				instances.Add(source, target);
-				foreach (var item in sourceType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
+
+				foreach (var item in sourceType.GetFields(BindingFlags.Public | BindingFlags.Instance))
 				{
 					var value = item.GetValue(source);
 					if (value != null)
 					{
-						item.SetValue(target, CloneField(value, item.FieldType));
+						item.SetValue(target, Clone(value));
 					}
 				}
 
 				return target;
-			}
-
-			object CloneField(object value, Type type)
-			{
-				if (type.IsValueType || type == typeof(string))
-				{
-					return value;
-				}
-				else
-				{
-					return Clone(value);
-				}
 			}
 		}
 	}
