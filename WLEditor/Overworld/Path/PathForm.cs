@@ -589,19 +589,12 @@ namespace WLEditor
 
 			WorldPathStatusEnum GetStatus()
 			{
-				WorldPathStatusEnum status = WorldPathStatusEnum.None;
-				switch (pathMode)
+				return pathMode switch
 				{
-					case PathModeEnum.Invisible:
-						status = WorldPathStatusEnum.Invisible;
-						break;
-
-					case PathModeEnum.Water:
-						status = WorldPathStatusEnum.WaterFront;
-						break;
-				}
-
-				return status;
+					PathModeEnum.Invisible => WorldPathStatusEnum.Invisible,
+					PathModeEnum.Water => WorldPathStatusEnum.WaterFront,
+					_ => WorldPathStatusEnum.None,
+				};
 			}
 		}
 

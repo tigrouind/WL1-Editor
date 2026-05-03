@@ -300,7 +300,7 @@ namespace WLEditor
 			cutToolStripMenuItem.Enabled = levelPictureBox.HasSelection;
 			copyToolStripMenuItem.Enabled = levelPictureBox.HasSelection;
 			deleteToolStripMenuItem.Enabled = levelPictureBox.HasSelection;
-			pasteToolStripMenuItem.Enabled = (levelPictureBox.HasSelection && Clipboard.HasData(ClipboardType.TILE_16x16)) || Clipboard.HasData(ClipboardType.LEVEL);
+			pasteToolStripMenuItem.Enabled = (levelPictureBox.HasSelection && Clipboard.ContainsData(ClipboardType.TILE_16x16)) || Clipboard.ContainsData(ClipboardType.LEVEL);
 
 			redoToolStripMenuItem.Enabled = levelPictureBox.History.CanRedo;
 			undoToolStripMenuItem.Enabled = levelPictureBox.History.CanUndo;
@@ -734,7 +734,7 @@ namespace WLEditor
 
 		void PasteToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			if (Clipboard.HasData(ClipboardType.LEVEL))
+			if (Clipboard.ContainsData(ClipboardType.LEVEL))
 			{
 				if (LevelCopy.Paste(rom, currentCourseId, levelPictureBox, Text))
 				{

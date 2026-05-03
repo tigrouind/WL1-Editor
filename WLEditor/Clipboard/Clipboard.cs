@@ -8,12 +8,12 @@ namespace WLEditor
 
 		public static void Copy(ClipboardData data, ClipboardType type)
 		{
-			SetData(JsonSerializer.Serialize(data, options), type);
+			System.Windows.Forms.Clipboard.SetData(GetName(type), JsonSerializer.Serialize(data, options));
 		}
 
 		public static ClipboardData Paste(ClipboardType type)
 		{
-			var json = GetData(type);
+			var json = (string)System.Windows.Forms.Clipboard.GetData(GetName(type));
 			if (!string.IsNullOrEmpty(json))
 			{
 				return JsonSerializer.Deserialize<ClipboardData>(json, options);
@@ -24,10 +24,8 @@ namespace WLEditor
 			}
 		}
 
-		public static bool HasData(ClipboardType type) => !string.IsNullOrEmpty(GetData(type));
+		public static bool ContainsData(ClipboardType type) => System.Windows.Forms.Clipboard.ContainsData(GetName(type));
 
-		static string GetData(ClipboardType type) => (string)System.Windows.Forms.Clipboard.GetData($"WLEditor{type}");
-
-		static void SetData(string data, ClipboardType type) => System.Windows.Forms.Clipboard.SetData($"WLEditor{type}", data);
+		static string GetName(ClipboardType type) => $"WLEditor{type}";
 	}
 }

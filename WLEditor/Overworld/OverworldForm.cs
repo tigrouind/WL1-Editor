@@ -101,22 +101,26 @@ namespace WLEditor
 
 		public void ApplicationIdle(object sender, EventArgs e)
 		{
-			bool hasSelection = selection1.HasSelection || selection2.HasSelection;
+			if (Visible)
+			{
+				bool hasSelection = selection1.HasSelection || selection2.HasSelection;
 
-			copyToolStripMenuItem.Enabled = hasSelection;
-			cutToolStripMenuItem.Enabled = hasSelection;
-			pasteToolStripMenuItem.Enabled = Clipboard.HasData(ClipboardType.TILE_8x8) && hasSelection;
+				copyToolStripMenuItem.Enabled = hasSelection;
+				cutToolStripMenuItem.Enabled = hasSelection;
+				pasteToolStripMenuItem.Enabled = Clipboard.ContainsData(ClipboardType.TILE_8x8) && hasSelection;
 
-			deleteToolStripMenuItem.Enabled = hasSelection || (pathMode && pathForm.CanDelete) || (eventMode && eventForm.CanDelete);
-			deleteAllToolStripMenuItem.Enabled = (pathMode && pathForm.CanDeleteAll) || (eventMode && eventForm.CanDeleteAll);
+				deleteToolStripMenuItem.Enabled = hasSelection || (pathMode && pathForm.CanDelete) || (eventMode && eventForm.CanDelete);
+				deleteAllToolStripMenuItem.Enabled = (pathMode && pathForm.CanDeleteAll) || (eventMode && eventForm.CanDeleteAll);
 
-			undoToolStripMenuItem.Enabled = pathForm.History.CanUndo || eventForm.History.CanUndo || history.CanUndo;
-			redoToolStripMenuItem.Enabled = pathForm.History.CanRedo || eventForm.History.CanRedo || history.CanRedo;
+				undoToolStripMenuItem.Enabled = pathForm.History.CanUndo || eventForm.History.CanUndo || history.CanUndo;
+				redoToolStripMenuItem.Enabled = pathForm.History.CanRedo || eventForm.History.CanRedo || history.CanRedo;
 
-			previousEventToolStripMenuItem.Enabled = eventMode && eventForm.CanPreviousEvent;
-			nextEventToolStripMenuItem.Enabled = eventMode && eventForm.CanNextEvent;
-			previousStepToolStripMenuItem.Enabled = eventMode && eventForm.CanPreviousStep;
-			nextStepToolStripMenuItem.Enabled = eventMode && eventForm.CanNextStep;
+				previousEventToolStripMenuItem.Enabled = eventMode && eventForm.CanPreviousEvent;
+				nextEventToolStripMenuItem.Enabled = eventMode && eventForm.CanNextEvent;
+				previousStepToolStripMenuItem.Enabled = eventMode && eventForm.CanPreviousStep;
+				nextStepToolStripMenuItem.Enabled = eventMode && eventForm.CanNextStep;
+			}
+
 		}
 
 		public void LoadRom(Rom rom)
