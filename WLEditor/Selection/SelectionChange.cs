@@ -1,9 +1,8 @@
-namespace WLEditor
+namespace WLEditor;
+
+public class SelectionChange
 {
-	public class SelectionChange
-	{
-		public int X;
-		public int Y;
-		public int Data;
-	}
+	public int X;
+	public int Y;
+	public int Data;
 }

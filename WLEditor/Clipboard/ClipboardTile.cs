@@ -1,8 +1,7 @@
-namespace WLEditor
+namespace WLEditor;
+
+public class ClipboardTile
 {
-	public class ClipboardTile
-	{
-		public int Tile;
-		public int Order;
-	}
+	public int Tile;
+	public int Order;
 }

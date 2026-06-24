@@ -1,11 +1,10 @@
 using System.Collections.Generic;
 
-namespace WLEditor
+namespace WLEditor;
+
+public class WorldPathDirection
 {
-	public class WorldPathDirection
-	{
-		public List<WorldPathSegment> Path;
-		public WorldPathProgressEnum Progress;
-		public WorldPathNextEnum Next;
-	}
+	public List<WorldPathSegment> Path;
+	public WorldPathProgressEnum Progress;
+	public WorldPathNextEnum Next;
 }

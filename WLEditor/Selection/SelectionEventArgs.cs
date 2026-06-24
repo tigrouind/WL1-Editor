@@ -1,10 +1,9 @@
 using System;
 using System.Drawing;
 
-namespace WLEditor
+namespace WLEditor;
+
+public class SelectionEventArgs(Rectangle rectangle) : EventArgs
 {
-	public class SelectionEventArgs(Rectangle rectangle) : EventArgs
-	{
-		public readonly Rectangle ClipRectangle = rectangle;
-	}
+	public readonly Rectangle ClipRectangle = rectangle;
 }

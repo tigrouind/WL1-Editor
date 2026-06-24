@@ -3,351 +3,350 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 
-namespace WLEditor
+namespace WLEditor;
+
+public static class Sprite
 {
-	public static class Sprite
+	readonly static uint[] enemyPalette = [0xFFFFFFFF, 0xFF9DC9FD, 0xFFFF00FF, 0xFF000029];
+
+	public readonly static (Rectangle Rectangle, Point Offsets)[] PlayerRects = new (Rectangle, Point)[2];
+	public readonly static (Rectangle Rectangle, Point Offsets)[] LoadedSprites = new (Rectangle, Point)[6];
+
+	public readonly static DirectBitmap TilesObjects = new(16 * 9, 16);
+	public readonly static DirectBitmap TilesEnemies = new(40 * 6, 40);
+	public readonly static DirectBitmap PlayerSprite = new(32, 32 * 2);
+	public readonly static DirectBitmap Tiles8x8 = new(16 * 8, 4 * 8);
+
+	readonly static ushort[] enemySpriteAddress =
+	[
+		0x4FAA, 0x6FBC, 0x74E9, 0x6B4E, 0x6C70, 0x4DB0, 0x0000, 0x5BAF, 0x66A0, 0x66A0, 0x686C, 0x60D1, 0x6373, 0x4035, 0x40F5,
+		0x4308, 0x459E, 0x4AA0, 0x53A3, 0x5C86, 0x5E0F, 0x64D4, 0x6D16, 0x6726, 0x6C2F, 0x7C56, 0x7C56, 0x435D, 0x4D26, 0x5ECA, 0x460F,
+		0x54F8, 0x5536, 0x0000, 0x6B57, 0x6DFC, 0x6DE4, 0x6E87, 0x736F, 0x75BA, 0x6082, 0x64BA, 0x67BF, 0x6933, 0x6933, 0x6BEE, 0x6F27,
+		0x72BF, 0x7570, 0x7B10, 0x4F33, 0x42D0, 0x45AC, 0x4F5D, 0x6B39, 0x7AB7, 0x7ABB, 0x7AC3, 0x7ABF, 0x6F1F, 0x6D59, 0x6F84, 0x7338,
+		0x6D56, 0x6D8E, 0x730D, 0x7567, 0x7B16, 0x778B, 0x776D, 0x6D56, 0x796C, 0x7992, 0x7572, 0x7C24, 0x7DE6, 0x7F1F, 0x7153
+	];
+
+	readonly static ushort[] bonusSpriteAddress = [0x4ACB, 0x4AEB, 0x4ADB, 0x4AFB, 0x4B0B, 0x4B1B, 0x4B2B, 0x4B4B, 0x4B5B];
+
+	readonly static byte[] enemyCodePattern =
+	[
+		0x3E, 0x00,       //ld  a, ..
+		0xEA, 0x2F, 0xA3, //ld  (A32F),a
+		0x3E, 0x00,       //ld  a, ..
+		0xEA, 0x30, 0xA3, //ld  (A330),a
+		0x01, 0x00, 0x00, //ld  bc, ..
+		0xCD, 0xA7, 0x40  //call 40A7
+	];
+
+	readonly static byte[] treasurePattern =
+	[
+		0x3E, 0x00,      // ld a, ..
+		0xEA, 0x82, 0xA3 // ld (A382), a
+	];
+
+	readonly static byte[] exitPattern =
+	[
+		0x3E, 0x02,      // ld a, 02
+		0xEA, 0x76, 0xA3 // ld (A376), a
+	];
+
+	public static void DumpBonusSprites(Rom rom)
 	{
-		readonly static uint[] enemyPalette = [0xFFFFFFFF, 0xFF9DC9FD, 0xFFFF00FF, 0xFF000029];
+		Array.Clear(Tiles8x8.Bits, 0, Tiles8x8.Bits.Length);
+		//bonus sprites
+		rom.SetBank(0x5);
+		Level.Dump8x8Tiles(rom, Tiles8x8, 0x4C81, 23, 0, 0x1E, enemyPalette, true);
 
-		public readonly static (Rectangle Rectangle, Point Offsets)[] PlayerRects = new (Rectangle, Point)[2];
-		public readonly static (Rectangle Rectangle, Point Offsets)[] LoadedSprites = new (Rectangle, Point)[6];
+		rom.SetBank(0x11);
+		Level.Dump8x8Tiles(rom, Tiles8x8, 0x7300, 4, 16 + 23, 0x1E, enemyPalette, true);
 
-		public readonly static DirectBitmap TilesObjects = new(16 * 9, 16);
-		public readonly static DirectBitmap TilesEnemies = new(40 * 6, 40);
-		public readonly static DirectBitmap PlayerSprite = new(32, 32 * 2);
-		public readonly static DirectBitmap Tiles8x8 = new(16 * 8, 4 * 8);
-
-		readonly static ushort[] enemySpriteAddress =
-		[
-			0x4FAA, 0x6FBC, 0x74E9, 0x6B4E, 0x6C70, 0x4DB0, 0x0000, 0x5BAF, 0x66A0, 0x66A0, 0x686C, 0x60D1, 0x6373, 0x4035, 0x40F5,
-			0x4308, 0x459E, 0x4AA0, 0x53A3, 0x5C86, 0x5E0F, 0x64D4, 0x6D16, 0x6726, 0x6C2F, 0x7C56, 0x7C56, 0x435D, 0x4D26, 0x5ECA, 0x460F,
-			0x54F8, 0x5536, 0x0000, 0x6B57, 0x6DFC, 0x6DE4, 0x6E87, 0x736F, 0x75BA, 0x6082, 0x64BA, 0x67BF, 0x6933, 0x6933, 0x6BEE, 0x6F27,
-			0x72BF, 0x7570, 0x7B10, 0x4F33, 0x42D0, 0x45AC, 0x4F5D, 0x6B39, 0x7AB7, 0x7ABB, 0x7AC3, 0x7ABF, 0x6F1F, 0x6D59, 0x6F84, 0x7338,
-			0x6D56, 0x6D8E, 0x730D, 0x7567, 0x7B16, 0x778B, 0x776D, 0x6D56, 0x796C, 0x7992, 0x7572, 0x7C24, 0x7DE6, 0x7F1F, 0x7153
-		];
-
-		readonly static ushort[] bonusSpriteAddress = [0x4ACB, 0x4AEB, 0x4ADB, 0x4AFB, 0x4B0B, 0x4B1B, 0x4B2B, 0x4B4B, 0x4B5B];
-
-		readonly static byte[] enemyCodePattern =
-		[
-			0x3E, 0x00,       //ld  a, ..
-			0xEA, 0x2F, 0xA3, //ld  (A32F),a
-			0x3E, 0x00,       //ld  a, ..
-			0xEA, 0x30, 0xA3, //ld  (A330),a
-			0x01, 0x00, 0x00, //ld  bc, ..
-			0xCD, 0xA7, 0x40  //call 40A7
-		];
-
-		readonly static byte[] treasurePattern =
-		[
-			0x3E, 0x00,      // ld a, ..
-			0xEA, 0x82, 0xA3 // ld (A382), a
-		];
-
-		readonly static byte[] exitPattern =
-		[
-			0x3E, 0x02,      // ld a, 02
-			0xEA, 0x76, 0xA3 // ld (A376), a
-		];
-
-		public static void DumpBonusSprites(Rom rom)
+		rom.SetBank(0xF);
+		for (int i = 0; i < bonusSpriteAddress.Length; i++)
 		{
-			Array.Clear(Tiles8x8.Bits, 0, Tiles8x8.Bits.Length);
-			//bonus sprites
-			rom.SetBank(0x5);
-			Level.Dump8x8Tiles(rom, Tiles8x8, 0x4C81, 23, 0, 0x1E, enemyPalette, true);
+			DumpSprite(rom, i * 16, 0, bonusSpriteAddress[i], TilesObjects, 16);
+		}
+	}
 
-			rom.SetBank(0x11);
-			Level.Dump8x8Tiles(rom, Tiles8x8, 0x7300, 4, 16 + 23, 0x1E, enemyPalette, true);
+	#region Player
 
-			rom.SetBank(0xF);
-			for (int i = 0; i < bonusSpriteAddress.Length; i++)
-			{
-				DumpSprite(rom, i * 16, 0, bonusSpriteAddress[i], TilesObjects, 16);
-			}
+	public static void DumpPlayerSprite(Rom rom)
+	{
+		Array.Clear(Tiles8x8.Bits, 0, Tiles8x8.Bits.Length);
+
+		rom.SetBank(0x5);
+		Level.Dump8x8Tiles(rom, Tiles8x8, 0x42F1, 64, 0, 0x1E, enemyPalette, true);
+		PlayerRects[0] = DumpSpritePlayer(rom, 0, 0, 0x603B, false);
+		PlayerRects[1] = DumpSpritePlayer(rom, 0, 32, 0x603B, true);
+	}
+
+	static (Rectangle Rect, Point Offset) DumpSpritePlayer(Rom rom, int posx, int posy, int spriteAddress, bool horizontalFlip)
+	{
+		Rectangle rectangle = Rectangle.Empty;
+		foreach (var sprite in GetPlayerInfo())
+		{
+			Rectangle tileRect = new(sprite.posx, sprite.posy, 8, 8);
+			rectangle = rectangle == Rectangle.Empty ? tileRect : Rectangle.Union(rectangle, tileRect);
 		}
 
-		#region Player
-
-		public static void DumpPlayerSprite(Rom rom)
+		var bounds = new Rectangle(posx, posy, 32, 32);
+		foreach (var sprite in GetPlayerInfo())
 		{
-			Array.Clear(Tiles8x8.Bits, 0, Tiles8x8.Bits.Length);
-
-			rom.SetBank(0x5);
-			Level.Dump8x8Tiles(rom, Tiles8x8, 0x42F1, 64, 0, 0x1E, enemyPalette, true);
-			PlayerRects[0] = DumpSpritePlayer(rom, 0, 0, 0x603B, false);
-			PlayerRects[1] = DumpSpritePlayer(rom, 0, 32, 0x603B, true);
+			DumpSpriteInternal(
+				posx + sprite.posx - rectangle.X,
+				posy + sprite.posy - rectangle.Y,
+				sprite.index, sprite.flags, PlayerSprite, bounds);
 		}
 
-		static (Rectangle Rect, Point Offset) DumpSpritePlayer(Rom rom, int posx, int posy, int spriteAddress, bool horizontalFlip)
+		return (new Rectangle(posx, posy, rectangle.Width, rectangle.Height), new Point(rectangle.X, rectangle.Y));
+
+		IEnumerable<(int posx, int posy, int index, int flags)> GetPlayerInfo()
 		{
-			Rectangle rectangle = Rectangle.Empty;
-			foreach (var sprite in GetPlayerInfo())
+			int pos = spriteAddress;
+
+			sbyte hflip(sbyte x) => (sbyte)(horizontalFlip ? ((~x) - 7) : x);
+
+			pos = rom.ReadWord(pos);
+			while (rom.ReadByte(pos) != 0x80)
 			{
-				Rectangle tileRect = new(sprite.posx, sprite.posy, 8, 8);
-				rectangle = rectangle == Rectangle.Empty ? tileRect : Rectangle.Union(rectangle, tileRect);
-			}
-
-			var bounds = new Rectangle(posx, posy, 32, 32);
-			foreach (var sprite in GetPlayerInfo())
-			{
-				DumpSpriteInternal(
-					posx + sprite.posx - rectangle.X,
-					posy + sprite.posy - rectangle.Y,
-					sprite.index, sprite.flags, PlayerSprite, bounds);
-			}
-
-			return (new Rectangle(posx, posy, rectangle.Width, rectangle.Height), new Point(rectangle.X, rectangle.Y));
-
-			IEnumerable<(int posx, int posy, int index, int flags)> GetPlayerInfo()
-			{
-				int pos = spriteAddress;
-
-				sbyte hflip(sbyte x) => (sbyte)(horizontalFlip ? ((~x) - 7) : x);
-
-				pos = rom.ReadWord(pos);
-				while (rom.ReadByte(pos) != 0x80)
+				int spx, spy;
+				unchecked
 				{
-					int spx, spy;
-					unchecked
+					spy = (sbyte)rom.ReadByte(pos++);
+					spx = hflip((sbyte)rom.ReadByte(pos++));
+				}
+				int spriteIndex = rom.ReadByte(pos++);
+				int spriteFlags = rom.ReadByte(pos++) ^ (horizontalFlip ? 0x40 : 0x00);
+
+				yield return (spx, spy, spriteIndex, spriteFlags);
+			}
+		}
+	}
+
+	#endregion
+
+	static (Rectangle rect, Point point) DumpSprite(Rom rom, int posx, int posy, int spriteAddress, DirectBitmap tilesDest, int width)
+	{
+		Rectangle rectangle = Rectangle.Empty;
+		foreach (var sprite in GetSpriteInfo())
+		{
+			Rectangle tileRect = new(sprite.posx, sprite.posy, 8, 8);
+			rectangle = rectangle == Rectangle.Empty ? tileRect : Rectangle.Union(rectangle, tileRect);
+		}
+
+		var bounds = new Rectangle(posx, posy, width, width);
+		var center = new Point((width - rectangle.Width) / 2, (width - rectangle.Height) / 2);
+
+		foreach (var sprite in GetSpriteInfo())
+		{
+			DumpSpriteInternal(
+				posx + sprite.posx - rectangle.X + center.X,
+				posy + sprite.posy - rectangle.Y + center.Y,
+				sprite.index, sprite.flags, tilesDest, bounds);
+		}
+
+		return (new Rectangle(posx + center.X, posy + center.Y, rectangle.Width, rectangle.Height), new Point(rectangle.X + 8, rectangle.Y + 16));
+
+		IEnumerable<(int posx, int posy, int flags, int index)> GetSpriteInfo()
+		{
+			int pos = spriteAddress;
+
+			pos = rom.ReadWord(pos);
+			pos++; //skip sprite flags
+
+			while (rom.ReadByte(pos) != 0x80)
+			{
+				int spx, spy;
+				unchecked
+				{
+					spy = (sbyte)rom.ReadByte(pos++);
+					spx = (sbyte)rom.ReadByte(pos++);
+				}
+				int spriteData = rom.ReadByte(pos++);
+				int spriteIndex = spriteData & 0x3F;
+
+				yield return (spx, spy, spriteData, spriteIndex);
+			}
+		}
+	}
+
+	static void DumpSpriteInternal(int spx, int spy, int spriteIndex, int spriteFlags, DirectBitmap tilesDest, Rectangle bounds)
+	{
+		if (new Rectangle(spx, spy, 8, 8).IntersectsWith(bounds))
+		{
+			Func<int, int> getY;
+			Func<int, int> getX;
+
+			if ((spriteFlags & 0x40) != 0) //horizontal flip
+			{
+				getX = x => 7 - x;
+			}
+			else
+			{
+				getX = x => x;
+			}
+
+			if ((spriteFlags & 0x80) != 0) //vertical flip
+			{
+				getY = y => 7 - y;
+			}
+			else
+			{
+				getY = y => y;
+			}
+
+			Point source = new((spriteIndex % 16) * 8, (spriteIndex / 16) * 8);
+			for (int y = 0; y < 8; y++)
+			{
+				if ((spy + y) >= bounds.Top && (spy + y) < bounds.Bottom)
+				{
+					int src = source.X + (source.Y + getY(y)) * Tiles8x8.Width;
+					int dst = spx + (spy + y) * tilesDest.Width;
+
+					for (int x = 0; x < 8; x++)
 					{
-						spy = (sbyte)rom.ReadByte(pos++);
-						spx = hflip((sbyte)rom.ReadByte(pos++));
-					}
-					int spriteIndex = rom.ReadByte(pos++);
-					int spriteFlags = rom.ReadByte(pos++) ^ (horizontalFlip ? 0x40 : 0x00);
-
-					yield return (spx, spy, spriteIndex, spriteFlags);
-				}
-			}
-		}
-
-		#endregion
-
-		static (Rectangle rect, Point point) DumpSprite(Rom rom, int posx, int posy, int spriteAddress, DirectBitmap tilesDest, int width)
-		{
-			Rectangle rectangle = Rectangle.Empty;
-			foreach (var sprite in GetSpriteInfo())
-			{
-				Rectangle tileRect = new(sprite.posx, sprite.posy, 8, 8);
-				rectangle = rectangle == Rectangle.Empty ? tileRect : Rectangle.Union(rectangle, tileRect);
-			}
-
-			var bounds = new Rectangle(posx, posy, width, width);
-			var center = new Point((width - rectangle.Width) / 2, (width - rectangle.Height) / 2);
-
-			foreach (var sprite in GetSpriteInfo())
-			{
-				DumpSpriteInternal(
-					posx + sprite.posx - rectangle.X + center.X,
-					posy + sprite.posy - rectangle.Y + center.Y,
-					sprite.index, sprite.flags, tilesDest, bounds);
-			}
-
-			return (new Rectangle(posx + center.X, posy + center.Y, rectangle.Width, rectangle.Height), new Point(rectangle.X + 8, rectangle.Y + 16));
-
-			IEnumerable<(int posx, int posy, int flags, int index)> GetSpriteInfo()
-			{
-				int pos = spriteAddress;
-
-				pos = rom.ReadWord(pos);
-				pos++; //skip sprite flags
-
-				while (rom.ReadByte(pos) != 0x80)
-				{
-					int spx, spy;
-					unchecked
-					{
-						spy = (sbyte)rom.ReadByte(pos++);
-						spx = (sbyte)rom.ReadByte(pos++);
-					}
-					int spriteData = rom.ReadByte(pos++);
-					int spriteIndex = spriteData & 0x3F;
-
-					yield return (spx, spy, spriteData, spriteIndex);
-				}
-			}
-		}
-
-		static void DumpSpriteInternal(int spx, int spy, int spriteIndex, int spriteFlags, DirectBitmap tilesDest, Rectangle bounds)
-		{
-			if (new Rectangle(spx, spy, 8, 8).IntersectsWith(bounds))
-			{
-				Func<int, int> getY;
-				Func<int, int> getX;
-
-				if ((spriteFlags & 0x40) != 0) //horizontal flip
-				{
-					getX = x => 7 - x;
-				}
-				else
-				{
-					getX = x => x;
-				}
-
-				if ((spriteFlags & 0x80) != 0) //vertical flip
-				{
-					getY = y => 7 - y;
-				}
-				else
-				{
-					getY = y => y;
-				}
-
-				Point source = new((spriteIndex % 16) * 8, (spriteIndex / 16) * 8);
-				for (int y = 0; y < 8; y++)
-				{
-					if ((spy + y) >= bounds.Top && (spy + y) < bounds.Bottom)
-					{
-						int src = source.X + (source.Y + getY(y)) * Tiles8x8.Width;
-						int dst = spx + (spy + y) * tilesDest.Width;
-
-						for (int x = 0; x < 8; x++)
+						if ((spx + x) >= bounds.Left && (spx + x) < bounds.Right && tilesDest.Bits[dst + x] == 0)
 						{
-							if ((spx + x) >= bounds.Left && (spx + x) < bounds.Right && tilesDest.Bits[dst + x] == 0)
-							{
-								tilesDest.Bits[dst + x] = Tiles8x8.Bits[src + getX(x)];
-							}
+							tilesDest.Bits[dst + x] = Tiles8x8.Bits[src + getX(x)];
 						}
 					}
 				}
 			}
 		}
+	}
 
-		#region Enemies
+	#region Enemies
 
-		public static (int enemyIdPointer, int tilesPointer, int treasureID, bool exitOpen) FindEnemiesData(Rom rom, int enemiesPointer)
+	public static (int enemyIdPointer, int tilesPointer, int treasureID, bool exitOpen) FindEnemiesData(Rom rom, int enemiesPointer)
+	{
+		int treasureID;
+		bool exitOpen;
+
+		rom.SetBank(0x7);
+		int position = enemiesPointer;
+		while (rom.ReadByte(position) != 0xC9) //ret
 		{
-			int treasureID;
-			bool exitOpen;
+			if (MatchPattern(enemyCodePattern))
+			{
+				int enemyIdPointer = rom.ReadByte(position + 6) << 8 | rom.ReadByte(position + 1);
+				int tilesPointer = rom.ReadWord(position + 11);
 
-			rom.SetBank(0x7);
-			int position = enemiesPointer;
+				position += enemyCodePattern.Length;
+				CheckExtraCode();
+				return (enemyIdPointer, tilesPointer, treasureID, exitOpen);
+			}
+
+			position++;
+		}
+
+		throw new Exception("cannot find enemies data");
+
+		void CheckExtraCode()
+		{
+			exitOpen = false;
+			treasureID = -1;
+
 			while (rom.ReadByte(position) != 0xC9) //ret
 			{
-				if (MatchPattern(enemyCodePattern))
+				if (MatchPattern(treasurePattern))
 				{
-					int enemyIdPointer = rom.ReadByte(position + 6) << 8 | rom.ReadByte(position + 1);
-					int tilesPointer = rom.ReadWord(position + 11);
-
-					position += enemyCodePattern.Length;
-					CheckExtraCode();
-					return (enemyIdPointer, tilesPointer, treasureID, exitOpen);
+					treasureID = rom.ReadByte(position + 1);
+					position += treasurePattern.Length;
 				}
-
-				position++;
-			}
-
-			throw new Exception("cannot find enemies data");
-
-			void CheckExtraCode()
-			{
-				exitOpen = false;
-				treasureID = -1;
-
-				while (rom.ReadByte(position) != 0xC9) //ret
+				else if (MatchPattern(exitPattern))
 				{
-					if (MatchPattern(treasurePattern))
-					{
-						treasureID = rom.ReadByte(position + 1);
-						position += treasurePattern.Length;
-					}
-					else if (MatchPattern(exitPattern))
-					{
-						exitOpen = true;
-						position += exitPattern.Length;
-					}
-					else
-					{
-						position++;
-					}
+					exitOpen = true;
+					position += exitPattern.Length;
 				}
-			}
-
-			bool MatchPattern(byte[] pattern)
-			{
-				for (int j = 0; j < pattern.Length; j++)
+				else
 				{
-					byte valueFromRom = rom.ReadByte(position + j);
-					byte valueToCompare = pattern[j];
-
-					if (valueToCompare != 0x00 && valueFromRom != valueToCompare)
-					{
-						return false;
-					}
+					position++;
 				}
-
-				return true;
 			}
 		}
 
-		public static IEnumerable<int> GetEnemyIds(Rom rom, int enemiesIdsPointer)
+		bool MatchPattern(byte[] pattern)
+		{
+			for (int j = 0; j < pattern.Length; j++)
+			{
+				byte valueFromRom = rom.ReadByte(position + j);
+				byte valueToCompare = pattern[j];
+
+				if (valueToCompare != 0x00 && valueFromRom != valueToCompare)
+				{
+					return false;
+				}
+			}
+
+			return true;
+		}
+	}
+
+	public static IEnumerable<int> GetEnemyIds(Rom rom, int enemiesIdsPointer)
+	{
+		rom.SetBank(0x7);
+		for (int i = 0; i < 6; i++)
+		{
+			int enemyId = rom.ReadWord(enemiesIdsPointer + (i + 1) * 2);
+			enemyId = (enemyId - 0x530F) / 4;
+			yield return enemyId;
+		}
+	}
+
+	public static int[] DumpEnemiesSprites(Rom rom, int enemiesIdsPointer, int tilesDataAddress,
+		DirectBitmap bitmap, int destY, (Rectangle Rectangle, Point Offset)[] sprites, int index, int width)
+	{
+		var enemyIds = GetEnemyIds(rom, enemiesIdsPointer).ToArray();
+		var enemyTileInfo = LoadEnemiesTiles().ToArray();
+
+		for (int i = 0; i < 6; i++)
+		{
+			int enemyId = enemyIds[i];
+			if (enemyId > 0 && enemyId <= enemySpriteAddress.Length)
+			{
+				int spriteDataAddress = enemySpriteAddress[enemyId - 1];
+				if (spriteDataAddress != 0)
+				{
+					var (tileBank, tileAddress, tileCount) = enemyTileInfo[Math.Min(i, enemyTileInfo.Length - 1)];
+					LoadEnemiesTilesInternal(spriteDataAddress, tileBank, tileCount, tileAddress);
+
+					var (rect, offset) = DumpSprite(rom, i * width, destY, spriteDataAddress, bitmap, width);
+					sprites[index + i] = (rect, offset);
+				}
+			}
+		}
+
+		return enemyIds;
+
+		void LoadEnemiesTilesInternal(int spriteDataAddress, int tilesBank, int tilesCount, int tilesAddress)
+		{
+			rom.SetBank(tilesBank);
+			int pos = rom.ReadWord(spriteDataAddress);
+			int spriteFlags = rom.ReadByte(pos);
+			int palette = (spriteFlags & 0x10) != 0 ? 0xD1 : 0x1E;
+
+			Array.Clear(Tiles8x8.Bits, 0, Tiles8x8.Bits.Length);
+			Level.Dump8x8Tiles(rom, Tiles8x8, tilesAddress, tilesCount, 0, (byte)palette, enemyPalette, true);
+		}
+
+		IEnumerable<(int Bank, int Address, int Count)> LoadEnemiesTiles()
 		{
 			rom.SetBank(0x7);
-			for (int i = 0; i < 6; i++)
+			do
 			{
-				int enemyId = rom.ReadWord(enemiesIdsPointer + (i + 1) * 2);
-				enemyId = (enemyId - 0x530F) / 4;
-				yield return enemyId;
-			}
-		}
+				int tilesBank = rom.ReadByte(tilesDataAddress++);
+				int tilesAddress = rom.ReadWord(tilesDataAddress++); tilesDataAddress++;
+				int tilesCount = rom.ReadByte(tilesDataAddress++);
 
-		public static int[] DumpEnemiesSprites(Rom rom, int enemiesIdsPointer, int tilesDataAddress,
-			DirectBitmap bitmap, int destY, (Rectangle Rectangle, Point Offset)[] sprites, int index, int width)
-		{
-			var enemyIds = GetEnemyIds(rom, enemiesIdsPointer).ToArray();
-			var enemyTileInfo = LoadEnemiesTiles().ToArray();
-
-			for (int i = 0; i < 6; i++)
-			{
-				int enemyId = enemyIds[i];
-				if (enemyId > 0 && enemyId <= enemySpriteAddress.Length)
+				if (tilesCount == 0xFF)
 				{
-					int spriteDataAddress = enemySpriteAddress[enemyId - 1];
-					if (spriteDataAddress != 0)
-					{
-						var (tileBank, tileAddress, tileCount) = enemyTileInfo[Math.Min(i, enemyTileInfo.Length - 1)];
-						LoadEnemiesTilesInternal(spriteDataAddress, tileBank, tileCount, tileAddress);
-
-						var (rect, offset) = DumpSprite(rom, i * width, destY, spriteDataAddress, bitmap, width);
-						sprites[index + i] = (rect, offset);
-					}
+					yield break;
 				}
+
+				yield return (tilesBank, tilesAddress, tilesCount);
 			}
-
-			return enemyIds;
-
-			void LoadEnemiesTilesInternal(int spriteDataAddress, int tilesBank, int tilesCount, int tilesAddress)
-			{
-				rom.SetBank(tilesBank);
-				int pos = rom.ReadWord(spriteDataAddress);
-				int spriteFlags = rom.ReadByte(pos);
-				int palette = (spriteFlags & 0x10) != 0 ? 0xD1 : 0x1E;
-
-				Array.Clear(Tiles8x8.Bits, 0, Tiles8x8.Bits.Length);
-				Level.Dump8x8Tiles(rom, Tiles8x8, tilesAddress, tilesCount, 0, (byte)palette, enemyPalette, true);
-			}
-
-			IEnumerable<(int Bank, int Address, int Count)> LoadEnemiesTiles()
-			{
-				rom.SetBank(0x7);
-				do
-				{
-					int tilesBank = rom.ReadByte(tilesDataAddress++);
-					int tilesAddress = rom.ReadWord(tilesDataAddress++); tilesDataAddress++;
-					int tilesCount = rom.ReadByte(tilesDataAddress++);
-
-					if (tilesCount == 0xFF)
-					{
-						yield break;
-					}
-
-					yield return (tilesBank, tilesAddress, tilesCount);
-				}
-				while (true);
-			}
+			while (true);
 		}
-
-		#endregion
 	}
+
+	#endregion
 }

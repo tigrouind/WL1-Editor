@@ -1,11 +1,10 @@
-namespace WLEditor
+namespace WLEditor;
+
+public enum TileEventStatus
 {
-	public enum TileEventStatus
-	{
-		None,
-		MouseDown,
-		MouseMove,
-		MouseUp,
-		MouseWheel
-	}
+	None,
+	MouseDown,
+	MouseMove,
+	MouseUp,
+	MouseWheel
 }

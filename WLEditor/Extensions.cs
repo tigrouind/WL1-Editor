@@ -3,80 +3,79 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace WLEditor
+namespace WLEditor;
+
+public static class Extensions
 {
-	public static class Extensions
+	public static int FindIndex<T>(this IEnumerable<T> items, Func<T, bool> predicate)
 	{
-		public static int FindIndex<T>(this IEnumerable<T> items, Func<T, bool> predicate)
+		int index = 0;
+		foreach (var item in items)
 		{
-			int index = 0;
-			foreach (var item in items)
+			if (predicate(item))
 			{
-				if (predicate(item))
-				{
-					return index;
-				}
-
-				index++;
+				return index;
 			}
-			return -1;
-		}
 
-		public static PointF Normalized(this PointF point)
-		{
-			float length = (float)Math.Sqrt(point.X * point.X + point.Y * point.Y);
-			return new PointF(point.X / length, point.Y / length);
+			index++;
 		}
+		return -1;
+	}
 
-		public static IEnumerable<TResult> GroupByAdjacent<TSource, TKey, TResult>(this IEnumerable<TSource> source,
-				Func<TSource, TKey> selector,
-				Func<TKey, IEnumerable<TSource>, TResult> resultSelector)
+	public static PointF Normalized(this PointF point)
+	{
+		float length = (float)Math.Sqrt(point.X * point.X + point.Y * point.Y);
+		return new PointF(point.X / length, point.Y / length);
+	}
+
+	public static IEnumerable<TResult> GroupByAdjacent<TSource, TKey, TResult>(this IEnumerable<TSource> source,
+			Func<TSource, TKey> selector,
+			Func<TKey, IEnumerable<TSource>, TResult> resultSelector)
+	{
+		var comparer = EqualityComparer<TKey>.Default;
+		using var enumerator = source.GetEnumerator();
+		if (enumerator.MoveNext())
 		{
-			var comparer = EqualityComparer<TKey>.Default;
-			using var enumerator = source.GetEnumerator();
-			if (enumerator.MoveNext())
+			List<TSource> buffer =
+			[
+					enumerator.Current
+				];
+
+			TKey lastKey = selector(enumerator.Current);
+
+			while (enumerator.MoveNext())
 			{
-				List<TSource> buffer =
-				[
-						enumerator.Current
-					];
+				TSource currentItem = enumerator.Current;
+				TKey currentKey = selector(currentItem);
 
-				TKey lastKey = selector(enumerator.Current);
-
-				while (enumerator.MoveNext())
+				if (!comparer.Equals(lastKey, currentKey))
 				{
-					TSource currentItem = enumerator.Current;
-					TKey currentKey = selector(currentItem);
-
-					if (!comparer.Equals(lastKey, currentKey))
-					{
-						yield return resultSelector(lastKey, buffer);
-						buffer = [];
-						lastKey = currentKey;
-					}
-
-					buffer.Add(currentItem);
+					yield return resultSelector(lastKey, buffer);
+					buffer = [];
+					lastKey = currentKey;
 				}
 
-				yield return resultSelector(lastKey, buffer);
+				buffer.Add(currentItem);
 			}
+
+			yield return resultSelector(lastKey, buffer);
 		}
+	}
 
-		public static IEnumerable<ToolStripMenuItem> GetAllMenuItems(this ToolStripItemCollection items)
+	public static IEnumerable<ToolStripMenuItem> GetAllMenuItems(this ToolStripItemCollection items)
+	{
+		foreach (ToolStripItem item in items)
 		{
-			foreach (ToolStripItem item in items)
+			if (item is ToolStripMenuItem toolStrip)
 			{
-				if (item is ToolStripMenuItem toolStrip)
-				{
-					yield return toolStrip;
-				}
+				yield return toolStrip;
+			}
 
-				if (item is ToolStripDropDownItem toolStripDropDown)
+			if (item is ToolStripDropDownItem toolStripDropDown)
+			{
+				foreach (var child in GetAllMenuItems(toolStripDropDown.DropDownItems))
 				{
-					foreach (var child in GetAllMenuItems(toolStripDropDown.DropDownItems))
-					{
-						yield return child;
-					}
+					yield return child;
 				}
 			}
 		}

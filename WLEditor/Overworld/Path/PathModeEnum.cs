@@ -1,9 +1,8 @@
-namespace WLEditor
+namespace WLEditor;
+
+public enum PathModeEnum
 {
-	public enum PathModeEnum
-	{
-		None,
-		Invisible,
-		Water
-	}
+	None,
+	Invisible,
+	Water
 }

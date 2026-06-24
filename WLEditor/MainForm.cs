@@ -7,896 +7,895 @@ using System.Reflection;
 using System.Windows.Forms;
 using WLEditor.Toolbox;
 
-namespace WLEditor
+namespace WLEditor;
+
+public partial class MainForm : Form
 {
-	public partial class MainForm : Form
+	Rom rom = new();
+	readonly BlocksForm blocksForm = new();
+	readonly ObjectsForm objectsForm = new();
+	readonly OverworldForm overworldForm = new();
+	readonly SectorForm sectorForm = new();
+	Form lastFormFocus;
+
+	public readonly static string[] LevelNames =
+	[
+		"SS Teacup 1",
+		"Parsley Woods 3",
+		"Sherbet Land 2",
+		"Stove Canyon 1",
+		"Sherbet Land 3",
+		"Mt. Teapot 4",
+		"Mt. Teapot 1",
+		"Rice Beach 1",
+		"Sherbet Land 4",
+		"Mt. Teapot 6",
+		"Mt. Teapot 4 - CRUSHED",
+		"SS Teacup 4",
+		"Rice Beach 4",
+		"Mt. Teapot 3",
+		"Rice Beach 3",
+		"Rice Beach 2",
+		"Mt. Teapot 2",
+		"Mt. Teapot 5",
+		"Parsley Woods 5",
+		"Parsley Woods 4",
+		"SS Teacup 5",
+		"Stove Canyon 2",
+		"Stove Canyon 3",
+		"Rice Beach 1 - FLOODED",
+		"Sherbet Land 6",
+		"Rice Beach 5",
+		"Parsley Woods 6",
+		"Stove Canyon 5",
+		"Stove Canyon 6",
+		"Parsley Woods 2",
+		"SS Teacup 2",
+		"SS Teacup 3",
+		"Sherbet Land 5",
+		"Sherbet Land 1",
+		"Syrup Castle 2",
+		"Syrup Castle 3",
+		"Rice Beach 3 - FLOODED",
+		"Syrup Castle 1",
+		"Parsley Woods 1 - FLOODED",
+		"Stove Canyon 4",
+		"Syrup Castle 4",
+		"Rice Beach 6",
+		"Parsley Woods 1 - DRAINED"
+	];
+
+	int currentCourseId = -1;
+	int currentWarp = -1;
+	int treasureId = -1;
+	bool checkPoint;
+	int animatedTileIndex;
+	int timerTicks;
+	string romFilePath;
+	ChangeEnum changeMode;
+	int zoom;
+	bool ignoreEvents;
+
+	public MainForm(string romFile)
 	{
-		Rom rom = new();
-		readonly BlocksForm blocksForm = new();
-		readonly ObjectsForm objectsForm = new();
-		readonly OverworldForm overworldForm = new();
-		readonly SectorForm sectorForm = new();
-		Form lastFormFocus;
+		InitializeComponent();
+		Icon = Icon.ExtractAssociatedIcon(Assembly.GetExecutingAssembly().Location);
 
-		public readonly static string[] LevelNames =
-		[
-			"SS Teacup 1",
-			"Parsley Woods 3",
-			"Sherbet Land 2",
-			"Stove Canyon 1",
-			"Sherbet Land 3",
-			"Mt. Teapot 4",
-			"Mt. Teapot 1",
-			"Rice Beach 1",
-			"Sherbet Land 4",
-			"Mt. Teapot 6",
-			"Mt. Teapot 4 - CRUSHED",
-			"SS Teacup 4",
-			"Rice Beach 4",
-			"Mt. Teapot 3",
-			"Rice Beach 3",
-			"Rice Beach 2",
-			"Mt. Teapot 2",
-			"Mt. Teapot 5",
-			"Parsley Woods 5",
-			"Parsley Woods 4",
-			"SS Teacup 5",
-			"Stove Canyon 2",
-			"Stove Canyon 3",
-			"Rice Beach 1 - FLOODED",
-			"Sherbet Land 6",
-			"Rice Beach 5",
-			"Parsley Woods 6",
-			"Stove Canyon 5",
-			"Stove Canyon 6",
-			"Parsley Woods 2",
-			"SS Teacup 2",
-			"SS Teacup 3",
-			"Sherbet Land 5",
-			"Sherbet Land 1",
-			"Syrup Castle 2",
-			"Syrup Castle 3",
-			"Rice Beach 3 - FLOODED",
-			"Syrup Castle 1",
-			"Parsley Woods 1 - FLOODED",
-			"Stove Canyon 4",
-			"Syrup Castle 4",
-			"Rice Beach 6",
-			"Parsley Woods 1 - DRAINED"
-		];
+		LevelPanel.MouseWheel += LevelPanelMouseWheel;
+		levelPictureBox.TileMouseMove += LevelPictureBoxTileMouseMove;
+		levelPictureBox.TileMouseDown += LevelPictureBoxTileMouseDown;
+		levelPictureBox.SectorChanged += LevelPictureBoxSectorChanged;
+		levelPictureBox.GetSourceSector = x => Sector.GetSourceSector(rom, currentCourseId, x);
 
-		int currentCourseId = -1;
-		int currentWarp = -1;
-		int treasureId = -1;
-		bool checkPoint;
-		int animatedTileIndex;
-		int timerTicks;
-		string romFilePath;
-		ChangeEnum changeMode;
-		int zoom;
-		bool ignoreEvents;
+		blocksForm.MouseWheel += LevelPanelMouseWheel;
+		blocksForm.FormClosing += BlocksFormClosing;
+		blocksForm.ProcessCommandKey += ProcessSubFormCommand;
+		blocksForm.GotFocus += (s, e) => lastFormFocus = blocksForm;
 
-		public MainForm(string romFile)
+		objectsForm.MouseWheel += LevelPanelMouseWheel;
+		objectsForm.FormClosing += ObjectsFormClosing;
+		objectsForm.ProcessCommandKey += ProcessSubFormCommand;
+		objectsForm.GotFocus += (s, e) => lastFormFocus = objectsForm;
+
+		overworldForm.FormClosing += OverworldFormClosing;
+		overworldForm.ProcessCommandKey += ProcessSubFormCommand;
+		overworldForm.MouseWheel += LevelPanelMouseWheel;
+		overworldForm.WorldMapChanged += WorldMapChanged;
+
+		sectorForm.FormClosing += SectorFormClosing;
+		sectorForm.ProcessCommandKey += ProcessSubFormCommand;
+		sectorForm.SectorChanged += SectorFormSectorChanged;
+		sectorForm.SectorLoad += SectorFormSectorLoad;
+
+		SetZoomLevel(2);
+
+		if (File.Exists(romFile))
 		{
-			InitializeComponent();
-			Icon = Icon.ExtractAssociatedIcon(Assembly.GetExecutingAssembly().Location);
-
-			LevelPanel.MouseWheel += LevelPanelMouseWheel;
-			levelPictureBox.TileMouseMove += LevelPictureBoxTileMouseMove;
-			levelPictureBox.TileMouseDown += LevelPictureBoxTileMouseDown;
-			levelPictureBox.SectorChanged += LevelPictureBoxSectorChanged;
-			levelPictureBox.GetSourceSector = x => Sector.GetSourceSector(rom, currentCourseId, x);
-
-			blocksForm.MouseWheel += LevelPanelMouseWheel;
-			blocksForm.FormClosing += BlocksFormClosing;
-			blocksForm.ProcessCommandKey += ProcessSubFormCommand;
-			blocksForm.GotFocus += (s, e) => lastFormFocus = blocksForm;
-
-			objectsForm.MouseWheel += LevelPanelMouseWheel;
-			objectsForm.FormClosing += ObjectsFormClosing;
-			objectsForm.ProcessCommandKey += ProcessSubFormCommand;
-			objectsForm.GotFocus += (s, e) => lastFormFocus = objectsForm;
-
-			overworldForm.FormClosing += OverworldFormClosing;
-			overworldForm.ProcessCommandKey += ProcessSubFormCommand;
-			overworldForm.MouseWheel += LevelPanelMouseWheel;
-			overworldForm.WorldMapChanged += WorldMapChanged;
-
-			sectorForm.FormClosing += SectorFormClosing;
-			sectorForm.ProcessCommandKey += ProcessSubFormCommand;
-			sectorForm.SectorChanged += SectorFormSectorChanged;
-			sectorForm.SectorLoad += SectorFormSectorLoad;
-
-			SetZoomLevel(2);
-
-			if (File.Exists(romFile))
-			{
-				LoadRom(romFile);
-			}
-
-			void ProcessSubFormCommand(object sender, KeyEventArgs e)
-			{
-				if ((sender != overworldForm || e.Modifiers == Keys.Shift || e.Modifiers == Keys.Control) && DispatchShortcut(e.KeyData))
-				{
-					e.Handled = true;
-				}
-				else if (sender != overworldForm)
-				{
-					DispatchCommandKey(e.KeyData);
-				}
-			}
-
-			#region Subforms
-
-			void SectorFormSectorChanged(object sender, EventArgs e)
-			{
-				currentWarp = Sector.SearchWarp(rom, currentCourseId, levelPictureBox.CurrentSector, treasureId);
-				LoadLevel();
-				SetChanges(ChangeEnum.Sectors);
-			}
-
-			void SectorFormSectorLoad(object sender, (int Sector, bool Checkpoint, int TreasureId) e)
-			{
-				treasureId = e.TreasureId;
-				levelPictureBox.CurrentSector = e.Sector;
-				checkPoint = e.Checkpoint;
-
-				currentWarp = Sector.SearchWarp(rom, currentCourseId, levelPictureBox.CurrentSector, treasureId);
-				LoadLevel();
-				sectorForm.LoadSector(currentCourseId, levelPictureBox.CurrentSector, treasureId, checkPoint);
-				levelPictureBox.ClearSelection();
-			}
-
-			void WorldMapChanged(object sender, EventArgs e)
-			{
-				SetChanges(ChangeEnum.WorldEvent | ChangeEnum.WorldPath | ChangeEnum.WorldTile);
-			}
-
-			void BlocksFormClosing(object sender, EventArgs e)
-			{
-				blocksToolStripMenuItem.Checked = false;
-				Focus(); //prevent main window disapearing
-			}
-
-			void ObjectsFormClosing(object sender, EventArgs e)
-			{
-				objectsFormToolStripMenuItem.Checked = false;
-				Focus(); //prevent main window disapearing
-			}
-
-			void OverworldFormClosing(object sender, EventArgs e)
-			{
-				overworldToolStripMenuItem.Checked = false;
-				Focus(); //prevent main window disapearing
-			}
-
-			void SectorFormClosing(object sender, EventArgs e)
-			{
-				sectorsToolStripMenuItem.Checked = false;
-				Focus(); //prevent main window disapearing
-			}
-
-			#endregion
-
-			#region Zoom
-
-			void LevelPanelMouseWheel(object sender, MouseEventArgs e)
-			{
-				if (ModifierKeys == Keys.Control)
-				{
-					if (e.Delta > 0 && zoom < 4)
-					{
-						SetZoomLevel(zoom + 1);
-					}
-					else if (e.Delta < 0 && zoom > 1)
-					{
-						SetZoomLevel(zoom - 1);
-					}
-				}
-			}
-
-			#endregion
-
-			#region LevelPictureBox
-
-			void LevelPictureBoxSectorChanged(object sender, EventArgs e)
-			{
-				treasureId = -1;
-				checkPoint = false;
-
-				currentWarp = Sector.SearchWarp(rom, currentCourseId, levelPictureBox.CurrentSector, treasureId);
-				LoadLevel();
-				sectorForm.LoadSector(currentCourseId, levelPictureBox.CurrentSector, treasureId, checkPoint);
-				levelPictureBox.ClearSelection();
-			}
-
-			void LevelPictureBoxTileMouseMove(object sender, TileEventArgs e)
-			{
-				byte tileIndex = Level.LevelData[e.TileX + e.TileY * 256 + 0x1000];
-				var tileInfo = Level.GetTileInfo(tileIndex);
-				toolStripStatusLabel1.Text = $"{e.TileX}:{e.TileY} - {tileIndex:X2} {tileInfo.Text}";
-			}
-
-			void LevelPictureBoxTileMouseDown(object sender, TileEventArgs e)
-			{
-				if (blocksForm.Visible || objectsForm.Visible)
-				{
-					if (e.Status == TileEventStatus.MouseDown)
-					{
-						levelPictureBox.StartChanges();
-					}
-
-					if (e.Status == TileEventStatus.MouseMove || e.Status == TileEventStatus.MouseDown)
-					{
-						if (e.Button == MouseButtons.Right && !levelPictureBox.HasSelection)
-						{
-							int tileIndex = e.TileX + e.TileY * 256;
-							int currentTile = blocksForm.CurrentTile;
-							int currentObject = objectsForm.CurrentObject;
-
-							if (currentTile != -1 && blocksForm.Visible && (!objectsForm.Visible || lastFormFocus == blocksForm))
-							{
-								UpdateTile(tileIndex, currentTile);
-							}
-							else if (levelPictureBox.ShowObjects && objectsForm.Visible && (!blocksForm.Visible || lastFormFocus == objectsForm))
-							{
-								UpdateObject(tileIndex, currentObject);
-							}
-						}
-					}
-
-					if (e.Status == TileEventStatus.MouseUp)
-					{
-						levelPictureBox.CommitChanges();
-					}
-				}
-
-				if (e.Button == MouseButtons.Left)
-				{
-					if (e.Status == TileEventStatus.MouseDown)
-					{
-						levelPictureBox.StartSelection(e.TileX, e.TileY);
-					}
-					else if (e.Status == TileEventStatus.MouseMove)
-					{
-						levelPictureBox.SetSelection(e.TileX, e.TileY);
-					}
-				}
-				else
-				{
-					levelPictureBox.ClearSelection();
-				}
-
-				void UpdateTile(int tileIndex, int currentTile)
-				{
-					int previousTile = Level.LevelData[tileIndex + 0x1000];
-					if (previousTile != currentTile)
-					{
-						levelPictureBox.AddChange(tileIndex % 256, tileIndex / 256);
-						Level.LevelData[tileIndex + 0x1000] = (byte)currentTile;
-						levelPictureBox.InvalidateTile(tileIndex);
-						SetChanges(ChangeEnum.Blocks);
-					}
-				}
-
-				void UpdateObject(int tileIndex, int currentObject)
-				{
-					int previousObject = Level.ObjectsData[tileIndex];
-					if (previousObject != currentObject)
-					{
-						levelPictureBox.AddChange(tileIndex % 256, tileIndex / 256);
-						Level.ObjectsData[tileIndex] = (byte)currentObject;
-						levelPictureBox.InvalidateObject(tileIndex, currentObject, previousObject);
-						SetChanges(ChangeEnum.Blocks);
-					}
-				}
-			}
-
-			#endregion
+			LoadRom(romFile);
 		}
 
-		public void ApplicationIdle(object sender, EventArgs e)
+		void ProcessSubFormCommand(object sender, KeyEventArgs e)
 		{
-			cutToolStripMenuItem.Enabled = levelPictureBox.HasSelection;
-			copyToolStripMenuItem.Enabled = levelPictureBox.HasSelection;
-			deleteToolStripMenuItem.Enabled = levelPictureBox.HasSelection;
-			pasteToolStripMenuItem.Enabled = (levelPictureBox.HasSelection && Clipboard.ContainsData(ClipboardType.TILE_16x16)) || Clipboard.ContainsData(ClipboardType.LEVEL);
-
-			redoToolStripMenuItem.Enabled = levelPictureBox.History.CanRedo;
-			undoToolStripMenuItem.Enabled = levelPictureBox.History.CanUndo;
-
-			overworldForm.ApplicationIdle(sender, e);
-		}
-
-		#region Load
-
-		void LoadLevel()
-		{
-			if (rom.IsLoaded && levelComboBox.SelectedItem != null)
+			if ((sender != overworldForm || e.Modifiers == Keys.Shift || e.Modifiers == Keys.Control) && DispatchShortcut(e.KeyData))
 			{
-				Level.DumpLevel(rom, currentCourseId, currentWarp, checkPoint, animatedTileIndex, false);
-
-				levelPictureBox.ClearTileCache();
-				levelPictureBox.Invalidate();
-
-				blocksForm.Invalidate(true);
-				objectsForm.Invalidate(true);
+				e.Handled = true;
+			}
+			else if (sender != overworldForm)
+			{
+				DispatchCommandKey(e.KeyData);
 			}
 		}
 
-		void LevelComboBoxSelectedIndexChanged(object sender, EventArgs e)
+		#region Subforms
+
+		void SectorFormSectorChanged(object sender, EventArgs e)
 		{
-			if (!ignoreEvents && levelComboBox.SelectedItem != null)
-			{
-				if (SaveChanges(false))
-				{
-					treasureId = -1;
-					currentWarp = -1;
-					checkPoint = false;
-					levelPictureBox.CurrentSector = -1;
-					var item = (ComboboxItem<int>)levelComboBox.SelectedItem;
-					currentCourseId = item.Value;
-					Level.DumpBlocks(rom, currentCourseId);
-					Level.SwitchType = Level.GetSwitchType();
-					Level.SwitchMode = 0;
-					ignoreEvents = true;
-					switchBlockToolStripMenuItem.Enabled = Level.GetSwitchType() != 0;
-					switchBlockToolStripMenuItem.Checked = false;
-					ignoreEvents = false;
-					LoadLevel();
-					sectorForm.LoadSector(currentCourseId, levelPictureBox.CurrentSector, treasureId, checkPoint);
-					levelPictureBox.ClearSelection();
-					levelPictureBox.ClearUndo();
-				}
-				else
-				{
-					//restore previous item
-					ignoreEvents = true;
-					levelComboBox.SelectedIndex = levelComboBox.Items.Cast<ComboboxItem<int>>().FindIndex(x => x.Value == currentCourseId);
-					ignoreEvents = false;
-				}
-			}
-		}
-
-		void LoadToolStripMenuItemClick(object sender, EventArgs e)
-		{
-			OpenFileDialog openFileDialog1 = new()
-			{
-				Filter = "GB ROM Image (*.gb)|*.gb|All Files (*.*)|*.*"
-			};
-
-			if (openFileDialog1.ShowDialog() == DialogResult.OK)
-			{
-				if (!LoadRom(openFileDialog1.FileName))
-				{
-					MessageBox.Show("Please select a valid WarioLand 1 rom", Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
-				}
-			}
-		}
-
-		protected override void OnDragEnter(DragEventArgs e)
-		{
-			e.Effect = DragDropEffects.Move;
-			base.OnDragEnter(e);
-		}
-
-		protected override void OnDragDrop(DragEventArgs e)
-		{
-			string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
-			string filePath = files[0];
-			if (File.Exists(filePath))
-			{
-				LoadRom(filePath);
-			}
-
-			base.OnDragDrop(e);
-		}
-
-		bool LoadRom(string filePath)
-		{
-			Rom newRom = new();
-			newRom.Load(filePath);
-			if (!newRom.Title.StartsWith("SUPERMARIOLAND3"))
-			{
-				return false;
-			}
-
-			if (!newRom.CheckCRC())
-			{
-				MessageBox.Show("ROM checksum failed", Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
-			}
-
-			rom = newRom;
-			LoadLevelCombobox();
-			Sprite.DumpBonusSprites(rom);
-			Sprite.DumpPlayerSprite(rom);
-			sectorForm.LoadRom(rom);
-			overworldForm.LoadRom(rom);
-			romFilePath = filePath;
-
-			SetChanges(ChangeEnum.None);
-			ignoreEvents = true;
-			levelComboBox.SelectedIndex = 0;
-			ignoreEvents = false;
-			LevelComboBoxSelectedIndexChanged(this, EventArgs.Empty);
-
-			blocksToolStripMenuItem.Enabled = true;
-			objectsFormToolStripMenuItem.Enabled = true;
-			overworldToolStripMenuItem.Enabled = true;
-			sectorsToolStripMenuItem.Enabled = true;
-			saveAsToolStripMenuItem.Enabled = true;
-			selectAllToolStripMenuItem.Enabled = true;
-			deleteToolStripMenuItem.Enabled = true;
-			levelComboBox.Visible = true;
-			LevelPanel.Visible = true;
-			return true;
-
-			void LoadLevelCombobox()
-			{
-				//init combobox
-				levelComboBox.SelectedItem = null;
-				levelComboBox.Items.Clear();
-
-				var items = Level.GetCourseIds(rom)
-					.OrderBy(x => x.CourseNo)
-					.Select(x => new ComboboxItem<int>(x.CourseId, $"{x.CourseNo:D2} {LevelNames[x.CourseId]}"))
-					.ToList();
-
-				levelComboBox.Items.AddRange([.. items]);
-			}
-		}
-
-		#endregion
-
-		void RegionsToolStripMenuItemClick(object sender, EventArgs e)
-		{
-			levelPictureBox.ShowSectors = regionsToolStripMenuItem.Checked;
-			levelPictureBox.Invalidate();
-		}
-
-		void ObjectsToolStripMenuItemClick(object sender, EventArgs e)
-		{
-			levelPictureBox.ShowObjects = objectsToolStripMenuItem.Checked;
-			levelPictureBox.Invalidate();
-		}
-
-		void AboutToolStripMenuItemClick(object sender, EventArgs e)
-		{
-			var version = Assembly.GetEntryAssembly().GetName().Version;
-			var buildDateTime = new DateTime(2000, 1, 1).Add(new TimeSpan(TimeSpan.TicksPerDay * version.Build));
-
-			MessageBox.Show($"{Text} v{version.Major}.{version.Minor}\r\nDate : {buildDateTime:d}\r\nContact me : tigrou.ind@gmail.com");
-		}
-
-		void ExitToolStripMenuItemClick(object sender, EventArgs e)
-		{
-			Application.Exit();
-		}
-
-		void CollidersToolStripMenuItemClick(object sender, EventArgs e)
-		{
-			Level.ShowColliders = collidersToolStripMenuItem.Checked;
+			currentWarp = Sector.SearchWarp(rom, currentCourseId, levelPictureBox.CurrentSector, treasureId);
 			LoadLevel();
+			SetChanges(ChangeEnum.Sectors);
 		}
 
-		void CollectiblesToolStripMenuItem_Click(object sender, EventArgs e)
+		void SectorFormSectorLoad(object sender, (int Sector, bool Checkpoint, int TreasureId) e)
 		{
-			Level.ShowCollectibles = collectiblesToolStripMenuItem.Checked;
+			treasureId = e.TreasureId;
+			levelPictureBox.CurrentSector = e.Sector;
+			checkPoint = e.Checkpoint;
+
+			currentWarp = Sector.SearchWarp(rom, currentCourseId, levelPictureBox.CurrentSector, treasureId);
 			LoadLevel();
+			sectorForm.LoadSector(currentCourseId, levelPictureBox.CurrentSector, treasureId, checkPoint);
+			levelPictureBox.ClearSelection();
 		}
 
-		private void SwitchBlockToolStripMenuItem_Click(object sender, EventArgs e)
+		void WorldMapChanged(object sender, EventArgs e)
 		{
-			if (!ignoreEvents)
-			{
-				switchBlockToolStripMenuItem.Checked = !switchBlockToolStripMenuItem.Checked;
-
-				int switchType = Level.GetSwitchType();
-				int switchMode = switchBlockToolStripMenuItem.Checked ? switchType : 0;
-
-				LoadSwitchBlock(switchMode, switchType);
-			}
+			SetChanges(ChangeEnum.WorldEvent | ChangeEnum.WorldPath | ChangeEnum.WorldTile);
 		}
 
-		void LoadSwitchBlock(int switchMode, int switchType)
+		void BlocksFormClosing(object sender, EventArgs e)
 		{
-			if (Level.SwitchMode != switchMode || Level.SwitchType != switchType)
-			{
-				Level.SwitchMode = switchMode;
-				Level.SwitchType = switchType;
-				LoadLevel();
-			}
+			blocksToolStripMenuItem.Checked = false;
+			Focus(); //prevent main window disapearing
 		}
 
-		#region Save
-
-		bool SaveChanges(bool saveFile)
+		void ObjectsFormClosing(object sender, EventArgs e)
 		{
-			if (rom.IsLoaded)
-			{
-				if ((changeMode & ChangeEnum.Blocks) != 0)
-				{
-					if (!Level.SaveChanges(rom, currentCourseId, out string message))
-					{
-						MessageBox.Show(message, Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
-						return false;
-					}
-				}
-
-				if (saveFile && !overworldForm.SaveChanges())
-				{
-					return false;
-				}
-			}
-
-			return true;
+			objectsFormToolStripMenuItem.Checked = false;
+			Focus(); //prevent main window disapearing
 		}
 
-		bool SaveRomFile(string filePath)
+		void OverworldFormClosing(object sender, EventArgs e)
 		{
-			rom.FixCRC();
-			try
-			{
-				rom.Save(filePath);
-			}
-			catch (UnauthorizedAccessException)
-			{
-				MessageBox.Show("The ROM file is marked as read-only and cannot be overwritten.", Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
-				return false;
-			}
-
-			SetChanges(ChangeEnum.None);
-			return true;
+			overworldToolStripMenuItem.Checked = false;
+			Focus(); //prevent main window disapearing
 		}
 
-		void SetChanges(ChangeEnum mode)
+		void SectorFormClosing(object sender, EventArgs e)
 		{
-			if (mode == ChangeEnum.None)
-			{
-				changeMode = ChangeEnum.None;
-				saveToolStripMenuItem.Enabled = false;
-			}
-			else
-			{
-				changeMode |= mode;
-				saveToolStripMenuItem.Enabled = true;
-			}
-
-			if (mode == ChangeEnum.Blocks)
-			{
-				int switchType = Level.GetSwitchType();
-				switchBlockToolStripMenuItem.Checked &= switchType != 0;
-				switchBlockToolStripMenuItem.Enabled = switchType != 0;
-				LoadSwitchBlock(switchBlockToolStripMenuItem.Checked ? switchType : 0, switchType);
-			}
-		}
-
-		void SaveToolStripMenuItemClick(object sender, EventArgs e)
-		{
-			if (SaveChanges(true))
-			{
-				SaveRomFile(romFilePath);
-			}
-		}
-
-		protected override void OnFormClosing(FormClosingEventArgs e)
-		{
-			e.Cancel = !AskForSavingChanges();
-			base.OnFormClosing(e);
-
-			bool AskForSavingChanges()
-			{
-				if (changeMode != ChangeEnum.None)
-				{
-					DialogResult result = MessageBox.Show("Save pending changes ?", Text, MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
-					return result switch
-					{
-						DialogResult.Yes => SaveChanges(true) && SaveRomFile(romFilePath),
-						DialogResult.No => true,
-						DialogResult.Cancel => false,
-						_ => throw new NotImplementedException(),
-					};
-				}
-
-				return true;
-			}
-		}
-
-		void SaveAsToolStripMenuItemClick(object sender, EventArgs e)
-		{
-			if (SaveChanges(true))
-			{
-				SaveFileDialog saveFileDialog = new()
-				{
-					Filter = "GB ROM Image (*.gb)|*.gb"
-				};
-
-				if (saveFileDialog.ShowDialog() == DialogResult.OK)
-				{
-					var filePath = saveFileDialog.FileName;
-					if (SaveRomFile(filePath))
-					{
-						romFilePath = filePath;
-					}
-				}
-			}
+			sectorsToolStripMenuItem.Checked = false;
+			Focus(); //prevent main window disapearing
 		}
 
 		#endregion
 
 		#region Zoom
 
-		void SetZoomLevel(int zoomLevel)
+		void LevelPanelMouseWheel(object sender, MouseEventArgs e)
 		{
-			zoom = zoomLevel;
-			zoom100ToolStripMenuItem.Checked = zoomLevel == 1;
-			zoom200ToolStripMenuItem.Checked = zoomLevel == 2;
-			zoom300ToolStripMenuItem.Checked = zoomLevel == 3;
-			zoom400ToolStripMenuItem.Checked = zoomLevel == 4;
-			zoomOutToolStripMenuItem.Enabled = zoomLevel > 1;
-			zoomInToolStripMenuItem.Enabled = zoomLevel < 4;
-
-			levelPictureBox.SetZoom(zoomLevel);
-			blocksForm.SetZoom(zoomLevel);
-			objectsForm.SetZoom(zoomLevel);
-			overworldForm.SetZoom(zoomLevel);
-			sectorForm.SetZoom(zoomLevel);
-		}
-
-		void Zoom100ToolStripMenuItemClick(object sender, EventArgs e)
-		{
-			SetZoomLevel(1);
-		}
-
-		void Zoom200ToolStripMenuItemClick(object sender, EventArgs e)
-		{
-			SetZoomLevel(2);
-		}
-
-		void Zoom300ToolStripMenuItemClick(object sender, EventArgs e)
-		{
-			SetZoomLevel(3);
-		}
-
-		void Zoom400ToolStripMenuItemClick(object sender, EventArgs e)
-		{
-			SetZoomLevel(4);
-		}
-
-		void ZoomOutToolStripMenuItemClick(object sender, EventArgs e)
-		{
-			SetZoomLevel(zoom - 1);
-		}
-
-		void ZoomInToolStripMenuItemClick(object sender, EventArgs e)
-		{
-			SetZoomLevel(zoom + 1);
-		}
-
-		#endregion
-
-		protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
-		{
-			if (DispatchCommandKey(keyData))
+			if (ModifierKeys == Keys.Control)
 			{
-				return true;
-			}
-
-			return base.ProcessCmdKey(ref msg, keyData);
-		}
-
-		bool DispatchCommandKey(Keys keyData)
-		{
-			switch (keyData)
-			{
-				case Keys.Control | Keys.Add:
-				case Keys.Control | Keys.Oemplus:
-					zoomInToolStripMenuItem.PerformClick();
-					return true;
-
-				case Keys.Control | Keys.Subtract:
-				case Keys.Control | Keys.OemMinus:
-					zoomOutToolStripMenuItem.PerformClick();
-					return true;
-			}
-
-			return DispatchShortcut(keyData);
-		}
-
-		void UndoToolStripMenuItem_Click(object sender, EventArgs e)
-		{
-			if (levelPictureBox.Undo())
-			{
-				SetChanges(ChangeEnum.Blocks);
-			}
-		}
-
-		void RedoToolStripMenuItem_Click(object sender, EventArgs e)
-		{
-			if (levelPictureBox.Redo())
-			{
-				SetChanges(ChangeEnum.Blocks);
-			}
-		}
-
-		void CopyToolStripMenuItem_Click(object sender, EventArgs e)
-		{
-			if (levelPictureBox.AllSelected)
-			{
-				LevelCopy.Copy(rom, currentCourseId, levelPictureBox);
-			}
-			else
-			{
-				levelPictureBox.CopySelection();
-				levelPictureBox.ClearSelection();
-			}
-		}
-
-		void PasteToolStripMenuItem_Click(object sender, EventArgs e)
-		{
-			if (Clipboard.ContainsData(ClipboardType.LEVEL))
-			{
-				if (LevelCopy.Paste(rom, currentCourseId, levelPictureBox, Text))
+				if (e.Delta > 0 && zoom < 4)
 				{
-					//reload
-					LoadLevel();
-					sectorForm.LoadSector(currentCourseId, levelPictureBox.CurrentSector, treasureId, checkPoint);
-					SetChanges(ChangeEnum.Blocks);
-					SetChanges(ChangeEnum.Sectors);
+					SetZoomLevel(zoom + 1);
 				}
-			}
-			else
-			{
-				if (levelPictureBox.PasteSelection())
+				else if (e.Delta < 0 && zoom > 1)
 				{
-					SetChanges(ChangeEnum.Blocks);
-				}
-
-				levelPictureBox.ClearSelection();
-			}
-		}
-
-		void DeleteToolStripMenuItem_Click(object sender, EventArgs e)
-		{
-			if (levelPictureBox.DeleteSelection())
-			{
-				SetChanges(ChangeEnum.Blocks);
-			}
-
-			levelPictureBox.ClearSelection();
-		}
-
-		void SelectAllToolStripMenuItem_Click(object sender, EventArgs e)
-		{
-			levelPictureBox.StartSelection(0, 0);
-			levelPictureBox.SetSelection(255, 31);
-		}
-
-		void CutToolStripMenuItem_Click(object sender, EventArgs e)
-		{
-			if (levelPictureBox.CutSelection())
-			{
-				SetChanges(ChangeEnum.Blocks);
-			}
-
-			levelPictureBox.ClearSelection();
-		}
-
-		bool DispatchShortcut(Keys keyData)
-		{
-			ToolStripMenuItem toolStrip = menuStrip1.Items.GetAllMenuItems()
-				.FirstOrDefault(x => x.ShortcutKeys == keyData);
-
-			if (toolStrip != null)
-			{
-				if (!toolStrip.Enabled)
-				{
-					SystemSounds.Exclamation.Play();
-				}
-				else
-				{
-					toolStrip.PerformClick();
-				}
-
-				return true;
-			}
-
-			return false;
-		}
-
-		private void ScrollBoundaryToolStripMenuItem_Click(object sender, EventArgs e)
-		{
-			levelPictureBox.ScrollLines = (levelPictureBox.ScrollLines + 1) % 5;
-			scrollBoundaryToolStripMenuItem.Checked = levelPictureBox.ScrollLines != 0;
-			levelPictureBox.Invalidate();
-		}
-
-		#region Subforms
-
-		void BlocksToolStripMenuItemClick(object sender, EventArgs e)
-		{
-			ToggleForm(blocksForm, blocksToolStripMenuItem.Checked);
-		}
-
-		void ObjectsFormToolStripMenuItemClick(object sender, EventArgs e)
-		{
-			ToggleForm(objectsForm, objectsFormToolStripMenuItem.Checked);
-		}
-
-		void OverworldToolStripMenuItemClick(object sender, EventArgs e)
-		{
-			ToggleForm(overworldForm, overworldToolStripMenuItem.Checked);
-		}
-
-		void SectorsToolStripMenuItemClick(object sender, EventArgs e)
-		{
-			ToggleForm(sectorForm, sectorsToolStripMenuItem.Checked);
-		}
-
-		void ToggleForm(Form form, bool visible)
-		{
-			if (visible)
-			{
-				if (!form.Visible)
-				{
-					form.Show(this);
-				}
-			}
-			else
-			{
-				if (form.Visible)
-				{
-					form.Close();
+					SetZoomLevel(zoom - 1);
 				}
 			}
 		}
 
 		#endregion
 
-		#region Animation
+		#region LevelPictureBox
 
-		void TimerTick(object sender, EventArgs e)
+		void LevelPictureBoxSectorChanged(object sender, EventArgs e)
 		{
-			if (rom.IsLoaded)
+			treasureId = -1;
+			checkPoint = false;
+
+			currentWarp = Sector.SearchWarp(rom, currentCourseId, levelPictureBox.CurrentSector, treasureId);
+			LoadLevel();
+			sectorForm.LoadSector(currentCourseId, levelPictureBox.CurrentSector, treasureId, checkPoint);
+			levelPictureBox.ClearSelection();
+		}
+
+		void LevelPictureBoxTileMouseMove(object sender, TileEventArgs e)
+		{
+			byte tileIndex = Level.LevelData[e.TileX + e.TileY * 256 + 0x1000];
+			var tileInfo = Level.GetTileInfo(tileIndex);
+			toolStripStatusLabel1.Text = $"{e.TileX}:{e.TileY} - {tileIndex:X2} {tileInfo.Text}";
+		}
+
+		void LevelPictureBoxTileMouseDown(object sender, TileEventArgs e)
+		{
+			if (blocksForm.Visible || objectsForm.Visible)
 			{
-				timerTicks++;
-				if (levelComboBox.SelectedItem != null && Level.AnimatedTilesMask != 0)
+				if (e.Status == TileEventStatus.MouseDown)
 				{
-					if ((timerTicks & (Level.AnimatedTilesMask >> 2)) == 0)
+					levelPictureBox.StartChanges();
+				}
+
+				if (e.Status == TileEventStatus.MouseMove || e.Status == TileEventStatus.MouseDown)
+				{
+					if (e.Button == MouseButtons.Right && !levelPictureBox.HasSelection)
 					{
-						animatedTileIndex = (animatedTileIndex + 1) % 4;
-						RefreshAnimatedTiles();
+						int tileIndex = e.TileX + e.TileY * 256;
+						int currentTile = blocksForm.CurrentTile;
+						int currentObject = objectsForm.CurrentObject;
+
+						if (currentTile != -1 && blocksForm.Visible && (!objectsForm.Visible || lastFormFocus == blocksForm))
+						{
+							UpdateTile(tileIndex, currentTile);
+						}
+						else if (levelPictureBox.ShowObjects && objectsForm.Visible && (!blocksForm.Visible || lastFormFocus == objectsForm))
+						{
+							UpdateObject(tileIndex, currentObject);
+						}
 					}
 				}
 
-				overworldForm.TimerTick();
+				if (e.Status == TileEventStatus.MouseUp)
+				{
+					levelPictureBox.CommitChanges();
+				}
 			}
 
-			void RefreshAnimatedTiles()
+			if (e.Button == MouseButtons.Left)
 			{
-				Level.DumpLevel(rom, currentCourseId, currentWarp, checkPoint, animatedTileIndex, true);
-
-				//redraw
-				levelPictureBox.InvalidateAnimatedTiles();
-				if (blocksForm.Visible)
+				if (e.Status == TileEventStatus.MouseDown)
 				{
-					blocksForm.PictureBox.Invalidate();
+					levelPictureBox.StartSelection(e.TileX, e.TileY);
 				}
-
-				if (sectorForm.Visible)
+				else if (e.Status == TileEventStatus.MouseMove)
 				{
-					sectorForm.PictureBox.Invalidate();
+					levelPictureBox.SetSelection(e.TileX, e.TileY);
 				}
 			}
-		}
+			else
+			{
+				levelPictureBox.ClearSelection();
+			}
 
-		void AnimationToolStripMenuItemClick(object sender, EventArgs e)
-		{
-			timer.Enabled = animationToolStripMenuItem.Checked;
-			overworldForm.ResetTimer();
+			void UpdateTile(int tileIndex, int currentTile)
+			{
+				int previousTile = Level.LevelData[tileIndex + 0x1000];
+				if (previousTile != currentTile)
+				{
+					levelPictureBox.AddChange(tileIndex % 256, tileIndex / 256);
+					Level.LevelData[tileIndex + 0x1000] = (byte)currentTile;
+					levelPictureBox.InvalidateTile(tileIndex);
+					SetChanges(ChangeEnum.Blocks);
+				}
+			}
+
+			void UpdateObject(int tileIndex, int currentObject)
+			{
+				int previousObject = Level.ObjectsData[tileIndex];
+				if (previousObject != currentObject)
+				{
+					levelPictureBox.AddChange(tileIndex % 256, tileIndex / 256);
+					Level.ObjectsData[tileIndex] = (byte)currentObject;
+					levelPictureBox.InvalidateObject(tileIndex, currentObject, previousObject);
+					SetChanges(ChangeEnum.Blocks);
+				}
+			}
 		}
 
 		#endregion
-
 	}
+
+	public void ApplicationIdle(object sender, EventArgs e)
+	{
+		cutToolStripMenuItem.Enabled = levelPictureBox.HasSelection;
+		copyToolStripMenuItem.Enabled = levelPictureBox.HasSelection;
+		deleteToolStripMenuItem.Enabled = levelPictureBox.HasSelection;
+		pasteToolStripMenuItem.Enabled = (levelPictureBox.HasSelection && Clipboard.ContainsData(ClipboardType.TILE_16x16)) || Clipboard.ContainsData(ClipboardType.LEVEL);
+
+		redoToolStripMenuItem.Enabled = levelPictureBox.History.CanRedo;
+		undoToolStripMenuItem.Enabled = levelPictureBox.History.CanUndo;
+
+		overworldForm.ApplicationIdle(sender, e);
+	}
+
+	#region Load
+
+	void LoadLevel()
+	{
+		if (rom.IsLoaded && levelComboBox.SelectedItem != null)
+		{
+			Level.DumpLevel(rom, currentCourseId, currentWarp, checkPoint, animatedTileIndex, false);
+
+			levelPictureBox.ClearTileCache();
+			levelPictureBox.Invalidate();
+
+			blocksForm.Invalidate(true);
+			objectsForm.Invalidate(true);
+		}
+	}
+
+	void LevelComboBoxSelectedIndexChanged(object sender, EventArgs e)
+	{
+		if (!ignoreEvents && levelComboBox.SelectedItem != null)
+		{
+			if (SaveChanges(false))
+			{
+				treasureId = -1;
+				currentWarp = -1;
+				checkPoint = false;
+				levelPictureBox.CurrentSector = -1;
+				var item = (ComboboxItem<int>)levelComboBox.SelectedItem;
+				currentCourseId = item.Value;
+				Level.DumpBlocks(rom, currentCourseId);
+				Level.SwitchType = Level.GetSwitchType();
+				Level.SwitchMode = 0;
+				ignoreEvents = true;
+				switchBlockToolStripMenuItem.Enabled = Level.GetSwitchType() != 0;
+				switchBlockToolStripMenuItem.Checked = false;
+				ignoreEvents = false;
+				LoadLevel();
+				sectorForm.LoadSector(currentCourseId, levelPictureBox.CurrentSector, treasureId, checkPoint);
+				levelPictureBox.ClearSelection();
+				levelPictureBox.ClearUndo();
+			}
+			else
+			{
+				//restore previous item
+				ignoreEvents = true;
+				levelComboBox.SelectedIndex = levelComboBox.Items.Cast<ComboboxItem<int>>().FindIndex(x => x.Value == currentCourseId);
+				ignoreEvents = false;
+			}
+		}
+	}
+
+	void LoadToolStripMenuItemClick(object sender, EventArgs e)
+	{
+		OpenFileDialog openFileDialog1 = new()
+		{
+			Filter = "GB ROM Image (*.gb)|*.gb|All Files (*.*)|*.*"
+		};
+
+		if (openFileDialog1.ShowDialog() == DialogResult.OK)
+		{
+			if (!LoadRom(openFileDialog1.FileName))
+			{
+				MessageBox.Show("Please select a valid WarioLand 1 rom", Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
+			}
+		}
+	}
+
+	protected override void OnDragEnter(DragEventArgs e)
+	{
+		e.Effect = DragDropEffects.Move;
+		base.OnDragEnter(e);
+	}
+
+	protected override void OnDragDrop(DragEventArgs e)
+	{
+		string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+		string filePath = files[0];
+		if (File.Exists(filePath))
+		{
+			LoadRom(filePath);
+		}
+
+		base.OnDragDrop(e);
+	}
+
+	bool LoadRom(string filePath)
+	{
+		Rom newRom = new();
+		newRom.Load(filePath);
+		if (!newRom.Title.StartsWith("SUPERMARIOLAND3"))
+		{
+			return false;
+		}
+
+		if (!newRom.CheckCRC())
+		{
+			MessageBox.Show("ROM checksum failed", Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+		}
+
+		rom = newRom;
+		LoadLevelCombobox();
+		Sprite.DumpBonusSprites(rom);
+		Sprite.DumpPlayerSprite(rom);
+		sectorForm.LoadRom(rom);
+		overworldForm.LoadRom(rom);
+		romFilePath = filePath;
+
+		SetChanges(ChangeEnum.None);
+		ignoreEvents = true;
+		levelComboBox.SelectedIndex = 0;
+		ignoreEvents = false;
+		LevelComboBoxSelectedIndexChanged(this, EventArgs.Empty);
+
+		blocksToolStripMenuItem.Enabled = true;
+		objectsFormToolStripMenuItem.Enabled = true;
+		overworldToolStripMenuItem.Enabled = true;
+		sectorsToolStripMenuItem.Enabled = true;
+		saveAsToolStripMenuItem.Enabled = true;
+		selectAllToolStripMenuItem.Enabled = true;
+		deleteToolStripMenuItem.Enabled = true;
+		levelComboBox.Visible = true;
+		LevelPanel.Visible = true;
+		return true;
+
+		void LoadLevelCombobox()
+		{
+			//init combobox
+			levelComboBox.SelectedItem = null;
+			levelComboBox.Items.Clear();
+
+			var items = Level.GetCourseIds(rom)
+				.OrderBy(x => x.CourseNo)
+				.Select(x => new ComboboxItem<int>(x.CourseId, $"{x.CourseNo:D2} {LevelNames[x.CourseId]}"))
+				.ToList();
+
+			levelComboBox.Items.AddRange([.. items]);
+		}
+	}
+
+	#endregion
+
+	void RegionsToolStripMenuItemClick(object sender, EventArgs e)
+	{
+		levelPictureBox.ShowSectors = regionsToolStripMenuItem.Checked;
+		levelPictureBox.Invalidate();
+	}
+
+	void ObjectsToolStripMenuItemClick(object sender, EventArgs e)
+	{
+		levelPictureBox.ShowObjects = objectsToolStripMenuItem.Checked;
+		levelPictureBox.Invalidate();
+	}
+
+	void AboutToolStripMenuItemClick(object sender, EventArgs e)
+	{
+		var version = Assembly.GetEntryAssembly().GetName().Version;
+		var buildDateTime = new DateTime(2000, 1, 1).Add(new TimeSpan(TimeSpan.TicksPerDay * version.Build));
+
+		MessageBox.Show($"{Text} v{version.Major}.{version.Minor}\r\nDate : {buildDateTime:d}\r\nContact me : tigrou.ind@gmail.com");
+	}
+
+	void ExitToolStripMenuItemClick(object sender, EventArgs e)
+	{
+		Application.Exit();
+	}
+
+	void CollidersToolStripMenuItemClick(object sender, EventArgs e)
+	{
+		Level.ShowColliders = collidersToolStripMenuItem.Checked;
+		LoadLevel();
+	}
+
+	void CollectiblesToolStripMenuItem_Click(object sender, EventArgs e)
+	{
+		Level.ShowCollectibles = collectiblesToolStripMenuItem.Checked;
+		LoadLevel();
+	}
+
+	private void SwitchBlockToolStripMenuItem_Click(object sender, EventArgs e)
+	{
+		if (!ignoreEvents)
+		{
+			switchBlockToolStripMenuItem.Checked = !switchBlockToolStripMenuItem.Checked;
+
+			int switchType = Level.GetSwitchType();
+			int switchMode = switchBlockToolStripMenuItem.Checked ? switchType : 0;
+
+			LoadSwitchBlock(switchMode, switchType);
+		}
+	}
+
+	void LoadSwitchBlock(int switchMode, int switchType)
+	{
+		if (Level.SwitchMode != switchMode || Level.SwitchType != switchType)
+		{
+			Level.SwitchMode = switchMode;
+			Level.SwitchType = switchType;
+			LoadLevel();
+		}
+	}
+
+	#region Save
+
+	bool SaveChanges(bool saveFile)
+	{
+		if (rom.IsLoaded)
+		{
+			if ((changeMode & ChangeEnum.Blocks) != 0)
+			{
+				if (!Level.SaveChanges(rom, currentCourseId, out string message))
+				{
+					MessageBox.Show(message, Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
+					return false;
+				}
+			}
+
+			if (saveFile && !overworldForm.SaveChanges())
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	bool SaveRomFile(string filePath)
+	{
+		rom.FixCRC();
+		try
+		{
+			rom.Save(filePath);
+		}
+		catch (UnauthorizedAccessException)
+		{
+			MessageBox.Show("The ROM file is marked as read-only and cannot be overwritten.", Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+			return false;
+		}
+
+		SetChanges(ChangeEnum.None);
+		return true;
+	}
+
+	void SetChanges(ChangeEnum mode)
+	{
+		if (mode == ChangeEnum.None)
+		{
+			changeMode = ChangeEnum.None;
+			saveToolStripMenuItem.Enabled = false;
+		}
+		else
+		{
+			changeMode |= mode;
+			saveToolStripMenuItem.Enabled = true;
+		}
+
+		if (mode == ChangeEnum.Blocks)
+		{
+			int switchType = Level.GetSwitchType();
+			switchBlockToolStripMenuItem.Checked &= switchType != 0;
+			switchBlockToolStripMenuItem.Enabled = switchType != 0;
+			LoadSwitchBlock(switchBlockToolStripMenuItem.Checked ? switchType : 0, switchType);
+		}
+	}
+
+	void SaveToolStripMenuItemClick(object sender, EventArgs e)
+	{
+		if (SaveChanges(true))
+		{
+			SaveRomFile(romFilePath);
+		}
+	}
+
+	protected override void OnFormClosing(FormClosingEventArgs e)
+	{
+		e.Cancel = !AskForSavingChanges();
+		base.OnFormClosing(e);
+
+		bool AskForSavingChanges()
+		{
+			if (changeMode != ChangeEnum.None)
+			{
+				DialogResult result = MessageBox.Show("Save pending changes ?", Text, MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
+				return result switch
+				{
+					DialogResult.Yes => SaveChanges(true) && SaveRomFile(romFilePath),
+					DialogResult.No => true,
+					DialogResult.Cancel => false,
+					_ => throw new NotImplementedException(),
+				};
+			}
+
+			return true;
+		}
+	}
+
+	void SaveAsToolStripMenuItemClick(object sender, EventArgs e)
+	{
+		if (SaveChanges(true))
+		{
+			SaveFileDialog saveFileDialog = new()
+			{
+				Filter = "GB ROM Image (*.gb)|*.gb"
+			};
+
+			if (saveFileDialog.ShowDialog() == DialogResult.OK)
+			{
+				var filePath = saveFileDialog.FileName;
+				if (SaveRomFile(filePath))
+				{
+					romFilePath = filePath;
+				}
+			}
+		}
+	}
+
+	#endregion
+
+	#region Zoom
+
+	void SetZoomLevel(int zoomLevel)
+	{
+		zoom = zoomLevel;
+		zoom100ToolStripMenuItem.Checked = zoomLevel == 1;
+		zoom200ToolStripMenuItem.Checked = zoomLevel == 2;
+		zoom300ToolStripMenuItem.Checked = zoomLevel == 3;
+		zoom400ToolStripMenuItem.Checked = zoomLevel == 4;
+		zoomOutToolStripMenuItem.Enabled = zoomLevel > 1;
+		zoomInToolStripMenuItem.Enabled = zoomLevel < 4;
+
+		levelPictureBox.SetZoom(zoomLevel);
+		blocksForm.SetZoom(zoomLevel);
+		objectsForm.SetZoom(zoomLevel);
+		overworldForm.SetZoom(zoomLevel);
+		sectorForm.SetZoom(zoomLevel);
+	}
+
+	void Zoom100ToolStripMenuItemClick(object sender, EventArgs e)
+	{
+		SetZoomLevel(1);
+	}
+
+	void Zoom200ToolStripMenuItemClick(object sender, EventArgs e)
+	{
+		SetZoomLevel(2);
+	}
+
+	void Zoom300ToolStripMenuItemClick(object sender, EventArgs e)
+	{
+		SetZoomLevel(3);
+	}
+
+	void Zoom400ToolStripMenuItemClick(object sender, EventArgs e)
+	{
+		SetZoomLevel(4);
+	}
+
+	void ZoomOutToolStripMenuItemClick(object sender, EventArgs e)
+	{
+		SetZoomLevel(zoom - 1);
+	}
+
+	void ZoomInToolStripMenuItemClick(object sender, EventArgs e)
+	{
+		SetZoomLevel(zoom + 1);
+	}
+
+	#endregion
+
+	protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+	{
+		if (DispatchCommandKey(keyData))
+		{
+			return true;
+		}
+
+		return base.ProcessCmdKey(ref msg, keyData);
+	}
+
+	bool DispatchCommandKey(Keys keyData)
+	{
+		switch (keyData)
+		{
+			case Keys.Control | Keys.Add:
+			case Keys.Control | Keys.Oemplus:
+				zoomInToolStripMenuItem.PerformClick();
+				return true;
+
+			case Keys.Control | Keys.Subtract:
+			case Keys.Control | Keys.OemMinus:
+				zoomOutToolStripMenuItem.PerformClick();
+				return true;
+		}
+
+		return DispatchShortcut(keyData);
+	}
+
+	void UndoToolStripMenuItem_Click(object sender, EventArgs e)
+	{
+		if (levelPictureBox.Undo())
+		{
+			SetChanges(ChangeEnum.Blocks);
+		}
+	}
+
+	void RedoToolStripMenuItem_Click(object sender, EventArgs e)
+	{
+		if (levelPictureBox.Redo())
+		{
+			SetChanges(ChangeEnum.Blocks);
+		}
+	}
+
+	void CopyToolStripMenuItem_Click(object sender, EventArgs e)
+	{
+		if (levelPictureBox.AllSelected)
+		{
+			LevelCopy.Copy(rom, currentCourseId, levelPictureBox);
+		}
+		else
+		{
+			levelPictureBox.CopySelection();
+			levelPictureBox.ClearSelection();
+		}
+	}
+
+	void PasteToolStripMenuItem_Click(object sender, EventArgs e)
+	{
+		if (Clipboard.ContainsData(ClipboardType.LEVEL))
+		{
+			if (LevelCopy.Paste(rom, currentCourseId, levelPictureBox, Text))
+			{
+				//reload
+				LoadLevel();
+				sectorForm.LoadSector(currentCourseId, levelPictureBox.CurrentSector, treasureId, checkPoint);
+				SetChanges(ChangeEnum.Blocks);
+				SetChanges(ChangeEnum.Sectors);
+			}
+		}
+		else
+		{
+			if (levelPictureBox.PasteSelection())
+			{
+				SetChanges(ChangeEnum.Blocks);
+			}
+
+			levelPictureBox.ClearSelection();
+		}
+	}
+
+	void DeleteToolStripMenuItem_Click(object sender, EventArgs e)
+	{
+		if (levelPictureBox.DeleteSelection())
+		{
+			SetChanges(ChangeEnum.Blocks);
+		}
+
+		levelPictureBox.ClearSelection();
+	}
+
+	void SelectAllToolStripMenuItem_Click(object sender, EventArgs e)
+	{
+		levelPictureBox.StartSelection(0, 0);
+		levelPictureBox.SetSelection(255, 31);
+	}
+
+	void CutToolStripMenuItem_Click(object sender, EventArgs e)
+	{
+		if (levelPictureBox.CutSelection())
+		{
+			SetChanges(ChangeEnum.Blocks);
+		}
+
+		levelPictureBox.ClearSelection();
+	}
+
+	bool DispatchShortcut(Keys keyData)
+	{
+		ToolStripMenuItem toolStrip = menuStrip1.Items.GetAllMenuItems()
+			.FirstOrDefault(x => x.ShortcutKeys == keyData);
+
+		if (toolStrip != null)
+		{
+			if (!toolStrip.Enabled)
+			{
+				SystemSounds.Exclamation.Play();
+			}
+			else
+			{
+				toolStrip.PerformClick();
+			}
+
+			return true;
+		}
+
+		return false;
+	}
+
+	private void ScrollBoundaryToolStripMenuItem_Click(object sender, EventArgs e)
+	{
+		levelPictureBox.ScrollLines = (levelPictureBox.ScrollLines + 1) % 5;
+		scrollBoundaryToolStripMenuItem.Checked = levelPictureBox.ScrollLines != 0;
+		levelPictureBox.Invalidate();
+	}
+
+	#region Subforms
+
+	void BlocksToolStripMenuItemClick(object sender, EventArgs e)
+	{
+		ToggleForm(blocksForm, blocksToolStripMenuItem.Checked);
+	}
+
+	void ObjectsFormToolStripMenuItemClick(object sender, EventArgs e)
+	{
+		ToggleForm(objectsForm, objectsFormToolStripMenuItem.Checked);
+	}
+
+	void OverworldToolStripMenuItemClick(object sender, EventArgs e)
+	{
+		ToggleForm(overworldForm, overworldToolStripMenuItem.Checked);
+	}
+
+	void SectorsToolStripMenuItemClick(object sender, EventArgs e)
+	{
+		ToggleForm(sectorForm, sectorsToolStripMenuItem.Checked);
+	}
+
+	void ToggleForm(Form form, bool visible)
+	{
+		if (visible)
+		{
+			if (!form.Visible)
+			{
+				form.Show(this);
+			}
+		}
+		else
+		{
+			if (form.Visible)
+			{
+				form.Close();
+			}
+		}
+	}
+
+	#endregion
+
+	#region Animation
+
+	void TimerTick(object sender, EventArgs e)
+	{
+		if (rom.IsLoaded)
+		{
+			timerTicks++;
+			if (levelComboBox.SelectedItem != null && Level.AnimatedTilesMask != 0)
+			{
+				if ((timerTicks & (Level.AnimatedTilesMask >> 2)) == 0)
+				{
+					animatedTileIndex = (animatedTileIndex + 1) % 4;
+					RefreshAnimatedTiles();
+				}
+			}
+
+			overworldForm.TimerTick();
+		}
+
+		void RefreshAnimatedTiles()
+		{
+			Level.DumpLevel(rom, currentCourseId, currentWarp, checkPoint, animatedTileIndex, true);
+
+			//redraw
+			levelPictureBox.InvalidateAnimatedTiles();
+			if (blocksForm.Visible)
+			{
+				blocksForm.PictureBox.Invalidate();
+			}
+
+			if (sectorForm.Visible)
+			{
+				sectorForm.PictureBox.Invalidate();
+			}
+		}
+	}
+
+	void AnimationToolStripMenuItemClick(object sender, EventArgs e)
+	{
+		timer.Enabled = animationToolStripMenuItem.Checked;
+		overworldForm.ResetTimer();
+	}
+
+	#endregion
+
 }
